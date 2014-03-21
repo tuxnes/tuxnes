@@ -1,0 +1,14 @@
+Authors of TuxNES
+See the files THANKS and ChangeLog for more credits
+
+- Quor <quor@altavista.net> designed and implemented Nestra, upon which TuxNES
+  is based
+- The Mighty Mike Master <melanson@pcisys.net> for much work on TuxNES 
+- Benjamin C. W. Sittler <bsittler@iname.com> for much work on TuxNES
+- Ingo Ruhnke <grumbel@gmx.de> for gzip file support
+- Jeroen Ruigrok/Asmodai <asmodai@wxs.nl> for work on *BSD support
+- J.D. <jodaman@bradley.edu> for joystick remapping support
+- Eric Jacobs <eaj@ricochet.com> for proper MMC2 support
+- Paul Zaremba <pez@treeofice.2y.net> for proper sound support
+- Kevin Lindsay <klindsay@mkintraweb.com> for zip file support
+			    

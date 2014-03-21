@@ -1,0 +1,63 @@
+Version 0.75, released April 15, 2001
+- complete sound support
+- complete MMC2 support (Mike Tyson's Punch-Out!!)
+- added MMC4 support
+- joystick remapping
+- NetBSD and experimental OpenBSD support
+- ZIP file support
+
+Version 0.74, released July 9, 2000
+- Nestra 0.66 improvements (thanks, Quor)
+- experimental support for mappers 13, 19, and 68
+- numerous graphics improvements
+- GGI support, with DirectBuffers, double buffering, and page flipping
+- X11 shared memory pixmap support
+- W window system support
+- experimental support for differential rendering
+- snapshot support in all renderers
+- scanline simulation
+- more palettes
+- greyscale support (great "monster-movie" effect in Castlevania)
+- audio synchronization fix
+- audio echo/reverb effect
+- support for joysticks with 6 axes, 9 buttons
+- profiling support
+
+Version 0.73, released December 9, 1999
+- Nestra 0.65 CPU improvements (thanks, Quor)
+- double-sized graphics window (512x480)
+- improved sound support, including more audio output formats
+- dual joystick support
+- support for mappers 33, 64, 78, 231
+- fixed mapper 1 so Skate or Die 2 and other games work (thanks, Quor)
+- fixed mapper 2 so The Guardian Legend and other games work
+- fixed mapper 3 so that King's Knight, Solomon's Key, and other games work
+- fixed mapper 4 so that Crystalis, Rampart, Road Runner work (thanks Quor)
+- fixed mapper 11 to support Wisdom Tree games
+- revised and modularized the help command line option
+- screenshots are now saved in the format "basefilename-snap-xxxx.xpm"
+
+Version 0.72, released October 1, 1999
+- experimental sound support 
+- gzip file support 
+- support for mapper 99, experimental support for mapper 23, 
+and improved support for mapper 15
+
+Version 0.71, released September 15, 1999
+- support for mappers 32 and 66, experimental support for mappers 15, 22,
+    and 71
+- better logic for deciding which mapper to use via -f, --fix-mapper and
+    -M, --mapper CLI options
+- Game Genie bug fixes
+- improved palette
+- trainer support
+- CLI option -H, --show-header for dumping iNES header bytes
+
+Version 0.70, released September 7, 1999, is the first public release of
+TuxNES, which is based on Nestra 0.63. New features include:
+- joystick support (2- or 4- button)
+- capture screens in X pixmap (xpm) format
+- Game Genie support
+- GNU-ified overhaul:
+    build/installation process (i.e., './configure', 'make', 'make install')
+    command line options (i.e., long options)

@@ -1,0 +1,24 @@
+TuxNES THANKS file
+
+These names appeared on the original Nestra homepage (anyone have email
+addresses for these fine folks?):
+
+Thanks to Matt Ghio for lots of assembly code work on the dynamic recompiler
+Thanks to Matthew Conte for the NES timing info
+Thanks to Kristoffer Brånemyr for helping with the mappers support
+
+Thanks, additionally, to:
+Marat Fayzullin <fms@cs.umd.edu> for releasing the original NES documentation
+Y0SHi <yoshi@parodius.com> for picking up where Marat left off and continuing
+    to document the internals of the NES
+\Firebug\ <Lavos999@aol.com> for his extraordinarily comprehensive mapper
+    documentation
+Cheatmaster <dlucas@inlink.com> for releasing the only documentation I could
+    find regarding the NES Game Genie
+Loopy <zxcvzxcv@netzero.net> for the improved palette as well as the VS
+    UniSystem info
+Chris Covell <ccovell@direct.ca> for another nice NES palette, and for
+    some excellent NES software
+Kevin Horton <khorton@iquest.net> for the NTSC palette generator
+New sound code based on code in DarcNES by Alastair Bridgewater and
+    by information contained in NESSOUND.txt and DMC.txt by Brad Taylor.

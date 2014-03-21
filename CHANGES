@@ -1,0 +1,179 @@
+NOTE:
+=---=
+Changes to TuxNES are recorded in the ChangeLog file. Here is the
+CHANGES file from the latest release of Nestra, some of which are also
+present in TuxNES:
+
+
+Changes in version 0.66:
+
+ Emulate the behavior of the bits which are shared between 2005/2006
+
+ Fixed the stuff that I broke in the last version
+
+ Fixed STA addr,X and STA addr,Y instructions
+
+ Added -i option to ignore unknown instructions
+
+ Added -s option to allocate static colormap on 8-bit displays
+
+ X11 keysym support (thanks Ben Sittler)
+
+
+Changes in version 0.65:
+
+ Allow the decimal mode bit to be set even tho it doesn't do anything.
+
+ Improved support for self-modifying code.
+
+ Some fixes to the mid-hblank and video registers.
+
+ MMC1 ROM address masking.
+
+ MMC3 VROM address masking, and ignore low bit for 2k pages. 
+
+
+Changes in version 0.64:
+
+ Added nesticle-type palette support (Thanks Ben Sittler)
+
+ 512-byte trainer support (also thanks to Ben Sittler)
+
+ Some minor changes for FreeBSD.
+
+ Fixed ROL instruction.
+
+ Fixed one-screen mirror bug.
+
+ Fixed VRAM palette mirroring bug.
+
+ Fixed interrupts and RTI instruction.
+
+ Fixed a sprite DMA bug.
+
+
+Changes in version 0.63:
+
+ Mapper 7 (RARE/AOROM) support
+
+ More support for self-modifying code
+
+ Cleaned up the memory allocation a bit
+
+ Save games can be stored in $HOME/.nestra/
+
+
+Changes in version 0.62:
+
+ Mapper 11 and partial mapper 9 support (thanks Kristoffer Brånemyr)
+
+ Reload code after mapper switch (should fix -l problems)
+
+ Fixed a MMC3 bug.
+
+ Minor bugfix to mid-hblank updates.
+
+
+Changes in version 0.61:
+
+ No scanline IRQs while the display is off.
+
+ Fixed some problems with the sprite 0 hit flag.
+
+ NMI occurs on scanline 241, not at the end of line 239.
+
+ Sprite DMA takes 514 CPU cycles.
+
+ Handle V-scroll values greater than 240 like a real NES does.
+
+
+Changes in version 0.6:
+
+ MMC3 IRQ support added.
+
+ New video code draws pixmap directly instead of calling xlib, which should
+ improve accuracy and portability.  It's a bit slower tho.
+
+ Self-modifying indirect jump instruction is now handled properly.
+
+ Corrected cycle count for branches which cross page boundary.
+
+
+Changes in version 0.51:
+
+ Corrected one-screen VRAM mirroring
+
+ VRAM mirroring can now be set via command line options
+
+
+Changes in version 0.5:
+
+ Split-screen character table switch is implemented
+
+ Sprite transparency is correct now (a bit expensive in CPU time tho)
+
+ Differential redraw is implemented (only changed scanlines are redrawn)
+
+ Disassembly is now a command line option
+
+ Minor updates to the dynamic recompiler + eliminated some compiler warnings
+
+
+Changes in version 0.41:
+
+ Cleaned up a few compiler warnings
+
+ Some timing fixes
+
+ Merged 16/24-bit color pallettes
+
+
+Changes in version 0.4:
+
+ Simplified background cache and rewrote sprite code to improve performance
+ and fix several bugs.
+
+ Support for 512K MMC1 and various mapper fixes.
+
+
+Changes in version 0.32:
+
+ Speed control added.
+
+ Various mapper fixes.
+
+ Preliminary support for self-modifying code.
+
+
+Changes in version 0.31:
+
+ Implemented BRK instruction and various bug fixes.
+
+
+Changes in version 0.3:
+
+ Support for 8-bit color displays and fixed some graphical glitches.
+
+
+Changes in version 0.2:
+
+ Improved pattern matching for the dynamic recompiler
+
+ Completed background caching for better performance
+
+
+Changes in version 0.15:
+
+ Corrected some cycle timings.
+
+ Corrected several mapper bugs.
+
+ Began work on window resizing (still incomplete)
+
+ Reworked background display code to cache multiple pixmaps - this can be
+ activated by changing #define tilecachedepth; there are some bugs still tho.
+
+
+Changes in version 0.1:
+
+ First release.

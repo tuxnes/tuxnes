@@ -1,0 +1,567 @@
+TuxNES version 0.75
+  http://tmmm.simplenet.com/tuxnes/index.html
+
+About:
+=----=
+    TuxNES is an emulator for the 8-bit Nintendo Entertainment System.
+
+    TuxNES is based on Nestra, a great public-domain NES emulator by
+Quor.  TuxNES adds many features not found in Nestra, and uses a more
+collaborative development model. Enhancements to Nestra often find
+their way into TuxNES.  Enhancements to TuxNES don't generally find
+their way into Nestra due to licensing restrictions (since pieces of
+TuxNES are generally copyrighted by their authors, and covered by the
+GNU General Public License,) although similar changes by the same
+authors sometimes find their way back into Nestra.
+
+Platforms: 
+=--------=
+    TuxNES requires an x86-family processor.
+
+    TuxNES should work with these operating systems:
+
+	FreeBSD
+	Linux
+	NetBSD
+	OpenBSD [needs to be verified!]
+
+    TuxNES can render using the X Window System, the W Window System, or GGI.
+
+Installing:
+=---------=
+    TuxNES follows the standard GNU process for installing tarballs. Download
+the archive, uncompress it and type
+
+    ./configure
+    make
+    make install
+
+Extra --enable and --with options understood by ./configure:
+
+  --enable-warnings       enable more compilation warning checks [default=no]
+  --enable-profiling      enable profiling of functions [default=no]
+  --without-ggi           disable check for GGI (General Graphics Interface)
+  --without-w             disable check for the W Window System
+
+For more information, see the INSTALL file.
+
+(If you recieved a binary distribution of TuxNES, just copy the appropriate
+ executable to a suitable directory such as /usr/local/bin.)
+
+Features:
+=-------=
+    The current features in TuxNES include:
+- open source
+- runs under Linux, FreeBSD, and NetBSD on x86 platforms
+- uses an X11 server, W server or GGI for display and input handling
+- dynamic recompilation from 6502 opcodes -> x86 native opcodes
+- mappers: 0, 1, 2, 3, 4, 7, 9, 11, 32, 66, 99
+- experimental mappers: 15, 22, 23, and 71
+- gzip and zip file support
+- game saving
+- built-in disassembler
+- joystick support (2- & 4-button)
+- experimental sound support
+- capture screenshots in X pixmap (xpm) or portable pixmap (ppm) format
+- Game Genie code support
+- trainer support
+- alternate palette support
+
+Running:
+=------=
+    TuxNES is invoked from the command line and the command line
+options are similar to those used by Nestra. TuxNES also supports long
+options on the command line.
+
+The only command line incompatibility TuxNES has with Nestra is
+mirroring. For example, TuxNES uses -mh rather than -hm for horizontal
+mirroring. Recent versions of Nestra support TuxNES-style mirroring
+specification.
+
+Usage: tuxnes [--help] [options] filename
+Help topics:
+      --help=help      Help topics (this list)
+      --help=options   Major command-line options
+      --help=sound     Sound synthesis options
+      --help=palettes  Custom palette options
+      --help=synonyms  Alternate option names
+      --help=controls  Keyboard and joystick options and bindings
+      --help=version   Version and copyright information
+      --help=all       All help topics
+      --help=-help     Concise version of --help=help
+      --help=-options  Concise version of --help=options
+      --help=-sound    Concise version of --help=sound
+      --help=-palettes Concise version of --help=palettes
+      --help=-all      Concise version of --help=all
+Major command-line options:
+  -v, --verbose       Verbose output
+  -f, --fix-mapper    Use only the low four bits of the mapper number
+  -M, --mapper=...    Specify mapper to use
+  -g, --gamegenie=... Game Genie code
+  -H, --show-header   Show iNES header bytes
+  -d, --disassemble   Disassemble
+  -l, --link          Link branches optimization (may improve speed)
+  -i, --ignore-unhandled
+                      Ignore unhandled instructions (don't breakpoint)
+  -m, --mirror=...    Manually specify type of mirroring
+      h = Use horizontal mirroring
+      v = Use vertical mirroring
+      s = Use single-screen mirroring
+      n = Use no mirroring
+  -G, --geometry=WxH  Specify window/screen geometry
+      --display=ID    Specify display/driver ID
+  -E, --enlarge[=NUM] Enlarge by a factor of NUM (default: 2)
+  -L, --scanlines[=%] Set alternate scanline intensity (default: 0%)
+  -S, --static-color  Force static color allocation (prevents flicker)
+  -r, --renderer=...  Select a rendering engine (default: auto)
+      x11        X11 renderer
+      diff       differential X11 renderer
+      old        old X11 renderer (tile-based)
+      auto       Choose one automatically
+      none       Don't draw anything
+  -I, --in-root       Display in root window
+  -K, --sticky-keys   Hit keys once to press buttons, again to release
+  -X, --swap-inputs   Swap P1 and P2 controls
+Sound synthesis options:
+  -s, --sound[=FILE]  Append sound data to FILE (default: /dev/dsp)
+      (specify sound file as mute or none for no sound, e.g., -smute)
+  -F, --format=...    Use the specified sound sample format (default: 8)
+      mu8        8-bit Mu-Law encoded *tested, imperfect
+      8          8-bit unsigned
+      8s         8-bit signed *untested
+      16         16-bit signed
+      16u        16-bit unsigned *untested
+      le16       16-bit signed (little-endian)
+      le16u      16-bit unsigned (little-endian) *untested
+      be16       16-bit signed (big-endian) *untested
+      be16u      16-bit unsigned (big-endian) *untested
+  -R, --soundrate=NUM Set sound sample rate to NUM Hz (default: 44100)
+  -D, --delay=NUM     Resynchronize if sound delay exceeds NUM seconds
+Custom palette options:
+  -p, --palfile=FILE  Load palette data from FILE
+  -P, --palette=...   Use a specified built-in palette (default: loopy)
+      loopy      Loopy's NES palette
+      quor       Quor's palette from Nestra 0.63
+      chris      Chris Covell's NES palette
+      matt       Matthew Conte's NES palette
+      pasofami   Palette from PasoFami/99
+      crashman   CrashMan's NES palette
+      mess       palette from the MESS NES driver
+      zaphod-cv  Zaphod's VS Castlevania palette
+      zaphod-smb Zaphod's VS SMB palette
+      vs-drmar   VS Dr. Mario palette
+      vs-cv      VS Castlevania palette
+      vs-smb     VS SMB/VS Ice Climber palette
+  -b, --bw            Convert palette to grayscale
+  -N, --ntsc-palette[=[HUE][,TINT]]
+                      Use Kevin Horton's dynamic NTSC palette generator
+                      with given hue angle (default: 332 degrees) and tint
+                      level (default: 0.5)
+Alternate option names:
+  -c, --controls      Equivalent to --help=controls
+  -h, --help          Equivalent to --help=-help if stdout is a tty,
+                      otherwise equivalent to --help=-all
+  -j, --joystick=FILE Equivalent to --js1=FILE
+  -o, --old           Equivalent to --renderer=old
+  -V, --version       Same information as --help=version
+Keyboard and joystick options and bindings:
+  -1, --js1[=FILE]            Use P1 joystick FILE (default: /dev/js0)
+  -2, --js2[=FILE]            Use P2 joystick FILE (default: /dev/js1)
+  -J, --joystick-map=MAPSPEC  Reassign joystick button bindings
+    MAPSPEC:
+      Specify joystick, then indicate buttons with 'B' and axes with 'A' in
+      sequence:  A, B, Start, Select, Left, Right, Up, Down, Pause
+      Multiple buttons may be bound to a single emulator control.
+      Default bindings will be used if no buttons are specified.
+      Examples:
+        1:B0,B1,B5,B2,A0,A1,B4
+        2:B0,B1,B5,B2,B10,B12,B11,B13,B4
+        1:B0B8,B1B9,B5,B2
+        2:,,,,A2,A3
+
+  Keyboard:
+    Arrows      - Move (P1)
+    A, C or Space
+                - A button (P1)
+    Z, X or D   - B button (P1)
+    Tab         - Select button (P1)
+    Enter       - Start button (P1)
+    H, J, K, L  - Move (P2)
+    B           - A button (P2)
+    V           - B button (P2)
+    F           - Select button (P2)
+    G           - Start button (P2)
+    BackSpace   - Reset game
+    P, Pause    - Pause or resume emulation
+    ESC         - Exit game
+    0-8, `      - Adjust emulation speed
+      0 stops the game, ` runs the game at half speed
+      1 runs at normal speed, 2..8 runs at 2..8x normal speed
+    S, F7, PrintScreen
+                - Capture screenshot
+                  Under X11, save to ~/.tuxnes/snap????.xpm
+                  (Note: XPM/PPM support must be installed and compiled
+                   for this to work; see the README file for more info.)
+
+  Keypad:
+    Arrows/12346789  - Move (P1)
+    Space/Begin/5, Delete/Decimal
+                     - A button (P1)
+    Insert/0         - B button (P1)
+    Add              - Select button (P1)
+    Enter            - Start button (P1)
+
+  Joystick Axes:
+    Axis 0           - Horizontal movement
+    Axis 1           - Vertical movement
+    Axis 2           - (unused)
+    Axis 3           - (unused)
+    Axis 4           - Horizontal movement
+    Axis 5           - Vertical movement
+
+  Joystick Buttons (2-button joysticks):
+    Button 0         - B button
+    Button 1         - A button
+
+  Joystick Buttons (other joysticks):
+    Button 0         - B button
+    Button 1         - Select button
+    Button 2         - A button
+    Button 3         - Start button
+    Button 4         - A button
+    Button 5         - B button
+    Button 6         - Select button
+    Button 7         - Start button
+    Button 8         - Pause or resume emulation
+
+  Extra keys for old X11 renderer (--renderer=old)
+    F1          - Disable background
+    F2          - Re-enable background
+    F3          - Disable sprites
+    F4          - Re-enable sprites
+    F5          - Alternate tiles
+    F6          - Default tiles
+    F8          - Flush tile cache
+
+  Extra Keys for VS UniSystem games:
+    [/{         - Insert Coin (Left)
+    ]/}         - Insert Coin (Right)
+    |/\         - Service Credit
+    Q/q         - Toggle Dipswitch #1
+    W/w         - Toggle Dipswitch #2
+    E/e         - Toggle Dipswitch #3
+    R/r         - Toggle Dipswitch #4
+    T/t         - Toggle Dipswitch #5
+    Y/y         - Toggle Dipswitch #6
+    U/u         - Toggle Dipswitch #7
+    I/i         - Toggle Dipswitch #8
+Version and copyright information:
+tuxnes 0.75
+
+Copyright © 1999-2001,  The TuxNES Team
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Written by  The TuxNES Team; see the AUTHORS file.
+Based on Nestra v0.66 by Quor
+
+Screenshots:
+=----------=
+    While you're running the emulator, you can capture screenshots in X
+pixmap (xpm) format anytime by pressing F7. However, you need to install
+the XPM library and compile TuxNES when the XPM library is installed in order
+to capture screens. TuxNES will still compile without the XPM library, but it
+won't take screenshots.
+
+    The pixmap files are stored in the ~/.tuxnes/ directory.
+
+    Of course, the XPM format is not the most widely accepted graphic file
+format. If you need a simple way to convert XPM files to GIF files, you can
+use the xpmtoppm and ppmtogif programs that should already be installed on
+your computer. Try this:
+  xpmtoppm file.xpm | ppmtogif > file.gif
+
+Graphics:
+=-------=
+    TuxNES has three different rendering engines, with different
+capabilities and limitations. Different renderers can be selected using
+the -r, --renderer=...  command-line option. Available renderers:
+
+      x11  = X11 renderer
+      diff = differential X11 renderer
+      old  = old X11 renderer (tile-based)
+      ggi  = GGI renderer
+      w    = W renderer
+      none = Don't draw anything
+
+    X11 renderer: (-r x11, --renderer=x11)
+    + allows mid-screen PPU/VRAM updates
+    + supports screenshots [requires libXpm]
+    + uses shared-memory XImages [when available]
+    - fairly slow (especially at high bpp)
+    - supports only 1bpp, 4bpp, 8bpp, 16bpp, 24bpp and 32bpp
+    - no graphics debugging/ripping support
+
+    differential X11 renderer: (-r diff, --renderer=diff)
+    + optimized differential display (ideal for >8bpp)
+    + allows mid-screen PPU/VRAM updates
+    + supports all bpps
+    + supports screenshots [requires libXpm]
+    + uses shared-memory XImages [when available]
+    - fairly slow (especially at 8bpp and lower)
+    - no graphics debugging/ripping support
+
+    old X11 renderer: (-r old, --renderer=old)
+    + very fast (provided the game doesn't change too many tiles at once)
+    + supports all bpps
+    + supports screenshots [requires libXpm]
+    + allows graphics debugging/ripping (F1-F6, F8)
+    - no shared-memory rendering
+    - doesn't support mid-screen PPU/VRAM updates
+
+    GGI renderer: (-r ggi, --renderer=ggi) [requires libgii and libggi]
+    + allows mid-screen PPU/VRAM updates
+    + supports screenshots [requires libppm]
+    + uses direct buffer rendering [when available]
+    - fairly slow (especially at high bpp)
+    - supports only 1bpp, 4bpp, 8bpp, 16bpp, 24bpp and 32bpp
+    - no graphics debugging/ripping support
+
+    W renderer: (-r w, --renderer=w)
+    + allows mid-screen PPU/VRAM updates
+    + supports screenshots
+    - supports only 1bpp and 8bpp
+    - fairly slow
+    - no shared-memory rendering
+    - no graphics debugging/ripping support
+
+    Don't draw anything: (-r none, --renderer=none)
+    + very, very fast!
+    - no display (sound still works)
+    - no screenshots
+    - no keyboard input (joystick still works)
+    - you must use Ctrl-C to quit
+
+Renderer speed depends on many things. If performance is unacceptable,
+try another renderer.
+
+The X Window System is available many places. My favorite
+implementation, XFree86, is available from:
+
+  http://www.xfree86.org/
+
+libXpm is included in recent distributions of XFree86.
+
+Other X Window System servers are listed on:
+
+  http://www.x.org/
+
+GGI (including libgii and libggi) is available from:
+
+  http://www.ggi-project.org/
+
+libppm is part of the netpbm package, available from web and ftp
+servers world-wide.
+
+The W Window System is available from:
+
+  http://www.students.tut.fi/~t150315/
+
+NOTE 1: libXpm (at least some versions) is badly broken for 1bpp X11
+visuals. A workaround is present in TuxNES, but XPM screenshots are
+very slow on 1bpp visuals as a result of this.
+
+NOTE 2: GGI's ggiUnpackPixels fails or is broken on some targets. As a
+result of this, TuxNES uses a workaround to capture screenshots on
+these targets. This workaround can cause flickering while the
+screenshot is saved, and under at least the "xlib" target, iconifying
+TuxNES during a screenshot will cause "missing" regions in the
+resulting image. The workaround is also very slow, but at least proper
+PPM screenshots are saved.
+
+NOTE 3: GGI is badly broken for some 1bpp targets (notably "x", but
+not "xlib",) and for DirectColor X11 visuals -- sorry! If this affects
+you, you should fix GGI and submit patches to the GGI maintainers. The
+typical symptom is a core dump on startup... although it seems to work
+fine using a direct buffer (in libggi-2.0b2.1, at least.) Also note
+that TuxNES treats all 1bpp targets as having broken ggiUnpackPixels
+implementations, and so uses the workaround described above -- but
+screenshots are broken under the "xlib" target at 1bpp anyhow.
+
+NOTE 4: Some GII input sources can't sense key release events, so they
+simulate key releases immediately following key presses. These input
+sources don't work right with TuxNES unless you use the --sticky-keys
+option.
+
+NOTE 5: Be sure to read the GGI and GII documentation if you use the
+"ggi" target. It includes numerous examples of target specifications
+and other library options, which are generally set using environment
+variables.
+
+NOTE 6: Note that some NES games change the palette in the middle of a
+screen refresh.  If you're using a palettized display and you notice
+color flickering or unusual delays, you can force static color
+allocation using the --static-color option.  This increases the number
+of colors allocated, but as a nice side-effect multiple TuxNES
+invocations will be able to share palette entries (provided they're
+using the same palette data.)
+
+NOTE 7: The code for 4bpp rendering is untested, but it might work.
+
+Joystick:
+=-------=
+    Linux joystick support is enabled by the -1, --js1 or -2, --js2
+command line options (enabling the joystick for P1 or P2, resp.) A
+joystick device may optionally be supplied (defaults: /dev/js0 for P1,
+/dev/js1 for P2). If you need help setting up a joystick under Linux,
+check out The Linux Joystick Driver at:
+
+  http://atrey.karlin.mff.cuni.cz/~vojtech/joystick/
+
+If you need to reassign your joystick buttons, use the -J option as follows:
+  -J, --joystick-map=MAPSPEC  Reassign joystick button bindings
+    MAPSPEC:
+      Specify joystick, then indicate buttons with 'B' and axes with 'A' in
+      sequence:  A, B, Start, Select, Left, Right, Up, Down, Pause
+      Multiple buttons may be bound to a single emulator control.
+      Default bindings will be used if no buttons are specified.
+      Examples:
+        1:B0,B1,B5,B2,A0,A1,B4
+        2:B0,B1,B5,B2,B10,B12,B11,B13,B4
+        1:B0B8,B1B9,B5,B2
+        2:,,,,A2,A3
+
+Sound:
+=----=
+    TuxNES supports all five NES sound channels. TuxNES uses /dev/dsp as
+the default audio port. To change this, use the --sound command line
+option. In order to turn off the sound, specify the file as 'mute' or
+'none', for example:
+        tuxnes --sound=mute [options...]
+        tuxnes -smute [options...]
+
+    The audio sample rate and resolution default to 44100 Hz/8 bits, but
+this may be changed using the --soundrate command line option. If FILE is
+a sound device supporting OSS-style ioctl() commands, the sample rate may
+be changed automatically to the nearest sample rate supported by the
+device.
+
+    Using --sound=/dev/audio may improve your listening experience, if
+the default sound device (/dev/dsp) doesn't work right.
+
+    If you are experiencing sound delays, you may be able to fix the
+problem usign the -D, --delay=NUM option, which causes the sound
+generator to resynchronize if the sound delay exceeds NUM seconds.
+For example, if you consider 1/5th-second delays between graphics and
+sound to be acceptable, you would give the option --delay=0.2 (note
+that specifying too short a delay could lead to near-continuous
+resynchronization, and jerky graphics.)
+
+esd: EsounD "Enlightened" Sound Daemon & TuxNES
+
+  http://www.tux.org/~ricdude/EsounD.html
+
+    EsounD may be used to send the audio output from TuxNES over a
+network, and/or to mix it with channels of audio output from other
+applications.
+
+    To use TuxNES with EsounD, run it inside the esddsp shim:
+
+       esddsp --server=audiohost:port \
+          tuxnes --sound=/dev/dsp [options...]
+
+    audiohost:port are the hostname and port where an esd is listening
+for your audio stream.
+
+sfspeaker: Speak Freely Internet Telephone & TuxNES
+
+  http://www.speakfreely.org/
+
+    Speak Freely may be used to send the audio output from TuxNES over
+the network to a wide variety of compatible internet phone receivers,
+inluding Speak Freely for UNIX and Windows.
+
+    To use TuxNES with Speak Freely, send audio output through a FIFO
+in Mu-Law encoding:
+
+       mkfifo sound-fifo
+       sfmike audiohost:port -N tuxnes-sf & \
+          tuxnes --sound=sound-fifo --format=mu8 [options...]
+       rm sound-fifo
+
+    audiohost:port are the hostname and port where an sfspeaker is
+listening for your audio stream. You may have to remove the -N option
+to sfmike to communicate with some other Internet Telephone programs,
+or to send audio over a slow network connection.
+
+Palettes:
+=-------=
+    TuxNES has several built-in color palettes, selectable at run-time
+using the --palette command line option. Palette data can also be
+loaded from a file using the --palfile command line option. The two
+common NES palette data formats (iNES-style comma-separated
+hexadecimal and Nesticle-style raw binary) are supported. Many
+alternate palette files are collected in rvu's NES Palette Zoo,
+reachable from:
+
+  http://nesemdev.cjb.net/
+
+    To use Kevin Horton's NTSC palette generator, use --ntsc-palette
+instead with an appropriate hue angle and tint level. The defaults are
+a hue angle of 332 degrees, and a tint level of 0.5. A tint level of 1
+is fully saturated, and a tint level of 0 is grayscale.
+
+    By default, TuxNES will use the VS SMB/VS Ice Climber palette for
+VS UniSystem games, and Loopy's NES palette for all other games.
+
+    Games in .NES-format which include 192 bytes of RGB palette data
+or a 64-byte palette remapping block immediately following the regular
+ROM data will use that, by default. As a fallback, a palette file with
+the same name as the game, but ending in .pal, will be used if it is
+available. Games with palette remapping blocks always default to using
+Loopy's NES palette, even if they are VS UniSystem games.
+
+    Any color palette can be converted to grayscale using the --bw
+option.
+
+Compressed ROMs:
+=--------------=
+    TuxNES is able to read ROMs that are compressed with either the gzip
+or zip utilities. Since a gzipped file can only contain a single file,
+TuxNES will attempt to load and run that file in the archive. However,
+since a zip file can contain more than one file, TuxNES will attempt to
+load and run the first file in the zip archive with a .nes extension.
+
+Troubleshooting:
+=--------------=
+    Are you having trouble getting a particular ROM to work with TuxNES? This
+most likely has to do with the memory mapper. If you try to run a game and
+TuxNES advises that you may wish to use the -f option, then you probably
+should use it (especially if your game fails to work).
+
+    If the game still doesn't work, the game's header info may be completely
+wrong about which mapper to use. Consult the Bigass NES Mapper List at the
+TuxNES home page to find the proper mapper the game should use and then run
+the game with the -M<number> option.
+
+ROMs:
+=---=
+
+    Don't even bother requesting NES ROMs. However, you might enjoy
+Chris Covell's games and demos, including Solar Wars, a nice artillery
+simulator for two players. They are completely legal and freely
+available from:
+
+  http://mypage.direct.ca/c/ccovell/

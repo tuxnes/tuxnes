@@ -1,0 +1,43 @@
+NOTE:
+=---=
+Currently, there is no single file tracking all the bugs in
+TuxNES. Some are mentioned in README, and some are marked in the
+sources with the string "FIXME". Since TuxNES is based on Nestra, some
+of the following Nestra bugs are also present in TuxNES:
+
+
+Known bugs in Nestra v0.66:
+
+The following is a list of known problems in the current version of NEStra. 
+Let me know if you have a fix for any of these problems, or if you find any
+other bugs not listed here:
+
+- A few cycle times aren't counted accurately.
+
+- Self-modifying code doesn't always work right.
+
+- Some instruction forms do not handle I/O and will produce a breakpoint
+  trap if used that way.  Use -i to ignore them, and send me a bug report
+  if you encounter this problem.
+
+- The following instuctions do not check for mapper writes: ASL LSR ROL ROR
+
+- I suspect that the sprite code isn't completely correct; please tell me
+  if you know what the problem is.
+
+- Mirroring of the internal 2K RAM is not emulated.
+
+- Doesn't implement the 6502 wrap-around bug (I really doubt that this
+  would make a difference)
+
+- Video code needs to be optimized for speed (TuxNES supports a range
+  of video output options)
+
+- No sound (TuxNES fully supports NES sound)
+
+- No PAL mode (I don't have any games that need it)
+
+- MMC2 support is incomplete (fixed in TuxNES)
+
+- Needs more mappers - submissions are welcome! (TuxNES supports quite a few
+  more mappers)

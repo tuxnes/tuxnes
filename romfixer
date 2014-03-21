@@ -1,0 +1,24 @@
+#! /bin/sh --
+if test "$#" != 1
+then cat <<EOF
+Usage: $0 nes-file
+
+This script uses dd(1) to remove garbage from the
+header of an old-format .NES file, making it a valid
+new-format .NES file.
+
+DO NOT RUN THIS ON VALID NEW-FORMAT .NES FILES, IT
+WILL *DESTROY THEM*!!!
+EOF
+exit 1
+fi
+
+if mv "$1" "$1".old
+then
+dd bs=1 if="$1".old of="$1" count=7 2> /dev/null &&
+dd bs=1 if=/dev/zero of="$1" count=9 seek=7 2> /dev/null &&
+dd bs=1 if="$1".old of="$1" skip=16 seek=16 2> /dev/null &&
+rm "$1".old && exit 0
+mv "$1".old "$1"
+fi
+exit 1

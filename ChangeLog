@@ -1,0 +1,582 @@
+2001-04-11  Mike Melanson <melanson@pcisys.net>
+
+	* final modifications for v0.75 release
+
+	* removed HACKING file from the distribution for the time being
+	due to lack of completeness
+
+	* updated NEWS, README, configure.in, Makefile.in
+
+2001-04-11  Mike Melanson <melanson@pcisys.net>
+
+	* sound.h, io.c: removed dead sound_data structure
+
+	* [all source code files]: added a new uniform file header
+
+2001-04-09  Mike Melanson <melanson@pcisys.net>
+
+	* BUGS, HACKING: Updated some documention
+
+2001-03-27  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* README, INSTALL.BSD: Update notes to reflect NetBSD compatibility.
+
+2001-03-27  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* configure.in, sound.c, w.c, x11.c: Fix the endian problems for
+	now.
+
+2001-03-27  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* sound.c, w.c, x11.c: Fix some more endian.h fun.  Still needs
+	more work, but at least it fixes an inclusion problem on NetBSD for
+	now.  But the macros and definitions are still not usable.  This is
+	due to some platforms trying to fix namespace pollution by prefixing
+	the definitions with underscores.
+
+2001-03-26  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* configure.in: Add some more tests to ease compilation across
+	systems, this includes tests for: strtod(), strtoul(), inline
+	definition, const definition, signal return type, sys/wait problems
+	and more.  Removed the awk test. Also removed the ln -s test.
+
+2001-03-23  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* configure.in, sound.c: Solve the inline problem more gracefully
+	by checking for it in configure, and define it appropriately in
+	config.h.
+
+2001-03-22  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* sound.c: Fix around lameness and brokeness in the GNU C compiler,
+	which requires us to specify __inline__ instead of inline, which is
+	only the ANSI C specified function specifier.
+
+2001-03-22  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* sound.c, x11.c: FreeBSD, and possibly other platforms,
+	do not have an <endian.h>, but often have a <machine/endian.h>.
+	This needs to become a configure thinghy later on.
+
+2001-03-14  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* sound.c: Get rid of superfluous semi-colons.
+
+2001-03-14  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* sound.c: Properly prototype shift_register15().
+
+2001-03-14  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* sound.c: ANSI C does not allow empty initialiser braces.
+
+2001-03-14  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* HACKING: Add comment about comments.
+
+2001-03-14  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* mapper.c, sound.c: Replace C99 comments with C89 comments
+	or #if 0/#endif constructs.
+
+2001-03-13  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+	* io.c: Fix C99 comments to a #if/#endif pair.
+
+2001-03-04  Paul Zaremba <pez@treeofice.2y.net>
+	* sound.c: Minor change to noise channel step counter
+
+2001-03-01  Paul Zaremba <pez@treeofice.2y.net>
+	* emu.c: Fixed "device busy" error for sound start
+
+	* sound.c: Fixed triangle channel linear counter (caused problems
+	with Zelda II title), changed header comment style
+
+2001-03-01  Mike Melanson <melanson@pcisys.net>
+
+	* fb.c mapper.c, pixels.h, x86.S: added MMC4 support
+
+2001-02-28  Mike Melanson <melanson@pcisys.net>
+
+	* emu.c, Makefile.am, added unzip.c, unzip.h, ziploader.c,
+	ziploader.h: added zip support, courtesy of Kevin Lindsay
+	<klindsay@mkintraweb.com>
+
+	* README: updated to explain compressed file support and revised
+	sound support
+
+	* Added HACKING file which will serve as a guide for developers
+
+	* emu.c: sound is now enabled by default and there are special
+	files ('mute' and 'none') to specify no sound with the --sound
+	option
+
+	* emu.c, sound.c, sound.h, x11.c, ggi.c, w.c: removed references
+	to options to generate sine waves in place of square wave; the
+	square waves work great now and the sine wave generation appears
+	to be gone now
+
+2001-02-27  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+
+	* configure.in: Fix configure script to be smarter than the
+	automake/autoconf stuff which automatically sets CFLAGS to
+	a braindead setting of -O2, while it is known that
+	optimisationlevels greater than -O are known to produce
+	broken code on certain architectures [Alpha] with gcc.
+
+2001-02-26  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+
+	* configure.in: Update warnings to latest.
+
+2001-02-26  Jeroen Ruigrok van der Werven <asmodai@wxs.nl>
+
+	* C fixes:
+	Fixed prototypes and style in:
+	emu.c, fb.c, sound.c, sound.h
+
+2001-02-05  Paul Zaremba <pez@treeofice.2y.net>
+
+	* Sound Fixes
+	Fixed Typo in sound.c - MegaMan2/Metal Man now sounds correct.
+	Determined that noise Dropout in Zelda/16 bit mode is a
+	problem with my laptop sound card (sounds fine on my desktop).
+	Default output changed to 44100Hz 8bit.
+	Updated help to reflect current state of sound.
+
+2000-11-16  Paul Zaremba <pez@treeofice.2y.net>
+
+	* More sound fixes:
+	DMC frequency implemented properly.  Sounds correct on Zelda,
+	Frequency corrected for noise channel, Volume envelope decay fixed
+	(sq?), Triangle channel sounds better (note length appears to be fixed)
+	
+2000-10-31  The Mighty Mike Master <melanson@pcisys.net>
+
+	* tweaked MMC3 support so that it actually supports a 16K-PRG/8K-CHR
+	MMC3 ROM (pedagogical exercise)
+
+	* sound fixes courtesy of Paul Zaremba <pez@treeofice.2y.net>:
+	Duty cycle fixed for square channels, 120/240hz timing problems
+	fixed for rates > 44khz, initial (proper) noise rate-conversion
+	implemented
+
+2000-10-04  The Mighty Mike Master <melanson@pcisys.net>
+
+	* revised sound support courtesy of Paul Zaremba 
+	<pez@treeofice.2y.net>
+
+2000-10-03  The Mighty Mike Master <melanson@pcisys.net>
+
+	* pixels.h, fb.c, mapper.c: proper MMC2 support, courtesy of Eric
+	Jacobs <eaj@ricochet.net>
+	
+2000-09-12  The Mighty Mike Master <melanson@pcisys.net>
+
+	* consts.h, emu.c, globals.h, x11.c: joystick remapping support
+	courtesy of J.D. <jodaman@bradley.edu>
+
+2000-07-07  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
+
+	* sound.h (SoundData): moved some global data from sound_config to
+ 	sound_data
+
+	* renderer.h (RendererData): moved some global data from
+ 	renderer_config to renderer_data
+
+	* sound.c: sound sample formats have more reasonable names, and
+ 	they're in synch with soundcard.h AFMT_* symbols again
+
+	* renderer.h (RendererConfig): cleaned up the renderer interface
+ 	somewhat
+
+	* sound.h (SoundConfig): cleaned up the sound interface somewhat
+
+2000-07-06  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
+
+	* emu.c (loadpal): Added support for iNES-style hexadecimal
+ 	palette files.
+
+	* README (Palettes): Added a pointer to rvu's NES Palette Zoo,
+ 	which includes many iNES-style hexadecimal palette files.
+
+2000-07-05  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
+
+	* README (ROMs): Added a pointer to Chris Covell's website, and
+ 	mentioned Solar Wars.
+
+	* renderer.c (InitDisplayAuto): X11 renderers now take precedence
+ 	over the W renderer
+
+	* emu.c (palettes): Added a new NES palette as "chris", thanks to
+ 	Chris Covell <ccovell@direct.ca>
+	(palettes): Added the excellent NTSC palette generator by Kevin
+ 	Horton <khorton@iquest.net>
+
+2000-07-02  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
+
+	* w.c (InitDisplayW): cleared up endianness issues -- W Window
+ 	System bitmaps are big-endian by definition
+
+2000-07-01  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
+
+	* w.c (InitDisplayW): fixed scanline color problem in static-color
+ 	mode, removed workarounds for old W server bugs
+
+2000-06-06  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
+
+	* x11.c (InitDisplayX11): pixmaps and GCs for the old renderer are
+ 	now optional
+
+2000-04-01  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* w.c (InitDisplayW): fixed alternate scanline intensity with --in-root
+
+	* emu.c (main): added option -b, --bw to convert palette to grayscale
+
+	* w.c (InitDisplayW): fixed screenshots for 8bpp with --static-color
+
+	* emu.c (main): --renderer=auto now checks /tmp/wserver to make
+	  sure it's a writable socket (when trying to detect W)
+
+	* w.c (InitDisplayW): added a renderer for the W Window System
+
+2000-03-28  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* fb.c: Added support for differential X11 rendering (-r diff,
+	  --renderer=diff)
+
+2000-02-25  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* ggi.c: Added support for double buffering and page flipping
+
+	* x11.c: Added -I, --in-root option to render in X11 root window
+
+2000-02-23  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* X11 is now optional.
+
+2000-02-23  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* Added -K, --sticky-keys for GII inputs with synthetic release events
+
+2000-02-23  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* ggi.c (SaveScreenshotGGI): screenshots now work in 1bpp under
+ 	  the DirectBuffered "x" target, but still break in 1bpp under the
+ 	  "xlib" target. Normal-buffered "x" still dumps core (it's not my
+ 	  fault!)
+
+2000-02-22  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* Added -X, --swap-inputs option to swap P1/P2 controls
+
+2000-02-22  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* ggi.c (SaveScreenshotGGI): screenshots don't flicker on buggy visuals
+
+2000-02-22  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* emu.c (help_controls): S/s is now another screenshot key.
+
+2000-02-21  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* ggi.c (SaveScreenshotGGI): screenshots work even on buggy visuals
+
+2000-02-21  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* fb.c: Added separate read/write framebuffer pointers
+
+2000-02-18  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* ggi.c (SaveScreenshotGGI): improved PPM snapshot support
+
+2000-02-17  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* ggi.c (SaveScreenshotGGI): added PPM screenshot support
+
+2000-02-14 Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* Added support for 4bpp rendering (untested, though...)
+	
+	* pixels.c: fixed a sprite-drawing bug I introduced in the last update
+
+2000-02-12  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* ggi.c: added support for DirectBuffers
+
+	* x11.c: added support for XShm
+
+2000-02-13  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+	* Rewrite configure.in so that GGI/GII gets detected in
+	  /usr/local installations as well
+
+2000-02-10  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* x11.c: resizing/maximizing no longer changes magstep
+
+	* emu.c: added a -G, --geometry=WxH command-line parameter
+
+	* pixels.c: added support for big-byte-endian pixels
+
+	* ggi.c: improved speed and compatibility of GGI code
+
+	* x11.c (SaveSnapshotX11): fixed 1bpp snapshots under old X11 renderer
+
+2000-02-08  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* Added support for GGI/GII
+
+2000-01-27  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* emu.c (help_version): reformatted to work with help2man
+
+1999-12-20  The Mighty Mike Master  <melanson@pcisys.net>
+
+	* added untested support for mapper 13 (CPROM, used in Videomation)
+
+	* added experimental support for mapper 19 (Namcot 106)
+
+1999-12-17  The Mighty Mike Master  <melanson@pcisys.net>
+
+	* added experimental support for mapper 68 (Sunsoft mapper 4)
+
+1999-12-17  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
+
+	* sound.c (UpdateAudio): Added an echo/reverb effect (-e, --echo)
+
+1999-12-16  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
+
+	* x11.c (SaveSnapshot): Added snapshot support to the old X11 code
+	(dobackground): Added scanline support to the old X11 code
+
+	* x11.c (HandleJoystick): Added support for joysticks with 6 axes
+ 	and 9 buttons [old news]
+
+	* sound.c (UpdateAudio): Added an option to resync. audio after a
+ 	specified delay has been reached [old news]
+
+1999-12-15  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
+
+	* Merged in changes from Nestra 0.66
+
+	* x11.c (InitDisplay): The VidMode-check is now disabled.
+
+	* README (esd): Added a mini-section on using TuxNES with Esound.
+	(sfspeaker): Added one for Speak Freely, too.
+
+1999-12-12  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+	* configure.in: added profiling support to spot our speed
+	  weaknesses
+
+1999-12-10  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
+
+	* pixels.c: Added support for scanlines.
+
+1999-12-08  The Mighty Mike Master  <melanson@pcisys.net>
+
+	* emu.c: added a routine to determine the base filename of a
+	 file, i.e., strip off leading directory info and trailing 
+	 extension
+
+	* x11.c: revised InitSnapshot() and SaveSnapshot so that they
+	 save files with the name "basefilename-snap-xxxx.xpm"
+
+1999-12-07  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
+
+	* table.x86: merged in Quor's fix for Dr. Mario
+
+	* emu.c: Totally redid command-line help system
+
+	* README (Usage): Updates to include new --help info
+
+1999-11-30  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* Merged in changes from Nestra 0.65
+
+1999-11-24  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* pixels.c: 2:1 integer scaling is now supported using separate
+	 drawimageXXd functions (compiled from the same source, but with
+	 DOUBLE defined true)
+
+	* x11.c (maxsize): 2:1 integer scaling is now permitted, use your
+ 	 window manager's "maximize" feature to activate it (it is disabled
+ 	 with the old renderer at the moment)
+	 (SaveSnapshot): there's now rudimentary support for saving
+ 	 snapshots from two simultaneous TuxNES processes
+
+	* README: re-labeled sections so 'C-x 4 a' can find them
+	 (Graphics): added a section comparing the two renderers' features
+
+1999-11-23  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* x11.c (SaveSnapshot): error messages are printed in case of failure,
+	  and in verbose mode a message is printed in the successful case, too
+
+	* emu.c (help): made symbolic constants for sound formats, and
+	  a macro to convert them into strings
+	  (main): sound formats are printed again in verbose mode
+
+	* fb.c: added support for 1bpp visuals in the new X11 renderer
+
+	* x11.c (InitDisplay): now use XYBitmap instead of ZPixmap for 1bpp
+	  displays, which makes screenshots work
+
+1999-11-11  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* emu.c (main): now the sound ioctls might work under *BSD, too...
+
+	* README (Usage): updated to reflect -F, --format option
+
+	* sound.c (ulaw): added a lookup table for linear->ulaw conversion
+	(UpdateAudio): added support for ulaw and several other sample formats
+
+	* emu.c (help): Added a list of supported sample formats
+
+	* x11.c (HandleKeyboard): Added support for diagonal movement using
+	  the WinVNC keypad mapping.
+
+1999-11-09  Benjamin C. W. Sittler  <bsittler@nmt.edu>
+
+	* README (Usage): Updated to reflect new -1, --js1 and -2, --js2
+	  options
+
+	* added preliminary support for second joystick
+
+	* x11.c (InitDisplay): we now process StructureNotify events, so
+	  we can properly handle being iconified (by disabling graphics,
+	  but not sound generation)
+	  (UpdateDisplay): FocusIn/FocusOut events are no longer useful,
+	  since we don't pause emulation when unfocused
+	  (UpdateDisplay_orig): FocusIn/FocusOut events are no longer useful,
+	  since we don't pause emulation when unfocused
+
+	* sound.c (UpdateAudio): merged in new audio engine from my devel
+	  tree with preliminary noise support
+
+	* README (Usage): Updated to reflect new -S, --soundbits option
+
+1999-11-08  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
+
+	* emu.c (loadpal): we no longer use strcasecmp()
+
+	* fb.c: include <string.h> to clear a warning in pixels.c
+
+	* sound.c (UpdateAudio): we now use rand() instead of random()
+	  for noise generation
+
+	* comptbl.c (main): cleaned a warning caused by passing a char *
+	  as an int *. ick.
+
+	* emu.c (loadpal): strdup? what strdup? there *is* no strdup!
+
+	* io.c (input): updated coinslot port to include service credit
+	  and two regular slots -- thanks to loopy <zxcvzxcv@netzero.net>
+	  for the info [which I found on nesdev]
+
+	* x11.c (HandleKeyboard): added support for two more coinslots
+
+	* README (Usage): updated to reflect changes to controls()
+
+	* emu.c (controls): Updated to include all three coinslots
+
+1999-11-07  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+	* io.h, consts.h: merged the two files into consts.h
+
+1999-11-06  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+	* configure.in: add --enable-warnings knob to configure for the
+	  compilation warning savvy people
+
+1999-11-01  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+	* comptabl.c: fix function declarations, fix main() bogon,
+	  stylistic changes
+
+1999-10-31  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+	* Reworked d6502.c patch due to a association bogon I made
+
+	* gamegenie.c patch to get rid of warnings
+
+	* fb.c/globals.h fix to allow proper assignment of drawimage
+	  and drawimageN
+
+	* io.c, mapper.c, emu.c: fix function declarations, fix warnings,
+	  general style changes
+
+	* x11.c: fixed function declarations, warnings, changed style
+
+1999-10-30  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+        * Removed spurious comment characters from x86.S
+
+	* Added INSTALL.BSD to help BSD users with installing
+
+	* Fixed warnings in d6502.c
+
+	* Fixed warnings in dynrec.c, introduce proper cast
+
+	* stylistic globals.h patch
+
+	* Reworked configure.in due to -I/usr/local/include not being
+	  propagated into the Makefile when getopt.h was detected in
+	  /usr/local/include
+
+1999-10-23  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+        * changed the configure.in script a lot in preparation for
+          the FreeBSD support
+
+        * added FreeBSD's libgnugetopt support
+
+1999-10-21  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
+
+        * added FreeBSD check for sys/soundcard.h
+
+        * messed around with getopt.h, which is a Linux/GNU only thing
+          and thus needs either external support or reworked sources
+
+1999-09-23  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
+
+	* configure.in: Finally fixed -lXpm problems, I think. It's a mess.
+
+	* Makefile.am (table.o): added a custom target for this, to make
+	  "make -j" work.
+	  Cleaned up "compdata" and related mess.
+
+1999-09-20  Benjamin C. W. Sittler  <bsittler@aldebaran>
+
+	* io.c (trace): removed a redundant fflush()
+
+	* dynrec.c (translate): removed a redundant fflush()
+
+	* comptbl.c: removed a bunch of redundant fflush() calls
+
+	* emu.c (main): removed VROM_MASK, it broke VS CastleVania
+	  (from Nestra 0.64)
+	  (help): fixed to use printf again
+	  (controls): fixed to use printf again
+	  (main): Uses PACKAGE for -V, --version
+	  (main): sanitized argument parsing
+	  (main): the HOME environment variable is no longer required
+	  changed quite a few fprintf(stderr,...) to use perror(), removed
+	  redundant fflush() calls
+
+	* mapper.c (unrom): removed VROM_MASK, it broke VS CastleVania (from
+	  Nestra 0.64)
+
+	* x86.S: fixes and comments (from Nestra 0.64)
+
+	* table.x86: updated (to Nestra 0.64 version)
+
+	* pixels.c (endif): mirroring change (from Nestra 0.64)
+
+	* mapper.c: various fixes (from Nestra 0.64)
+
+	* io.c: various fixes (from Nestra 0.64)
+
+	* emu.c (restoresavedgame): instead of tuxnestemp, uses tuxnes.tmp
+	  (main): merged in mmap () portability fixes (from Nestra 0.64)
+	  We now use ROM_MASK, VROM_MASK (from Nestra 0.64)
+
+	* README: fixed wrong version number and a repeated section
+
+	* emu.c (help): now uses VERSION for TuxNES version number
+	  (controls): re-generated from text in README
+
+	* x11.c (UpdateAudio): halved triangle wave frequency
+
+	* started ChangeLog using emacs: C-x 4 a (it automatically inserts
+	  source file and function names!)
