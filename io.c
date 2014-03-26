@@ -21,6 +21,7 @@
 #endif /* HAVE_FEATURES_H */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "consts.h"
 #include "globals.h"
