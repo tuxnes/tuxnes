@@ -30,7 +30,6 @@ ziploader (unzFile file, char *zipname)
   unz_file_info fileinfo;
   char *extension;
   char *ptr;
-  int repeat;
   int res;
   char romname[1024];
   
@@ -57,7 +56,6 @@ ziploader (unzFile file, char *zipname)
     return (0);
     
   ptr = ROM;
-  repeat = 0;
   unzLocateFile (file,romname,1);
   unzGetCurrentFileInfo (file, &fileinfo, romname,128, NULL,0, NULL,0);
   

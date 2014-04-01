@@ -48,7 +48,6 @@ translate(int addr)
   unsigned char *sptr;
   unsigned char *cptr, *bptr;
   int slen, dlen;
-  int x;
   u_char m, l, o;
   u_char stop = 0;
 
@@ -86,9 +85,9 @@ translate(int addr)
         {
           sptr = (u_char *) TRANS_TBL + ptr[src];
           slen = sptr[-1];
-          dlen = x = *(sptr++);
+          dlen = *(sptr++);
           bptr = cptr;
-          while (x--)
+          while (dlen--)
             *(cptr++) = *(sptr++);
           while (*sptr != 0)
             {
