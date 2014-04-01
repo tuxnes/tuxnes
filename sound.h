@@ -17,7 +17,7 @@ extern char     	SoundGetLengthReg(void);
 extern void		UpdateAudio(void);
 
 struct SampleFormat {
-     char *name, *fullname;
+     const char *name, *fullname;
      int number;
 };
 
@@ -32,7 +32,7 @@ extern unsigned char ulaw [0x4000];
 
 /* global sound parameters */
 extern struct SoundConfig {
-     char	*audiofile;
+     const char	*audiofile;
      int	audiorate;
      int	audiostereo;
      float	max_sound_delay;

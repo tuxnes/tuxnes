@@ -110,7 +110,7 @@ struct RendererData renderer_data = {
 int
 InitDisplayAuto(int argc, char **argv)
 {
-     char *rendname = 0;
+     const char *rendname = 0;
 
 #ifdef HAVE_W
      {

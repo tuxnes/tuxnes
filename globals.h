@@ -72,7 +72,7 @@ extern unsigned char	jsaxes[2];
 extern unsigned char	jsbuttons[2];
 extern int	 jsfd[2];
 extern int	 jsversion[2];
-extern char	*jsdevice[2];
+extern const char	*jsdevice[2];
 extern struct js_nesmap {
   unsigned char button[JS_MAX_BUTTONS];
   struct {

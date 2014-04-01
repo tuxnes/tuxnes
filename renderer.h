@@ -39,7 +39,7 @@ extern void	UpdateDisplayNone(void);
 #define RENDERER_DIFF		2
 
 struct Renderer {
-     char *name, *fullname;
+     const char *name, *fullname;
      int _flags;
      int (*InitDisplay)(int argc, char **argv);
      void (*UpdateDisplay)(void);

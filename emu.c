@@ -52,7 +52,7 @@
 u_char	*ROM_BASE;
 u_char	*VROM_BASE;
 char	*filename;
-char	*homedir;
+const char	*homedir;
 char	 savefile[1024];
 char	*tuxnesdir;                /* buffer for $HOME/.tuxnes dir */
 char    *basefilename;  /* base filename without the extensions */
@@ -61,7 +61,7 @@ unsigned int	VROM_PAGES;
 unsigned int    ROM_MASK;
 unsigned int    VROM_MASK;
 unsigned int    VROM_MASK_1k;
-char *sample_format_name = "8";
+const char *sample_format_name = "8";
 int	dirtyheader = 0;
 int	disassemble = 0;
 int	dolink = 0;
@@ -81,8 +81,8 @@ unsigned char	jsaxes[2] = {2, 2};
 unsigned char	jsbuttons[2] = {2, 2};
 int	 jsfd[2] = {-1, -1};
 int	 jsversion[2] = {0x000800, 0x000800};
-char	*jsdevice[2] = {0, 0};
-char	*rendname = "auto";
+const char	*jsdevice[2] = {0, 0};
+const char	*rendname = "auto";
 
 #define JS_DEFAULT_MAP \
 { { BUTTONB, SELECTBUTTON, BUTTONA, STARTBUTTON, \
@@ -112,7 +112,7 @@ static void	help_sound(int);
 /* help variables */
 const struct {
   int is_terse;
-  char *name, *desc;
+  const char *name, *desc;
   void (*dfn)(int);
 } topics[] = {
   /* The interactive default help topic is the first in the array */
@@ -149,7 +149,7 @@ const struct {
     "All help topics",
     (void (*)(int))0 }
 };
-static void	help(char *progname, char *topic);
+static void	help(const char *progname, const char *topic);
 
 #ifdef HAVE_LIBM
 extern unsigned int *ntsc_palette(double hue, double tint);
@@ -171,7 +171,7 @@ void	translate(int);
 /* color palettes */
 struct
   {
-    char *name, *desc;
+    const char *name, *desc;
     unsigned int data[64];
   }
 palettes[] =
@@ -470,11 +470,11 @@ quit(void)
 /****************************************************************************/
 
 static void
-help(char *progname, char *topic)
+help(const char *progname, const char *topic)
 {
   int			i;
   void (*dfn)(int) = (void (*)(int))0;
-  char *desc = 0;
+  const char *desc = 0;
   int dfns = 0;
   int len;
   int terse = 0;
