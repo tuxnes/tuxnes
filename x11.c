@@ -1410,7 +1410,7 @@ UpdateDisplayX11(void)
 {
   static XEvent ev;
   struct timeval time;
-  unsigned static int frame;
+  static unsigned int frame;
   unsigned int timeframe;
   static int sleep = 0;         /* Initially we start with the emulation running.  If you want to wait until the window receives input focus, change this. */
   static int nodisplay = 0;
