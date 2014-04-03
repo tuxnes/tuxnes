@@ -4,8 +4,6 @@
 # Please see the README and COPYING files for more information regarding
 # this project.
 #
-# $Id: table.x86,v 1.9 2001/04/11 21:45:47 tmmm Exp $
-#
 #
 # Description: Translation tables for 6502 to x86 dynamic recompiler
 

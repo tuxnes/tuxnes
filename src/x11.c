@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: x11.c,v 1.60 2001/04/11 21:45:48 tmmm Exp $
- *
  * Description: This file handles the I/O subsystem for the X window
  * system.
  */

@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: ziploader.c,v 1.3 2001/04/11 21:45:48 tmmm Exp $
- *
  * Description: Loads a .nes rom from a .zip file.
  */
 

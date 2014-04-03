@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: mapper.h,v 1.8 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: Important constants related to the mapper functionality and
  * ASM linkage.
  */

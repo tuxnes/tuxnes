@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: gamegenie.h,v 1.6 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: Constants for the Game Genie translator functions
  */
 

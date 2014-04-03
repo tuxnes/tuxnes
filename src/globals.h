@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: globals.h,v 1.33 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: A bunch of global variables
  */
 

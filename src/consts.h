@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: consts.h,v 1.16 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: Miscellaneous constants for the TuxNES program.
  */
 

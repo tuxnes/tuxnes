@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: d6502.c,v 1.9 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: 6502 CPU disassembler
  */
 

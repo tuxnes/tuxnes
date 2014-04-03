@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: gamegenie.c,v 1.7 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: Routines for translating Game Genie codes into useful
  * addresses and data
  */

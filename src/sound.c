@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: sound.c,v 1.36 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: This file is largely responsible for mixing the waveform and
  * pumping it out the audio device.
  */

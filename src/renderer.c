@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: renderer.c,v 1.6 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: This file provides the "auto" and "none"
  * pseudo-renderers.
  */

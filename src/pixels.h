@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: pixels.h,v 1.18 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: This file is included several times with different bpps
  * and enlargement/scanline combinations defined. See fb.c.
  */

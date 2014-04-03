@@ -1,5 +1,3 @@
-$Id: INSTALL.BSD,v 1.2 2001/03/27 19:45:02 asmodai Exp $
-
 Make sure you install the libgnugetopt port from
 /usr/ports/devel/libgnugetopt because at current
 this package is needed to compile TuxNES.

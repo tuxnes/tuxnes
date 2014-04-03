@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: dynrec.c,v 1.9 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: This is the dynamic recompiler.  This takes 6502 code as
  * input, looks up the opcodes in the translation dictionary, evaluates
  * any expressions found therein, and writes the translated code to

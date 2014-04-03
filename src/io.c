@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: io.c,v 1.32 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: This file consists of functions which are called by the
  * dynamically recompiled code to do I/O operations. Whenever the 6502 code
  * reads from or writes to a memory location known to be a NES register,

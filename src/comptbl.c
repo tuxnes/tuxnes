@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: comptbl.c,v 1.12 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: comptbl.c is a separate support program used in the TuxNES
  * build process. When run, the comptbl executable builds file 'compdata'
  * out of table.x86 which is later turned into table.o.

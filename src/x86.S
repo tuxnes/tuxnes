@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: x86.S,v 1.17 2001/04/11 21:45:48 tmmm Exp $
- *
  * Description: This file contains x86 ASM routines to link the dynamic
  * recompiler to the C code.
  */

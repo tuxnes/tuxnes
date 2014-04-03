@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: ntsc_pal.c,v 1.2 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: NES palette generator
  */
 

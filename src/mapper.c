@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: mapper.c,v 1.31 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: This file controls the mapper subsystem for the emulator.
  * See the HACKING file (and examine existing mapper code) for information
  * on how to add new mappers.

@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: ggi.c,v 1.20 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: This file handles the I/O subsystem for GGI.
  */
 

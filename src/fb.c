@@ -4,8 +4,6 @@
  * Please see the README and COPYING files for more information regarding
  * this project.
  *
- * $Id: fb.c,v 1.25 2001/04/11 21:45:47 tmmm Exp $
- *
  * Description: Framebuffer/pixmap rendering; the main rendering
  * function drawimage* is included (several times) from pixels.h.
  */
