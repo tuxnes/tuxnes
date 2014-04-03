@@ -3,8 +3,8 @@
 
 AC_PREREQ([2.69])
 AC_INIT([TuxNES],[0.75])
-AC_CONFIG_SRCDIR([consts.h])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_SRCDIR([src/consts.h])
+AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE
 
 # Checks for programs.
@@ -125,5 +125,5 @@ if test "x$no_x" != "xyes"; then
 	LIBS="$save_LIBS"
 fi
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
