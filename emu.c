@@ -1187,7 +1187,6 @@ main (int argc, char **argv)
   int size;
   int cmirror;
   DIR *dir;		/* for checking if .tuxnes directory is present */
-  char *mkdircall;	/* buffer for /bin/mkdir call */
   char *palfile = 0;	/* palette file */
 
   char *ggcode;
@@ -1232,16 +1231,7 @@ main (int argc, char **argv)
   if ((dir == NULL)
       && (errno == ENOENT))
     {
-      if ((mkdircall = malloc (strlen ("/bin/mkdir ") + strlen (tuxnesdir) + 1))
-          == NULL)
-        {
-          fprintf (stderr, "Out of memory\n");
-          return (1);
-        }
-      sprintf (mkdircall, "/bin/mkdir %s", tuxnesdir);
-      system (mkdircall);
-      free (mkdircall);
-
+      mkdir (tuxnesdir, 0777);
       if ((dir = opendir (tuxnesdir)) == NULL)
         {
           fprintf (stderr, "Cannot open directory %s\n", tuxnesdir);
