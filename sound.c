@@ -402,8 +402,7 @@ InitAudio(int argc, char **argv)
   /* Open an audio stream */
   if (sound_config.audiofile)
     {
-      if ((audiofd = open (sound_config.audiofile,
-                           O_CREAT | O_WRONLY | O_APPEND, 0666 & ~mask)) < 0)
+      if ((audiofd = open (sound_config.audiofile, O_WRONLY | O_APPEND)) < 0)
         {
           perror (sound_config.audiofile);
           return 1;

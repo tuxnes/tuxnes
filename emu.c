@@ -1271,7 +1271,7 @@ main (int argc, char **argv)
   gamegenie = 0;
 
   /* check for the default output device */
-  if ((audiofd = open (DSP, O_CREAT | O_WRONLY | O_APPEND)) < 0)
+  if ((audiofd = open (DSP, O_WRONLY | O_APPEND)) < 0)
     sound_config.audiofile = NULL;
   else {
     sound_config.audiofile = DSP;
