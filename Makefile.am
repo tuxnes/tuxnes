@@ -1,4 +1,4 @@
-# $Id: Makefile.am,v 1.21 2001/04/16 01:08:07 tmmm Exp $
+AM_CFLAGS = $(WARNING_CFLAGS) $(PROFILING_CFLAGS) $(X_CFLAGS)
 
 bin_PROGRAMS = tuxnes
 bin_SCRIPTS = romfixer
@@ -9,7 +9,7 @@ tuxnes_SOURCES = x86.S d6502.c dynrec.c emu.c fb.c gamegenie.c io.c mapper.c \
 	mapper.h renderer.c renderer.h ntsc_pal.c unzip.c unzip.h \
 	ziploader.c ziploader.h
 EXTRA_tuxnes_SOURCES = pixels.h
-tuxnes_LDADD = table.o
+tuxnes_LDADD = table.o $(W_LIBS) $(GGI_LIBS) $(X_LIBS)
 
 comptbl_SOURCES = comptbl.c
 
