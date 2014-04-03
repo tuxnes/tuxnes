@@ -835,7 +835,7 @@ restoresavedgame(void)
       savefile[1019] = 0;
       strcat (savefile, ".sav");
     }
-  if ((fd = open (savefile, O_RDWR, 0666 & ~mask)) >= 0)
+  if ((fd = open (savefile, O_RDWR)) >= 0)
     {
       read (fd, RAM + 0x6000, 8192);
       close (fd);
@@ -848,7 +848,7 @@ restoresavedgame(void)
       strncpy (buffer, filename, 1019);
       buffer[1019] = 0;
       strcat (buffer, ".sav");
-      if ((fd = open (buffer, O_RDWR, 0666 & ~mask)) >= 0)
+      if ((fd = open (buffer, O_RDWR)) >= 0)
         {
           read (fd, RAM + 0x6000, 8192);
           close (fd);
@@ -861,7 +861,7 @@ restoresavedgame(void)
           buffer[1023] = 0;
           buffer[strlen (buffer) - 4] = 0;
           strcat (buffer, ".sav");
-          fd = open (buffer, O_RDWR, 0666 & ~mask);
+          fd = open (buffer, O_RDWR);
           read (fd, RAM + 0x6000, 8192);
           close (fd);
         }
