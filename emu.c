@@ -456,7 +456,7 @@ quit(void)
   for (x = 0; ((long long *) (RAM + 0x6000))[x] == 0; x++)
     if (x >= 1023)
       exit (0);                 /* Nothing to save */
-  fd = open (savefile, O_CREAT | O_RDWR, 0666 & ~mask);
+  fd = open (savefile, O_CREAT | O_RDWR, 0666);
   if (fd > 0)
     {
       write (fd, RAM + 0x6000, 8192);
@@ -820,7 +820,7 @@ restoresavedgame(void)
       for (x = strlen (buffer); x >= 0 && buffer[x] != '/'; x--)
         buffer[x] = 0;
       strcat (buffer, "tuxnes.tmp");
-      result = open (buffer, O_CREAT | O_RDWR, 0666 & ~mask);
+      result = open (buffer, O_CREAT | O_RDWR, 0666);
       unlink (buffer);
       if (result < 0)
         {
@@ -1208,10 +1208,6 @@ main (int argc, char **argv)
 
   /* set up the mapper arrays */
   InitMapperSubsystem();
-
-  /* find the file creation mask */
-  mask = umask (022);
-  umask (mask);
 
   /* Find the user's home directory */
   if (!(homedir = getenv ("HOME")))

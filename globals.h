@@ -29,7 +29,6 @@ extern void	(*MapperInit[])(void);
 extern void	(*drawimage)(int);
 
 /* Global Variables */
-int	mask;                       /* file creation mask */
 extern int      swap_inputs;
 extern int	desync;
 extern unsigned short int hscroll[], vscroll[];
