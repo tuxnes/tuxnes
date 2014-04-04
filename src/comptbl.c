@@ -53,7 +53,6 @@ main(int argc, char *argv[])
 {
   int			 x;
   int			 fd;
-  FILE			*file;
   char			 input[1024], i;
   int			*ptr;
 
@@ -76,8 +75,7 @@ main(int argc, char *argv[])
     }
   memset (TBL_BASE, 0, 1024);
   datap = TBL_BASE2;
-  file = fopen ("table.x86", "r");
-  while (fgets (input, 1024, file))
+  while (fgets (input, 1024, stdin))
     {
       cln++;
       for (cip = 0; (input[cip] != 0) && (input[cip] != '#') && (input[cip]
@@ -257,7 +255,6 @@ main(int argc, char *argv[])
 
         }
     }
-  fclose (file);
   /* relocate pointers */
   for (ptr = (int *) TBL_BASE, x = blocksalloc * 256; x--; ptr++)
     {

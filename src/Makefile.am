@@ -16,8 +16,8 @@ comptbl_SOURCES = comptbl.c
 EXTRA_DIST = table.x86 romfixer
 CLEANFILES = compdata
 
-compdata: comptbl table.x86
-	./comptbl
+compdata: comptbl $(srcdir)/table.x86
+	./comptbl < $(srcdir)/table.x86
 
 table.o: compdata
 	ld -r -b binary -r -defsym TRANS_TBL=_binary_compdata_start $< -o $@
