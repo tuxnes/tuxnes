@@ -10,6 +10,7 @@ tuxnes_SOURCES = x86.S d6502.c dynrec.c emu.c fb.c gamegenie.c io.c mapper.c \
 	ziploader.c ziploader.h
 EXTRA_tuxnes_SOURCES = pixels.h
 tuxnes_LDADD = table.o $(W_LIBS) $(GGI_LIBS) $(X_LIBS)
+tuxnes_LDFLAGS = $(AM_LDFLAGS) -Wl,-z,noexecstack
 
 comptbl_SOURCES = comptbl.c
 
