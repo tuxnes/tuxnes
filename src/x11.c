@@ -49,6 +49,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/XKBlib.h>
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
@@ -926,7 +927,7 @@ HandleJoystickLinux(int stick)
 void
 HandleKeyboardX11(XEvent ev)
 {
-  KeySym keysym = XKeycodeToKeysym (display, ((XKeyEvent *) & ev)->keycode, 0);
+  KeySym keysym = XkbKeycodeToKeysym (display, ev.xkey.keycode, 0, 0);
 
   if (ev.type == KeyPress && keysym == XK_Escape)
     quit ();                    /* ESC */
