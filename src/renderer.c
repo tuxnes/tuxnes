@@ -21,6 +21,7 @@
 
 #include "consts.h"
 #include "globals.h"
+#include "joystick.h"
 #include "mapper.h"
 #include "renderer.h"
 #include "sound.h"
@@ -52,7 +53,6 @@ void	UpdateDisplayNone(void);
 
 /* imports */
 extern void	fbinit(void);
-extern void	HandleJoystickLinux(int);
 
 /* globals */
 struct Renderer renderers[] = {
@@ -218,14 +218,7 @@ UpdateDisplayNone(void)
   /* Input loop */
   do {
     /* Handle joystick input */
-    if (jsfd[0] >= 0)
-      {
-	HandleJoystickLinux(0);
-      }
-    if (jsfd[1] >= 0)
-      {
-	HandleJoystickLinux(1);
-      }
+    js_handle_input();
   } while (renderer_data.pause_display);
 
   /* Check the time.  If we're getting behind, skip next frame to stay in sync. */

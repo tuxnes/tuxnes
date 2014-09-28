@@ -21,7 +21,6 @@
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <dirent.h>
-#include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,12 +34,9 @@
 #include <endian.h>
 #endif
 
-#ifdef HAVE_LINUX_JOYSTICK_H
-#include <linux/joystick.h>
-#endif /* HAVE_LINUX_JOYSTICK_H */
-
 #include "consts.h"
 #include "globals.h"
+#include "joystick.h"
 #include "mapper.h"
 #include "renderer.h"
 #include "sound.h"
@@ -124,9 +120,6 @@ unsigned char	needsredraw = 1;	/* Refresh screen display */
 unsigned char	redrawbackground = 1;	/* Redraw tile background */
 unsigned char	redrawall = 1;		/* Redraw all scanlines */
 unsigned char	palette_cache[tilecachedepth][32];
-
-/* imports */
-void	HandleJoystickLinux(int);
 
 #ifdef HAVE_X
 
@@ -844,85 +837,6 @@ InitDisplayX11(int argc, char **argv)
   fbinit ();
   return 0;
 }
-#endif /* HAVE_X */
-
-void
-HandleJoystickLinux(int stick)
-{
-#ifdef HAVE_LINUX_JOYSTICK_H
-  struct js_event js;
-  int nes_button;
-  int axis_i;
-
-  while (read (jsfd[stick], &js, sizeof (struct js_event)) ==
-         sizeof (struct js_event))
-    {
-      /* verbose joystick reporting */
-/*        if (verbose) */
-/*  	{ */
-/*  	  fprintf (stderr, "%s: type %d number %d value %d\n", */
-/*  		   jsdevice[stick], js.type, js.number, js.value); */
-/*  	} */
-
-      switch (js.type)
-	{
-	case 1:			/* button report */
-	  nes_button = js_nesmaps[stick].button[js.number];
-	  if( nes_button != PAUSEDISPLAY )
-	    {
-	      if( js.value )
-		controller[stick] |= nes_button;
-	      else
-		controller[stick] &= ~nes_button;
-	    }
-	  else			/* (nes_button == PAUSEDISPLAY) */
-	    if( js.value )
-	      {
-		renderer_data.pause_display = ! renderer_data.pause_display;
-		desync = 1;
-	      }
-	  break;
-	case 2:  /* axis report */
-	  if (js.value < -JS_IGNORE)
-	    {
-	      js_axismeso[js.number] = js_nesmaps[stick].axis[js.number].neg; 
-	      controller[stick] &= ~js_nesmaps[stick].axis[js.number].pos;
-	    }
-	  else if (js.value > JS_IGNORE)
-	    {
-	      js_axismeso[js.number] = js_nesmaps[stick].axis[js.number].pos;
-	      controller[stick] &= ~js_nesmaps[stick].axis[js.number].neg;
-	    }
-	  else
-	    {
-	      js_axismeso[js.number] = 0;
-	      controller[stick] &= ~js_nesmaps[stick].axis[js.number].neg;
-	      controller[stick] &= ~js_nesmaps[stick].axis[js.number].pos;
-	    }
-	  for( axis_i = JS_MAX_AXES; --axis_i >= 0; )
-	    controller[stick] |= js_axismeso[axis_i];
-	  break;
-	}
-    }
-
-  if (errno != EAGAIN)
-    {
-      if (errno)
-	{
-	  perror (jsdevice[stick]);
-	}
-      else
-	{
-	  fprintf (stderr, "%s: device violates joystick protocol, disabling\n",
-		   jsdevice[stick]);
-	  close (jsfd[stick]);
-	  jsfd[stick] = -1;
-	}
-    }
-#endif /* HAVE_LINUX_JOYSTICK_H */
-}
-
-#ifdef HAVE_X
 
 void
 HandleKeyboardX11(XEvent ev)
@@ -1592,14 +1506,7 @@ UpdateDisplayX11(void)
   /* Input loop */
   do {
     /* Handle joystick input */
-    if (jsfd[0] >= 0)
-      {
-	HandleJoystickLinux(0);
-      }
-    if (jsfd[1] >= 0)
-      {
-	HandleJoystickLinux(1);
-      }
+    js_handle_input();
 
     /* Handle X input */
     while (XPending (display) || ev.type == -1)
@@ -1786,15 +1693,8 @@ UpdateDisplayOldX11(void)
   /* Input loop */
   do {
     /* Handle joystick input */
-    if (jsfd[0] >= 0)
-      {
-	HandleJoystickLinux(0);
-      }
-    if (jsfd[1] >= 0)
-      {
-	HandleJoystickLinux(1);
-      }
-    
+    js_handle_input();
+
     /* Handle X input */
     while (XPending (display) || ev.type == -1)
       {

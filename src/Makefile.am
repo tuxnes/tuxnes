@@ -15,6 +15,7 @@ tuxnes_SOURCES = \
 	fb.c \
 	pixels.h \
 	gamegenie.c gamegenie.h \
+	joystick.c joystick.h \
 	mapper.c mapper.h \
 	ntsc_pal.c \
 	sound.c sound.h \

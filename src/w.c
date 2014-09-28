@@ -35,6 +35,7 @@
 
 #include "consts.h"
 #include "globals.h"
+#include "joystick.h"
 #include "mapper.h"
 #include "renderer.h"
 #include "sound.h"
@@ -43,7 +44,6 @@
 void	quit(void);
 void	START(void);
 void	fbinit(void);
-void	HandleJoystickLinux(int);
 
 #ifdef HAVE_W
 #include <Wlib.h>
@@ -1081,14 +1081,7 @@ UpdateDisplayW(void)
     WEVENT *ev;
 
     /* Handle joystick input */
-    if (jsfd[0] >= 0)
-      {
-	HandleJoystickLinux(0);
-      }
-    if (jsfd[1] >= 0)
-      {
-	HandleJoystickLinux(1);
-      }
+    js_handle_input();
 
     /* Handle W input */
     while ((ev = w_queryevent (0, 0, 0, 0))) {

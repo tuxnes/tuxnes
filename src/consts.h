@@ -25,14 +25,15 @@
 #define PBL	81840	/* PPU cycles per frame (not counting vblank) */
 #define PPF	89342	/* PPU cycles per frame */
 
-#define BUTTONA		0x01
-#define BUTTONB		0x02
-#define SELECTBUTTON	0x04
-#define STARTBUTTON	0x08
-#define UP		0x10
-#define DOWN		0x20
-#define LEFT		0x40
-#define RIGHT		0x80
+#define BUTTONA      0x01
+#define BUTTONB      0x02
+#define SELECTBUTTON 0x04
+#define STARTBUTTON  0x08
+#define UP           0x10
+#define DOWN         0x20
+#define LEFT         0x40
+#define RIGHT        0x80
+#define PAUSEDISPLAY 0xff
 
 /* prettified package name */
 #define PRETTY_NAME "TuxNES"
@@ -41,14 +42,5 @@
 #define JS1 "/dev/js0"
 #define JS2 "/dev/js1"
 #define DSP "/dev/dsp"
-
-/* joystick dead-zone */
-#define JS_IGNORE 8192
-
-/* joystick mapping */
-#define JS_MAX_BUTTONS     32
-#define JS_MAX_AXES        8
-#define JS_MAX_NES_BUTTONS 9
-#define PAUSEDISPLAY 0xff
 
 #endif /* _CONSTS_H_ */

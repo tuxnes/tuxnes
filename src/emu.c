@@ -17,16 +17,12 @@
 
 #include <ctype.h>
 #include <sys/types.h>
-#include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
-#ifdef HAVE_LINUX_JOYSTICK_H
-#include <linux/joystick.h>
-#endif /* HAVE_LINUX_JOYSTICK_H */
 #include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -43,6 +39,7 @@
 #include "consts.h"
 #include "gamegenie.h"
 #include "globals.h"
+#include "joystick.h"
 #include "mapper.h"
 #include "renderer.h"
 #include "sound.h"
@@ -74,28 +71,7 @@ int	showheader = 0;
 int	unisystem = 0;
 int	verbose = 0;
 
-/* joystick variables */
-unsigned char	jsaxes[2] = {2, 2};
-unsigned char	jsbuttons[2] = {2, 2};
-int	 jsfd[2] = {-1, -1};
-int	 jsversion[2] = {0x000800, 0x000800};
-const char	*jsdevice[2] = {0, 0};
 const char	*rendname = "auto";
-
-#define JS_DEFAULT_MAP \
-{ { BUTTONB, SELECTBUTTON, BUTTONA, STARTBUTTON, \
-    BUTTONA, BUTTONB, SELECTBUTTON, STARTBUTTON, \
-    PAUSEDISPLAY, 0, 0, 0,  0, 0, 0, 0, \
-    0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 }, \
-  { { LEFT, RIGHT }, { UP, DOWN }, { 0, 0 }, { 0, 0 }, \
-    { LEFT, RIGHT }, { UP, DOWN }, { 0, 0 }, { 0, 0 } } }
-struct js_nesmap js_nesmaps[2] = { JS_DEFAULT_MAP, JS_DEFAULT_MAP };
-#undef JS_DEFAULT_MAP
-unsigned char js_mapsequence[JS_MAX_NES_BUTTONS] = 
-{       BUTTONA, BUTTONB, STARTBUTTON, SELECTBUTTON,
-	LEFT, RIGHT, UP, DOWN, PAUSEDISPLAY };
-unsigned char js_axismeso[JS_MAX_AXES] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-unsigned char js_usermapped2button[2][2] = {{0, 0}, {0, 0}};
 
 #define USAGE "Usage: %s [--help] [options] filename\n"
 
@@ -155,7 +131,6 @@ double hue = 332.0;
 double tint = 0.5;
 #endif /* HAVE_LIBM */
 
-static void	js_set_nesmaps(char *);
 static void	loadpal(char *);
 static void	restoresavedgame(void);
 static void	traphandler(int);
@@ -1086,95 +1061,6 @@ loadpal(char *palfile)
 
 /****************************************************************************/
 
-static void
-js_set_nesmaps(char *mapspec)
-{
-  enum buttonaxis_state { none = 0, button, axis };
-
-  int js_dev = -1;
-  int nes_button_i;
-  int nes_button_inc = 1;
-  int expect_buttonaxis = none;
-  int buttonaxis = -1;
-  unsigned char *s = (unsigned char *) mapspec;
-
-  while( *s != '\0' )
-    if( isdigit( *s ) && (*(s + 1) == ':' ) )
-      {
-	js_dev = (*s - '1');
-	++s;
-	if( (js_dev < 0) || (js_dev > 2) )
-	  {
-	    fprintf( stderr, 
-		     "ignoring joystick map (limited to joystick 1 and 2)\n" );
-	    continue;
-	  }
-	nes_button_i = 0;
-	while( (*(++s) != '\0') || (expect_buttonaxis) )
-	  {
-	    if( expect_buttonaxis != none )
-	      {
-		if( isdigit( *s ) )
-		  {
-		    buttonaxis *= 10;
-		    buttonaxis += (*s - '0');
-		    continue;
-		  }
-		else
-		  {
-		    if( expect_buttonaxis == button )
-		      {
-			if( buttonaxis < 2 )
-			  js_usermapped2button[js_dev][buttonaxis] = 1;
-			expect_buttonaxis = none;
-			if( buttonaxis < JS_MAX_BUTTONS ) 
-			  js_nesmaps[js_dev].button[buttonaxis] = js_mapsequence[nes_button_i];
-		      }
-		    else		/* (expect_buttonaxis == axis) */
-		      {
-			expect_buttonaxis = none;
-			nes_button_inc = 2;
-			if( buttonaxis < JS_MAX_AXES )
-			  if( (nes_button_i + 1) < JS_MAX_NES_BUTTONS )
-			    {
-			      js_nesmaps[js_dev].axis[buttonaxis].neg
-				= js_mapsequence[nes_button_i];
-			      js_nesmaps[js_dev].axis[buttonaxis].pos
-				= js_mapsequence[nes_button_i + 1];
-			    }
-		      }
-		    if( *s == '\0' )
-		      break;
-		  }
-	      }
-	    if( *s == ',' )
-	      if( (nes_button_i += nes_button_inc) < JS_MAX_NES_BUTTONS )
-		nes_button_inc = 1;
-	      else
-		break;
-	    else if( *s == '+' )
-	      break;
-	    else if ( expect_buttonaxis == none )
-	      {
-		if( (*s == 'b') || (*s == 'B') )
-		  expect_buttonaxis = button;
-		else if( (*s == 'a') || (*s == 'A') )
-		  expect_buttonaxis = axis;
-		else
-		  continue;
-		if( isdigit( *(s+1) ) )
-		  buttonaxis = 0;
-		else
-		  expect_buttonaxis = none;
-	      }
-	  }
-      }
-    else
-      ++s;
-}
-
-/****************************************************************************/
-
 int
 main (int argc, char **argv)
 {
@@ -1597,54 +1483,7 @@ main (int argc, char **argv)
     basefilename[baseend - basestart + 1] = '\0';
 
   /* initialize joysticks */
-  {
-    int stick;
-
-    for (stick = 0; stick < 2; stick ++)
-      {
-	if (jsdevice[stick])
-	  {
-#ifdef HAVE_LINUX_JOYSTICK_H
-	    if ((jsfd[stick] = open (jsdevice[stick], O_RDONLY)) < 0)
-	      {
-		perror (jsdevice[stick]);
-	      }
-	    else
-	      {
-		ioctl (jsfd[stick], JSIOCGVERSION, jsversion + stick);
-		ioctl (jsfd[stick], JSIOCGAXES, jsaxes + stick);
-		ioctl (jsfd[stick], JSIOCGBUTTONS, jsbuttons + stick);
-		fcntl (jsfd[stick], F_SETFL, O_NONBLOCK);    /* set joystick to non-blocking */
-		if( jsbuttons[stick] == 2 )
-		  {		/* modify button map for a 2-button joystick */
-		    if( !js_usermapped2button[stick][0] )
-		      js_nesmaps[stick].button[0] = BUTTONB;
-		    if( !js_usermapped2button[stick][1] )
-		      js_nesmaps[stick].button[1] = BUTTONA;
-		  }
-
-		if (verbose)
-		  {
-		    fprintf (stderr,
-			     "Joystick %d (%s) has %d axes and %d buttons. Driver version is %d.%d.%d.\n",
-			     stick + 1,
-			     jsdevice[stick],
-			     jsaxes[stick],
-			     jsbuttons[stick],
-			     jsversion[stick] >> 16,
-			     (jsversion[stick] >> 8) & 0xff,
-			     jsversion[stick] & 0xff);
-		  }
-	      }
-#else
-	    fprintf (stderr,
-		     "Joystick support was disabled at compile-time. To enable it, make sure\n"
-		     "you are running a recent version of the Linux kernel with the joystick\n"
-		     "driver enabled, and install the header file <linux/joystick.h>.\n");
-#endif /* HAVE_LINUX_JOYSTICK_H */
-	  }
-      }
-  }
+  js_init();
 
   /* Select a sound sample format */
   {

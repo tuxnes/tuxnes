@@ -65,21 +65,6 @@ extern char	*fb;
 extern int	*palette, *palette2;
 extern char	*tuxnesdir;
 extern char *basefilename;  /* filename without extension */
-extern unsigned char	jsaxes[2];
-extern unsigned char	jsbuttons[2];
-extern int	 jsfd[2];
-extern int	 jsversion[2];
-extern const char	*jsdevice[2];
-extern struct js_nesmap {
-  unsigned char button[JS_MAX_BUTTONS];
-  struct {
-    unsigned char neg;
-    unsigned char pos;
-  } axis[JS_MAX_AXES];
-} js_nesmaps[2];
-extern unsigned char js_mapoption[JS_MAX_NES_BUTTONS];
-extern unsigned char js_axismeso[JS_MAX_AXES];
-extern unsigned char js_usermapped2button[2][2];
 
 /* Flags */
 extern int      verbose;

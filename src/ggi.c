@@ -28,6 +28,7 @@
 
 #include "consts.h"
 #include "globals.h"
+#include "joystick.h"
 #include "mapper.h"
 #include "renderer.h"
 #include "sound.h"
@@ -36,7 +37,6 @@
 void	quit(void);
 void	START(void);
 void	fbinit(void);
-void	HandleJoystickLinux(int);
 
 #ifdef HAVE_GGI
 #include <ggi/gii.h>
@@ -1291,14 +1291,7 @@ UpdateDisplayGGI(void)
     struct timeval tv = { 0, 0 };
 
     /* Handle joystick input */
-    if (jsfd[0] >= 0)
-      {
-	HandleJoystickLinux(0);
-      }
-    if (jsfd[1] >= 0)
-      {
-	HandleJoystickLinux(1);
-      }
+    js_handle_input();
 
     /* Handle GGI input */
     while (ggiEventPoll(visualGGI, emKeyPress | emKeyRelease, &tv)) {
