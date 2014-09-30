@@ -12,11 +12,6 @@
 
 #define MAXMAPPER 255
 
-/* only 1x1 or 2x2 integer scaling is permitted for now */
-#define maxsize 2
-
-#define tilecachedepth 25
-
 /* Constants */
 #define HCYCLES	341	/* PPU cycles per scanline (113.6666.. CPU cycles) */
 #define VLINES	262	/* Total scanlines (including vblank) */

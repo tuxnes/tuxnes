@@ -7,6 +7,9 @@
  * Description: Abstract renderer interface
  */
 
+#ifndef _RENDERER_H_
+#define _RENDERER_H_
+
 #ifndef X_DISPLAY_MISSING
 #define HAVE_X 1
 #endif /* !defined(X_DISPLAY_MISSING) */
@@ -63,6 +66,11 @@ extern struct RendererData {
      int	pause_display;
 } renderer_data;
 
+/* only 1x1 or 2x2 integer scaling is permitted for now */
+#define maxsize 2
+
+#define tilecachedepth 25
+
 extern int	indexedcolor;
 extern int	screenshotnumber;
 extern char	*screenshotfile;
@@ -74,3 +82,5 @@ extern unsigned char	needsredraw;		/* Refresh screen display */
 extern unsigned char	redrawbackground;	/* Redraw tile background */
 extern unsigned char	redrawall;		/* Redraw all scanlines */
 extern unsigned char	palette_cache[tilecachedepth][32];
+
+#endif
