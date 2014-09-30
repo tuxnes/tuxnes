@@ -25,9 +25,4 @@
 #define PBL	81840	/* PPU cycles per frame (not counting vblank) */
 #define PPF	89342	/* PPU cycles per frame */
 
-/* constant filenames */
-#define JS1 "/dev/js0"
-#define JS2 "/dev/js1"
-#define DSP "/dev/dsp"
-
 #endif /* _CONSTS_H_ */

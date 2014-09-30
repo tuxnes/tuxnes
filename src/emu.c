@@ -45,6 +45,11 @@
 #include "renderer.h"
 #include "sound.h"
 
+/* filenames */
+#define JS1 "/dev/js0"
+#define JS2 "/dev/js1"
+#define DSP "/dev/dsp"
+
 u_char	*ROM_BASE;
 u_char	*VROM_BASE;
 char	*filename;
