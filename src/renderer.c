@@ -196,7 +196,7 @@ void
 UpdateDisplayNone(void)
 {
   struct timeval time;
-  unsigned static int frame;
+  static unsigned int frame;
   unsigned int timeframe;
 
   /* do audio update */

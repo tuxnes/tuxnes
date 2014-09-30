@@ -118,48 +118,48 @@ void	UpdateDisplayX11(void);
 void	UpdateDisplayOldX11(void);
 
 /* X11 stuff: */
-Display	*display;
-int	(*oldhandler)(Display *, XErrorEvent *) = 0;
-Visual	*visual;
-Window	 rootwindow, w;
-int	 screen;
-Colormap	colormap;
+static Display	*display;
+static int	(*oldhandler)(Display *, XErrorEvent *) = 0;
+static Visual	*visual;
+static Window	 rootwindow, w;
+static int	 screen;
+static Colormap	colormap;
 
-unsigned int paletteX11[64];
-unsigned int palette2X11[64];
+static unsigned int paletteX11[64];
+static unsigned int palette2X11[64];
 
-unsigned char	*keystate[32];
-GC	gc, blackgc;
-GC	addgc, maskgc;
-GC	backgroundgc, solidbggc;
-GC	color1gc, color2gc, color3gc, bgcolorgc;
-GC	spritesolidcolorgc, spritecolor1gc, spritecolor2gc, spritecolor3gc;
-GC	planegc, blackplanegc, planenorgc, planeandgc, planexorgc;
-int	black, white;
-XSizeHints	sizehints;
-XClassHint      classhints;
-XWMHints        wmhints;
-XGCValues	GCValues;
+static unsigned char	*keystate[32];
+static GC	gc, blackgc;
+static GC	addgc, maskgc;
+static GC	backgroundgc, solidbggc;
+static GC	color1gc, color2gc, color3gc, bgcolorgc;
+static GC	spritesolidcolorgc, spritecolor1gc, spritecolor2gc, spritecolor3gc;
+static GC	planegc, blackplanegc, planenorgc, planeandgc, planexorgc;
+static int	black, white;
+static XSizeHints	sizehints;
+static XClassHint      classhints;
+static XWMHints        wmhints;
+static XGCValues	GCValues;
 static unsigned long	colortableX11[25];
-XColor	color;
+static XColor	color;
 
-Pixmap background[tilecachedepth];      /* The pre-rendered background that sprites are drawn on top of */
-Pixmap bgplane1[tilecachedepth], bgplane2[tilecachedepth], bgplane3[tilecachedepth],
+static Pixmap background[tilecachedepth];      /* The pre-rendered background that sprites are drawn on top of */
+static Pixmap bgplane1[tilecachedepth], bgplane2[tilecachedepth], bgplane3[tilecachedepth],
   bgmask[tilecachedepth];       /* Bitmaps for each color plane of the rendered background */
-Pixmap tilecache1[tilecachedepth], tilecache2[tilecachedepth], tilecache3[tilecachedepth],
+static Pixmap tilecache1[tilecachedepth], tilecache2[tilecachedepth], tilecache3[tilecachedepth],
   tilebgmask[tilecachedepth];   /* Bitmaps for the background tiles in each of the four colors */
-Pixmap layout;                  /* To assemble the final image to be displayed */
-XImage	*tilebitimage, *tilebitimage2;
-unsigned char tilebitdata[256 * maxsize * 64 * maxsize];
-unsigned char tilebitdata2[256 * maxsize * 64 * maxsize];
-XImage	*image = 0;
+static Pixmap layout;                  /* To assemble the final image to be displayed */
+static XImage	*tilebitimage, *tilebitimage2;
+static unsigned char tilebitdata[256 * maxsize * 64 * maxsize];
+static unsigned char tilebitdata2[256 * maxsize * 64 * maxsize];
+static XImage	*image = 0;
 
 /* X11 virtual framebuffer */
-char 	*xfb = 0;
+static char 	*xfb = 0;
 
 /* X11 differential framebuffers */
-char	*xdfb[2] = {0, 0};
-int	xdfb_frame = 0;
+static char	*xdfb[2] = {0, 0};
+static int	xdfb_frame = 0;
 
 /* externel and forward declarations */
 void	fbinit(void);
@@ -177,49 +177,49 @@ static void	UpdateTileColorsOldX11(void);
 static void	UpdateTilesOldX11(void);
 
 /* Flags for OldX11 differential renderer "old" */
-unsigned char	bgmask_changed[tilecachedepth];
-unsigned char	current_bgmask = 0;
-unsigned char	tilebgmask_changed[tilecachedepth];
-unsigned char	tilemask1_changed[tilecachedepth];
-unsigned char	tilemask2_changed[tilecachedepth];
-unsigned char	tilemask3_changed[tilecachedepth];
-unsigned char	scanline_diff[240];
-unsigned short int	tileline_begin[60];
-unsigned short int	tileline_end[60];
+static unsigned char	bgmask_changed[tilecachedepth];
+static unsigned char	current_bgmask = 0;
+static unsigned char	tilebgmask_changed[tilecachedepth];
+static unsigned char	tilemask1_changed[tilecachedepth];
+static unsigned char	tilemask2_changed[tilecachedepth];
+static unsigned char	tilemask3_changed[tilecachedepth];
+static unsigned char	scanline_diff[240];
+static unsigned short int	tileline_begin[60];
+static unsigned short int	tileline_end[60];
 
 /* Precalculated/Cached values */
-unsigned char	spritecache[256];
-unsigned char	ntcache[tilecachedepth][3840];
-unsigned char	vramcache[tilecachedepth][4096];
-unsigned char	tiledirty[tilecachedepth][256];
-unsigned char	tilechanged[256];
-unsigned int	displaytilecache[tilecachedepth][3840];
-unsigned int	displaycolorcache[tilecachedepth][3840];
-unsigned char	displaycachevalid[tilecachedepth][3840];
-unsigned char	bitplanecachevalid[tilecachedepth][3840];
-unsigned int	bgcolor[tilecachedepth];
+static unsigned char	spritecache[256];
+static unsigned char	ntcache[tilecachedepth][3840];
+static unsigned char	vramcache[tilecachedepth][4096];
+static unsigned char	tiledirty[tilecachedepth][256];
+static unsigned char	tilechanged[256];
+static unsigned int	displaytilecache[tilecachedepth][3840];
+static unsigned int	displaycolorcache[tilecachedepth][3840];
+static unsigned char	displaycachevalid[tilecachedepth][3840];
+static unsigned char	bitplanecachevalid[tilecachedepth][3840];
+static unsigned int	bgcolor[tilecachedepth];
 
 /* Misc globals */
-int	hoffset, voffset;
-int	oldhoffset, oldvoffset;
-unsigned short int	oldhscroll[240], oldvscroll[240];
-unsigned int	currentline;
-int	debug_bgoff = 0;
-int	debug_spritesoff = 0;
-int	debug_switchtable = 0;
-int	currentcache = 0;
-int	nextcache = 1 % tilecachedepth;
+static int	hoffset, voffset;
+static int	oldhoffset, oldvoffset;
+static unsigned short int	oldhscroll[240], oldvscroll[240];
+static unsigned int	currentline;
+static int	debug_bgoff = 0;
+static int	debug_spritesoff = 0;
+static int	debug_switchtable = 0;
+static int	currentcache = 0;
+static int	nextcache = 1 % tilecachedepth;
 static int width, height;
 
 #if HAVE_SHM
 
-Status shm_status = 0;
-int shm_major, shm_minor;
-Bool shm_pixmaps;
-XShmSegmentInfo shminfo;
-Status shm_attached = 0;
-int shm_attaching = 0;
-XImage *shm_image = 0;
+static Status shm_status = 0;
+static int shm_major, shm_minor;
+static Bool shm_pixmaps;
+static XShmSegmentInfo shminfo;
+static Status shm_attached = 0;
+static int shm_attaching = 0;
+static XImage *shm_image = 0;
 
 void cleanup_shm (void)
 {
@@ -1437,7 +1437,7 @@ UpdateDisplayOldX11(void)
 {
   static XEvent ev;
   struct timeval time;
-  unsigned static int frame;
+  static unsigned int frame;
   unsigned int timeframe;
   static int sleep = 0;         /* Initially we start with the emulation running.  If you want to wait until the window receives input focus, change this. */
   static int nodisplay = 0;

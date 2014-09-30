@@ -61,9 +61,9 @@ static void	HandleKeyboardW(WEVENT *);
 static WSERVER *serverW;
 static WWIN *winW, *iconW = 0;
 static BITMAP *bitmapW;
-short width, height, x0, y0;
-short paletteW[64], palette2W[64];
-short whitepixel, blackpixel;
+static short width, height, x0, y0;
+static short paletteW[64], palette2W[64];
+static short whitepixel, blackpixel;
 
 #endif
 
@@ -832,7 +832,7 @@ void
 UpdateDisplayW(void)
 {
   struct timeval time;
-  unsigned static int frame;
+  static unsigned int frame;
   unsigned int timeframe;
   static int nodisplay = 0;
 

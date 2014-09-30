@@ -64,17 +64,17 @@ static void	InitScreenshotGGI(void);
 static void	SaveScreenshotGGI(void);
 static void	HandleKeyboardGGI(ggi_event ev);
 
-ggi_visual_t visualGGI;
-const ggi_pixelformat *formatGGI;
-const ggi_directbuffer *bufferGGI[2] = {0, 0};
-int directGGI;
-int numbuffersGGI;
-int frameno;
-ggi_mode modeGGI;
-ggi_pixel whitepixel, blackpixel;
-ggi_pixel paletteGGI[64], palette2GGI[64];
-ggi_pixel basepixel;
-ggi_color colormapGGI[27];
+static ggi_visual_t visualGGI;
+static const ggi_pixelformat *formatGGI;
+static const ggi_directbuffer *bufferGGI[2] = {0, 0};
+static int directGGI;
+static int numbuffersGGI;
+static int frameno;
+static ggi_mode modeGGI;
+static ggi_pixel whitepixel, blackpixel;
+static ggi_pixel paletteGGI[64], palette2GGI[64];
+static ggi_pixel basepixel;
+static ggi_color colormapGGI[27];
 
 #endif
 
@@ -941,7 +941,7 @@ void
 UpdateDisplayGGI(void)
 {
   struct timeval time;
-  unsigned static int frame;
+  static unsigned int frame;
   unsigned int timeframe;
   static int nodisplay = 0;
 
