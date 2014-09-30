@@ -9,7 +9,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "consts.h"
+#include "controller.h"
 #include "globals.h"
 #include "joystick.h"
 #include "renderer.h"
@@ -36,6 +36,7 @@
 #define JS_MAX_NES_BUTTONS 9
 #define JS_MAX_NES_STICKS  2
 
+#define PAUSEDISPLAY 0xff
 
 const char *jsdevice[JS_MAX_NES_STICKS] = { NULL, NULL };
 static int jsfd[JS_MAX_NES_STICKS] = { -1, -1 };
@@ -240,16 +241,13 @@ stick_read(int stick)
 		case 1:  /* button report */
 			{
 				unsigned char nes_button = js_nesmaps[stick].button[js.number];
-				if (nes_button != PAUSEDISPLAY) {
-					if (js.value)
-						controller[stick] |= nes_button;
-					else
-						controller[stick] &= ~nes_button;
-				} else /* (nes_button == PAUSEDISPLAY) */ {
+				if (nes_button == PAUSEDISPLAY) {
 					if (js.value) {
 						renderer_data.pause_display = !renderer_data.pause_display;
 						desync = 1;
 					}
+				} else {
+					ctl_button(stick, nes_button, js.value);
 				}
 			}
 			break;
@@ -258,20 +256,8 @@ stick_read(int stick)
 			{
 				unsigned char nes_button_neg = js_nesmaps[stick].axis[js.number].neg;
 				unsigned char nes_button_pos = js_nesmaps[stick].axis[js.number].pos;
-				unsigned char axismeso[JS_MAX_AXES] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-				if (js.value < -JS_IGNORE) {
-					axismeso[js.number] = nes_button_neg;
-					controller[stick] &= ~nes_button_pos;
-				} else if (js.value > JS_IGNORE) {
-					axismeso[js.number] = nes_button_pos;
-					controller[stick] &= ~nes_button_neg;
-				} else {
-					axismeso[js.number] = 0;
-					controller[stick] &= ~nes_button_neg;
-					controller[stick] &= ~nes_button_pos;
-				}
-				for (int axis_i = JS_MAX_AXES; --axis_i >= 0; )
-					controller[stick] |= axismeso[axis_i];
+				ctl_button(stick, nes_button_neg, js.value < -JS_IGNORE);
+				ctl_button(stick, nes_button_pos, js.value >  JS_IGNORE);
 			}
 			break;
 		}

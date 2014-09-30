@@ -35,6 +35,7 @@
 #endif
 
 #include "consts.h"
+#include "controller.h"
 #include "globals.h"
 #include "joystick.h"
 #include "mapper.h"
@@ -842,8 +843,9 @@ void
 HandleKeyboardX11(XEvent ev)
 {
   KeySym keysym = XkbKeycodeToKeysym (display, ev.xkey.keycode, 0, 0);
+  _Bool press = ev.type == KeyPress;
 
-  if (ev.type == KeyPress && keysym == XK_Escape)
+  if (press && keysym == XK_Escape)
     quit ();                    /* ESC */
 
   /* the coin and dipswitch inputs work only in VS UniSystem mode */
@@ -852,79 +854,47 @@ HandleKeyboardX11(XEvent ev)
       {
       case XK_bracketleft:
       case XK_braceleft:
-        if (renderer_config.sticky_keys)
-          {
-            if (ev.type == KeyPress)
-              coinslot ^= 1;
-          }
-        else if (ev.type == KeyPress)
-          coinslot |= 1;
-        else
-          coinslot &= ~1;
+        ctl_coinslot(0x01, press);
         break;
       case XK_bracketright:
       case XK_braceright:
-        if (renderer_config.sticky_keys)
-          {
-            if (ev.type == KeyPress)
-              coinslot ^= 2;
-          }
-        else if (ev.type == KeyPress)
-          coinslot |= 2;
-        else
-          coinslot &= ~2;
+        ctl_coinslot(0x02, press);
         break;
       case XK_backslash:
       case XK_bar:
-        if (renderer_config.sticky_keys)
-          {
-            if (ev.type == KeyPress)
-              coinslot ^= 4;
-          }
-        else if (ev.type == KeyPress)
-          coinslot |= 4;
-        else
-          coinslot &= ~4;
+        ctl_coinslot(0x04, press);
         break;
       case XK_Q:
       case XK_q:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x01;
+        ctl_dipswitch(0x01, press);
         break;
       case XK_W:
       case XK_w:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x02;
+        ctl_dipswitch(0x02, press);
         break;
       case XK_E:
       case XK_e:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x04;
+        ctl_dipswitch(0x04, press);
         break;
       case XK_R:
       case XK_r:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x08;
+        ctl_dipswitch(0x08, press);
         break;
       case XK_T:
       case XK_t:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x10;
+        ctl_dipswitch(0x10, press);
         break;
       case XK_Y:
       case XK_y:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x20;
+        ctl_dipswitch(0x20, press);
         break;
       case XK_U:
       case XK_u:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x40;
+        ctl_dipswitch(0x40, press);
         break;
       case XK_I:
       case XK_i:
-        if (ev.type == KeyPress)
-          dipswitches ^= 0x80;
+        ctl_dipswitch(0x80, press);
         break;
       }
 
@@ -933,140 +903,60 @@ HandleKeyboardX11(XEvent ev)
       /* controller 1 keyboard mapping */
     case XK_Return:
     case XK_KP_Enter:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= STARTBUTTON;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= STARTBUTTON;
-      else
-        controller[0] &= ~STARTBUTTON;
+      ctl_keypress(0, STARTBUTTON, press);
       break;
     case XK_Tab:
     case XK_ISO_Left_Tab:
     case XK_KP_Add:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= SELECTBUTTON;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= SELECTBUTTON;
-      else
-        controller[0] &= ~SELECTBUTTON;
+      ctl_keypress(0, SELECTBUTTON, press);
       break;
     case XK_Up:
     case XK_KP_Up:
     case XK_KP_8:
     case XK_Pointer_Up:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= UP;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= UP;
-      else
-        controller[0] &= ~UP;
+      ctl_keypress(0, UP, press);
       break;
     case XK_Down:
     case XK_KP_Down:
     case XK_KP_2:
     case XK_Pointer_Down:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= DOWN;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= DOWN;
-      else
-        controller[0] &= ~DOWN;
+      ctl_keypress(0, DOWN, press);
       break;
     case XK_Left:
     case XK_KP_Left:
     case XK_KP_4:
     case XK_Pointer_Left:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= LEFT;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= LEFT;
-      else
-        controller[0] &= ~LEFT;
+      ctl_keypress(0, LEFT, press);
       break;
     case XK_Right:
     case XK_KP_Right:
     case XK_KP_6:
     case XK_Pointer_Right:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= RIGHT;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= RIGHT;
-      else
-        controller[0] &= ~RIGHT;
+      ctl_keypress(0, RIGHT, press);
       break;
     case XK_Pointer_UpLeft:
     case XK_Home:
     case XK_KP_Home:
     case XK_KP_7:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controllerd[0] ^= (UP|LEFT);
-        }
-      else if (ev.type == KeyPress)
-        controllerd[0] |= (UP|LEFT);
-      else
-        controllerd[0] &= ~(UP|LEFT);
+      ctl_keypress_diag(0, UP | LEFT, press);
       break;
     case XK_Pointer_UpRight:
     case XK_Prior:
     case XK_KP_Prior:
     case XK_KP_9:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controllerd[0] ^= (UP|RIGHT);
-        }
-      else if (ev.type == KeyPress)
-        controllerd[0] |= (UP|RIGHT);
-      else
-        controllerd[0] &= ~(UP|RIGHT);
+      ctl_keypress_diag(0, UP | RIGHT, press);
       break;
     case XK_Pointer_DownLeft:
     case XK_End:
     case XK_KP_End:
     case XK_KP_1:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controllerd[0] ^= (DOWN|LEFT);
-        }
-      else if (ev.type == KeyPress)
-        controllerd[0] |= (DOWN|LEFT);
-      else
-        controllerd[0] &= ~(DOWN|LEFT);
+      ctl_keypress_diag(0, DOWN | LEFT, press);
       break;
     case XK_Pointer_DownRight:
     case XK_Next:
     case XK_KP_Next:
     case XK_KP_3:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controllerd[0] ^= (DOWN|RIGHT);
-        }
-      else if (ev.type == KeyPress)
-        controllerd[0] |= (DOWN|RIGHT);
-      else
-        controllerd[0] &= ~(DOWN|RIGHT);
+      ctl_keypress_diag(0, DOWN | RIGHT, press);
       break;
     case XK_Z:
     case XK_z:
@@ -1082,15 +972,7 @@ HandleKeyboardX11(XEvent ev)
     case XK_Eisu_Shift:
     case XK_Control_L:
     case XK_Alt_R:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= BUTTONB;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= BUTTONB;
-      else
-        controller[0] &= ~BUTTONB;
+      ctl_keypress(0, BUTTONB, press);
       break;
     case XK_A:
     case XK_a:
@@ -1106,118 +988,46 @@ HandleKeyboardX11(XEvent ev)
     case XK_KP_Decimal:
     case XK_Alt_L:
     case XK_Control_R:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[0] ^= BUTTONA;
-        }
-      else if (ev.type == KeyPress)
-        controller[0] |= BUTTONA;
-      else
-        controller[0] &= ~BUTTONA;
+      ctl_keypress(0, BUTTONA, press);
       break;
 
       /* controller 2 keyboard mapping */
     case XK_G:
     case XK_g:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= STARTBUTTON;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= STARTBUTTON;
-      else
-        controller[1] &= ~STARTBUTTON;
+      ctl_keypress(1, STARTBUTTON, press);
       break;
     case XK_F:
     case XK_f:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= SELECTBUTTON;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= SELECTBUTTON;
-      else
-        controller[1] &= ~SELECTBUTTON;
+      ctl_keypress(1, SELECTBUTTON, press);
       break;
     case XK_K:
     case XK_k:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= UP;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= UP;
-      else
-        controller[1] &= ~UP;
+      ctl_keypress(1, UP, press);
       break;
     case XK_J:
     case XK_j:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= DOWN;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= DOWN;
-      else
-        controller[1] &= ~DOWN;
+      ctl_keypress(1, DOWN, press);
       break;
     case XK_H:
     case XK_h:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= LEFT;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= LEFT;
-      else
-        controller[1] &= ~LEFT;
+      ctl_keypress(1, LEFT, press);
       break;
     case XK_L:
     case XK_l:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= RIGHT;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= RIGHT;
-      else
-        controller[1] &= ~RIGHT;
+      ctl_keypress(1, RIGHT, press);
       break;
     case XK_V:
     case XK_v:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= BUTTONB;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= BUTTONB;
-      else
-        controller[1] &= ~BUTTONB;
+      ctl_keypress(1, BUTTONB, press);
       break;
     case XK_B:
     case XK_b:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.type == KeyPress)
-            controller[1] ^= BUTTONA;
-        }
-      else if (ev.type == KeyPress)
-        controller[1] |= BUTTONA;
-      else
-        controller[1] &= ~BUTTONA;
+      ctl_keypress(1, BUTTONA, press);
       break;
     }
 
   /* emulator keys */
-  if (ev.type == KeyPress)
+  if (press)
     switch (keysym)
       {
       case XK_F1:

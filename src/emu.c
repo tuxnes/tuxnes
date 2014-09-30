@@ -37,6 +37,7 @@
 #endif
 
 #include "consts.h"
+#include "controller.h"
 #include "gamegenie.h"
 #include "globals.h"
 #include "joystick.h"
@@ -1223,7 +1224,7 @@ main (int argc, char **argv)
 	  swap_inputs = 1;
 	  break;
 	case 'K':
-	  renderer_config.sticky_keys = 1;
+	  sticky_keys = 1;
 	  break;
 	case 'I':
 	  renderer_config.inroot = 1;

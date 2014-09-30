@@ -53,7 +53,6 @@ extern struct Renderer renderers[];
 /* global renderer parameters */
 extern struct RendererConfig {
      int	inroot;
-     int	sticky_keys;
      char	*geometry;
      char	*display_id;
 } renderer_config;

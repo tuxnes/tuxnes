@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "consts.h"
+#include "controller.h"
 #include "globals.h"
 #include "mapper.h"
 #include "renderer.h"
@@ -32,7 +33,6 @@ int	hvscroll = 0;
 int     vramlatch = 0;
 int	hscrollval, vscrollval;
 int	sprite0hit;
-int     swap_inputs = 0;
 
 /* forward and external declarations */
 void	vs(int, int);
@@ -45,11 +45,6 @@ void	trace(int);
 
 /* Declaration of global variables */
 unsigned char	vram[16384];
-/* primary controller status vectors */
-unsigned int	controller[2] = {0, 0};
-/* secondary (diagonal key and joystick "hat") controller status vectprs */
-unsigned int	controllerd[2] = {0, 0};
-unsigned int	coinslot = 0, dipswitches = 0;
 unsigned char	spriteram[256];
 unsigned int	hvmirror = 0;
 unsigned int	nomirror = 0;
@@ -461,16 +456,8 @@ output(int addr, int val)
   /* Reset controller */
   if ((addr | 1) == 0x4017)
     {
-      if (swap_inputs)
-	{
-	  RAM[0x4016] = controller[1] | controllerd[1];
-	  RAM[0x4017] = controller[0] | controllerd[0];
-	}
-      else
-	{
-	  RAM[0x4016] = controller[0] | controllerd[0];
-	  RAM[0x4017] = controller[1] | controllerd[1];
-	}
+      RAM[0x4016] = controller[0] | controllerd[0];
+      RAM[0x4017] = controller[1] | controllerd[1];
     }
 
   /* more debugging stuff: */

@@ -89,8 +89,6 @@ struct Renderer renderers[] = {
 struct RendererConfig renderer_config = {
      /* int	inroot */
      0,
-     /* int	sticky_keys */
-     0,
      /* char	*geometry */
      0,
      /* char    *display_id */

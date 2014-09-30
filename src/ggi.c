@@ -27,6 +27,7 @@
 #include <unistd.h>
 
 #include "consts.h"
+#include "controller.h"
 #include "globals.h"
 #include "joystick.h"
 #include "mapper.h"
@@ -301,7 +302,9 @@ SaveScreenshotGGI(void)
 void
 HandleKeyboardGGI(ggi_event ev)
 {
-  if (ev.any.type == evKeyPress && ev.key.sym == GIIUC_Escape)
+  _Bool press = ev.any.type == evKeyPress;
+
+  if (press && ev.key.sym == GIIUC_Escape)
     {
       ggiClose (visualGGI);
       ggiExit ();
@@ -314,79 +317,47 @@ HandleKeyboardGGI(ggi_event ev)
       {
       case '[':
       case '{':
-        if (renderer_config.sticky_keys)
-          {
-            if (ev.any.type == evKeyPress)
-              coinslot ^= 1;
-          }
-        else if (ev.any.type == evKeyPress)
-          coinslot |= 1;
-        else
-          coinslot &= ~1;
+        ctl_coinslot(0x01, press);
         break;
       case ']':
       case '}':
-        if (renderer_config.sticky_keys)
-          {
-            if (ev.any.type == evKeyPress)
-              coinslot ^= 2;
-          }
-        else if (ev.any.type == evKeyPress)
-          coinslot |= 2;
-        else
-          coinslot &= ~2;
+        ctl_coinslot(0x02, press);
         break;
       case '\\':
       case '|':
-        if (renderer_config.sticky_keys)
-          {
-            if (ev.any.type == evKeyPress)
-              coinslot ^= 4;
-          }
-        else if (ev.any.type == evKeyPress)
-          coinslot |= 4;
-        else
-          coinslot &= ~4;
+        ctl_coinslot(0x04, press);
         break;
       case GIIUC_Q:
       case GIIUC_q:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x01;
+        ctl_dipswitch(0x01, press);
         break;
       case GIIUC_W:
       case GIIUC_w:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x02;
+        ctl_dipswitch(0x02, press);
         break;
       case GIIUC_E:
       case GIIUC_e:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x04;
+        ctl_dipswitch(0x04, press);
         break;
       case GIIUC_R:
       case GIIUC_r:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x08;
+        ctl_dipswitch(0x08, press);
         break;
       case GIIUC_T:
       case GIIUC_t:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x10;
+        ctl_dipswitch(0x10, press);
         break;
       case GIIUC_Y:
       case GIIUC_y:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x20;
+        ctl_dipswitch(0x20, press);
         break;
       case GIIUC_U:
       case GIIUC_u:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x40;
+        ctl_dipswitch(0x40, press);
         break;
       case GIIUC_I:
       case GIIUC_i:
-        if (ev.any.type == evKeyPress)
-          dipswitches ^= 0x80;
+        ctl_dipswitch(0x80, press);
         break;
       }
 
@@ -395,124 +366,44 @@ HandleKeyboardGGI(ggi_event ev)
       /* controller 1 keyboard mapping */
     case GIIUC_Return:
     case GIIK_PEnter:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= STARTBUTTON;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= STARTBUTTON;
-      else
-        controller[0] &= ~STARTBUTTON;
+      ctl_keypress(0, STARTBUTTON, press);
       break;
     case GIIUC_Tab:
     case GIIK_PTab:
     case GIIK_PPlus:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= SELECTBUTTON;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= SELECTBUTTON;
-      else
-        controller[0] &= ~SELECTBUTTON;
+      ctl_keypress(0, SELECTBUTTON, press);
       break;
     case GIIK_Up:
     case GIIK_P8:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= UP;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= UP;
-      else
-        controller[0] &= ~UP;
+      ctl_keypress(0, UP, press);
       break;
     case GIIK_Down:
     case GIIK_P2:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= DOWN;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= DOWN;
-      else
-        controller[0] &= ~DOWN;
+      ctl_keypress(0, DOWN, press);
       break;
     case GIIK_Left:
     case GIIK_P4:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= LEFT;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= LEFT;
-      else
-        controller[0] &= ~LEFT;
+      ctl_keypress(0, LEFT, press);
       break;
     case GIIK_Right:
     case GIIK_P6:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= RIGHT;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= RIGHT;
-      else
-        controller[0] &= ~RIGHT;
+      ctl_keypress(0, RIGHT, press);
       break;
     case GIIK_Home:
     case GIIK_P7:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controllerd[0] ^= (UP|LEFT);
-        }
-      else if (ev.any.type == evKeyPress)
-        controllerd[0] |= (UP|LEFT);
-      else
-        controllerd[0] &= ~(UP|LEFT);
+      ctl_keypress_diag(0, UP | LEFT, press);
       break;
     case GIIK_Prior:
     case GIIK_P9:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controllerd[0] ^= (UP|RIGHT);
-        }
-      else if (ev.any.type == evKeyPress)
-        controllerd[0] |= (UP|RIGHT);
-      else
-        controllerd[0] &= ~(UP|RIGHT);
+      ctl_keypress_diag(0, UP | RIGHT, press);
       break;
     case GIIK_End:
     case GIIK_P1:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controllerd[0] ^= (DOWN|LEFT);
-        }
-      else if (ev.any.type == evKeyPress)
-        controllerd[0] |= (DOWN|LEFT);
-      else
-        controllerd[0] &= ~(DOWN|LEFT);
+      ctl_keypress_diag(0, DOWN | LEFT, press);
       break;
     case GIIK_Next:
     case GIIK_P3:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controllerd[0] ^= (DOWN|RIGHT);
-        }
-      else if (ev.any.type == evKeyPress)
-        controllerd[0] |= (DOWN|RIGHT);
-      else
-        controllerd[0] &= ~(DOWN|RIGHT);
+      ctl_keypress_diag(0, DOWN | RIGHT, press);
       break;
     case GIIUC_Z:
     case GIIUC_z:
@@ -526,15 +417,7 @@ HandleKeyboardGGI(ggi_event ev)
     case GIIK_ShiftR:
     case GIIK_CtrlL:
     case GIIK_AltR:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= BUTTONB;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= BUTTONB;
-      else
-        controller[0] &= ~BUTTONB;
+      ctl_keypress(0, BUTTONB, press);
       break;
     case GIIUC_A:
     case GIIUC_a:
@@ -549,118 +432,46 @@ HandleKeyboardGGI(ggi_event ev)
     case GIIK_PDecimal:
     case GIIK_AltL:
     case GIIK_CtrlR:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[0] ^= BUTTONA;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[0] |= BUTTONA;
-      else
-        controller[0] &= ~BUTTONA;
+      ctl_keypress(0, BUTTONA, press);
       break;
 
       /* controller 2 keyboard mapping */
     case GIIUC_G:
     case GIIUC_g:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= STARTBUTTON;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= STARTBUTTON;
-      else
-        controller[1] &= ~STARTBUTTON;
+      ctl_keypress(1, STARTBUTTON, press);
       break;
     case GIIUC_F:
     case GIIUC_f:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= SELECTBUTTON;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= SELECTBUTTON;
-      else
-        controller[1] &= ~SELECTBUTTON;
+      ctl_keypress(1, SELECTBUTTON, press);
       break;
     case GIIUC_K:
     case GIIUC_k:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= UP;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= UP;
-      else
-        controller[1] &= ~UP;
+      ctl_keypress(1, UP, press);
       break;
     case GIIUC_J:
     case GIIUC_j:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= DOWN;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= DOWN;
-      else
-        controller[1] &= ~DOWN;
+      ctl_keypress(1, DOWN, press);
       break;
     case GIIUC_H:
     case GIIUC_h:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= LEFT;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= LEFT;
-      else
-        controller[1] &= ~LEFT;
+      ctl_keypress(1, LEFT, press);
       break;
     case GIIUC_L:
     case GIIUC_l:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= RIGHT;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= RIGHT;
-      else
-        controller[1] &= ~RIGHT;
+      ctl_keypress(1, RIGHT, press);
       break;
     case GIIUC_V:
     case GIIUC_v:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= BUTTONB;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= BUTTONB;
-      else
-        controller[1] &= ~BUTTONB;
+      ctl_keypress(1, BUTTONB, press);
       break;
     case GIIUC_B:
     case GIIUC_b:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev.any.type == evKeyPress)
-            controller[1] ^= BUTTONA;
-        }
-      else if (ev.any.type == evKeyPress)
-        controller[1] |= BUTTONA;
-      else
-        controller[1] &= ~BUTTONA;
+      ctl_keypress(1, BUTTONA, press);
       break;
     }
 
   /* emulator keys */
-  if (ev.any.type == evKeyPress)
+  if (press)
     switch (ev.key.sym)
       {
 /*       case GIIK_F1: */

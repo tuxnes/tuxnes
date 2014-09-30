@@ -34,6 +34,7 @@
 #endif
 
 #include "consts.h"
+#include "controller.h"
 #include "globals.h"
 #include "joystick.h"
 #include "mapper.h"
@@ -154,7 +155,9 @@ SaveScreenshotW(void)
 void
 HandleKeyboardW(WEVENT *ev)
 {
-  if (ev -> type == EVENT_KEY && ev -> key == 27)
+  _Bool press = ev -> type == EVENT_KEY;
+
+  if (press && ev -> key == 27)
     {
       if (winW != WROOT) w_delete (winW);
       w_exit ();
@@ -167,79 +170,47 @@ HandleKeyboardW(WEVENT *ev)
       {
       case '[':
       case '{':
-        if (renderer_config.sticky_keys)
-          {
-            if (ev -> type == EVENT_KEY)
-              coinslot ^= 1;
-          }
-        else if (ev -> type == EVENT_KEY)
-          coinslot |= 1;
-        else
-          coinslot &= ~1;
+        ctl_coinslot(0x01, press);
         break;
       case ']':
       case '}':
-        if (renderer_config.sticky_keys)
-          {
-            if (ev -> type == EVENT_KEY)
-              coinslot ^= 2;
-          }
-        else if (ev -> type == EVENT_KEY)
-          coinslot |= 2;
-        else
-          coinslot &= ~2;
+        ctl_coinslot(0x02, press);
         break;
       case '\\':
       case '|':
-        if (renderer_config.sticky_keys)
-          {
-            if (ev -> type == EVENT_KEY)
-              coinslot ^= 4;
-          }
-        else if (ev -> type == EVENT_KEY)
-          coinslot |= 4;
-        else
-          coinslot &= ~4;
+        ctl_coinslot(0x04, press);
         break;
       case 'Q':
       case 'q':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x01;
+        ctl_dipswitch(0x01, press);
         break;
       case 'W':
       case 'w':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x02;
+        ctl_dipswitch(0x02, press);
         break;
       case 'E':
       case 'e':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x04;
+        ctl_dipswitch(0x04, press);
         break;
       case 'R':
       case 'r':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x08;
+        ctl_dipswitch(0x08, press);
         break;
       case 'T':
       case 't':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x10;
+        ctl_dipswitch(0x10, press);
         break;
       case 'Y':
       case 'y':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x20;
+        ctl_dipswitch(0x20, press);
         break;
       case 'U':
       case 'u':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x40;
+        ctl_dipswitch(0x40, press);
         break;
       case 'I':
       case 'i':
-        if (ev -> type == EVENT_KEY)
-          dipswitches ^= 0x80;
+        ctl_dipswitch(0x80, press);
         break;
       }
 
@@ -248,114 +219,34 @@ HandleKeyboardW(WEVENT *ev)
       /* controller 1 keyboard mapping */
     case '\r':
     case '\n':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= STARTBUTTON;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= STARTBUTTON;
-      else
-        controller[0] &= ~STARTBUTTON;
+      ctl_keypress(0, STARTBUTTON, press);
       break;
     case '\t':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= SELECTBUTTON;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= SELECTBUTTON;
-      else
-        controller[0] &= ~SELECTBUTTON;
+      ctl_keypress(0, SELECTBUTTON, press);
       break;
     case WKEY_UP:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= UP;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= UP;
-      else
-        controller[0] &= ~UP;
+      ctl_keypress(0, UP, press);
       break;
     case WKEY_DOWN:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= DOWN;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= DOWN;
-      else
-        controller[0] &= ~DOWN;
+      ctl_keypress(0, DOWN, press);
       break;
     case WKEY_LEFT:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= LEFT;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= LEFT;
-      else
-        controller[0] &= ~LEFT;
+      ctl_keypress(0, LEFT, press);
       break;
     case WKEY_RIGHT:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= RIGHT;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= RIGHT;
-      else
-        controller[0] &= ~RIGHT;
+      ctl_keypress(0, RIGHT, press);
       break;
     case WKEY_HOME:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controllerd[0] ^= (UP|LEFT);
-        }
-      else if (ev -> type == EVENT_KEY)
-        controllerd[0] |= (UP|LEFT);
-      else
-        controllerd[0] &= ~(UP|LEFT);
+      ctl_keypress_diag(0, UP | LEFT, press);
       break;
     case WKEY_PGUP:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controllerd[0] ^= (UP|RIGHT);
-        }
-      else if (ev -> type == EVENT_KEY)
-        controllerd[0] |= (UP|RIGHT);
-      else
-        controllerd[0] &= ~(UP|RIGHT);
+      ctl_keypress_diag(0, UP | RIGHT, press);
       break;
     case WKEY_END:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controllerd[0] ^= (DOWN|LEFT);
-        }
-      else if (ev -> type == EVENT_KEY)
-        controllerd[0] |= (DOWN|LEFT);
-      else
-        controllerd[0] &= ~(DOWN|LEFT);
+      ctl_keypress_diag(0, DOWN | LEFT, press);
       break;
     case WKEY_PGDOWN:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controllerd[0] ^= (DOWN|RIGHT);
-        }
-      else if (ev -> type == EVENT_KEY)
-        controllerd[0] |= (DOWN|RIGHT);
-      else
-        controllerd[0] &= ~(DOWN|RIGHT);
+      ctl_keypress_diag(0, DOWN | RIGHT, press);
       break;
     case 'Z':
     case 'z':
@@ -371,15 +262,7 @@ HandleKeyboardW(WEVENT *ev)
     case WMOD_META | WMOD_RIGHT:
     case WMOD_ALTGR | WMOD_LEFT:
     case WMOD_ALTGR | WMOD_RIGHT:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= BUTTONB;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= BUTTONB;
-      else
-        controller[0] &= ~BUTTONB;
+      ctl_keypress(0, BUTTONB, press);
       break;
     case 'A':
     case 'a':
@@ -389,118 +272,46 @@ HandleKeyboardW(WEVENT *ev)
     case WKEY_DEL:
     case WMOD_ALT | WMOD_LEFT:
     case WMOD_CTRL | WMOD_RIGHT:
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[0] ^= BUTTONA;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[0] |= BUTTONA;
-      else
-        controller[0] &= ~BUTTONA;
+      ctl_keypress(0, BUTTONA, press);
       break;
 
       /* controller 2 keyboard mapping */
     case 'G':
     case 'g':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= STARTBUTTON;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= STARTBUTTON;
-      else
-        controller[1] &= ~STARTBUTTON;
+      ctl_keypress(1, STARTBUTTON, press);
       break;
     case 'F':
     case 'f':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= SELECTBUTTON;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= SELECTBUTTON;
-      else
-        controller[1] &= ~SELECTBUTTON;
+      ctl_keypress(1, SELECTBUTTON, press);
       break;
     case 'K':
     case 'k':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= UP;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= UP;
-      else
-        controller[1] &= ~UP;
+      ctl_keypress(1, UP, press);
       break;
     case 'J':
     case 'j':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= DOWN;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= DOWN;
-      else
-        controller[1] &= ~DOWN;
+      ctl_keypress(1, DOWN, press);
       break;
     case 'H':
     case 'h':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= LEFT;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= LEFT;
-      else
-        controller[1] &= ~LEFT;
+      ctl_keypress(1, LEFT, press);
       break;
     case 'L':
     case 'l':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= RIGHT;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= RIGHT;
-      else
-        controller[1] &= ~RIGHT;
+      ctl_keypress(1, RIGHT, press);
       break;
     case 'V':
     case 'v':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= BUTTONB;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= BUTTONB;
-      else
-        controller[1] &= ~BUTTONB;
+      ctl_keypress(1, BUTTONB, press);
       break;
     case 'B':
     case 'b':
-      if (renderer_config.sticky_keys)
-        {
-          if (ev -> type == EVENT_KEY)
-            controller[1] ^= BUTTONA;
-        }
-      else if (ev -> type == EVENT_KEY)
-        controller[1] |= BUTTONA;
-      else
-        controller[1] &= ~BUTTONA;
+      ctl_keypress(1, BUTTONA, press);
       break;
     }
 
   /* emulator keys */
-  if (ev -> type == EVENT_KEY)
+  if (press)
     switch (ev -> key)
       {
 /*       case WKEY_F1: */

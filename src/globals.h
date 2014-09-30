@@ -27,13 +27,9 @@ extern void	(*MapperInit[])(void);
 extern void	(*drawimage)(int);
 
 /* Global Variables */
-extern int      swap_inputs;
 extern int	desync;
 extern unsigned short int hscroll[], vscroll[];
 extern unsigned char	 linereg[];
-extern unsigned int	 controller[2];
-extern unsigned int	 controllerd[2];
-extern unsigned int	 coinslot, dipswitches;
 extern unsigned char	 spriteram[];
 extern unsigned char	 vram[];
 extern unsigned int	*NES_palette;
