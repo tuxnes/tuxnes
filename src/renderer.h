@@ -62,3 +62,15 @@ extern struct RendererData {
      int	basetime;
      int	pause_display;
 } renderer_data;
+
+extern int	indexedcolor;
+extern int	screenshotnumber;
+extern char	*screenshotfile;
+extern int	magstep;
+extern int	halfspeed, doublespeed;
+extern int	desync;
+extern unsigned int	currentbgcolor, oldbgcolor;
+extern unsigned char	needsredraw;		/* Refresh screen display */
+extern unsigned char	redrawbackground;	/* Redraw tile background */
+extern unsigned char	redrawall;		/* Redraw all scanlines */
+extern unsigned char	palette_cache[tilecachedepth][32];

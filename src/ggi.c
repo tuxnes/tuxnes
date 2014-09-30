@@ -63,13 +63,6 @@ void	UpdateDisplayGGI(void);
 static void	InitScreenshotGGI(void);
 static void	SaveScreenshotGGI(void);
 static void	HandleKeyboardGGI(ggi_event ev);
-extern unsigned char	palette_cache[tilecachedepth][32];
-extern int	screenshotnumber;
-extern char	*screenshotfile;
-extern unsigned char	needsredraw;		/* Refresh screen display */
-extern unsigned char	redrawbackground;	/* Redraw tile background */
-extern unsigned char	redrawall;		/* Redraw all scanlines */
-extern unsigned int	currentbgcolor, oldbgcolor;
 
 ggi_visual_t visualGGI;
 const ggi_pixelformat *formatGGI;

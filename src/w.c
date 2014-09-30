@@ -57,13 +57,6 @@ void	UpdateDisplayW(void);
 static void	InitScreenshotW(void);
 static void	SaveScreenshotW(void);
 static void	HandleKeyboardW(WEVENT *);
-extern unsigned char	palette_cache[tilecachedepth][32];
-extern int	screenshotnumber;
-extern char	*screenshotfile;
-extern unsigned char	needsredraw;		/* Refresh screen display */
-extern unsigned char	redrawbackground;	/* Redraw tile background */
-extern unsigned char	redrawall;		/* Redraw all scanlines */
-extern unsigned int	currentbgcolor, oldbgcolor;
 
 static WSERVER *serverW;
 static WWIN *winW, *iconW = 0;

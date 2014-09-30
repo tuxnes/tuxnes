@@ -27,7 +27,6 @@ extern void	(*MapperInit[])(void);
 extern void	(*drawimage)(int);
 
 /* Global Variables */
-extern int	desync;
 extern unsigned short int hscroll[], vscroll[];
 extern unsigned char	 linereg[];
 extern unsigned char	 spriteram[];
@@ -43,8 +42,6 @@ extern unsigned int	 bpu;
 extern unsigned int	 bitmap_pad;
 extern unsigned int	 depth;
 extern unsigned int      bytes_per_line;
-extern int	magstep;
-extern int	xpan, ypan;
 extern unsigned int	 lsb_first;
 extern unsigned int	 lsn_first;
 extern unsigned int	 pix_swab;
@@ -67,9 +64,6 @@ extern int      verbose;
 extern int	disassemble;
 extern int	ignorebadinstr;
 extern int	unisystem;
-extern int	halfspeed;
-extern int      doublespeed;
-extern int	indexedcolor;
 
 /* Asm linkage */
 extern unsigned int	STACKPTR;   /* Store 6502 stack pointer */

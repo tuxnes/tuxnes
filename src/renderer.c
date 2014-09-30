@@ -103,6 +103,18 @@ struct RendererData renderer_data = {
      0
 };
 
+int	indexedcolor = 1;
+int	screenshotnumber = 0;
+char	*screenshotfile;
+int	magstep = 0;
+int	halfspeed = 0, doublespeed = 0;
+int	desync = 1;
+unsigned int	currentbgcolor, oldbgcolor;
+unsigned char	needsredraw = 1;	/* Refresh screen display */
+unsigned char	redrawbackground = 1;	/* Redraw tile background */
+unsigned char	redrawall = 1;		/* Redraw all scanlines */
+unsigned char	palette_cache[tilecachedepth][32];
+
 int
 InitDisplayAuto(int argc, char **argv)
 {
