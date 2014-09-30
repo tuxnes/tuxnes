@@ -96,7 +96,7 @@ InitScreenshotGGI(void)
   int			currentnumber = 0;
   int 			ppm_argc = 1;
   char 			*ppm_argv[] = {
-    PRETTY_NAME
+    PACKAGE_NAME
   };
 
   /* Initialize PPM */
@@ -675,7 +675,7 @@ InitDisplayGGI(int argc, char **argv)
 		   "======================================================\n"
 		   "GGI: ggiSetPalette failed in GT_PALETTE mode!\n"
 		   "\n"
-		   "To work around this problem, run " PRETTY_NAME " with the\n"
+		   "To work around this problem, run " PACKAGE_NAME " with the\n"
 		   "--static-color option.\n"
 		   "\n"
 		   "There is probably a bug in your GGI display driver.\n"

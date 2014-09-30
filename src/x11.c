@@ -393,7 +393,7 @@ InitDisplayX11(int argc, char **argv)
   int border;
   struct timeval time;
   char *wname[] = {
-    PRETTY_NAME,
+    PACKAGE_NAME,
     PACKAGE
   };
   XTextProperty name[2];

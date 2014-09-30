@@ -506,7 +506,7 @@ InitDisplayW(int argc, char **argv)
 	  fprintf (stderr, "%s: failed to create window\n", argv[0]);
 	  exit (1);
 	}
-      w_settitle (winW, PRETTY_NAME);
+      w_settitle (winW, PACKAGE_NAME);
       limit2screen (winW, &x0, &y0);
     }
   /* Allocate rendering bitmap */

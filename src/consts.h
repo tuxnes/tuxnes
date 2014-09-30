@@ -25,9 +25,6 @@
 #define PBL	81840	/* PPU cycles per frame (not counting vblank) */
 #define PPF	89342	/* PPU cycles per frame */
 
-/* prettified package name */
-#define PRETTY_NAME "TuxNES"
-
 /* constant filenames */
 #define JS1 "/dev/js0"
 #define JS2 "/dev/js1"

@@ -208,7 +208,7 @@ fbinit(void)
 		   "\n");
 	  fprintf (stderr, "%s @ 4bpp\n",
 		   renderer->fullname);
-	  fprintf (stderr, PRETTY_NAME " release: %s-%s\n", PACKAGE, VERSION);
+	  fprintf (stderr, PACKAGE_NAME " release: %s-%s\n", PACKAGE, VERSION);
 	  fprintf (stderr, "Built on %s at %s\n", __DATE__, __TIME__);
 	  fprintf (stderr, "\n");
 	  fprintf (stderr, "OS version and platform:\n");
