@@ -159,7 +159,7 @@ void	mmc2_4_latchspr(int);
 
 #undef BPP
 
-void
+static void
 drawimage_old(int endclock)
 {
   return;

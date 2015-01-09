@@ -80,7 +80,7 @@ static ggi_color colormapGGI[27];
 
 #ifdef HAVE_GGI
 
-void
+static void
 InitScreenshotGGI(void)
 {
 #if HAVE_PPM
@@ -148,7 +148,7 @@ InitScreenshotGGI(void)
 #endif
 }
 
-void
+static void
 SaveScreenshotGGI(void)
 {
 #ifdef HAVE_PPM
@@ -292,7 +292,7 @@ SaveScreenshotGGI(void)
 #endif /* HAVE_PPM */
 }
 
-void
+static void
 HandleKeyboardGGI(ggi_event ev)
 {
   _Bool press = ev.any.type == evKeyPress;

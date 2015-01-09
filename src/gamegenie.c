@@ -16,7 +16,7 @@
 
 static int	ggtable(char);
 
-int
+static int
 ggtable(char lookup)
 {
   switch (toupper (lookup))

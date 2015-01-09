@@ -13,7 +13,7 @@
 
 void	disas(int);
 
-char Opcodes_6502[256][4] =
+static char Opcodes_6502[256][4] =
 {
   "BRK", "ORA", "BAD", "BAD", "BAD", "ORA", "ASL", "BAD",
   "PHP", "ORA", "ASL", "BAD", "BAD", "ORA", "ASL", "BAD",
@@ -60,7 +60,7 @@ char Opcodes_6502[256][4] =
 #define IND 9
 #define REL 10
 #define IMM 11
-unsigned char Modes_6502[256] =
+static unsigned char Modes_6502[256] =
 {
   0, ZPIx, 0, 0, 0, ZP, ZP, 0,
   0, IMM, 0, 0, 0, ABS, ABS, 0,

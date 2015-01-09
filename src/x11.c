@@ -221,7 +221,8 @@ static Status shm_attached = 0;
 static int shm_attaching = 0;
 static XImage *shm_image = 0;
 
-void cleanup_shm (void)
+static void
+cleanup_shm(void)
 {
   if (shminfo.shmid >= 0)
     {
@@ -241,7 +242,7 @@ void cleanup_shm (void)
 
 #endif
 
-void
+static void
 InitScreenshotX11(void)
 {
   DIR			*dir;
@@ -288,7 +289,7 @@ InitScreenshotX11(void)
   closedir (dir);
 }
 
-void
+static void
 SaveScreenshotX11(void)
 {
   int status;
@@ -353,7 +354,8 @@ SaveScreenshotX11(void)
 #endif /* HAVE_XPM */
 }
 
-int handler(Display *display, XErrorEvent *ev)
+static int
+handler(Display *display, XErrorEvent *ev)
 {
 #if HAVE_SHM
   if (shm_attaching &&
@@ -826,7 +828,7 @@ InitDisplayX11(int argc, char **argv)
   return 0;
 }
 
-void
+static void
 HandleKeyboardX11(XEvent ev)
 {
   KeySym keysym = XkbKeycodeToKeysym (display, ev.xkey.keycode, 0, 0);
@@ -1578,7 +1580,7 @@ UpdateDisplayOldX11(void)
 }
 
 /* Update the background as necessary */
-void
+static void
 DoBackgroundOldX11(void)
 {
   unsigned int x, y, z;
@@ -1927,7 +1929,7 @@ DoBackgroundOldX11(void)
   /*if (count)printf("bg tiles changed: %d\n",count); */
 }
 
-void
+static void
 UpdateTilesOldX11(void)
 {
   int x, y, l, n;
@@ -2214,7 +2216,7 @@ UpdateTilesOldX11(void)
     }
 }
 
-void
+static void
 LayoutBackgroundOldX11(void)
 {
   int y, z;
@@ -2487,7 +2489,7 @@ UpdateColorsX11(void)
 
 /* Update the tile colors for the current cache if the palette changed */
 /* (direct color mode only) */
-void
+static void
 UpdateTileColorsOldX11(void)
 {
   int x, y, t;
@@ -2558,7 +2560,7 @@ UpdateTileColorsOldX11(void)
 /* This looks up a pixel on the screen and returns 1 if it is in the
    foreground and 0 if it is in the background.  This is used for the
    sprite transparency. */
-int
+static int
 InForegroundOldX11(unsigned int x, unsigned int y)
 {
   unsigned int		h, v;
@@ -2583,7 +2585,7 @@ InForegroundOldX11(unsigned int x, unsigned int y)
   return ((d1 | d2) >> (~x & 7)) & 1;
 }
 
-void
+static void
 DrawSpritesOldX11(void)
 {
   int x, y;
@@ -2795,7 +2797,7 @@ DrawSpritesOldX11(void)
     }
 }
 
-void
+static void
 DiffUpdateOldX11(void)
 {
   static int old_screen_on;

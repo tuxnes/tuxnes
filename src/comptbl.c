@@ -286,7 +286,7 @@ parse_error:
 
 
 /* Recursively build binary search tree */
-int
+static int
 do_tree(int sbn, int *blockp)
 {
   int			*nblockp;
@@ -323,7 +323,7 @@ do_tree(int sbn, int *blockp)
   return (0);
 }
 
-void
+static void
 memory_error(void)
 {
   printf ("Buffer memory exceeded in comptbl\n");

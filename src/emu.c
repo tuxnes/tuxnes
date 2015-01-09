@@ -383,8 +383,8 @@ void (*oldtraphandler)(int);
 
 /****************************************************************************/
 
-void
-traphandler (int signum)
+static void
+traphandler(int signum)
 {
   if (signal (SIGTRAP, &traphandler) == SIG_ERR)
     {
@@ -849,7 +849,7 @@ restoresavedgame(void)
 
 /****************************************************************************/
 
-void
+static void
 loadpal(char *palfile)
 {
   /* for the raw palette data */

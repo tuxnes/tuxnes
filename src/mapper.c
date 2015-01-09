@@ -184,7 +184,7 @@ MapRom(int page, unsigned loc, unsigned size)
 
 /****************************************************************************/
 
-void
+static void
 init_none(void)
 {
   if (ROM_PAGES < 2)
@@ -202,7 +202,7 @@ init_none(void)
 /****************************************************************************/
 
 /* defaults for MMC1 (Zelda, etc) */
-void
+static void
 init_mmc1(void)
 {
   /* First page is mapped to first page of rom */
@@ -312,7 +312,7 @@ mmc1(int addr, int val)
 
 /****************************************************************************/
 
-void
+static void
 init_unrom(void)
 {
   /* figure out if the PRG bank should be masked */
@@ -348,7 +348,7 @@ unrom(int addr, int val)
 
 /****************************************************************************/
 
-void
+static void
 init_cnrom(void)
 {
   /* figure out if the CHR bank should be masked */
@@ -380,7 +380,7 @@ cnrom(int addr, int val)
 /****************************************************************************/
 
 /* defaults for MMC3 (SMB2, etc) */
-void
+static void
 init_mmc3(void)
 {
   /* this is a quick hack to satisfy a technical purity issue */
@@ -558,7 +558,7 @@ static int prgmask8;
 static int prgmask16;
 static int prgmask32;
 
-void
+static void
 init_mmc5(void)
 {
   int i;
@@ -775,7 +775,7 @@ mmc5(int addr, int val)
 /****************************************************************************/
 
 /* mapper 7: Rare */
-void
+static void
 init_aorom(void)
 {
   mapmirror = osmirror = 1;
@@ -805,14 +805,14 @@ aorom(int addr, int val)
 /****************************************************************************/
 
 /* MMC2 for PunchOut contributed by Kristoffer Brånemyr */
-int mmc2_4_latch1;
-int mmc2_4_latch1hi;
-int mmc2_4_latch1low;
-int mmc2_4_latch2;
-int mmc2_4_latch2hi;
-int mmc2_4_latch2low;
-int mmc2_4_init = 0;
-void
+static int mmc2_4_latch1;
+static int mmc2_4_latch1hi;
+static int mmc2_4_latch1low;
+static int mmc2_4_latch2;
+static int mmc2_4_latch2hi;
+static int mmc2_4_latch2low;
+static int mmc2_4_init = 0;
+static void
 init_mmc2(void)
 {
   /* the first page is at the start of the rom */
@@ -831,7 +831,7 @@ init_mmc2(void)
   mmc2_4_init = 1;
 }
 
-void
+static void
 init_mmc4(void)
 {
   MapRom (PAGE_8000, 0, SIZE_16K);
@@ -996,7 +996,7 @@ mmc4(int addr, int val)
 /****************************************************************************/
 
 /* Mapper 11 (Colordreams) */
-void
+static void
 init_clrdrms(void)
 {
   /* figure out if the PRG bank should be masked */
@@ -1037,7 +1037,7 @@ clrdrms(int addr, int val)
 /****************************************************************************/
 
 /* Mapper 13 (CPROM) */
-void
+static void
 init_cprom(void)
 {
   MapRom (PAGE_8000, 0, SIZE_32K);
@@ -1057,7 +1057,7 @@ cprom(int addr, int val)
 /****************************************************************************/
 
 /* 100-in-1 mapper */
-void
+static void
 init_100in1(void)
 {
   mapmirror = 0;
@@ -1155,7 +1155,7 @@ m100in1(int addr, int val)
 /****************************************************************************/
 
 /* Mapper 19, Namcot 106 */
-void
+static void
 init_namcot106(void)
 {
   /* figure out if the PRG bank should be masked */
@@ -1246,7 +1246,7 @@ namcot106(int addr, int val)
 /****************************************************************************/
 
 /* Konami VRC2 type A */
-void
+static void
 init_vrc2_a(void)
 {
   MapRom (PAGE_8000, 0, SIZE_16K);
@@ -1393,7 +1393,7 @@ printf("VROM page 0x%02X loaded at 0x1C00\n", reg1C00 >> 1);
 
 /****************************************************************************/
 /* Konami VRC2 type B */
-void
+static void
 init_vrc2_b(void)
 {
   MapRom (PAGE_8000, 0, SIZE_16K);
@@ -1509,7 +1509,7 @@ vrc2_b(int addr, int val)
 /****************************************************************************/
 
 /* Irem G-101 */
-void
+static void
 init_g101(void)
 {
   MapRom (PAGE_8000, 0, SIZE_16K);
@@ -1571,7 +1571,7 @@ g101(int addr, int val)
 /****************************************************************************/
 
 /* Taito TC0190 */
-void
+static void
 init_taito_tc0190(void)
 {
   /* figure out if the PRG bank should be masked */
@@ -1640,7 +1640,7 @@ taito_tc0190(int addr, int val)
 /****************************************************************************/
 
 /* Tengen RAMBO-1 */
-void
+static void
 init_tengen_rambo1(void)
 {
   MapRom (PAGE_8000, (ROM_PAGES - 1) * 16384 + 8192, SIZE_8K);
@@ -1749,7 +1749,7 @@ void tengen_rambo1(int addr, int val)
 /****************************************************************************/
 
 /* GNROM */
-void
+static void
 init_gnrom(void)
 {
   MapRom (PAGE_8000, 0, SIZE_32K);
@@ -1770,7 +1770,7 @@ gnrom(int addr, int val)
 /****************************************************************************/
 
 /* Sunsoft Mapper 4 */
-void
+static void
 init_sunsoft4(void)
 {
   MapRom (PAGE_8000, 0, SIZE_16K);
@@ -1840,7 +1840,7 @@ sunsoft4(int addr, int val)
 /****************************************************************************/
 
 /* FME-7 */
-void
+static void
 init_fme7(void)
 {
   MapRom (PAGE_8000, 0, SIZE_16K);
@@ -1910,7 +1910,7 @@ fme7(int addr, int val)
 /****************************************************************************/
 
 /* Camerica */
-void
+static void
 init_camerica(void)
 {
   MapRom (PAGE_8000, 0, SIZE_16K);
@@ -1939,7 +1939,7 @@ camerica(int addr, int val)
 /****************************************************************************/
 
 /* Irem 74HC161_32 */
-void
+static void
 init_irem_74hc161_32(void)
 {
   /* figure out if the PRG bank should be masked */
@@ -1979,7 +1979,7 @@ void irem_74hc161_32(int addr, int val)
 
 static int vsreg = 0;
 
-void
+static void
 init_vs(void)
 {
   MapRom (PAGE_8000, 0, SIZE_32K);
@@ -2007,7 +2007,7 @@ vs(int addr, int val)
 /****************************************************************************/
 
 /* SuperVision */
-void
+static void
 init_supervision(void)
 {
   /* on power-up, mapper acts as if $8000 has been written */
@@ -2055,7 +2055,7 @@ void supervision(int addr, int val)
 /****************************************************************************/
 
 /* NINA-07 */
-void
+static void
 init_nina7(void)
 {
   MapRom (PAGE_8000, (ROM_PAGES / 2 - 1) * 32768, SIZE_32K);

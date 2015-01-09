@@ -69,7 +69,7 @@ static short whitepixel, blackpixel;
 
 #ifdef HAVE_W
 
-void
+static void
 InitScreenshotW(void)
 {
   DIR			*dir;
@@ -116,7 +116,7 @@ InitScreenshotW(void)
   closedir (dir);
 }
 
-void
+static void
 SaveScreenshotW(void)
 {
   /* make sure we don't over-write screenshots written by a concurrent TuxNES process */
@@ -145,7 +145,7 @@ SaveScreenshotW(void)
     }
 }
 
-void
+static void
 HandleKeyboardW(WEVENT *ev)
 {
   _Bool press = ev -> type == EVENT_KEY;
