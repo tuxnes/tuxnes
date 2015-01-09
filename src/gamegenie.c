@@ -23,55 +23,38 @@ ggtable(char lookup)
     {
     case 'A':
       return 0x0;
-      break;
     case 'P':
       return 0x1;
-      break;
     case 'Z':
       return 0x2;
-      break;
     case 'L':
       return 0x3;
-      break;
     case 'G':
       return 0x4;
-      break;
     case 'I':
       return 0x5;
-      break;
     case 'T':
       return 0x6;
-      break;
     case 'Y':
       return 0x7;
-      break;
     case 'E':
       return 0x8;
-      break;
     case 'O':
       return 0x9;
-      break;
     case 'X':
       return 0xA;
-      break;
     case 'U':
       return 0xB;
-      break;
     case 'K':
       return 0xC;
-      break;
     case 'S':
       return 0xD;
-      break;
     case 'V':
       return 0xE;
-      break;
     case 'N':
       return 0xF;
-      break;
     default:
       return -1;
-      break;
     }
 }
 
