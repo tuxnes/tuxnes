@@ -14,6 +14,6 @@
 #define GAME_GENIE_6_CHAR 1
 #define GAME_GENIE_8_CHAR 2
 
-int DecodeGameGenieCode (char *ggcode, int *address, int *data, int *compare);
+int DecodeGameGenieCode(const char *ggcode, int *address, int *data, int *compare);
 
 #endif /* _GAMEGENIE_H_ */
