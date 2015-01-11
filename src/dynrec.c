@@ -10,6 +10,10 @@
  * *(next_code_alloc++). Pretty simple, huh?
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include "mapper.h"
 #include "globals.h"

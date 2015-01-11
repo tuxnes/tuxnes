@@ -7,6 +7,10 @@
  * Description: Loads a .nes rom from a .zip file.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string.h>
 #include <ctype.h>
 
