@@ -5,8 +5,8 @@
  * this project.
  */
 
-#ifndef _JOYSTICK_H_
-#define _JOYSTICK_H_
+#ifndef JOYSTICK_H
+#define JOYSTICK_H
 
 extern const char *jsdevice[2];
 

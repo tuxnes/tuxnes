@@ -7,8 +7,8 @@
  * Description: Constants for the Game Genie translator functions
  */
 
-#ifndef _GAMEGENIE_H_
-#define _GAMEGENIE_H_
+#ifndef GAMEGENIE_H
+#define GAMEGENIE_H
 
 #define GAME_GENIE_BAD_CODE 0
 #define GAME_GENIE_6_CHAR 1
@@ -16,4 +16,4 @@
 
 int DecodeGameGenieCode(const char *ggcode, int *address, int *data, int *compare);
 
-#endif /* _GAMEGENIE_H_ */
+#endif

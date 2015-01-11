@@ -7,8 +7,8 @@
  * Description: Abstract renderer interface
  */
 
-#ifndef _RENDERER_H_
-#define _RENDERER_H_
+#ifndef RENDERER_H
+#define RENDERER_H
 
 #ifndef X_DISPLAY_MISSING
 #define HAVE_X 1

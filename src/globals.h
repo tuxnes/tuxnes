@@ -7,8 +7,8 @@
  * Description: A bunch of global variables
  */
 
-#ifndef _GLOBALS_H_
-#define _GLOBALS_H_
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
 #include "consts.h"
 
@@ -83,4 +83,4 @@ struct configvars
 };
 extern struct configvars config;
 
-#endif /* _GLOBALS_H_ */
+#endif

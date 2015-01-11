@@ -5,8 +5,8 @@
  * this project.
  */
 
-#ifndef _CONTROLLER_H_
-#define _CONTROLLER_H_
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
 #define BUTTONA      0x01
 #define BUTTONB      0x02

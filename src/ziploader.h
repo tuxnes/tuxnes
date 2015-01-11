@@ -8,8 +8,8 @@
  * ziploader.
  */
 
-#ifndef _ZIPLOADER_H_
-#define _ZIPLOADER_H_
+#ifndef ZIPLOADER_H
+#define ZIPLOADER_H
 
 #include "unzip.h"
 

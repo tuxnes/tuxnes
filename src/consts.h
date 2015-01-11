@@ -7,8 +7,8 @@
  * Description: Miscellaneous constants for the TuxNES program.
  */
 
-#ifndef _CONSTS_H_
-#define _CONSTS_H_
+#ifndef CONSTS_H
+#define CONSTS_H
 
 #define MAXMAPPER 255
 
@@ -20,4 +20,4 @@
 #define PBL	81840	/* PPU cycles per frame (not counting vblank) */
 #define PPF	89342	/* PPU cycles per frame */
 
-#endif /* _CONSTS_H_ */
+#endif
