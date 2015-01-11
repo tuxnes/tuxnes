@@ -16,11 +16,9 @@
 #include <features.h>
 #endif /* HAVE_FEATRES_H */
 
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/wait.h>
-#include <dirent.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +38,7 @@
 #include "joystick.h"
 #include "mapper.h"
 #include "renderer.h"
+#include "screenshot.h"
 #include "sound.h"
 
 #ifdef HAVE_X
@@ -245,70 +244,16 @@ cleanup_shm(void)
 static void
 InitScreenshotX11(void)
 {
-  DIR			*dir;
-  struct		dirent *dirp;
-  int			currentnumber = 0;
-
-  /* Allocate space for (tuxnesdir) + (basefilename-snap-xxxx.xpm) + ('\0') */
-  if ((screenshotfile = (char *) malloc (strlen (tuxnesdir) +
-    strlen (basefilename) + 1 + 4 + 1 + 4 + 1 + 3 + 1)) == NULL)
-    {
-      perror ("malloc");
-      exit (1);
-    }
-  sprintf(screenshotfile, "%s-snap-", basefilename);
-
-  /* open the screenshot directory */
-  if ((dir = opendir (tuxnesdir)) == NULL)
-    {
-      return;
-    }
-
-  /* iterate through the files and establish the starting screenshot number */
-  while ((dirp = readdir (dir)) != NULL)
-    {
-      if ((strlen(dirp->d_name) >= 8)
-          && (strncmp (dirp->d_name, screenshotfile, strlen (screenshotfile)) == 0)
-          && (strncmp (dirp->d_name + strlen (dirp->d_name) - 4, ".xpm",
-            strlen (".xpm")) == 0))
-        {
-          dirp->d_name[strlen (dirp->d_name) - 4] = '\0';
-          if ((currentnumber = atoi (dirp->d_name + strlen (screenshotfile))) >
-            screenshotnumber)
-            {
-              screenshotnumber = currentnumber;
-            }
-        }
-    }
-
-  if (++screenshotnumber > 9999)
-    {
-      screenshotnumber = 0;
-    }
-
-  closedir (dir);
+  screenshot_init(".xpm");
 }
 
 static void
 SaveScreenshotX11(void)
 {
+#ifdef HAVE_XPM
   int status;
 
-  /* make sure we don't over-write screenshots written by a concurrent TuxNES process */
-  {
-    struct stat buf[1];
-
-    do
-      sprintf (screenshotfile, "%s%s-snap-%04u.xpm", tuxnesdir, basefilename,
-        screenshotnumber ++);
-    while ((! stat (screenshotfile, buf)) && ! (screenshotnumber > 9999));
-  }
-
-  if (screenshotnumber > 9999)
-    {
-      screenshotnumber = 0;
-    }
-#ifdef HAVE_XPM
+  screenshot_new();
   if (renderer->_flags & RENDERER_OLD)
     {
       if (depth == 1)

@@ -104,8 +104,6 @@ struct RendererData renderer_data = {
 };
 
 int	indexedcolor = 1;
-int	screenshotnumber = 0;
-char	*screenshotfile;
 int	magstep = 0;
 int	halfspeed = 0, doublespeed = 0;
 int	desync = 1;

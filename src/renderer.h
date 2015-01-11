@@ -72,8 +72,6 @@ extern struct RendererData {
 #define tilecachedepth 25
 
 extern int	indexedcolor;
-extern int	screenshotnumber;
-extern char	*screenshotfile;
 extern int	magstep;
 extern int	halfspeed, doublespeed;
 extern int	desync;

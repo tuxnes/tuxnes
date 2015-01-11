@@ -21,6 +21,7 @@ tuxnes_SOURCES = \
 	ntsc_pal.c \
 	sound.c sound.h \
 	renderer.c renderer.h \
+	screenshot.c screenshot.h \
 	ggi.c \
 	x11.c \
 	w.c \
