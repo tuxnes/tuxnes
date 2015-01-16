@@ -465,7 +465,7 @@ help(const char *progname, const char *topic)
       ((*topic == '-') &&
        ! topic[1])) {
     terse = 1;
-    if (isatty (fileno (stdout)))
+    if (isatty (STDOUT_FILENO))
       topic = topics[0].name;
     else
       topic = topics[sizeof(topics)/sizeof(*topics) - 1].name;
