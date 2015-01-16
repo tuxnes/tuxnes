@@ -808,7 +808,7 @@ aorom(int addr, int val)
 
 /****************************************************************************/
 
-/* MMC2 for PunchOut contributed by Kristoffer Brånemyr */
+/* MMC2 for PunchOut contributed by Kristoffer BrÃ¥nemyr */
 static int mmc2_4_latch1;
 static int mmc2_4_latch1hi;
 static int mmc2_4_latch1low;

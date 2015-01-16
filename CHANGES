@@ -65,7 +65,7 @@ Changes in version 0.63:
 
 Changes in version 0.62:
 
- Mapper 11 and partial mapper 9 support (thanks Kristoffer Brånemyr)
+ Mapper 11 and partial mapper 9 support (thanks Kristoffer BrÃ¥nemyr)
 
  Reload code after mapper switch (should fix -l problems)
 
