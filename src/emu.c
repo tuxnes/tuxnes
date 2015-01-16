@@ -504,7 +504,7 @@ help(const char *progname, const char *topic)
   printf (USAGE, progname);
   if (dfn)
     {
-      printf ("%s:\n", desc);
+      printf ("\n%s:\n", desc);
       dfn (terse);
     }
   else
@@ -512,7 +512,7 @@ help(const char *progname, const char *topic)
       for (i = 0; i < sizeof(topics)/sizeof(*topics); i++)
 	if (topics[i].dfn && (terse ? topics[i].is_terse : 1))
 	  {
-	    printf ("%s:\n", topics[i].desc);
+	    printf ("\n%s:\n", topics[i].desc);
 	    topics[i].dfn (terse);
 	  }
     }
@@ -549,13 +549,13 @@ help_options(int terse)
      printf ("  -H, --show-header   Show iNES header bytes\n");
      printf ("  -d, --disassemble   Disassemble\n");
      printf ("  -l, --link          Link branches optimization (may improve speed)\n");
-     printf ("  -i, --ignore-unhandled\n");
-     printf ("                      Ignore unhandled instructions (don't breakpoint)\n");
-     printf ("  -m, --mirror=...    Manually specify type of mirroring\n");
-     printf ("      h = Use horizontal mirroring\n");
-     printf ("      v = Use vertical mirroring\n");
-     printf ("      s = Use single-screen mirroring\n");
-     printf ("      n = Use no mirroring\n");
+     printf ("  -i, --ignore-unhandled\n"
+             "                      Ignore unhandled instructions (don't breakpoint)\n");
+     printf ("  -m, --mirror=...    Manually specify type of mirroring\n"
+             "      h = Use horizontal mirroring\n"
+             "      v = Use vertical mirroring\n"
+             "      s = Use single-screen mirroring\n"
+             "      n = Use no mirroring\n");
      printf ("  -G, --geometry=WxH  Specify window/screen geometry\n");
      printf ("      --display=ID    Specify display/driver ID\n");
      printf ("  -E, --enlarge[=NUM] Enlarge by a factor of NUM (default: 2)\n");
@@ -581,8 +581,8 @@ help_options(int terse)
 static void
 help_sound(int terse)
 {
-  printf ("  -s, --sound[=FILE]  Append sound data to FILE (default: %s)\n", DSP);
-  printf ("      (specify sound file as mute or none for no sound, e.g., -smute)\n");
+  printf ("  -s, --sound[=FILE]  Append sound data to FILE (default: %s)\n"
+          "      (specify sound file as mute or none for no sound, e.g., -smute)\n", DSP);
   printf ("  -F, --format=...    Use the specified sound sample format (default: %s)\n",
 	  sample_format_name);
   for (sample_format = sample_formats; sample_format->name; sample_format++)
@@ -637,9 +637,9 @@ help_synonyms(int terse)
 static void
 help_version(int terse)
 {
-  printf ("%s %s\n\n%s",
-	  PACKAGE, VERSION,
-	  "Copyright \xa9 1999-2001,  The TuxNES Team\n"
+  printf ("%s\n\n%s",
+	  PACKAGE_STRING,
+	  "Copyright \u00a9 1999-2001,  The TuxNES Team\n"
 	  "\n"
 	  "This program is free software; you can redistribute it and/or modify\n"
 	  "it under the terms of the GNU General Public License as published by\n"
@@ -677,96 +677,94 @@ help_controls(int terse)
           "        1:B0,B1,B5,B2,A0,A1,B4\n" 
 	  "        2:B0,B1,B5,B2,B10,B12,B11,B13,B4\n"
 	  "        1:B0B8,B1B9,B5,B2\n"
-	  "        2:,,,,A2,A3\n"
-	  );
-  printf ("\n");
-  printf ("  Keyboard:\n");
-  printf ("    Arrows      - Move (P1)\n");
-  printf ("    A, C or Space\n");
-  printf ("                - A button (P1)\n");
-  printf ("    Z, X or D   - B button (P1)\n");
-  printf ("    Tab         - Select button (P1)\n");
-  printf ("    Enter       - Start button (P1)\n");
-  printf ("    H, J, K, L  - Move (P2)\n");
-  printf ("    B           - A button (P2)\n");
-  printf ("    V           - B button (P2)\n");
-  printf ("    F           - Select button (P2)\n");
-  printf ("    G           - Start button (P2)\n");
-  printf ("    BackSpace   - Reset game\n");
-  printf ("    P, Pause    - Pause or resume emulation\n");
-  printf ("    ESC         - Exit game\n");
-  printf ("    0-8, `      - Adjust emulation speed\n");
-  printf ("      0 stops the game, ` runs the game at half speed\n");
-  printf ("      1 runs at normal speed, 2..8 runs at 2..8x normal speed\n");
-  printf ("    S, F7, PrintScreen\n"
+	  "        2:,,,,A2,A3\n");
+  printf ("\n"
+          "  Keyboard:\n"
+          "    Arrows      - Move (P1)\n"
+          "    A, C or Space\n"
+          "                - A button (P1)\n"
+          "    Z, X or D   - B button (P1)\n"
+          "    Tab         - Select button (P1)\n"
+          "    Enter       - Start button (P1)\n"
+          "    H, J, K, L  - Move (P2)\n"
+          "    B           - A button (P2)\n"
+          "    V           - B button (P2)\n"
+          "    F           - Select button (P2)\n"
+          "    G           - Start button (P2)\n"
+          "    BackSpace   - Reset game\n"
+          "    P, Pause    - Pause or resume emulation\n"
+          "    ESC         - Exit game\n"
+          "    0-8, `      - Adjust emulation speed\n"
+          "      0 stops the game, ` runs the game at half speed\n"
+          "      1 runs at normal speed, 2..8 runs at 2..8x normal speed\n"
+          "    S, F7, PrintScreen\n"
 	  "                - Capture screenshot\n"
 #ifdef HAVE_X
-	  "                  Under X11, save to ~/.tuxnes/snap\?\?\?\?.xpm\n"
+	  "                  Under X11, save to ~/.tuxnes/snap????.xpm\n"
 #endif /* HAVE_X */
 #ifdef HAVE_GGI
-	  "                  Under GGI, save to ~/.tuxnes/snap\?\?\?\?.ppm\n"
+	  "                  Under GGI, save to ~/.tuxnes/snap????.ppm\n"
 #endif /* HAVE_GGI */
 #ifdef HAVE_W
-	  "                  Under W, save to ~/.tuxnes/snap\?\?\?\?.p8m\n"
+	  "                  Under W, save to ~/.tuxnes/snap????.p8m\n"
 #endif /* HAVE_W */
-       );
-  printf ("                  (Note: XPM/PPM support must be installed and compiled\n");
-  printf ("                   for this to work; see the README file for more info.)\n");
-  printf ("\n");
-  printf ("  Keypad:\n");
-  printf ("    Arrows/12346789  - Move (P1)\n");
-  printf ("    Space/Begin/5, Delete/Decimal\n");
-  printf ("                     - A button (P1)\n");
-  printf ("    Insert/0         - B button (P1)\n");
-  printf ("    Add              - Select button (P1)\n");
-  printf ("    Enter            - Start button (P1)\n");
-  printf ("\n");
-  printf ("  Joystick Axes:\n");
-  printf ("    Axis 0           - Horizontal movement\n");
-  printf ("    Axis 1           - Vertical movement\n");
-  printf ("    Axis 2           - (unused)\n");
-  printf ("    Axis 3           - (unused)\n");
-  printf ("    Axis 4           - Horizontal movement\n");
-  printf ("    Axis 5           - Vertical movement\n");
-  printf ("\n");
-  printf ("  Joystick Buttons (2-button joysticks):\n");
-  printf ("    Button 0         - B button\n");
-  printf ("    Button 1         - A button\n");
-  printf ("\n");
-  printf ("  Joystick Buttons (other joysticks):\n");
-  printf ("    Button 0         - B button\n");
-  printf ("    Button 1         - Select button\n");
-  printf ("    Button 2         - A button\n");
-  printf ("    Button 3         - Start button\n");
-  printf ("    Button 4         - A button\n");
-  printf ("    Button 5         - B button\n");
-  printf ("    Button 6         - Select button\n");
-  printf ("    Button 7         - Start button\n");
-  printf ("    Button 8         - Pause or resume emulation\n");
-  printf ("\n");
+          "                  (Note: XPM/PPM support must be installed and compiled\n"
+          "                   for this to work; see the README file for more info.)\n");
+  printf ("\n"
+          "  Keypad:\n"
+          "    Arrows/12346789  - Move (P1)\n"
+          "    Space/Begin/5, Delete/Decimal\n"
+          "                     - A button (P1)\n"
+          "    Insert/0         - B button (P1)\n"
+          "    Add              - Select button (P1)\n"
+          "    Enter            - Start button (P1)\n");
+  printf ("\n"
+          "  Joystick Axes:\n"
+          "    Axis 0           - Horizontal movement\n"
+          "    Axis 1           - Vertical movement\n"
+          "    Axis 2           - (unused)\n"
+          "    Axis 3           - (unused)\n"
+          "    Axis 4           - Horizontal movement\n"
+          "    Axis 5           - Vertical movement\n");
+  printf ("\n"
+          "  Joystick Buttons (2-button joysticks):\n"
+          "    Button 0         - B button\n"
+          "    Button 1         - A button\n");
+  printf ("\n"
+          "  Joystick Buttons (other joysticks):\n"
+          "    Button 0         - B button\n"
+          "    Button 1         - Select button\n"
+          "    Button 2         - A button\n"
+          "    Button 3         - Start button\n"
+          "    Button 4         - A button\n"
+          "    Button 5         - B button\n"
+          "    Button 6         - Select button\n"
+          "    Button 7         - Start button\n"
+          "    Button 8         - Pause or resume emulation\n");
 #ifdef HAVE_X
-  printf ("  Extra keys for old X11 renderer (--renderer=old)\n");
-  printf ("    F1          - Disable background\n");
-  printf ("    F2          - Re-enable background\n");
-  printf ("    F3          - Disable sprites\n");
-  printf ("    F4          - Re-enable sprites\n");
-  printf ("    F5          - Alternate tiles\n");
-  printf ("    F6          - Default tiles\n");
-  printf ("    F8          - Flush tile cache\n");
-  printf ("\n");
+  printf ("\n"
+          "  Extra keys for old X11 renderer (--renderer=old)\n"
+          "    F1          - Disable background\n"
+          "    F2          - Re-enable background\n"
+          "    F3          - Disable sprites\n"
+          "    F4          - Re-enable sprites\n"
+          "    F5          - Alternate tiles\n"
+          "    F6          - Default tiles\n"
+          "    F8          - Flush tile cache\n");
 #endif /* HAVE_X */
-  printf ("  Extra Keys for VS UniSystem games:\n");
-  printf ("    [/{         - Insert Coin (Left)\n");
-  printf ("    ]/}         - Insert Coin (Right)\n");
-  printf ("    |/\\         - Service Credit\n");
-  printf ("    Q/q         - Toggle Dipswitch #1\n");
-  printf ("    W/w         - Toggle Dipswitch #2\n");
-  printf ("    E/e         - Toggle Dipswitch #3\n");
-  printf ("    R/r         - Toggle Dipswitch #4\n");
-  printf ("    T/t         - Toggle Dipswitch #5\n");
-  printf ("    Y/y         - Toggle Dipswitch #6\n");
-  printf ("    U/u         - Toggle Dipswitch #7\n");
-  printf ("    I/i         - Toggle Dipswitch #8\n");
+  printf ("\n"
+          "  Extra Keys for VS UniSystem games:\n"
+          "    [/{         - Insert Coin (Left)\n"
+          "    ]/}         - Insert Coin (Right)\n"
+          "    |/\\         - Service Credit\n"
+          "    Q/q         - Toggle Dipswitch #1\n"
+          "    W/w         - Toggle Dipswitch #2\n"
+          "    E/e         - Toggle Dipswitch #3\n"
+          "    R/r         - Toggle Dipswitch #4\n"
+          "    T/t         - Toggle Dipswitch #5\n"
+          "    Y/y         - Toggle Dipswitch #6\n"
+          "    U/u         - Toggle Dipswitch #7\n"
+          "    I/i         - Toggle Dipswitch #8\n");
 }
 
 /****************************************************************************/
