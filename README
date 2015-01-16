@@ -79,6 +79,7 @@ mirroring. Recent versions of Nestra support TuxNES-style mirroring
 specification.
 
 Usage: tuxnes [--help] [options] filename
+
 Help topics:
       --help=help      Help topics (this list)
       --help=options   Major command-line options
@@ -93,6 +94,7 @@ Help topics:
       --help=-sound    Concise version of --help=sound
       --help=-palettes Concise version of --help=palettes
       --help=-all      Concise version of --help=all
+
 Major command-line options:
   -v, --verbose       Verbose output
   -f, --fix-mapper    Use only the low four bits of the mapper number
@@ -122,6 +124,7 @@ Major command-line options:
   -I, --in-root       Display in root window
   -K, --sticky-keys   Hit keys once to press buttons, again to release
   -X, --swap-inputs   Swap P1 and P2 controls
+
 Sound synthesis options:
   -s, --sound[=FILE]  Append sound data to FILE (default: /dev/dsp)
       (specify sound file as mute or none for no sound, e.g., -smute)
@@ -137,6 +140,7 @@ Sound synthesis options:
       be16u      16-bit unsigned (big-endian) *untested
   -R, --soundrate=NUM Set sound sample rate to NUM Hz (default: 44100)
   -D, --delay=NUM     Resynchronize if sound delay exceeds NUM seconds
+
 Custom palette options:
   -p, --palfile=FILE  Load palette data from FILE
   -P, --palette=...   Use a specified built-in palette (default: loopy)
@@ -157,6 +161,7 @@ Custom palette options:
                       Use Kevin Horton's dynamic NTSC palette generator
                       with given hue angle (default: 332 degrees) and tint
                       level (default: 0.5)
+
 Alternate option names:
   -c, --controls      Equivalent to --help=controls
   -h, --help          Equivalent to --help=-help if stdout is a tty,
@@ -164,6 +169,7 @@ Alternate option names:
   -j, --joystick=FILE Equivalent to --js1=FILE
   -o, --old           Equivalent to --renderer=old
   -V, --version       Same information as --help=version
+
 Keyboard and joystick options and bindings:
   -1, --js1[=FILE]            Use P1 joystick FILE (default: /dev/js0)
   -2, --js2[=FILE]            Use P2 joystick FILE (default: /dev/js1)
@@ -255,8 +261,9 @@ Keyboard and joystick options and bindings:
     Y/y         - Toggle Dipswitch #6
     U/u         - Toggle Dipswitch #7
     I/i         - Toggle Dipswitch #8
+
 Version and copyright information:
-tuxnes 0.75
+TuxNES 0.75
 
 Copyright © 1999-2001,  The TuxNES Team
 
