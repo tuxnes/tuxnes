@@ -202,7 +202,7 @@ fbinit(void)
 		   "In case of difficulty, switch to --renderer=diff\n"
 		   "                              or --renderer=old\n"
 		   "\n"
-		   "Please send a status report to <tuxnes-dev@dod.hpi.net>.\n"
+		   "Please send a status report to <" PACKAGE_BUGREPORT ">.\n"
 		   "Describe the appearance of TuxNES, and whether it is correct.\n"
 		   "Also include this information in your report:\n"
 		   "\n");

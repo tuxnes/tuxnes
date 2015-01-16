@@ -407,7 +407,7 @@ traphandler(int signum)
   fprintf (stderr, "run GDB on the resulting core-file to find out which\n");
   fprintf (stderr, "recompiled instruction caused the problem. Please\n");
   fprintf (stderr, "send a description of the problem (and, if possible,\n");
-  fprintf (stderr, "a fix) to <tuxnes-dev@dod.hpi.net>. Include this\n");
+  fprintf (stderr, "a fix) to <" PACKAGE_BUGREPORT ">. Include this\n");
   fprintf (stderr, "information in your description:\n");
   fprintf (stderr, "\n");
   fprintf (stderr, PACKAGE_NAME " release: %s-%s\n", PACKAGE, VERSION);
