@@ -50,6 +50,8 @@
 #define JS2 "/dev/js1"
 #define DSP "/dev/dsp"
 
+#define ARRAY_LEN(x) (sizeof (x) / sizeof *(x))
+
 u_char	*ROM_BASE;
 u_char	*VROM_BASE;
 char	*filename;
@@ -468,13 +470,13 @@ help(const char *progname, const char *topic)
     if (isatty (STDOUT_FILENO))
       topic = topics[0].name;
     else
-      topic = topics[sizeof(topics)/sizeof(*topics) - 1].name;
+      topic = topics[ARRAY_LEN(topics) - 1].name;
   } else if (*topic == '-') {
     terse = 1;
     topic ++;
     len --;
   }
-  for (i = 0; i < sizeof(topics)/sizeof(*topics); i++)
+  for (i = 0; i < ARRAY_LEN(topics); i++)
     if (terse ? topics[i].is_terse : 1)
       {
 	if (!strcmp (topics[i].name, topic))
@@ -509,7 +511,7 @@ help(const char *progname, const char *topic)
     }
   else
     {
-      for (i = 0; i < sizeof(topics)/sizeof(*topics); i++)
+      for (i = 0; i < ARRAY_LEN(topics); i++)
 	if (topics[i].dfn && (terse ? topics[i].is_terse : 1))
 	  {
 	    printf ("\n%s:\n", topics[i].desc);
@@ -525,12 +527,12 @@ help_help(int terse)
 {
   int i;
 
-  for (i = 0; i < sizeof(topics)/sizeof(*topics); i++)
+  for (i = 0; i < ARRAY_LEN(topics); i++)
     printf ("      --help=%-9s %s%s\n",
 	    topics[i].name,
 	    topics[i].desc,
 	    (topics[i].dfn == help_help) ? " (this list)" : "");
-  for (i = 0; i < sizeof(topics)/sizeof(*topics); i++)
+  for (i = 0; i < ARRAY_LEN(topics); i++)
     if (topics[i].is_terse)
       printf ("      --help=-%-8s Concise version of --help=%s\n",
 	      topics[i].name,
@@ -606,7 +608,7 @@ help_palettes(int terse)
   printf ("  -p, --palfile=FILE  Load palette data from FILE\n");
   printf ("  -P, --palette=...   Use a specified built-in palette (default: %s)\n",
           palettes[0].name);
-  for (i = 0; i < (sizeof (palettes) / sizeof (*palettes)); i++)
+  for (i = 0; i < ARRAY_LEN(palettes); i++)
     printf ("      %-10s %s\n", palettes[i].name, palettes[i].desc);
   printf ("  -b, --bw            Convert palette to grayscale\n");
 #ifdef HAVE_LIBM
@@ -626,7 +628,7 @@ help_synonyms(int terse)
   printf ("  -h, --help          Equivalent to --help=-%s if stdout is a tty,\n",
 	  topics[0].name);
   printf ("                      otherwise equivalent to --help=-%s\n",
-	  topics[sizeof(topics)/sizeof(*topics) - 1].name);
+	  topics[ARRAY_LEN(topics) - 1].name);
   printf ("  -j, --joystick=FILE Equivalent to --js1=FILE\n");
   printf ("  -o, --old           Equivalent to --renderer=old\n");
   printf ("  -V, --version       Same information as --help=version\n");
@@ -857,7 +859,7 @@ loadpal(char *palfile)
   int fd = -1;
 
   if (unisystem && !palremap)
-    NES_palette = palettes[sizeof (palettes) / sizeof (*palettes) - 1].data;
+    NES_palette = palettes[ARRAY_LEN(palettes) - 1].data;
   else
     NES_palette = palettes[0].data;
   if (palfile)
@@ -1049,8 +1051,7 @@ loadpal(char *palfile)
       else
         {
           if (unisystem)
-            NES_palette[pen] = palettes[sizeof (palettes) / sizeof
-                                        (*palettes) - 1].data[pen];
+            NES_palette[pen] = palettes[ARRAY_LEN(palettes) - 1].data[pen];
           else
             NES_palette[pen] = palettes[0].data[pen];
         }
@@ -1344,7 +1345,7 @@ main (int argc, char **argv)
               palfile = 0;
               NES_palette = 0;
               len = strlen (optarg);
-              for (i = 0; i < (sizeof (palettes) / sizeof (*palettes)); i++)
+              for (i = 0; i < ARRAY_LEN(palettes); i++)
                 if (!strcmp (palettes[i].name, optarg))
                   {
                     NES_palette = palettes[i].data;
@@ -1900,7 +1901,7 @@ main (int argc, char **argv)
     {
       int i;
 
-      for (i = 0; i < (sizeof (palettes) / sizeof (*palettes)); i++)
+      for (i = 0; i < ARRAY_LEN(palettes); i++)
         if (NES_palette == palettes[i].data)
           {
             fprintf (stderr, "Using built-in palette \"%s\"\n", palettes[i].name);

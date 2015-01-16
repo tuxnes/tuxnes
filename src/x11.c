@@ -105,6 +105,8 @@
 
 #endif /* HAVE_X */
 
+#define ARRAY_LEN(x) (sizeof (x) / sizeof *(x))
+
 #define screen_on (RAM[0x2001]&8)
 #define sprites_on (RAM[0x2001]&16)
 
@@ -742,7 +744,7 @@ InitDisplayX11(int argc, char **argv)
     {
       int f;
 
-      for (f = 0; f < sizeof(xdfb)/sizeof(*xdfb); f ++)
+      for (f = 0; f < ARRAY_LEN(xdfb); f ++)
 	{
 	  if ((bpp == 8) && (f == 0) && (bytes_per_line == 256))
 	    {
@@ -1110,7 +1112,7 @@ UpdateDisplayX11(void)
 	      int next_frame;
 	      static int virgin = 1;
 	      
-	      next_frame = (xdfb_frame + 1) % (sizeof(xdfb)/sizeof(*xdfb));
+	      next_frame = (xdfb_frame + 1) % ARRAY_LEN(xdfb);
 	      /* This horrible hack checks for updates one scanline at a time. */
 	      /* Obviously, that only works well for some programs... */
 	      for (y = 0; y < 240; y ++)
