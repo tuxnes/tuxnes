@@ -726,7 +726,7 @@ InitDisplayX11(int argc, char **argv)
   if (! image)
     {
       bytes_per_line = 256 / 8 * magstep * bpp;
-      if (! (xfb = (char *) malloc (bytes_per_line * 240 * magstep)))
+      if (! (xfb = malloc (bytes_per_line * 240 * magstep)))
 	{
 	  perror ("malloc");
 	  exit (1);
@@ -752,7 +752,7 @@ InitDisplayX11(int argc, char **argv)
 	    }
 	  else
 	    {
-	      if (! (xdfb[f] = (char *) malloc ((size_t) 256 * 240)))
+	      if (! (xdfb[f] = malloc ((size_t) 256 * 240)))
 		{
 		  perror ("malloc");
 		  exit (1);

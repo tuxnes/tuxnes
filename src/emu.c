@@ -1033,7 +1033,7 @@ loadpal(char *palfile)
   }
 
   /* convert the palette */
-  if (!(NES_palette = (unsigned int *) malloc (64 * sizeof (*NES_palette))))
+  if (!(NES_palette = malloc (64 * sizeof (*NES_palette))))
     {
       perror ("malloc");
       free (palfile);
@@ -1912,7 +1912,7 @@ main (int argc, char **argv)
     unsigned int *new_palette;
     int pen;
     
-    if (!(new_palette = (unsigned int *) malloc (64 * sizeof (*new_palette))))
+    if (!(new_palette = malloc (64 * sizeof (*new_palette))))
       {
 	fprintf(stderr, "Can't remap palette: ");
 	fflush (stderr);

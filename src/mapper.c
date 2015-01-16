@@ -580,7 +580,7 @@ init_mmc5(void)
   prgmask16 = prgmask;
   prgmask32 = prgmask >> 2;
 
-  blankbank = (char *)malloc(4096);
+  blankbank = malloc(4096);
   for (i = 0; i < 4096; i++)
     {
       blankbank[i] = 0xFF;

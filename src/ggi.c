@@ -98,7 +98,7 @@ InitScreenshotGGI(void)
     }
   else
     {
-      if (! (cols = (ggi_color *) malloc (256 * magstep * sizeof (ggi_color))))
+      if (! (cols = malloc (256 * magstep * sizeof (*cols))))
 	{
 	  perror ("malloc");
 	  pixels = 0;
@@ -769,7 +769,7 @@ InitDisplayGGI(int argc, char **argv)
   if (! fb)
     {
       bytes_per_line = 256 / 8 * magstep * bpp;
-      if (! (rfb = (fb = (char *) malloc (bytes_per_line * 240 * magstep))))
+      if (! (rfb = (fb = malloc (bytes_per_line * 240 * magstep))))
 	{
 	  ggiClose (visualGGI);
 	  ggiExit ();
