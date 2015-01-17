@@ -1066,7 +1066,6 @@ main (int argc, char **argv)
 {
   int x;
   int r;
-  int basestart, baseend; /* these are for working out the base filename */
   int audiofd;
   int size;
   int cmirror;
@@ -1456,30 +1455,33 @@ main (int argc, char **argv)
     parsing of leading directory information as well as the trailing extension
     (.nes, .gz, .Z).
   */
-  basestart = baseend = 0;
-  for (size_t i = 0; i < strlen(filename); i++)
-    {
-      if (filename[i] == '/')
-        {
-          basestart = i + 1;
-        }
-      else if (filename[i] == '.')
-        {
-          baseend = i - 1;
-        }
-    }
+  {
+    char *basename;
+    size_t baselen, namelen;
 
-    if (! (basefilename = malloc(baseend - basestart + 1)))
+    basename = filename;
+    baselen = namelen = strlen(filename);
+    for (size_t i = 0; i < namelen; i++)
+      {
+        if (filename[i] == '/')
+          {
+            basename = &filename[i + 1];
+            baselen = namelen - i - 1;
+          }
+        else if (filename[i] == '.')
+          {
+            baselen -= namelen - i;
+          }
+      }
+
+    if (! (basefilename = malloc(baselen + 1)))
       {
         perror ("main: malloc");
         exit (1);
       }
-
-    for (size_t i = 0; i <= (baseend - basestart); i++)
-      {
-        basefilename[i] = filename[basestart + i];
-      }
-    basefilename[baseend - basestart + 1] = '\0';
+    strncpy(basefilename, basename, baselen);
+    basefilename[baselen] = '\0';
+  }
 
   /* initialize joysticks */
   js_init();
