@@ -456,7 +456,7 @@ help(const char *progname, const char *topic)
   void (*dfn)(int) = (void (*)(int))0;
   const char *desc = 0;
   int dfns = 0;
-  int len;
+  size_t len;
   int terse = 0;
 
   if (! topic)
@@ -850,7 +850,7 @@ loadpal(char *palfile)
   /* for the raw palette data */
   unsigned char palette[192];
   int pen, pens;
-  int len;
+  size_t len;
   int fd = -1;
 
   if (unisystem && !palremap)
@@ -1333,7 +1333,7 @@ main (int argc, char **argv)
             {
               unsigned int *partial = 0;
               int partials = 0;
-              int len;
+              size_t len;
 
               palfile = 0;
               NES_palette = 0;
@@ -1490,7 +1490,7 @@ main (int argc, char **argv)
   {
     struct SampleFormat *match = 0;
     int partials = 0;
-    int len;
+    size_t len;
     
     len = strlen (sample_format_name);
     for (sample_format = sample_formats; sample_format->name; sample_format++)
