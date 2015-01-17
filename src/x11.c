@@ -201,8 +201,6 @@ static unsigned char	bitplanecachevalid[tilecachedepth][3840];
 static unsigned int	bgcolor[tilecachedepth];
 
 /* Misc globals */
-static int	hoffset, voffset;
-static int	oldhoffset, oldvoffset;
 static unsigned short int	oldhscroll[240], oldvscroll[240];
 static unsigned int	currentline;
 static int	debug_bgoff = 0;
