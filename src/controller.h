@@ -24,10 +24,10 @@ extern unsigned int controller[2];
 extern unsigned int controllerd[2];
 extern unsigned int coinslot, dipswitches;
 
-void ctl_button(int, unsigned char, _Bool);
-void ctl_keypress(int, unsigned char, _Bool);
-void ctl_keypress_diag(int, unsigned char, _Bool);
-void ctl_coinslot(unsigned char, _Bool);
-void ctl_dipswitch(unsigned char, _Bool);
+void ctl_button(int, unsigned int, _Bool);
+void ctl_keypress(int, unsigned int, _Bool);
+void ctl_keypress_diag(int, unsigned int, _Bool);
+void ctl_coinslot(unsigned int, _Bool);
+void ctl_dipswitch(unsigned int, _Bool);
 
 #endif

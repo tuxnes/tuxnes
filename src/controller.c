@@ -22,7 +22,7 @@ unsigned int coinslot = 0, dipswitches = 0;
 
 
 void
-ctl_button(int stick, unsigned char mask, _Bool value)
+ctl_button(int stick, unsigned int mask, _Bool value)
 {
 	if (swap_inputs)
 		stick = !stick;
@@ -35,7 +35,7 @@ ctl_button(int stick, unsigned char mask, _Bool value)
 
 
 void
-ctl_keypress(int stick, unsigned char mask, _Bool value)
+ctl_keypress(int stick, unsigned int mask, _Bool value)
 {
 	if (swap_inputs)
 		stick = !stick;
@@ -51,7 +51,7 @@ ctl_keypress(int stick, unsigned char mask, _Bool value)
 
 
 void
-ctl_keypress_diag(int stick, unsigned char mask, _Bool value)
+ctl_keypress_diag(int stick, unsigned int mask, _Bool value)
 {
 	if (swap_inputs)
 		stick = !stick;
@@ -67,7 +67,7 @@ ctl_keypress_diag(int stick, unsigned char mask, _Bool value)
 
 
 void
-ctl_coinslot(unsigned char mask, _Bool value)
+ctl_coinslot(unsigned int mask, _Bool value)
 {
 	if (sticky_keys) {
 		if (value)
@@ -81,7 +81,7 @@ ctl_coinslot(unsigned char mask, _Bool value)
 
 
 void
-ctl_dipswitch(unsigned char mask, _Bool value)
+ctl_dipswitch(unsigned int mask, _Bool value)
 {
 	if (value)
 		dipswitches ^= mask;
