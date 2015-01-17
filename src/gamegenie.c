@@ -45,19 +45,19 @@ ggtable(char lookup)
 int
 DecodeGameGenieCode(const char *ggcode, int *address, int *data, int *compare)
 {
-	int codelen;
+	size_t codelen;
 	int decode[9];
 
 	/* make sure the code is either 6 or 8 characters */
 	codelen = strlen(ggcode);
 	if (codelen != 6
 	 && codelen != 8) {
-		/* printf("invalid number of Game Genie character: %d\n", codelen); */
+		/* printf("invalid number of Game Genie character: %zu\n", codelen); */
 		return GAME_GENIE_BAD_CODE;
 	}
 
 	/* make sure that all of the characters are valid */
-	for (int i = 0; i < codelen; ++i) {
+	for (size_t i = 0; i < codelen; ++i) {
 		decode[i+1] = ggtable(ggcode[i]);
 		if (decode[i+1] == -1) {
 			/* printf("bad character: %c\n", ggcode[i]); */
@@ -67,7 +67,7 @@ DecodeGameGenieCode(const char *ggcode, int *address, int *data, int *compare)
 
 	/* rotate the high bit from each code letter to the next */
 	decode[0] = decode[codelen] & 8;
-	for (int i = 0; i < codelen; ++i) {
+	for (size_t i = 0; i < codelen; ++i) {
 		decode[i] = (decode[i]   & 8)
 		          | (decode[i+1] & 7);
 	}
