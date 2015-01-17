@@ -453,7 +453,6 @@ quit(void)
 static void
 help(const char *progname, const char *topic)
 {
-  int			i;
   void (*dfn)(int) = (void (*)(int))0;
   const char *desc = 0;
   int dfns = 0;
@@ -476,7 +475,7 @@ help(const char *progname, const char *topic)
     topic ++;
     len --;
   }
-  for (i = 0; i < ARRAY_LEN(topics); i++)
+  for (size_t i = 0; i < ARRAY_LEN(topics); i++)
     if (terse ? topics[i].is_terse : 1)
       {
 	if (!strcmp (topics[i].name, topic))
@@ -511,7 +510,7 @@ help(const char *progname, const char *topic)
     }
   else
     {
-      for (i = 0; i < ARRAY_LEN(topics); i++)
+      for (size_t i = 0; i < ARRAY_LEN(topics); i++)
 	if (topics[i].dfn && (terse ? topics[i].is_terse : 1))
 	  {
 	    printf ("\n%s:\n", topics[i].desc);
@@ -525,14 +524,12 @@ help(const char *progname, const char *topic)
 static void
 help_help(int terse)
 {
-  int i;
-
-  for (i = 0; i < ARRAY_LEN(topics); i++)
+  for (size_t i = 0; i < ARRAY_LEN(topics); i++)
     printf ("      --help=%-9s %s%s\n",
 	    topics[i].name,
 	    topics[i].desc,
 	    (topics[i].dfn == help_help) ? " (this list)" : "");
-  for (i = 0; i < ARRAY_LEN(topics); i++)
+  for (size_t i = 0; i < ARRAY_LEN(topics); i++)
     if (topics[i].is_terse)
       printf ("      --help=-%-8s Concise version of --help=%s\n",
 	      topics[i].name,
@@ -603,12 +600,10 @@ help_sound(int terse)
 static void
 help_palettes(int terse)
 {
-  int i;
-
   printf ("  -p, --palfile=FILE  Load palette data from FILE\n");
   printf ("  -P, --palette=...   Use a specified built-in palette (default: %s)\n",
           palettes[0].name);
-  for (i = 0; i < ARRAY_LEN(palettes); i++)
+  for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
     printf ("      %-10s %s\n", palettes[i].name, palettes[i].desc);
   printf ("  -b, --bw            Convert palette to grayscale\n");
 #ifdef HAVE_LIBM
@@ -1071,7 +1066,7 @@ main (int argc, char **argv)
 {
   int x;
   int r;
-  int i, basestart, baseend; /* these are for working out the base filename */
+  int basestart, baseend; /* these are for working out the base filename */
   int audiofd;
   int size;
   int cmirror;
@@ -1337,7 +1332,6 @@ main (int argc, char **argv)
         case 'P':
           if (optarg && *optarg)
             {
-              int i;
               unsigned int *partial = 0;
               int partials = 0;
               int len;
@@ -1345,7 +1339,7 @@ main (int argc, char **argv)
               palfile = 0;
               NES_palette = 0;
               len = strlen (optarg);
-              for (i = 0; i < ARRAY_LEN(palettes); i++)
+              for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
                 if (!strcmp (palettes[i].name, optarg))
                   {
                     NES_palette = palettes[i].data;
@@ -1463,7 +1457,7 @@ main (int argc, char **argv)
     (.nes, .gz, .Z).
   */
   basestart = baseend = 0;
-  for (i = 0; i < strlen(filename); i++)
+  for (size_t i = 0; i < strlen(filename); i++)
     {
       if (filename[i] == '/')
         {
@@ -1481,7 +1475,7 @@ main (int argc, char **argv)
         exit (1);
       }
 
-    for (i = 0; i <= (baseend - basestart); i++)
+    for (size_t i = 0; i <= (baseend - basestart); i++)
       {
         basefilename[i] = filename[basestart + i];
       }
@@ -1899,9 +1893,7 @@ main (int argc, char **argv)
     loadpal (palfile);
   if (verbose)
     {
-      int i;
-
-      for (i = 0; i < ARRAY_LEN(palettes); i++)
+      for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
         if (NES_palette == palettes[i].data)
           {
             fprintf (stderr, "Using built-in palette \"%s\"\n", palettes[i].name);
