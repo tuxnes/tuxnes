@@ -905,9 +905,9 @@ loadpal(char *palfile)
       /* .NES -> .pal */
       if ((len > 4)
           && (palfile[len - 4] == '.')
-          && (tolower(palfile[len - 3]) == tolower('N'))
-          && (tolower(palfile[len - 2]) == tolower('E'))
-          && (tolower(palfile[len - 1]) == tolower('S')))
+          && (tolower(palfile[len - 3]) == 'n')
+          && (tolower(palfile[len - 2]) == 'e')
+          && (tolower(palfile[len - 1]) == 's'))
         palfile[len -= 4] = '\0';
       strcat (palfile + len, ".pal");
       if ((fd = open (palfile, O_RDONLY)) < 0) {
