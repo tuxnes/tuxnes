@@ -396,20 +396,20 @@ traphandler(int signum)
     return;
   /* this will only affect subsequently-compiled code */
   ignorebadinstr = 1;
-  fprintf (stderr, "======================================================\n");
-  fprintf (stderr, "Trap/Breakpoint: Unimplemented instruction detected\n");
-  fprintf (stderr, "\n");
-  fprintf (stderr, "To ignore such instructions, run " PACKAGE_NAME " with the\n");
-  fprintf (stderr, "--ignore-unhandled option.\n");
-  fprintf (stderr, "\n");
-  fprintf (stderr, "To find out which instruction caused the problem,\n");
-  fprintf (stderr, "run " PACKAGE_NAME " with the --disassemble option, and then\n");
-  fprintf (stderr, "run GDB on the resulting core-file to find out which\n");
-  fprintf (stderr, "recompiled instruction caused the problem. Please\n");
-  fprintf (stderr, "send a description of the problem (and, if possible,\n");
-  fprintf (stderr, "a fix) to <" PACKAGE_BUGREPORT ">. Include this\n");
-  fprintf (stderr, "information in your description:\n");
-  fprintf (stderr, "\n");
+  fprintf (stderr, "======================================================\n"
+                   "Trap/Breakpoint: Unimplemented instruction detected\n"
+                   "\n"
+                   "To ignore such instructions, run " PACKAGE_NAME " with the\n"
+                   "--ignore-unhandled option.\n"
+                   "\n"
+                   "To find out which instruction caused the problem,\n"
+                   "run " PACKAGE_NAME " with the --disassemble option, and then\n"
+                   "run GDB on the resulting core-file to find out which\n"
+                   "recompiled instruction caused the problem. Please\n"
+                   "send a description of the problem (and, if possible,\n"
+                   "a fix) to <" PACKAGE_BUGREPORT ">. Include this\n"
+                   "information in your description:\n"
+                   "\n");
   fprintf (stderr, PACKAGE_NAME " release: %s-%s\n", PACKAGE, VERSION);
   fprintf (stderr, "Built on %s at %s\n", __DATE__, __TIME__);
   fprintf (stderr, "\n");

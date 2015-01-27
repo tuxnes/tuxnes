@@ -240,8 +240,7 @@ fbinit(void)
 	{
 	  fprintf (stderr, "Don't know how to handle %dbpp\n", bpp);
 	  fprintf (stderr,
-		   "As a temporary workaround, try --renderer=diff\n");
-	  fprintf (stderr,
+		   "As a temporary workaround, try --renderer=diff\n"
 		   "                            or --renderer=old\n");
 	  exit (1);
 	}
@@ -251,8 +250,7 @@ fbinit(void)
 		   "Don't know how to handle pix_swabbed %dbpp/%dbpu\n",
 		   bpp, bpu);
 	  fprintf (stderr,
-		   "As a temporary workaround, try --renderer=diff\n");
-	  fprintf (stderr,
+		   "As a temporary workaround, try --renderer=diff\n"
 		   "                            or --renderer=old\n");
 	  exit (1);
 	}
