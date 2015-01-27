@@ -242,7 +242,7 @@ fbinit(void)
 	  fprintf (stderr,
 		   "As a temporary workaround, try --renderer=diff\n"
 		   "                            or --renderer=old\n");
-	  exit (1);
+	  exit (EXIT_FAILURE);
 	}
       if ((bpp == 1) && (bpu > 8) && pix_swab)
 	{
@@ -252,7 +252,7 @@ fbinit(void)
 	  fprintf (stderr,
 		   "As a temporary workaround, try --renderer=diff\n"
 		   "                            or --renderer=old\n");
-	  exit (1);
+	  exit (EXIT_FAILURE);
 	}
     }
 }

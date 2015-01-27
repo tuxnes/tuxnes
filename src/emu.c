@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sysexits.h>
 #include <unistd.h>
 
 #ifdef HAVE_LIBZ
@@ -436,16 +437,16 @@ quit(void)
   /* Save ram */
   for (x = 0; ((long long *) (RAM + 0x6000))[x] == 0; x++)
     if (x >= 1023)
-      exit (0);                 /* Nothing to save */
+      exit (EXIT_SUCCESS);      /* Nothing to save */
   fd = open (savefile, O_CREAT | O_RDWR, 0666);
   if (fd > 0)
     {
       write (fd, RAM + 0x6000, 8192);
       close (fd);
-      exit (0);
+      exit (EXIT_SUCCESS);
     }
   perror (savefile);
-  exit (1);
+  exit (EXIT_FAILURE);
 }
 
 /****************************************************************************/
@@ -500,7 +501,7 @@ help(const char *progname, const char *topic)
       fprintf (stderr, "%s: unrecognized help topic name `%s'\n",
 	       progname, topic);
     fprintf (stderr, USAGE, progname);
-    exit (2);
+    exit (EX_USAGE);
   }
   printf (USAGE, progname);
   if (dfn)
@@ -1107,7 +1108,7 @@ main (int argc, char **argv)
       == NULL)
     {
       fprintf (stderr, "Out of memory\n");
-      return (1);
+      return (EXIT_FAILURE);
     }
   sprintf (tuxnesdir, "%s%s", homedir, "/.tuxnes/");
   dir = opendir (tuxnesdir);
@@ -1118,14 +1119,14 @@ main (int argc, char **argv)
       if ((dir = opendir (tuxnesdir)) == NULL)
         {
           fprintf (stderr, "Cannot open directory %s\n", tuxnesdir);
-          return (1);
+          return (EXIT_FAILURE);
         }
     }
   else if ((dir == NULL)
            && (errno == ENOENT))
     {
       fprintf (stderr, "Cannot open directory %s\n", tuxnesdir);
-      return (1);
+      return (EXIT_FAILURE);
     }
   else
     {
@@ -1216,7 +1217,7 @@ main (int argc, char **argv)
 	  break;
         case 'c':
           help (*argv, "controls");
-          exit (0);
+          exit (EXIT_SUCCESS);
           break;
 	case 'X':
 	  swap_inputs = 1;
@@ -1235,7 +1236,7 @@ main (int argc, char **argv)
           break;
         case 'h':
           help (*argv, optarg);
-          exit (0);
+          exit (EXIT_SUCCESS);
           break;
         case 'H':
           showheader = 1;
@@ -1280,7 +1281,7 @@ main (int argc, char **argv)
               break;
             default:
               fprintf (stderr, "bad mirror argument: %s\n", optarg);
-              exit (2);
+              exit (EX_USAGE);
               break;
             }
           break;
@@ -1310,7 +1311,7 @@ main (int argc, char **argv)
 	  if (sound_config.audiorate < 1)
 	    {
 	      fprintf (stderr, "%s: not a valid audio rate (need a positive integer)\n", optarg);
-	      exit (2);
+	      exit (EX_USAGE);
 	    }
 	  break;
 	case 'D':
@@ -1318,7 +1319,7 @@ main (int argc, char **argv)
 	  if (sound_config.max_sound_delay < 0.0)
 	    {
 	      fprintf (stderr, "%s: not a valid delay (must be non-negative))\n", optarg);
-	      exit (2);
+	      exit (EX_USAGE);
 	    }
 	  break;
 	case 'e':
@@ -1359,7 +1360,7 @@ main (int argc, char **argv)
                   else
                     fprintf (stderr, "%s: unrecognized palette name `%s'\n",
                              *argv, optarg);
-                  exit (2);
+                  exit (EX_USAGE);
                 }
             }
           else
@@ -1367,7 +1368,7 @@ main (int argc, char **argv)
           break;
         case 'V':
 	  help_version (0);
-          exit (0);
+          exit (EXIT_SUCCESS);
           break;
 	case 'G':
 	  renderer_config.geometry = optarg;
@@ -1412,13 +1413,13 @@ main (int argc, char **argv)
                   if (*p || (tint < 0.0) || (tint > 1.0))
                     {
 	              fprintf (stderr, "%s: not a valid tint level (must be a number from 0 to 1)\n", optarg);
-		      exit (2);
+		      exit (EX_USAGE);
 		    }
 		}
 	      else if (*p)
 	        {
 	          fprintf (stderr, "%s: not a valid hue angle (must be an angle in degrees)\n", optarg);
-		  exit (2);
+		  exit (EX_USAGE);
 		}
 	    }
 	  NES_palette = ntsc_palette(hue, tint);
@@ -1432,7 +1433,7 @@ main (int argc, char **argv)
 	    }
         default:
           fprintf (stderr, USAGE, *argv);
-          exit (2);
+          exit (EX_USAGE);
           break;
         }
     }
@@ -1446,7 +1447,7 @@ main (int argc, char **argv)
     {
       fprintf (stderr, "%s: too %s arguments\n", *argv, (argc > optind) ? "many" : "few");
       fprintf (stderr, USAGE, *argv);
-      exit (2);
+      exit (EX_USAGE);
     }
   filename = argv[optind];
 
@@ -1477,7 +1478,7 @@ main (int argc, char **argv)
     if (! (basefilename = malloc(baselen + 1)))
       {
         perror ("main: malloc");
-        exit (1);
+        exit (EXIT_FAILURE);
       }
     strncpy(basefilename, basename, baselen);
     basefilename[baselen] = '\0';
@@ -1527,7 +1528,7 @@ main (int argc, char **argv)
 	else
 	  fprintf (stderr, "%s: unrecognized sound sample format name `%s'\n",
 		   *argv, sample_format_name);
-	exit (2);
+	exit (EX_USAGE);
       }
   }
 
@@ -1561,7 +1562,7 @@ main (int argc, char **argv)
   if (romfd < 0)
     {
       perror (filename);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 #endif
 
@@ -1577,12 +1578,12 @@ main (int argc, char **argv)
   if (size < 0)
     {
       perror (filename);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   if (size == 0)
     {
       fprintf (stderr, "Unable to read %s (empty file)\n", filename);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 #endif
 
@@ -1593,7 +1594,7 @@ main (int argc, char **argv)
 		       -1, 0)) < 0)
     {
       perror ("mmap");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   /* load the ROM */
@@ -1622,7 +1623,7 @@ main (int argc, char **argv)
   if (read (romfd, ROM, size) != size)
     {
       perror (filename);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   close (romfd);
@@ -1639,7 +1640,7 @@ main (int argc, char **argv)
   if (r <= 0)
     {
       perror ("mmap");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   r = (int) mmap (CODE_BASE, 0x800000,
 		  PROT_READ | PROT_WRITE | PROT_EXEC,
@@ -1648,7 +1649,7 @@ main (int argc, char **argv)
   if (r <= 0)
     {
       perror ("mmap");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   r = (int) mmap ((void *) INT_MAP, 0x400000,
 		  PROT_READ | PROT_WRITE,
@@ -1657,7 +1658,7 @@ main (int argc, char **argv)
   if (r <= 0)
     {
       perror ("mmap");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   /* Initialize sound playback */
@@ -1785,7 +1786,7 @@ main (int argc, char **argv)
     {
       fprintf (stderr,
             "Famicom Disk System (FDS) disk images aren't yet supported\n");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   else if (size == 40960)
     {
@@ -1802,14 +1803,14 @@ main (int argc, char **argv)
   else
     {
       fprintf (stderr, "Unrecognized ROM file format\n");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   if (MAPPERNUMBER > MAXMAPPER || ((int *) MapperInit)[MAPPERNUMBER] == 0)
     {
       fprintf (stderr, "Unknown Mapper: %d (0x%02X)\n", MAPPERNUMBER,
                MAPPERNUMBER);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   if (verbose)
     {
@@ -2012,7 +2013,7 @@ main (int argc, char **argv)
 		 fprintf (stderr, "%s: unrecognized renderer name `%s'\n",
 			  *argv, rendname);
 	    fprintf (stderr, USAGE, *argv);
-	    exit (2);
+	    exit (EX_USAGE);
        }
        renderer = match;
   }
@@ -2023,7 +2024,7 @@ main (int argc, char **argv)
        fprintf (stderr,
 		"%s: failed to initialize renderer `%s'\n",
 		*argv, renderer->name);
-       exit (1);
+       exit (EXIT_FAILURE);
   }
 
   /* trap traps */
@@ -2039,5 +2040,5 @@ main (int argc, char **argv)
   START();                     /* execute translated code */
 
   /* Not Reached, but return something anyway to get rid of warnings */
-  return(0);
+  return(EXIT_SUCCESS);
 }

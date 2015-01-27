@@ -366,7 +366,7 @@ InitDisplayW(int argc, char **argv)
   if (! (serverW = w_init()))
     {
       fprintf (stderr, "%s: W initialization failed\n", argv[0]);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   bpp = serverW -> planes;
   if (verbose)
@@ -422,7 +422,7 @@ InitDisplayW(int argc, char **argv)
 	  {
 	    w_exit ();
 	    fprintf (stderr, "%s: failed to acquire font\n", argv[0]);
-	    exit (1);
+	    exit (EXIT_FAILURE);
 	  }
       if ((iconW = w_create (w_strlen (fontW, PACKAGE) + 4,
 			     fontW -> height + 2,
@@ -442,7 +442,7 @@ InitDisplayW(int argc, char **argv)
 	  if (iconW) w_delete (iconW);
 	  w_exit ();
 	  fprintf (stderr, "%s: failed to create window\n", argv[0]);
-	  exit (1);
+	  exit (EXIT_FAILURE);
 	}
       w_settitle (winW, PACKAGE_NAME);
       limit2screen (winW, &x0, &y0);
@@ -458,7 +458,7 @@ InitDisplayW(int argc, char **argv)
       w_delete (winW); if (iconW) w_delete (iconW);
       w_exit ();
       fprintf (stderr, "%s: failed to allocate bitmap\n", argv[0]);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   /* Allocate black and white pixels */
   for (blackpixel = 0; blackpixel < serverW -> sharedcolors; blackpixel ++)
@@ -524,7 +524,7 @@ InitDisplayW(int argc, char **argv)
 	      if (winW != WROOT) w_delete (winW); if (iconW) w_delete (iconW);
 	      w_exit ();
 	      fprintf (stderr, "Can't allocate colors!\n");
-	      exit (1);
+	      exit (EXIT_FAILURE);
 	    }
 	  else if (bitmapW -> palette)
 	    bitmapW -> palette[palette[x]] = color;
@@ -636,7 +636,7 @@ InitDisplayW(int argc, char **argv)
       w_delete (winW); if (iconW) w_delete (iconW);
       w_exit ();
       fprintf (stderr, "%s: failed to open window\n", argv[0]);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   /** endianness **/
@@ -747,7 +747,7 @@ UpdateColorsW(void)
 		  w_exit ();
 		  fprintf (stderr,
 			   "W: w_changeColor failed!\n");
-		  exit (1);
+		  exit (EXIT_FAILURE);
 		}
 	      else if (bitmapW -> palette)
 		bitmapW -> palette[palette[x]] = color;

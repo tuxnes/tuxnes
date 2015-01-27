@@ -341,7 +341,7 @@ InitDisplayX11(int argc, char **argv)
 	       argv[0],
 	       renderer->name,
 	       XDisplayName (renderer_config.display_id));
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   screen = XDefaultScreen (display);
 #ifdef HAVE_SHM
@@ -403,7 +403,7 @@ InitDisplayX11(int argc, char **argv)
         {
           fprintf (stderr, "%s: [%s] Can't allocate colors!\n",
 		   *argv, renderer->name);
-          exit (1);
+          exit (EXIT_FAILURE);
         }
       /* Pre-initialize the colormap to known values */
       color.red = ((NES_palette[0] & 0xFF0000) >> 8);
@@ -443,7 +443,7 @@ InitDisplayX11(int argc, char **argv)
 	    {
 	      fprintf (stderr, "%s: [%s] Can't allocate colors!\n",
 		       *argv, renderer->name);
-	      exit (1);
+	      exit (EXIT_FAILURE);
 	    }
           paletteX11[x] = color.pixel;
           palette2X11[x] = BlackPixel(display, screen);
@@ -681,11 +681,11 @@ InitDisplayX11(int argc, char **argv)
 			atexit (cleanup_shm);
 			while (wait (&status) != -1)
 			     if (WIFEXITED(status))
-				  exit (status);
+				  exit (WEXITSTATUS(status));
 			     else if (WIFSIGNALED(status))
 				  raise (WTERMSIG(status));
 			perror ("wait");
-			exit (1);
+			exit (EXIT_FAILURE);
 		   }
 	      }
 	      xfb =
@@ -727,7 +727,7 @@ InitDisplayX11(int argc, char **argv)
       if (! (xfb = malloc (bytes_per_line * 240 * magstep)))
 	{
 	  perror ("malloc");
-	  exit (1);
+	  exit (EXIT_FAILURE);
 	}
       if (depth == 1)
 	image = XCreateImage (display, visual, depth,
@@ -753,7 +753,7 @@ InitDisplayX11(int argc, char **argv)
 	      if (! (xdfb[f] = malloc ((size_t) 256 * 240)))
 		{
 		  perror ("malloc");
-		  exit (1);
+		  exit (EXIT_FAILURE);
 		}
 	      memset ((void *) xdfb[f], 64, (size_t) 256 * 240);
 	    }
@@ -1559,7 +1559,7 @@ DoBackgroundOldX11(void)
       else if (c < 16)
         {
           fprintf (stderr, "Error: Short scanline!\n");
-          exit (1);
+          exit (EXIT_FAILURE);
         }                       /* Sanity check */
       else if (c >= 32)
         c = 32;
@@ -1568,7 +1568,7 @@ DoBackgroundOldX11(void)
       for (x = h = (tileline_begin[y] >> 3) & 62; c--; x = (x + 2) & 62)
         {
           if (h > 63)
-            exit (1);           /* shouldn't happen */
+            exit (EXIT_FAILURE);  /* shouldn't happen */
           v = y;
 
           /* Colors are assigned to a group of four tiles, so we use
@@ -2034,14 +2034,9 @@ UpdateTilesOldX11(void)
             hlastchange = h;
           if (v > vlastchange)
             vlastchange = v;
-          if (v >= 64)
-            exit (1);           /* sanity check - this should not happen! */
-          if (h >= 256)
-            exit (1);           /* sanity check - this should not happen! */
-          if (v < 0)
-            exit (1);           /* sanity check - this should not happen! */
-          if (h < 0)
-            exit (1);           /* sanity check - this should not happen! */
+          if (v < 0 || v >= 64
+           || h < 0 || h >= 256)
+            exit (EXIT_FAILURE);  /* sanity check - this should not happen! */
         }
     }
   for (h = hfirstchange; h <= hlastchange; h += 8)

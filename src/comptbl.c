@@ -58,20 +58,20 @@ main(int argc, char *argv[])
 
   fd = open ("compdata", O_RDWR | O_TRUNC | O_CREAT, 0666);
   if (fd < 0)
-    exit (1);
+    exit (EXIT_FAILURE);
   lseek (fd, 0x1000000, SEEK_SET);
   ftruncate (fd, 0x1000000);
   if (mmap (TBL_BASE, ALLOC_SIZE, PROT_READ | PROT_WRITE, MAP_FIXED |
             MAP_SHARED, fd, 0) != (void *) TBL_BASE)
     {
       printf ("Can't allocate memory!\n");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   if (mmap (TBL_BASE2, ALLOC_SIZE, PROT_READ | PROT_WRITE, MAP_FIXED |
             MAP_ANON | MAP_PRIVATE, -1, 0) != (void *) TBL_BASE2)
     {
       printf ("Can't allocate memory!\n");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   memset (TBL_BASE, 0, 1024);
   datap = TBL_BASE2;
@@ -266,11 +266,11 @@ main(int argc, char *argv[])
         }
     }
   if (fsync (fd) != 0)
-    exit (1);
+    exit (EXIT_FAILURE);
   lseek (fd, blocksalloc * 1024, SEEK_SET);
   ftruncate (fd, blocksalloc * 1024);
   write (fd, TBL_BASE2, datap - TBL_BASE2);
-  exit (0);
+  exit (EXIT_SUCCESS);
 
 parse_error:
   printf ("Parse error at line %d:\n", cln);
@@ -281,7 +281,7 @@ parse_error:
     else
       printf (" ");
   printf ("^\n");
-  exit (1);
+  exit (EXIT_FAILURE);
 }
 
 
@@ -328,5 +328,5 @@ memory_error(void)
 {
   printf ("Buffer memory exceeded in comptbl\n");
   printf (__FILE__ ":%d: increase ALLOC_SIZE and recompile\n", __LINE__);
-  exit (1);
+  exit (EXIT_FAILURE);
 }

@@ -530,7 +530,7 @@ InitDisplayGGI(int argc, char **argv)
   if (ggiInit())
     {
       fprintf (stderr, "%s: GGI initialization failed\n", argv[0]);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   if (! (visualGGI = ggiOpen (renderer_config.display_id, 0)))
     {
@@ -539,7 +539,7 @@ InitDisplayGGI(int argc, char **argv)
 	       renderer_config.display_id ? "\"" : "",
 	       renderer_config.display_id ? renderer_config.display_id : "default",
 	       renderer_config.display_id ? "\"" : "");
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   ggiParseMode (renderer_config.geometry ? renderer_config.geometry : "", &modeGGI);
   if (modeGGI.visible.x == GGI_AUTO)
@@ -573,7 +573,7 @@ InitDisplayGGI(int argc, char **argv)
 	ggiClose (visualGGI);
 	ggiExit ();
 	fprintf(stderr, "%s: requested GGI mode refused.\n", argv[0]);
-	exit (1);
+	exit (EXIT_FAILURE);
       }
   }
   ggiGetMode (visualGGI, &modeGGI);
@@ -594,7 +594,7 @@ InitDisplayGGI(int argc, char **argv)
 	  ggiClose (visualGGI);
 	  ggiExit ();
           fprintf (stderr, "Can't allocate colors!\n");
-          exit (1);
+          exit (EXIT_FAILURE);
 	}
       /* Pre-initialize the colormap to known values */
       blackpixel = basepixel;
@@ -774,7 +774,7 @@ InitDisplayGGI(int argc, char **argv)
 	  ggiClose (visualGGI);
 	  ggiExit ();
 	  perror ("malloc");
-	  exit (1);
+	  exit (EXIT_FAILURE);
 	}
     }
   InitScreenshotGGI ();
@@ -790,7 +790,7 @@ InitDisplayGGI(int argc, char **argv)
       fprintf (stderr,
 	       "GGI: ggiSetWriteFrame failed for frame %d\n",
 	       directGGI ? bufferGGI[frameno]->frame : frameno);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
   ggiSetGCForeground(visualGGI, blackpixel);
   ggiFillscreen (visualGGI);
@@ -860,7 +860,7 @@ UpdateColorsGGI(void)
 		  ggiExit ();
 		  fprintf (stderr,
 			   "GGI: ggiSetPalette failed in GT_PALETTE mode!\n");
-		  exit (1);
+		  exit (EXIT_FAILURE);
 		}
             }
         }
@@ -933,7 +933,7 @@ UpdateDisplayGGI(void)
 		  fprintf (stderr,
 			   "GGI: ggiSetDisplayFrame failed for frame %d\n",
 			   bufferGGI[frameno]->frame);
-		  exit (1);
+		  exit (EXIT_FAILURE);
 		}
 	      frameno = (frameno + 1) % numbuffersGGI;
 	      if (ggiResourceAcquire (bufferGGI[frameno]->resource,
@@ -942,7 +942,7 @@ UpdateDisplayGGI(void)
 		  fprintf (stderr, "GGI: failed to acquire directbuffer\n");
 		  ggiClose (visualGGI);
 		  ggiExit ();
-		  exit (1);
+		  exit (EXIT_FAILURE);
 		}
 	      else
 		{
@@ -982,7 +982,7 @@ UpdateDisplayGGI(void)
 			  fprintf (stderr,
 				   "GGI: ggiSetWriteFrame failed for frame %d\n",
 				   bufferGGI[frameno]->frame);
-			  exit (1);
+			  exit (EXIT_FAILURE);
 			}
 		    }
 		  else
@@ -990,7 +990,7 @@ UpdateDisplayGGI(void)
 		      fprintf (stderr, "GGI: bad directbuffer pointers\n");
 		      ggiClose (visualGGI);
 		      ggiExit ();
-		      exit (1);
+		      exit (EXIT_FAILURE);
 		    }
 		}
 	    }
@@ -1012,7 +1012,7 @@ UpdateDisplayGGI(void)
 		  fprintf (stderr,
 			   "GGI: ggiSetDisplayFrame failed for frame %d\n",
 			   frameno);
-		  exit (1);
+		  exit (EXIT_FAILURE);
 		}
 	      frameno = (frameno + 1) % modeGGI.frames;
 	      while ((modeGGI.frames > 1) && 

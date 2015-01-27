@@ -417,7 +417,7 @@ output(int addr, int val)
 
       VRAMPTR += 1 << (((*((unsigned char *) REG1) & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
       if (VRAMPTR > 0x3FFF)
-        {                       /* printf ("help - vramptr >0x3fff!\n"); exit(1); */
+        {                       /* printf ("help - vramptr >0x3fff!\n"); exit(EXIT_FAILURE); */
           VRAMPTR &= 0x3fff;
         }
     }
