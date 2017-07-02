@@ -61,18 +61,18 @@ AC_CHECK_HEADERS([features.h linux/joystick.h linux/soundcard.h sys/soundcard.h]
 AC_CHECK_HEADERS([getopt.h])
 AC_CHECK_HEADERS([ppm.h])
 
-if test "x$with_ggi" = "xyes"; then
+AS_IF([test "x$with_ggi" = "xyes"],[
 	AC_CHECK_HEADERS([ggi/gii.h ggi/ggi.h])
-fi
+])
 
-if test "x$with_w" = "xyes"; then
+AS_IF([test "x$with_w" = "xyes"],[
 	AC_CHECK_HEADERS([Wlib.h])
-fi
+])
 
-if test "x$no_x" != "xyes"; then
+AS_IF([test "x$no_x" != "xyes"],[
 	AC_CHECK_HEADERS([X11/xpm.h X11/vroot.h sys/ipc.h sys/shm.h])
 	AC_CHECK_HEADERS([X11/extensions/XShm.h X11/extensions/Xext.h],[],[],[[#include <X11/Xlib.h>]])
-fi
+])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_BIGENDIAN
@@ -96,27 +96,27 @@ AC_CHECK_LIB([pgm],[pgm_writepgm])
 AC_CHECK_LIB([ppm],[ppm_writeppm])
 
 GGI_LIBS=""
-if test "x$with_ggi" = "xyes"; then
+AS_IF([test "x$with_ggi" = "xyes"],[
 	save_LIBS="$LIBS"
 	LIBS=""
 	AC_CHECK_LIB([ggi],[ggiInit])
 	AC_CHECK_LIB([gii],[giiInit])
 	GGI_LIBS="$LIBS"
 	LIBS="$save_LIBS"
-fi
+])
 AC_SUBST([GGI_LIBS])
 
 W_LIBS=""
-if test "x$with_w" = "xyes"; then
+AS_IF([test "x$with_w" = "xyes"],[
 	save_LIBS="$LIBS"
 	LIBS=""
 	AC_CHECK_LIB([W],[w_init])
 	W_LIBS="$LIBS"
 	LIBS="$save_LIBS"
-fi
+])
 AC_SUBST([W_LIBS])
 
-if test "x$no_x" != "xyes"; then
+AS_IF([test "x$no_x" != "xyes"],[
 	save_CFLAGS="$CFLAGS"
 	save_LIBS="$LIBS"
 	CFLAGS="$CFLAGS $X_CFLAGS"
@@ -126,7 +126,7 @@ if test "x$no_x" != "xyes"; then
 	X_LIBS="$LIBS"
 	CFLAGS="$save_CFLAGS"
 	LIBS="$save_LIBS"
-fi
+])
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
