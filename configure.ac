@@ -4,6 +4,8 @@
 AC_PREREQ([2.69])
 AC_INIT([TuxNES],[0.75],[tuxnes-dev@dod.hpi.net])
 AC_CONFIG_SRCDIR([src/consts.h])
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE
 
