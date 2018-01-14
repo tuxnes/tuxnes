@@ -42,7 +42,7 @@ static const double cols[16] = {0,240,210,180,150,120,90,60,30,0,330,300,270,0,0
 /* br1 is for X0h colours   br1(0) is for colour 00h, br1(1) is for 10h, etc */
 /* br2 is for X1h thru XCh */
 /* br3 is for XDh */
-static const double br[3][4] = { 
+static const double br[3][4] = {
      {0.50, 0.75, 1.00, 1.00},
      {0.29, 0.45, 0.73, 0.90},
      {0.00, 0.24, 0.47, 0.77}
@@ -99,9 +99,9 @@ unsigned int *ntsc_palette(double hue, double tint)
 /* first, it grabs the angle for the colour we're working on out of the */
 /* array that holds our angles.  Then, it divides by 180 and multiplies by */
 /* pi to turn the angle which was in degrees, into radians. */
-         
+
          theta = M_PI * ((cols[z] + hue) / 180.0);
-         
+
 /******/
 /* This next part is where the real work is done.  It is a mathematical */
 /* representation of an NTSC chroma decoder matrix.  It converts Hue, */
@@ -110,11 +110,11 @@ unsigned int *ntsc_palette(double hue, double tint)
 /* RGB must be normalized into a value from 00h thru FFh for our VGA cards :-) */
 /* First, we multiply by 256, then make sure they don't wrap or go negative. */
 /* Finally, they are integerized. */
-         
+
          r = 256 * (y + s * sin(theta));
          g = 256 * (y - (27.0 / 53.0) * s * sin(theta) + (10.0 / 53.0) * s * cos(theta));
          b = 256 * (y - s * cos(theta));
-         
+
          if (r > 255) r = 255;
          if (g > 255) g = 255;
          if (b > 255) b = 255;
@@ -123,7 +123,7 @@ unsigned int *ntsc_palette(double hue, double tint)
          if (b < 0) b = 0;
 
          ntsc_palette_data[(x<<4)|z] = (r << 16) | (g << 8) | b;
-         
+
 /* The variables R,G, and B now contain our actual RGB values. */
        }
      }

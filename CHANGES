@@ -30,7 +30,7 @@ Changes in version 0.65:
 
  MMC1 ROM address masking.
 
- MMC3 VROM address masking, and ignore low bit for 2k pages. 
+ MMC3 VROM address masking, and ignore low bit for 2k pages.
 
 
 Changes in version 0.64:

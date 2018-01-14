@@ -38,9 +38,9 @@ Version 0.73, released December 9, 1999
 - screenshots are now saved in the format "basefilename-snap-xxxx.xpm"
 
 Version 0.72, released October 1, 1999
-- experimental sound support 
-- gzip file support 
-- support for mapper 99, experimental support for mapper 23, 
+- experimental sound support
+- gzip file support
+- support for mapper 99, experimental support for mapper 23,
 and improved support for mapper 15
 
 Version 0.71, released September 15, 1999

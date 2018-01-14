@@ -1191,7 +1191,7 @@ idecmapper:
  movsbl %al,%edi
  call *%ecx
  popl %ecx
- popl %eax 
+ popl %eax
  popl %ebx
  jmp i_next
 
@@ -1219,7 +1219,7 @@ iincmapper:
  movsbl %al,%edi
  call *%ecx
  popl %ecx
- popl %eax 
+ popl %eax
  popl %ebx
  jmp i_next
 
@@ -1475,7 +1475,7 @@ ipla:
  movsbl %al,%edi
  jmp i_next
 
-icmpimm: 
+icmpimm:
  pushl  %ebx
  pushl  %eax
  movzbl _RAM+1(%ebx),%ebx
@@ -1490,7 +1490,7 @@ icmpimm:
  addl   $2,%esi
  jmp i_next
 
-icpyimm: 
+icpyimm:
  pushl  %ebx
  pushl  %edx
  movzbl _RAM+1(%ebx),%ebx
@@ -1554,7 +1554,7 @@ ibitz:
  popl   %ebx
  jmp i_next
 
-icpximm: 
+icpximm:
  pushl  %ebx
  pushl  %ecx
  movzbl _RAM+1(%ebx),%ebx

@@ -19,10 +19,10 @@
  *
  * 2001/02/04 - Paul Zaremba
  *           Noise Volume sweep fixed
- *           
+ *
  * 2001/01/28 - Paul Zaremba
  *           Default rate changed to 44100
- * 
+ *
  * 2001/01/14 - Paul Zaremba
  *           Change to make the noise channel less harsh sounding
  *
@@ -31,11 +31,11 @@
  *           Frequency corrected for noise channel.
  *           Volume envelope decay fixed (sq?).
  *           Triangle channel sounds better (note length appears to be fixed)
- * 
+ *
  * 2000/11/02 - Paul Zaremba
  *        Fixed most of the channel start/stop popping noises
  *        Removed hard tabs so sound.c now fits the project standard
- * 
+ *
  * 2000/10/23 - Paul Zaremba, corrections by Eric Jacobs integrated
  *        Duty cycle fixed for square channels         (Eric)
  *        Fixed 120/240hz timing problems
@@ -70,7 +70,7 @@
  * 2000/10/02 - Paul Zaremba
  *     Speed increases in square channels
  *     DMC Partially implemented, but silenced.  Interrupt works
- * 
+ *
  * 2000/09/26 - Paul Zaremba
  *     Initial diff to the mailing list
  *     New sound layout
@@ -96,7 +96,7 @@
  * * Format AFMT_MU_LAW is still unsupported/untested
  * * Need *BSD patches.  sound.c does not compile properly under FreeBSD.
  * * DMC pops periodically.
- * 
+ *
  * */
 
 #ifdef HAVE_CONFIG_H
@@ -355,7 +355,7 @@ static unsigned char  tri_len_counter     = 0;
 static unsigned char  tri_mode_count      = 0;
 static unsigned char  tri_will_count      = 0;
 static          short wavelen_tri         = 0;
-static          int   tri_count_delay     = 0; /* hack inspired by nosefart 
+static          int   tri_count_delay     = 0; /* hack inspired by nosefart
                                                   (pez) */
 static          int   tri_count_delay_max = 0;
 /* noise variables */
@@ -407,7 +407,7 @@ InitAudio(int argc, char **argv)
         }
       else
         {
-          int desired_fragmentsize = 0; 
+          int desired_fragmentsize = 0;
 #ifdef SNDCTL_DSP_RESET
           if (! ioctl (audiofd, SNDCTL_DSP_RESET)) {
             int desired_audiorate;
@@ -440,7 +440,7 @@ InitAudio(int argc, char **argv)
             sample_format_number = sample_format->number;
             if (ioctl (audiofd, SNDCTL_DSP_SAMPLESIZE, &sample_format_number))
               perror (sound_config.audiofile);
-            
+
             /* set bytes_per_sample */
             if ( sample_format_number == AFMT_U16_LE  ||
                  sample_format_number == AFMT_U16_BE  ||
@@ -452,7 +452,7 @@ InitAudio(int argc, char **argv)
                  sample_format_number == AFMT_S16_LE ||
                  sample_format_number == AFMT_S16_BE )
                 signed_samples = 1;
-            
+
             if (sample_format_number != sample_format->number)
               {
                 for (sample_format = sample_formats; sample_format->name; sample_format ++)
@@ -506,7 +506,7 @@ InitAudio(int argc, char **argv)
         }
    }
 
-  
+
 
   /* set up sound buffer */
   magic_adjust = SAMPLES_PER_SECOND / sound_config.audiorate;
@@ -538,7 +538,7 @@ InitAudio(int argc, char **argv)
           fprintf( stderr, "Test(0x%X): 0x%X\n",argc, triangle_50[argc] );
 #endif
   }
-  
+
   /* adjust the values if bytes_per_sample != 1 */
   if ( bytes_per_sample != 1 ) {
       volume_max    |= (volume_max << 8);
@@ -640,7 +640,7 @@ UpdateAudio(void) /* called freq times a sec */
         /* do counter checks */
         /* first, decrement counters */
         --hz_60; --hz_120; --hz_240;
-        
+
         /* then, check 60hz */
         if ( hz_60 == 0 ) {
 #if 0
@@ -681,11 +681,11 @@ UpdateAudio(void) /* called freq times a sec */
                             wavelen_sq1 = temp_wavelen;
                         }
                     }
-                    
+
                     step_sq1 = freq_buffer_squ[wavelen_sq1];
                 }
             }
-            
+
             /* frequency sweep sq2 : wavelen_sq2 */
             if ( sq2_sweep_enabled && sq2_len_counter && sq2_right_shift &&
                     sq2_sw_no_carry && wavelen_sq2 > 0x07 ) {
@@ -704,11 +704,11 @@ UpdateAudio(void) /* called freq times a sec */
                             wavelen_sq2 = temp_wavelen;
                         }
                     }
-                    
+
                     step_sq2 = freq_buffer_squ[wavelen_sq2];
                 }
             }
-    
+
             /* frequency sweep noi : wavelen_noi */
 #if 0
             if ( noi_sweep_enabled && noi_len_counter && noi_right_shift &&
@@ -728,7 +728,7 @@ UpdateAudio(void) /* called freq times a sec */
                             wavelen_noi = temp_wavelen;
                         }
                     }
-                    
+
                     step_noi = freq_buffer_squ[wavelen_noi];
                 }
             }
@@ -773,7 +773,7 @@ UpdateAudio(void) /* called freq times a sec */
             if ( tri_mode_count && tri_lin_counter &&
                  !tri_lin_cnt_strt ) --tri_lin_counter;
         }
-        
+
         /* set up audio values for this cycle */
         while ( head != tail && CUR_EVENT.count < count ) {
             switch( CUR_EVENT.addr ) {
@@ -854,7 +854,7 @@ UpdateAudio(void) /* called freq times a sec */
                     sq2_sw_no_carry = 1;
                     step_sq2 = freq_buffer_squ[wavelen_sq2];
                     break;
-                    
+
                 /* triangle channel */
                 case 0x4008:
                     tri_lin_cnt_ld_reg = (CUR_EVENT.value & 0x7F);
@@ -866,7 +866,7 @@ UpdateAudio(void) /* called freq times a sec */
                         tri_mode_count = 1;
                         tri_will_count = /* save a write later */
                         tri_count_delay = 0;
-                                         
+
                     } else {
                         if ( !(CUR_EVENT.value & 0x80) ) {
                             tri_will_count = 1;
@@ -887,7 +887,7 @@ UpdateAudio(void) /* called freq times a sec */
                 case 0x400B:
                     wavelen_tri = ((wavelen_tri & 0x00FF) |
                                    ((CUR_EVENT.value & 0x07) << 8));
-                    
+
                     tri_len_cnt_ld_reg = CUR_EVENT.value >> 3;
                     tri_len_counter = length_precalc[ tri_len_cnt_ld_reg ];
 
@@ -902,7 +902,7 @@ UpdateAudio(void) /* called freq times a sec */
                     tri_lin_counter = tri_lin_cnt_ld_reg;
                     step_tri = freq_buffer_tri[wavelen_tri];
                     break;
-                    
+
                 /* Noise Channel */
                 case 0x400C:
                     noi_env_dec_disable = (CUR_EVENT.value & 0x10);
@@ -922,8 +922,8 @@ UpdateAudio(void) /* called freq times a sec */
                     noi_sample_rate = (CUR_EVENT.value & 0x0F);
                     noi_number_type = (CUR_EVENT.value & 0x80);
                     if ( freq_buffer_noi[noi_sample_rate] == 0 ) {
-                        freq_buffer_noi[noi_sample_rate] = 
-                            (MAGIC_noi * CYCLES_PER_SAMPLE * magic_adjust) / 
+                        freq_buffer_noi[noi_sample_rate] =
+                            (MAGIC_noi * CYCLES_PER_SAMPLE * magic_adjust) /
                             noi_wavelen[noi_sample_rate];
                     }
                     step_noi = freq_buffer_noi[noi_sample_rate];
@@ -974,15 +974,15 @@ UpdateAudio(void) /* called freq times a sec */
                     if ( !sq1_enabled ) {
                         sq1_len_counter = 0;
                     }
-                    
+
                     if ( !sq2_enabled ) {
                         sq2_len_counter = 0;
                     }
-                    
+
                     if ( !tri_enabled ) {
                         tri_len_counter = 0;
                     }
-                    
+
                     if ( !noi_enabled ) {
                         noi_len_counter = 0;
                     }
@@ -994,7 +994,7 @@ UpdateAudio(void) /* called freq times a sec */
                         fprintf(stderr, "Sound Write: 0x%lX (0x%X)\n",
                                 CUR_EVENT.addr, CUR_EVENT.value );
             } /* switch */
-        
+
             ++head;
             if ( head == SND_BUF_SIZE ) head = 0;
         } /* while head != tail && CUR_EVENT.count <= count */
@@ -1022,15 +1022,15 @@ UpdateAudio(void) /* called freq times a sec */
         /* next do sq1 */
         if ( (sq1_enabled && sq1_len_counter && wavelen_sq1 > 0x07 &&
                      sq1_sw_no_carry) || sq1_index > step_sq1 ) {
-                                                
+
             sq1_index += step_sq1;
             sq1_index &= 0x1FFFFFFF; /* fast modulus of a power of 2 */
-            
+
             if ( sq1_index <= sq1_duty_cycle ) {
                 samp_temp += (  sq1_env_dec_disable ?
                                 sq1_volume_reg :
                                 sq1_env_dec_volume );
-                                                    
+
             } else if ( signed_samples ) {
                 samp_temp -= (  sq1_env_dec_disable ?
                                 sq1_volume_reg :
@@ -1058,16 +1058,16 @@ UpdateAudio(void) /* called freq times a sec */
         if ( noi_enabled ) {
             noi_index += step_noi;
             if ( noi_index > 0x1FFFFFFF ) {
-                noi_state_reg = 
+                noi_state_reg =
                     shift_register15(noi_number_type ? 0x40 : 0x02);
-                
+
                 noi_index &= 0x1FFFFFFF;
             }
 
 
             if ( noi_len_counter ) {
                 if (noi_state_reg) {
-                    samp_temp += 
+                    samp_temp +=
                         ( noi_env_dec_disable ?
                           noi_volume_reg    :
                           noi_env_dec_volume );
@@ -1080,7 +1080,7 @@ UpdateAudio(void) /* called freq times a sec */
             }
         }
 
-        /* do everything dmc here */ 
+        /* do everything dmc here */
         if ( dmc_enabled && /*dmc_clk_for_fetch &&*/ dmc_len_counter ) {
             if ( dmc_index >= MAGIC_dmc ) {
                 dmc_shift = MAPTABLE[dmc_dta_ftch_addr >> 12][dmc_dta_ftch_addr];
@@ -1106,7 +1106,7 @@ UpdateAudio(void) /* called freq times a sec */
                 }
             }
 
-            while ( dmc_shiftcnt > 0 && ( dmcs_index >= MAGIC_dmc || 
+            while ( dmc_shiftcnt > 0 && ( dmcs_index >= MAGIC_dmc ||
                     dmc_index >= MAGIC_dmc )) {
                 if ( dmc_shift & 1 ) {
                     if ( dmc_delta != 0x3F ) {
@@ -1123,25 +1123,25 @@ UpdateAudio(void) /* called freq times a sec */
             samp_temp += (dmc_delta << ( bytes_per_sample == 1 ? 3 : 11 ));
         }
 
-        
+
         if ( bytes_per_sample == 2 ) {
             *((short*)(audio_buffer + sample)) = (samp_temp / 5);
 #if BYTE_ORDER == BIG_ENDIAN
             /* swap order */
             if ( sample_format_number == AFMT_U16_BE ||
                  sample_format_number == AFMT_S16_BE ) {
-                audio_buffer[sample]     ^= audio_buffer[sample + 1];    
-                audio_buffer[sample + 1] ^= audio_buffer[sample];    
+                audio_buffer[sample]     ^= audio_buffer[sample + 1];
+                audio_buffer[sample + 1] ^= audio_buffer[sample];
                 audio_buffer[sample]     ^= audio_buffer[sample + 1];
             }
 #endif /* BYTE_ORDER == BIG_ENDIAN */
         } else {
             audio_buffer[sample] = (samp_temp / 5); /* average the waves */
         }
-        
+
         count += cycles_per_sample;
         sample += bytes_per_sample;
-        
+
     } /* while sample < samples_per_vsync */
 
     /* This is used to check sync every 0x0F frames instead of every frame.
@@ -1156,9 +1156,9 @@ UpdateAudio(void) /* called freq times a sec */
         static unsigned long frame_count = 0;
         static int maxdelay = 0;
                int odelay;
-               
+
         ++frame_count;
-    
+
         if ( (frame_count & 0x0F) == 0x0F && /* check it every few frames */
              !ioctl (audiofd, SNDCTL_DSP_GETODELAY, &odelay)) {
             if (odelay > maxdelay) {
@@ -1166,13 +1166,13 @@ UpdateAudio(void) /* called freq times a sec */
             }
             if (odelay * 1.0 / (sound_config.audiorate * bytes_per_sample) >=
                 sound_config.max_sound_delay) {
-                skip_count = odelay * UPDATE_FREQ / (sound_config.audiorate 
+                skip_count = odelay * UPDATE_FREQ / (sound_config.audiorate
                              * bytes_per_sample) + 1;
-                    
+
                   if (verbose) {
-                       fprintf (stderr, 
+                       fprintf (stderr,
                              "Warning: %.3f sec sound delay, resynchronizing\n",
-                             odelay * 1.0 / (sound_config.audiorate 
+                             odelay * 1.0 / (sound_config.audiorate
                              * bytes_per_sample));
                        fprintf (stderr, "Skipping %u frames.\n", skip_count );
                   }

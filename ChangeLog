@@ -137,7 +137,7 @@
 	DMC frequency implemented properly.  Sounds correct on Zelda,
 	Frequency corrected for noise channel, Volume envelope decay fixed
 	(sq?), Triangle channel sounds better (note length appears to be fixed)
-	
+
 2000-10-31  The Mighty Mike Master <melanson@pcisys.net>
 
 	* tweaked MMC3 support so that it actually supports a 16K-PRG/8K-CHR
@@ -150,14 +150,14 @@
 
 2000-10-04  The Mighty Mike Master <melanson@pcisys.net>
 
-	* revised sound support courtesy of Paul Zaremba 
+	* revised sound support courtesy of Paul Zaremba
 	<pez@treeofice.2y.net>
 
 2000-10-03  The Mighty Mike Master <melanson@pcisys.net>
 
 	* pixels.h, fb.c, mapper.c: proper MMC2 support, courtesy of Eric
 	Jacobs <eaj@ricochet.net>
-	
+
 2000-09-12  The Mighty Mike Master <melanson@pcisys.net>
 
 	* consts.h, emu.c, globals.h, x11.c: joystick remapping support
@@ -285,7 +285,7 @@
 2000-02-14 Benjamin C. W. Sittler  <bsittler@nmt.edu>
 
 	* Added support for 4bpp rendering (untested, though...)
-	
+
 	* pixels.c: fixed a sprite-drawing bug I introduced in the last update
 
 2000-02-12  Benjamin C. W. Sittler  <bsittler@nmt.edu>
@@ -365,7 +365,7 @@
 1999-12-08  The Mighty Mike Master  <melanson@pcisys.net>
 
 	* emu.c: added a routine to determine the base filename of a
-	 file, i.e., strip off leading directory info and trailing 
+	 file, i.e., strip off leading directory info and trailing
 	 extension
 
 	* x11.c: revised InitSnapshot() and SaveSnapshot so that they

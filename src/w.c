@@ -585,7 +585,7 @@ InitDisplayW(int argc, char **argv)
 	    short pixel;
 	    rgb_t desired;
 	    unsigned long r, g, b;
-	    
+
 	    r = ((NES_palette[x] & 0xFF0000) >> 8) * (scanlines / 100.0);
 	    if (r > 0xFFFF)
 	      r = 0xFFFF;
@@ -671,7 +671,7 @@ InitDisplayW(int argc, char **argv)
     scanlines = 1;
     drawimage (PBL);
     UpdateColorsW();
-    w_putblock (bitmapW, winW, 
+    w_putblock (bitmapW, winW,
 		(256 * magstep - width) / -2,
 		(240 * magstep - height) / -2);
     scanlines = old_scanlines;
@@ -807,7 +807,7 @@ UpdateDisplayW(void)
       if (!frameskip)
 	{
 	  UpdateColorsW();
-	  w_putblock (bitmapW, winW, 
+	  w_putblock (bitmapW, winW,
 		      (256 * magstep - width) / -2,
 		      (240 * magstep - height) / -2);
 	  w_flush ();
@@ -882,7 +882,7 @@ UpdateDisplayW(void)
 	}
     }
   } while (renderer_data.pause_display);
-  
+
   /* Check the time.  If we're getting behind, skip next frame to stay in sync. */
   gettimeofday (&time, NULL);
   timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */

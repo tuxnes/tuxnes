@@ -152,7 +152,7 @@ SaveScreenshotGGI(void)
       int x0, y0;
       int x1, y1;
       int w0, h0;
-      
+
       if ((modeGGI.frames > 1) &&
 	  (ggiGetReadFrame(visualGGI) != frameno) &&
 	  ggiSetReadFrame (visualGGI, frameno))
@@ -195,7 +195,7 @@ SaveScreenshotGGI(void)
 	      for (x = 0; (x < w0) && ((x + x0) < w); x ++)
 		{
 		  ggi_pixel pix;
-		  
+
 		  cols[x + x0].r = cols[x + x0].b = 0xFFFF;
 		  cols[x + x0].g = 0x0000;
 		  if (ggiGetPixel (visualGGI, x + x1, y + y1, &pix))
@@ -659,7 +659,7 @@ InitDisplayGGI(int argc, char **argv)
 	for (x = 0; x < 64; x++)
 	  {
 	    unsigned long r, g, b;
-	    
+
 	    r = ((NES_palette[x] & 0xFF0000) >> 8) * (scanlines / 100.0);
 	    if (r > 0xFFFF)
 	      r = 0xFFFF;
@@ -779,7 +779,7 @@ InitDisplayGGI(int argc, char **argv)
     }
   InitScreenshotGGI ();
   fbinit ();
-  if ((modeGGI.frames > 1) && 
+  if ((modeGGI.frames > 1) &&
       (ggiGetWriteFrame(visualGGI) !=
        (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
       ggiSetWriteFrame (visualGGI,
@@ -922,7 +922,7 @@ UpdateDisplayGGI(void)
 	    {
 	      ggiResourceRelease (bufferGGI[frameno]->resource);
 	      ggiFlush (visualGGI);
-	      if ((modeGGI.frames > 1) && 
+	      if ((modeGGI.frames > 1) &&
 		  (ggiGetDisplayFrame(visualGGI) !=
 		   (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
 		  ggiSetDisplayFrame (visualGGI,
@@ -971,7 +971,7 @@ UpdateDisplayGGI(void)
 			  depth = formatGGI->depth;
 			}
 		      fbinit();
-		      if ((modeGGI.frames > 1) && 
+		      if ((modeGGI.frames > 1) &&
 			  (ggiGetWriteFrame(visualGGI) !=
 			   (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
 			  ggiSetWriteFrame (visualGGI,
@@ -1002,7 +1002,7 @@ UpdateDisplayGGI(void)
 			 256 * magstep, 240 * magstep,
 			 fb);
 	      ggiFlush (visualGGI);
-	      if ((modeGGI.frames > 1) && 
+	      if ((modeGGI.frames > 1) &&
 		  (ggiGetDisplayFrame(visualGGI) !=
 		   (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
 		  ggiSetDisplayFrame (visualGGI, frameno))
@@ -1015,7 +1015,7 @@ UpdateDisplayGGI(void)
 		  exit (EXIT_FAILURE);
 		}
 	      frameno = (frameno + 1) % modeGGI.frames;
-	      while ((modeGGI.frames > 1) && 
+	      while ((modeGGI.frames > 1) &&
 		  (ggiGetWriteFrame(visualGGI) !=
 		   (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
 		  ggiSetWriteFrame (visualGGI, frameno))
@@ -1047,12 +1047,12 @@ UpdateDisplayGGI(void)
     /* Handle GGI input */
     while (ggiEventPoll(visualGGI, emKeyPress | emKeyRelease, &tv)) {
       ggi_event ev;
-      
+
       ggiEventRead (visualGGI, &ev, emKeyPress | emKeyRelease);
       HandleKeyboardGGI (ev);
     }
   } while (renderer_data.pause_display);
-  
+
   /* Check the time.  If we're getting behind, skip next frame to stay in sync. */
   gettimeofday (&time, NULL);
   timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */

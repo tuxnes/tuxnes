@@ -11,19 +11,19 @@
 # for x86 processors.  I have used the GNU standard for the representation
 # of operands, which is: source,destination.  Be aware that Intel uses the
 # opposite ordering in their documentation (destination preceeds source).
-# 
+#
 # I have adopted the following register usage conventions:
-# 
+#
 #      A -> %eax            Carry flag -> %ebp
 #      X -> %ecx     Zero & Sign flags -> %edi
 #      Y -> %edx           Cycle count -> %esi
-# 
+#
 # The stack pointer and remaining flags are stored in memory.  The 6502
 # program counter is loaded into %ebx when a branch occurs; at all other
 # times, %ebx is used to hold various temporary values.  The carry flag
 # is stored by setting %ebp to a nonzero value.  The %esi register is
 # incremented to represent the 6502 cycle count.
-# 
+#
 # %edi is used to store the sign and zero flags.  This is usually done by
 # sign-extending the result of arithmetic operations into %edi.  The
 # equivilence branch instructions check the lower 8 bits of %edi against
@@ -37,27 +37,27 @@
 # cycles to read/write memory, I see little advantage in this approach,
 # especially considering that the sign-extension can be precomputed for
 # immediate data, thus eliminating the 3-cycle penalty for most data load
-# operations.  
-# 
+# operations.
+#
 # This file consists of a substitution table for replacing 6502 code with
 # native equivilents.  The format is as follows:
-# 
+#
 # (6502 instruction bytes),length:  (native instruction bytes) /
-# 
+#
 # Each statement may span multiple lines and is terminated with a single
 # slash mark.  All values are in hexadecimal.  The compdata.c program parses
 # this file and compiles it into a binary search tree which is then linked
 # into the final executable.  Anything following a # mark (such as this text)
 # is ignored by the compiler.
-# 
+#
 # The source bytes may contain a pattern to be matched using an and-mask,
 # which follows the instruction byte and a slash.  For example:
 # 80/80 matches any value with the high bit set, 00/01 matches any even
 # number, and 00/00 matches anything.
-# 
+#
 # The compiler can evaluate the following expressions in generating the
 # translated code:
-# 
+#
 # [B+n] Byte at SRC+n, where SRC is the address of the 6502 instruction
 # [C+n] Bitwise compliment of byte at SRC+n
 # [W+n] 16-bit word at SRC+n
@@ -82,19 +82,19 @@
 # [Y]   Address to call remapper
 # [!]   Stop translating
 # [^]   Insert breakpoint/trap
-# 
+#
 # To write to an output register, the generated code should put the location
 # into %ebx and the value to write in %eax, and call [O].  (The compiler will
 # replace [O] with the proper address.)  To read an input register, place the
 # location into %ebx and call [I].  The value is returned in %edi.  For
 # writes into the ROM area, call [Y] to pass these values to the mapper.
-# 
+#
 # Reads of memory are redirected thru the mapper table.  This table consists
 # of 16 entries, each representing 4K of memory in the 6502 address space
 # and containing a pointer to the actual memory location where the data can
 # be found.  This table is used to emulate the function of the mapper chips
 # found in many game cartridges.
-# 
+#
 # To execute a jump to a 6502 address, load the address into %ebx and jump
 # to [U].  Also load the address of the operand of the jump instruction into
 # %esp-4; that is, put it on top of the stack without modifying the stack
@@ -104,7 +104,7 @@
 # the new location.  For indirect jumps which can not be predicted, zero
 # should be loaded into %esp-4, and the address will not be modified.  This
 # may also be necessary if the target of the jump is swapped by the mapper.
-# 
+#
 # The %esi register is constantly incremented to reflect the 6502 cycle count.
 # When this register exceeds 0xFFFFFFFF and wraps around, the program should
 # jump to the NMI function [N].  This is done whether interrupts are enabled
@@ -112,13 +112,13 @@
 # vblank NMI if appropriate.  In some cases the interrupt to be generated is
 # actually an IRQ and not an NMI, but these are treated the same; the [N]
 # function will determine which interrupt to generate, if any. (see x86.S)
-# 
+#
 # Note that this file is parsed beginning to end, with later statements
 # overriding previous ones.  Therefore, general cases are defined first, and
 # special cases last.
-# 
+#
 # Thanks to Matt Ghio for assembler coding help.
-# 
+#
 # Basic NES Memory Map:
 #
 # 0000-0800 - NES internal RAM
@@ -197,13 +197,13 @@
 # 02 - (bad)
 # 03 - (bad)
 # 04 - (bad)
-# 05 - ORA - Zero Page    
+# 05 - ORA - Zero Page
 05,2:
 	0b 05 [Z+1]		# orl    ZP,%eax
 	83 c6 03		# addl   $0x3,%esi
 	0f be f8		# movsbl %al,%edi
 	/
-# 06 - ASL - Zero Page    
+# 06 - ASL - Zero Page
 06,2:
         31 db			# xorl   %ebx,%ebx
 	8a 1d [Z+1]		# movb   ZP,%bl
@@ -213,7 +213,7 @@
 	88 1d [Z+1]		# movb   %bl,ZP
 	0f be fb		# movsbl %bl,%edi
 	/
-# 07 - (bad)   
+# 07 - (bad)
 # 08 - PHP
 08,1:
         83 25 [F] 3C      	# andl   $0x3C,F
@@ -239,32 +239,32 @@
         8b 2d [S]		# movl   S,%ebp
         88 5d 00		# movb   %bl,0x0(%ebp)
         83 e3 01		# andl   $0x1,%ebx
-        fe 0d [S]		# decb   S  
+        fe 0d [S]		# decb   S
         89 dd			# movl   %ebx,%ebp
 	/
-# 09 - ORA - Immediate    
+# 09 - ORA - Immediate
 09,2:
 	83 c8 [B+1]		# orl    $B+1,%eax
 	83 c6 02		# addl   $0x2,%esi
 	0f be f8		# movsbl %al,%edi
 	/
-# 0A - ASL - Accumulator  
+# 0A - ASL - Accumulator
 0A,1:
 	00 c0			# addb   %al,%al
 	8d 76 02		# leal   0x2(%esi),%esi
         19 ed			# sbbl   %ebp,%ebp
 	0f be f8		# movsbl %al,%edi
 	/
-# 0B - (bad)   
-# 0C - (bad)   
-# 0D - ORA - Absolute     
+# 0B - (bad)
+# 0C - (bad)
+# 0D - ORA - Absolute
 0D,3:
 	8b 1d [X+1]		# movl   XLATADDR,%ebx
 	83 c6 04		# addl   $0x4,%esi
 	0a 83 [W+1] 00 00	# orb    ADDR(%ebx),%al
 	0f be f8		# movsbl %al,%edi
 	/
-# 0E - ASL - Absolute     
+# 0E - ASL - Absolute
 0E,3:
 # Warning - doesn't check mapper
 	31 db			# xorl   %ebx,%ebx
@@ -275,9 +275,9 @@
 	88 1d [A+1]		# movb   %bl,ADDR
 	0f be fb		# movsbl %bl,%edi
 	/
-# 0F - (bad)   
-# 10 - BPL                
-10,2: 
+# 0F - (bad)
+# 10 - BPL
+10,2:
 	83 c6 [>+1] 03		# addl   $3+,%esi
 	bb [P]			# movl   $[P],%ebx
 	0f 89 [N]		# jns    NMI
@@ -303,15 +303,15 @@
  73 09             # jae    +9
  81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
  72 01             # jb     +1
- [^]               # int3   
+ [^]               # int3
 
 	0a 04 1f		# orb    (%edi,%ebx,1),%al
 	0f be f8		# movsbl %al,%edi
 	/
-# 12 - (bad)   
-# 13 - (bad)   
-# 14 - (bad)   
-# 15 - ORA - Zero Page,X  
+# 12 - (bad)
+# 13 - (bad)
+# 14 - (bad)
+# 15 - ORA - Zero Page,X
 15,2:
 	8d 59 [B+1]		# leal   operand(%ecx),%ebx
 	81 e3 ff 00 00 00	# andl   $0xff,%ebx
@@ -319,7 +319,7 @@
 	0b 83 [L]		# orl    RAM(%ebx),%eax
 	0f be f8		# movsbl %al,%edi
 	/
-# 16 - ASL - Zero Page,X  
+# 16 - ASL - Zero Page,X
 16,2:
 	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
 	31 db			# xorl   %ebx,%ebx
@@ -331,13 +331,13 @@
 	88 9f [L]		# movb   %bl,ZP(%edi)
 	0f be fb		# movsbl %bl,%edi
 	/
-# 17 - (bad)   
-# 18 - CLC                
+# 17 - (bad)
+# 18 - CLC
 18,1:
 	31 ed			# xorl   %ebp,%ebp
 	83 c6 02		# addl   $0x2,%esi
 	/
-# 19 - ORA - Absolute,Y   
+# 19 - ORA - Absolute,Y
 19,3:
 # FIXME - cycle count wrong
 	81 e2 ff 00 00 00	# andl   $0xff,%edx
@@ -349,10 +349,10 @@
 	0a 04 3b		# orb    (%ebx,%edi,1),%al
 	0f be f8		# movsbl %al,%edi
 	/
-# 1A - (bad)   
-# 1B - (bad)   
-# 1C - (bad)   
-# 1D - ORA - Absolute,X   
+# 1A - (bad)
+# 1B - (bad)
+# 1C - (bad)
+# 1D - ORA - Absolute,X
 1D,3:
 # FIXME - cycle count wrong
 	81 e1 ff 00 00 00	# andl   $0xff,%ecx
@@ -466,7 +466,7 @@
 	/
 # 2B - (bad)
 # 2C - BIT - Absolute
-2C,3: 
+2C,3:
 	8b 1d [X+1]		# movl   XADDRMAP,%ebx
 	0d 00 01 00 00		# orl    $0x100,%eax
 	0f be bb [W+1] 00 00	# movsbl ADDR(%ebx),%edi
@@ -563,7 +563,7 @@
 	83 c6 04		# addl   $0x4,%esi
 	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
 	22 04 3b		# andb   (%ebx,%edi,1),%al
-	0f be f8		# movsbl %al,%edi 
+	0f be f8		# movsbl %al,%edi
 	/
 # 3A - (bad)
 # 3B - (bad)
@@ -624,17 +624,17 @@
 	e9 [U]			# jmp    [U]
 	[!]
 	/
-# 41 - EOR - (Indirect,X) 
-# 42 - (bad)   
-# 43 - (bad)   
-# 44 - (bad)   
-# 45 - EOR - Zero Page    
+# 41 - EOR - (Indirect,X)
+# 42 - (bad)
+# 43 - (bad)
+# 44 - (bad)
+# 45 - EOR - Zero Page
 45,2:
         33 05 [Z+1]		# xorl   Z,%eax
 	83 c6 03		# addl   $0x3,%esi
 	0f be f8		# movsbl %al,%edi
 	/
-# 46 - LSR - Zero Page    
+# 46 - LSR - Zero Page
 46,2:
 	31 db			# xorl   %ebx,%ebx
 	8a 1d [Z+1]		# movb   ZP,%bl
@@ -644,8 +644,8 @@
 	88 1d [Z+1]		# movb   %bl,ZP
 	89 df			# movl   %ebx,%edi
 	/
-# 47 - (bad)   
-# 48 - PHA                
+# 47 - (bad)
+# 48 - PHA
 48,1:
 	8b 1d [S]		# movl   STACKPTR,%ebx
 	83 c6 03		# addl   $0x3,%esi
@@ -653,13 +653,13 @@
 	fe cb			# decb   %bl
 	88 1d [S]		# movb   %bl,STACKPTR
 	/
-# 49 - EOR - Immediate    
+# 49 - EOR - Immediate
 49,2:
 	35 [E+1]		# xorl   $imm,%eax
 	83 c6 02		# addl   $0x2,%esi
 	0f be f8		# movsbl %al,%edi
 	/
-# 4A - LSR - Accumulator  
+# 4A - LSR - Accumulator
 4A,1:
         d1 e8			# shrl   %eax
         19 ed			# sbbl   %ebp,%ebp
@@ -667,8 +667,8 @@
 	8d 76 02		# leal   0x2(%esi),%esi
 	89 c7			# movl   %eax,%edi
 	/
-# 4B - (bad)   
-# 4C - JMP - Absolute     
+# 4B - (bad)
+# 4C - JMP - Absolute
 4C,3:
 	83 c6 03		# addl   $3,%esi
 	bb [W+1] 00 00		# movl   $0000[W+1],%ebx
@@ -680,14 +680,14 @@
 	e9 [N]			# jmp    NMI
 	[!]
 	/
-# 4D - EOR - Absolute     
+# 4D - EOR - Absolute
 4D,3:
 	8b 1d [X+1]		# movl   XMAPADDR,%ebx
 	83 c6 04		# addl   $0x4,%esi
 	32 83 [W+1] 00 00	# xorb   ADDR(%ebx),%al
 	0f be f8		# movsbl %al,%edi
 	/
-# 4E - LSR - Absolute     
+# 4E - LSR - Absolute
 4E,3:
 # Warning: read-modify-write operation assumes RAM target, does not check mapper table
 	8b 1d [A+1]		# movl   ADDR,%ebx
@@ -698,7 +698,7 @@
 	88 1d [A+1]		# movb   %bl,ADDR
 	89 df			# movl   %ebx,%edi
 	/
-# 4F - (bad)   
+# 4F - (bad)
 # 50 - BVC
 50,2:
 	83 c6 [>+1] 03		# addl   $3+,%esi
@@ -712,7 +712,7 @@
 	0f 84 [U]		# je     U
 	83 ee [>+1] 01		# subl   $1+,%esi
 	/
-# 51 - EOR - (Indirect),Y 
+# 51 - EOR - (Indirect),Y
 51,2:
 	31 db			# xorl   %ebx,%ebx
 	81 e2 ff 00 00 00	# andl   $0xff,%edx
@@ -727,16 +727,16 @@
  73 09             # jae    +9
  81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
  72 01             # jb     +1
- [^]               # int3   
+ [^]               # int3
 
 	8b 3c bd [M]		# movl   [M](,%edi,4),%edi
 	32 04 3b		# xorb   (%ebx,%edi,1),%al
 	0f be f8		# movsbl %al,%edi
 	/
-# 52 - (bad)   
-# 53 - (bad)   
-# 54 - (bad)   
-# 55 - EOR - Zero Page,X  
+# 52 - (bad)
+# 53 - (bad)
+# 54 - (bad)
+# 55 - EOR - Zero Page,X
 55,2:
 	8d 59 [B+1]		# leal   operand(%ecx),%ebx
 	81 e3 ff 00 00 00	# andl   $0xff,%ebx
@@ -744,7 +744,7 @@
 	33 83 [L]		# xorl   RAM(%ebx),%eax
 	0f be f8		# movsbl %al,%edi
 	/
-# 56 - LSR - Zero Page,X  
+# 56 - LSR - Zero Page,X
 56,2:
 	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
 	31 db			# xorl   %ebx,%ebx
@@ -756,13 +756,13 @@
 	88 9f [L]		# movb   %bl,RAM(%edi)
 	89 df			# movl   %ebx,%edi
 	/
-# 57 - (bad)   
+# 57 - (bad)
 # 58 - CLI
 58,1:
 	83 c6 02		# addl   $0x2,%esi
 	80 25 [F] fb		# andb   $0xfb,F
 	/
-# 59 - EOR - Absolute,Y   
+# 59 - EOR - Absolute,Y
 59,3:
 	81 e2 ff 00 00 00	# andl   $0xff,%edx
 	8d ba [W+1] 00 00	# leal   ADDR(%edx),%edi
@@ -774,10 +774,10 @@
 	32 04 1f		# xorb   (%edi,%ebx,1),%al
 	0f be f8		# movsbl %al,%edi
 	/
-# 5A - (bad)   
-# 5B - (bad)   
-# 5C - (bad)   
-# 5D - EOR - Absolute,X   
+# 5A - (bad)
+# 5B - (bad)
+# 5C - (bad)
+# 5D - EOR - Absolute,X
 5D,3:
 	81 e1 ff 00 00 00	# andl   $0xff,%ecx
 	8d b9 [W+1] 00 00	# leal   ADDR(%ecx),%edi
@@ -789,7 +789,7 @@
 	32 04 1f		# xorb   (%edi,%ebx,1),%al
 	0f be f8		# movsbl %al,%edi
 	/
-# 5E - LSR - Absolute,X   
+# 5E - LSR - Absolute,X
 5E,3:
 # Warning- Doesn't check mapper
 	81 e1 ff 00 00 00	# andl   $0xff,%ecx
@@ -801,7 +801,7 @@
 	88 99 [A+1]		# movb   %bl,RAM(%ecx)
 	89 df			# movl   %ebx,%edi
 	/
-# 5F - (bad)   
+# 5F - (bad)
 # 60 - RTS
 60,1:
 	31 db			# xorl   %ebx,%ebx
@@ -832,7 +832,7 @@
  73 09             # jae    +9
  81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
  72 01             # jb     +1
- [^]               # int3   
+ [^]               # int3
 
 	c1 ef 0c		# shrl   $0xc,%edi
 	83 c5 ff		# addl   $0xffffffff,%ebp
@@ -1052,7 +1052,7 @@
 	0f be b9 [A+1]		# movsbl ADDR(%ecx),%edi
 	/
 # 7F - (bad)
-# 80 - (bad)   
+# 80 - (bad)
 # 81 - STA - (Indirect,X)
 81,2:
         8d 59 [B+1]             # leal   [B+1](%ecx),%ebx
@@ -1071,56 +1071,56 @@
         eb 05                   # jmp    +5
         e8 [Y]                  # call   MAPPER
         /
-# 82 - (bad)   
-# 83 - (bad)   
-# 84 - STY - Zero Page    
+# 82 - (bad)
+# 83 - (bad)
+# 84 - STY - Zero Page
 84,2:
 	83 c6 03		# addl   $0x3,%esi  # cycle count +3
         88 15 [Z+1]		# movb   %dl,ADDR
 	/
-# 85 - STA - Zero Page    
+# 85 - STA - Zero Page
 85,2:
 	83 c6 03		# addl   $0x3,%esi  # cycle count +3
         a2 [Z+1]		# movb   %al,ADDR
 	/
-# 86 - STX - Zero Page    
+# 86 - STX - Zero Page
 86,2:
 	83 c6 03		# addl   $0x3,%esi  # cycle count +3
         88 0d [Z+1]		# movb   %cl,ADDR
 	/
-# 87 - (bad)   
-# 88 - DEY                
+# 87 - (bad)
+# 88 - DEY
 88,1:
 	4a			# decl   %edx
 	83 c6 02		# addl   $0x2,%esi  # cycle count +2
 	0f be fa		# movsbl %dl,%edi
 	/
-# 89 - (bad)   
-# 8A - TXA                
+# 89 - (bad)
+# 8A - TXA
 8A,1:
 	0f be c1		# movsbl %cl,%eax
 	83 c6 02		# addl   $0x2,%esi  # cycle count +2
 	89 c7			# movl   %eax,%edi
 	/
-# 8B - (bad)   
-# 8C - STY - Absolute     
+# 8B - (bad)
+# 8C - STY - Absolute
 8C,3:
 	83 c6 04		# addl   $0x4,%esi  # cycle count +4
         88 15 [A+1]		# movb   %dl,ADDR
 	/
-# 8D - STA - Absolute     
+# 8D - STA - Absolute
 8D,3:
 	83 c6 04		# addl   $0x4,%esi  # cycle count +4
         a2 [A+1]		# movb   %al,ADDR
 	/
-# 8E - STX - Absolute     
+# 8E - STX - Absolute
 8E,3:
 	83 c6 04		# addl   $0x4,%esi  # cycle count +4
         88 0d [A+1]		# movb   %cl,ADDR
 	/
 
-# 8F - (bad)   
-# 90 - BCC                
+# 8F - (bad)
+# 90 - BCC
 90,2:
 	83 c6 [>+1] 03		# addl   $3+,%esi
 	bb [P]			# movl   $[P],%ebx
@@ -1131,7 +1131,7 @@
 	0f 84 [U]		# je     U
 	83 ee [>+1] 01		# subl   $1+,%esi
 	/
-# 91 - STA - (Indirect),Y 
+# 91 - STA - (Indirect),Y
 91,2:
 	31 db			# xorl   %ebx,%ebx
 	81 e2 ff 00 00 00	# andl   $0xff,%edx
@@ -1151,37 +1151,37 @@
         eb 05                   # jmp    +5
 	e8 [Y]			# call   MAPPER
 	/
-# 92 - (bad)   
-# 93 - (bad)   
-# 94 - STY - Zero Page,X  
+# 92 - (bad)
+# 93 - (bad)
+# 94 - STY - Zero Page,X
 94,2:
 	8d 59 [B+1]		# leal   operand(%ecx),%ebx
 	81 e3 ff 00 00 00	# andl   $0xff,%ebx
 	8d 76 04		# leal   0x4(%esi),%esi
 	88 93 [L]		# movb   %dl,RAM(%ebx)
 	/
-# 95 - STA - Zero Page,X  
-95,2: 
+# 95 - STA - Zero Page,X
+95,2:
 	8d 59 [B+1]		# leal   operand(%ecx),%ebx
 	81 e3 ff 00 00 00	# andl   $0xff,%ebx
 	8d 76 04		# leal   0x4(%esi),%esi
 	88 83 [L]		# movb   %al,RAM(%ebx)
 	/
-# 96 - STX - Zero Page,Y  
+# 96 - STX - Zero Page,Y
 96,2:
 	8d 5a [B+1]		# leal   operand(%edx),%ebx
 	81 e3 ff 00 00 00	# andl   $0xff,%ebx
 	8d 76 04		# leal   0x4(%esi),%esi
 	88 8b [L]		# movb   %cl,RAM(%ebx)
 	/
-# 97 - (bad)   
-# 98 - TYA                
+# 97 - (bad)
+# 98 - TYA
 98,1:
 	0f be c2		# movsbl %dl,%eax
 	83 c6 02		# addl   $0x2,%esi  # cycle count +2
 	89 c7			# movl   %eax,%edi
 	/
-# 99 - STA - Absolute,Y   
+# 99 - STA - Absolute,Y
 99,3:
 	81 e2 ff 00 00 00	# andl   $0xff,%edx
 	83 c6 05		# addl   $5,%esi    # cycle count +5
@@ -1191,17 +1191,17 @@
 9A,1:
 	88 0d [S]		# movb   %cl,S
 	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	/                
-# 9B - (bad)   
-# 9C - (bad)   
-# 9D - STA - Absolute,X   
+	/
+# 9B - (bad)
+# 9C - (bad)
+# 9D - STA - Absolute,X
 9D,3:
 	81 e1 ff 00 00 00	# andl   $0xff,%ecx
 	83 c6 05		# addl   $5,%esi    # cycle count +5
 	88 81 [A+1]		# movb   %al,[A+1](%ecx)
 	/
-# 9E - (bad)   
-# 9F - (bad)   
+# 9E - (bad)
+# 9F - (bad)
 # A0 - LDY - Immediate
 a0,2:
 	31 d2			# xorl   %edx,%edx
@@ -1226,7 +1226,7 @@ A1,2:
  73 09             # jae    +9
  81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
  72 01             # jb     +1
- [^]               # int3   
+ [^]               # int3
 
 	0f be 04 1f		# movsbl (%edi,%ebx,1),%eax
 	89 c7			# movl   %eax,%edi
@@ -1387,7 +1387,7 @@ BA,1:
 	/
 # BB - (bad)
 # BC - LDY - Absolute,X
-BC,3: 
+BC,3:
 # FIXME - cycle count wrong
 	81 e1 ff 00 00 00       # andl   $0xff,%ecx
 	8d 91 [W+1] 00 00	# leal   ADDR(%ecx),%edx
@@ -1423,7 +1423,7 @@ BE,3:
 	89 cf			# movl   %ecx,%edi
 	/
 # BF - (bad)
-# C0 - CPY - Immediate    
+# C0 - CPY - Immediate
 C0,2:
 	0f b6 da		# movzbl %dl,%ebx
 	bd 01 00 00 00		# movl   $0x1,%ebp
@@ -1432,7 +1432,7 @@ C0,2:
 	83 dd 00		# sbbl   $0x0,%ebp
 	8d 76 02                # leal   0x2(%esi),%esi  # cycle count +2
 	/
-# C1 - CMP - (Indirect,X) 
+# C1 - CMP - (Indirect,X)
 C1,2:
 	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
 	31 db			# xorl   %ebx,%ebx
@@ -1457,9 +1457,9 @@ C1,2:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# C2 - (bad)   
-# C3 - (bad)   
-# C4 - CPY - Zero Page    
+# C2 - (bad)
+# C3 - (bad)
+# C4 - CPY - Zero Page
 C4,2:
 	0f b6 da		# movzbl %dl,%ebx
 	0f b6 3d [Z+1]		# movzbl ZP,%edi
@@ -1469,7 +1469,7 @@ C4,2:
 	83 dd 00		# sbbl   $0x0,%ebp
 	8d 76 03		# leal   0x3(%esi),%esi  # cycle count +3
 	/
-# C5 - CMP - Zero Page    
+# C5 - CMP - Zero Page
 C5,2:
 	31 db			# xorl   %ebx,%ebx
 	0f b6 3d [Z+1]		# movzbl ZP,%edi
@@ -1480,7 +1480,7 @@ C5,2:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# C6 - DEC - Zero Page    
+# C6 - DEC - Zero Page
 C6,2:
 	31 db			# xorl   %ebx,%ebx
 	8a 1d [Z+1]		# movb   ZP,%bl
@@ -1490,14 +1490,14 @@ C6,2:
 	89 df			# movl   %ebx,%edi
 	88 1d [Z+1]		# movb   %bl,ZP
 	/
-# C7 - (bad)   
-# C8 - INY                
+# C7 - (bad)
+# C8 - INY
 C8,1:
 	42			# incl   %edx
 	83 c6 02		# addl   $0x2,%esi  # cycle count +2
 	0f be fa		# movsbl %dl,%edi
 	/
-# C9 - CMP - Immediate    
+# C9 - CMP - Immediate
 C9,2:
 	bd 01 00 00 00		# movl   $1,%ebp
 	0f b6 d8		# movzbl %al,%ebx
@@ -1512,8 +1512,8 @@ CA,1:
 	83 c6 02		# addl   $0x2,%esi  # cycle count +2
 	0f be f9		# movsbl %cl,%edi
 	/
-# CB - (bad)   
-# CC - CPY - Absolute     
+# CB - (bad)
+# CC - CPY - Absolute
 CC,3:
 	8b 3d [X+1]		# movl   X,%edi
 	31 db			# xorl   %ebx,%ebx
@@ -1525,7 +1525,7 @@ CC,3:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# CD - CMP - Absolute     
+# CD - CMP - Absolute
 CD,3:
 	8b 3d [X+1]		# movl   X,%edi
 	31 db			# xorl   %ebx,%ebx
@@ -1537,7 +1537,7 @@ CD,3:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# CE - DEC - Absolute     
+# CE - DEC - Absolute
 CE,3:
 	31 db			# xorl   %ebx,%ebx
 	8a 1d [A+1]		# movb   ADDR,%bl
@@ -1547,8 +1547,8 @@ CE,3:
 	89 df			# movl   %ebx,%edi
 	88 1d [A+1]		# movb   %bl,ADDR
 	/
-# CF - (bad)   
-# D0 - BNE                
+# CF - (bad)
+# D0 - BNE
 D0,2:
 	83 c6 [>+1] 03		# addl   $3+,%esi
 	bb [P]			# movl   $[P],%ebx
@@ -1559,7 +1559,7 @@ D0,2:
 	0f 85 [U]		# jne    U
 	83 ee [>+1] 01		# subl   $1+,%esi
 	/
-# D1 - CMP   (Indirect),Y 
+# D1 - CMP   (Indirect),Y
 D1,2:
 	31 db			# xorl   %ebx,%ebx
 	81 e2 ff 00 00 00	# andl   $0xff,%edx
@@ -1584,10 +1584,10 @@ D1,2:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# D2 - (bad)   
-# D3 - (bad)   
-# D4 - (bad)   
-# D5 - CMP - Zero Page,X  
+# D2 - (bad)
+# D3 - (bad)
+# D4 - (bad)
+# D5 - CMP - Zero Page,X
 D5,2:
 	8d 69 [B+1]		# leal   [B+1](%ecx),%ebp
 	31 db			# xorl   %ebx,%ebx
@@ -1600,7 +1600,7 @@ D5,2:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# D6 - DEC - Zero Page,X  
+# D6 - DEC - Zero Page,X
 D6,2:
 	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
 	31 db			# xorl   %ebx,%ebx
@@ -1612,13 +1612,13 @@ D6,2:
 	88 9f [L]		# movb   %bl,RAM(%edi)
 	89 df			# movl   %ebx,%edi
 	/
-# D7 - (bad)   
+# D7 - (bad)
 # D8 - CLD
 D8,1:
 	83 c6 02		# addl   $0x2,%esi
 	80 25 [F] f7		# andb   $0xf7,[F]
 	/
-# D9 - CMP - Absolute,Y   
+# D9 - CMP - Absolute,Y
 D9,3:
 	81 e2 ff 00 00 00	# andl   $0xff,%edx
 	25 ff 00 00 00		# andl   $0xff,%eax
@@ -1635,9 +1635,9 @@ D9,3:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# DA - (bad)   
-# DB - (bad)   
-# DC - (bad)   
+# DA - (bad)
+# DB - (bad)
+# DC - (bad)
 # DD - CMP - Absolute,X
 DD,3:
 # FIXME - cycle count wrong
@@ -1655,7 +1655,7 @@ DD,3:
 	0f be fb		# movsbl %bl,%edi
 	83 dd 00		# sbbl   $0x0,%ebp
 	/
-# DE - DEC - Absolute,X   
+# DE - DEC - Absolute,X
 DE,3:
 	81 e1 ff 00 00 00	# andl   $0xff,%ecx
 	31 db			# xorl   %ebx,%ebx
@@ -1666,7 +1666,7 @@ DE,3:
 	89 df			# movl   %ebx,%edi
 	88 99 [A+1]		# movb   %bl,ADDR(%ecx)
 	/
-# DF - (bad)   
+# DF - (bad)
 # E0 - CPX - Immediate
 E0,2:
 	0f b6 d9		# movzbl %cl,%ebx
@@ -2192,7 +2192,7 @@ A0 00 F0,4:
 	[!]
 	/
 
-# This shows up quite a bit also... LDA #0 / STA / BEQ 
+# This shows up quite a bit also... LDA #0 / STA / BEQ
 A9 00 85 00/00 F0,6:
 	31 c0			# xorl   %eax,%eax
 	31 ff			# xorl   %edi,%edi
@@ -2238,7 +2238,7 @@ A9 00 85 00/00 F0,6:
 	e9 [U]			# jmp    [U]
 	[!]
 	/
-09 00 D0,4: # ORA #$00 / BNE  
+09 00 D0,4: # ORA #$00 / BNE
 	0f be f8		# movsbl %al,%edi
 	83 c6 [>+3] 05		# addl   $5+,%esi # timing
 	bb [P]			# movl   $[P],%ebx
@@ -2286,7 +2286,7 @@ A9 00 85 00/00 F0,6:
 #-----------------------------------------------------------------------------
 # Writes to Mapper Registers
 
-# STA $8000+  - write mapper regs 
+# STA $8000+  - write mapper regs
 8D 00/00 80/80,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
@@ -2424,7 +2424,7 @@ FE 00/00 80/80,3:
 	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
 	e9 [U]			# jmp    [U]
 	/
- 
+
 # DEC $8000+,X to mapper
 DE 00/00 80/80,3:
 	81 e1 ff 00 00 00	# andl   $0xff,%ecx
@@ -2488,7 +2488,7 @@ AD 07 20,3:
 	e8 [I]		# call   INPUT
 	89 f8		# movl   %edi,%eax
 	/
-# LDX $2007 
+# LDX $2007
 AE 07 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi # do timing count
 	bb 07 20 00 00	# movl   $0x2007,%ebx
@@ -2553,7 +2553,7 @@ B9 00/00 40,3:
 
 # Output
 
-# STA $2000  - write to $2000 
+# STA $2000  - write to $2000
 8D 00 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
@@ -2576,7 +2576,7 @@ B9 00/00 40,3:
 	92              # xchgl  %eax,%edx
 	/
 
-# STA $2001  - write to $2001 
+# STA $2001  - write to $2001
 8D 01 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
@@ -2599,14 +2599,14 @@ B9 00/00 40,3:
 	92              # xchgl  %eax,%edx
 	/
 
-# STA $2002  - write to $2002?? should not happen 
+# STA $2002  - write to $2002?? should not happen
 8D 02 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 #	bb [W+1] 00 00	# movl   $ADDR,%ebx
 #	e8 [O]		# call   OUTPUT
 	/
 
-# STA $2003  - write to $2003 
+# STA $2003  - write to $2003
 8D 03 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
@@ -2629,7 +2629,7 @@ B9 00/00 40,3:
 	92              # xchgl  %eax,%edx
 	/
 
-# STA $2004  - write to $2004 
+# STA $2004  - write to $2004
 8D 04 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
@@ -2652,7 +2652,7 @@ B9 00/00 40,3:
 	92              # xchgl  %eax,%edx
 	/
 
-# STA $2005  - write to $2005 
+# STA $2005  - write to $2005
 8D 05 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
@@ -2666,7 +2666,7 @@ B9 00/00 40,3:
 	e8 [O]		# call   OUTPUT
 	91              # xchgl  %eax,%ecx
 	/
-# STY $2005  - write to $2005 
+# STY $2005  - write to $2005
 8C 05 20,3:
 	92              # xchgl  %eax,%edx
 	8d 76 04        # leal   0x4(%esi),%esi
@@ -2675,13 +2675,13 @@ B9 00/00 40,3:
 	92              # xchgl  %eax,%edx
 	/
 
-# STA $2006  - write to $2006 
+# STA $2006  - write to $2006
 8D 06 20,3:
 	8d 76 04	# leal   0x4(%esi),%esi #timing
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
 	e8 [O]		# call   OUTPUT
 	/
-# STX $2006  - write to $2006 
+# STX $2006  - write to $2006
 8E 06 20,3:
 	8d 76 04        # leal   0x4(%esi),%esi
 	91              # xchgl  %eax,%ecx
@@ -2689,7 +2689,7 @@ B9 00/00 40,3:
 	e8 [O]		# call   OUTPUT
 	91              # xchgl  %eax,%ecx
 	/
-# STY $2006  - write to $2006 
+# STY $2006  - write to $2006
 8C 06 20,3:
 	8d 76 04        # leal   0x4(%esi),%esi
 	92              # xchgl  %eax,%edx
@@ -2698,13 +2698,13 @@ B9 00/00 40,3:
 	92              # xchgl  %eax,%edx
 	/
 
-# STA $2007  - write to $2007 
+# STA $2007  - write to $2007
 8D 07 20,3:
 	bb [W+1] 00 00	# movl   $ADDR,%ebx
 	8d 76 04        # leal   0x4(%esi),%esi
 	e8 [O]		# call   OUTPUT
 	/
-# STX $2007  - write to $2007 
+# STX $2007  - write to $2007
 8E 07 20,3:
 	8d 76 04        # leal   0x4(%esi),%esi
 	91              # xchgl  %eax,%ecx
@@ -2712,7 +2712,7 @@ B9 00/00 40,3:
 	e8 [O]		# call   OUTPUT
 	91              # xchgl  %eax,%ecx
 	/
-# STY $2007  - write to $2007 
+# STY $2007  - write to $2007
 8C 07 20,3:
 	8d 76 04        # leal   0x4(%esi),%esi
 	92              # xchgl  %eax,%edx

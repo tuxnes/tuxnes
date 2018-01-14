@@ -593,7 +593,7 @@ drawimage32(int endclock)
               memset (linebuffer, 0, 256);      /* Clear buffer for this scanline */
               for (s = 0; s < 64; s++) {
                 if (spriteram[s * 4] < currentline && spriteram[s * 4] <
-                  240 && spriteram[s * 4 + 3] < 249 
+                  240 && spriteram[s * 4 + 3] < 249
                       && (spriteram[s * 4] + spritesize >= currentline))
                 {
                   spritetile = spriteram[s * 4 + 1];

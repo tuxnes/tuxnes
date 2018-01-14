@@ -554,10 +554,10 @@ InitDisplayX11(int argc, char **argv)
       sizehints.base_width = width;
       sizehints.base_height = height;
       XSetWMNormalHints (display, w, &sizehints);
-      
+
       /* pass the command line to the window system */
       XSetCommand (display, w, argv, argc);
-      
+
       /* set window manager hints */
       wmhints.flags = InputHint | StateHint;
       wmhints.input = True;
@@ -689,7 +689,7 @@ InitDisplayX11(int argc, char **argv)
 		   }
 	      }
 	      xfb =
-		shminfo.shmaddr = 
+		shminfo.shmaddr =
 		shm_image->data =
 		shmat (shminfo.shmid, 0, 0);
 	      shminfo.readOnly = False;
@@ -1109,7 +1109,7 @@ UpdateDisplayX11(void)
  	    {
 	      int next_frame;
 	      static int virgin = 1;
-	      
+
 	      next_frame = (xdfb_frame + 1) % ARRAY_LEN(xdfb);
 	      /* This horrible hack checks for updates one scanline at a time. */
 	      /* Obviously, that only works well for some programs... */
@@ -1124,7 +1124,7 @@ UpdateDisplayX11(void)
 			for (x = 0; x < 256; x ++)
 			  {
 			    int c1, c2;
-			    
+
 			    c = fb[(y << 8) + x];
 			    c1 =
 			      indexedcolor
@@ -1151,7 +1151,7 @@ UpdateDisplayX11(void)
 					if (scanlines || virgin)
 					{
 					     int yyy;
-					     
+
 					     for (yyy = 1; yyy < magstep; yyy++)
 						  XPutPixel (image,
 							     x * magstep + xxx,
@@ -1269,7 +1269,7 @@ UpdateDisplayX11(void)
 	if (ev.type == MapNotify)
 	  {
 	    XExposeEvent *xev = (XExposeEvent *) &ev;
-	    
+
 	    xev -> type = Expose;
 	    xev -> count = 0;
 	    nodisplay = 0;
@@ -1415,13 +1415,13 @@ UpdateDisplayOldX11(void)
 	{
 	  /* If mode settings are different, force a redraw. */
 	  DiffUpdateOldX11();
-	  
+
 	  /* If the palette changed, update the colors. */
 	  UpdateColorsX11();
-	  
+
 	  /* Layout the background with h/v-scrolling */
 	  LayoutBackgroundOldX11();
-	  
+
 	  /* Draw the sprites on top */
 	  if (screen_on && sprites_on)
 	    DrawSpritesOldX11();
@@ -1460,7 +1460,7 @@ UpdateDisplayOldX11(void)
 	  nodisplay = 1;
 	  needsredraw = redrawall = 0;
 	}
-	
+
 	/* Handle keyboard input */
 	if (ev.type == KeyPress || ev.type == KeyRelease)
 	  {
@@ -1508,7 +1508,7 @@ UpdateDisplayOldX11(void)
                  (256 * magstep - width) / -2,
 		 (240 * magstep - height) / -2);
       XFlush (display);
-      /* 
+      /*
          The purpose of this is to wait for the acknowledgement from the
          X server (a NoExpose event on the window background in response
          to the CopyArea) before proceeding, so we don't send commands

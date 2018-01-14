@@ -672,7 +672,7 @@ help_controls(int terse)
 	  "      Multiple buttons may be bound to a single emulator control.\n"
 	  "      Default bindings will be used if no buttons are specified.\n"
 	  "      Examples:\n"
-          "        1:B0,B1,B5,B2,A0,A1,B4\n" 
+          "        1:B0,B1,B5,B2,A0,A1,B4\n"
 	  "        2:B0,B1,B5,B2,B10,B12,B11,B13,B4\n"
 	  "        1:B0B8,B1B9,B5,B2\n"
 	  "        2:,,,,A2,A3\n");
@@ -1492,7 +1492,7 @@ main (int argc, char **argv)
     struct SampleFormat *match = 0;
     int partials = 0;
     size_t len;
-    
+
     len = strlen (sample_format_name);
     for (sample_format = sample_formats; sample_format->name; sample_format++)
       if (!strcmp (sample_format->name, sample_format_name))
@@ -1547,14 +1547,14 @@ main (int argc, char **argv)
 	/* If its not a .zip file treat it as a .gz */
 	else {
 		rom_file_gz = gzopen (filename, "rb");
-		
+
 		if (rom_file_gz == NULL)
 		{
 			perror (filename);
 			exit (EXIT_FAILURE);
 		}
 	}
-	
+
   /* FIXME: Error */
 #else
   romfd = open (filename, O_RDONLY);
@@ -1599,8 +1599,8 @@ main (int argc, char **argv)
 
   /* load the ROM */
 #if HAVE_LIBZ
-	
-	
+
+
 	/* Treat as a .zip file */
 	if (extension && !strcasecmp(extension,".zip")) {
 		ziploader(rom_file_zip,filename);
@@ -1906,7 +1906,7 @@ main (int argc, char **argv)
   if (palremap) {
     unsigned int *new_palette;
     int pen;
-    
+
     if (!(new_palette = malloc (64 * sizeof (*new_palette))))
       {
 	fprintf(stderr, "Can't remap palette: ");

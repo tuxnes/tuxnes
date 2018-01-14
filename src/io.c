@@ -116,7 +116,7 @@ input(int addr)
 
       /* When does sprite0hit go off? */
       /*if((CLOCK*3>=sprite0hit)&&(CLOCK<VBL)) INRET|=(signed char)0x40; */
-      
+
       /* Pick a number, any number... hmm... this one seems to work
          okay, I think I'll use it. */
       if ((CLOCK * 3 >= sprite0hit) && (CLOCK < 27742))
@@ -354,7 +354,7 @@ output(int addr, int val)
      start at whatever vram page was selected, unless the program
      writes to register 2000 to change it.  I probably don't have this
      completely correct. */
-  
+
   /* Write VRAM */
   if (addr == 0x2007)
     {

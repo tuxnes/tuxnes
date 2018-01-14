@@ -931,7 +931,7 @@ mmc2(int addr, int val)
         memcpy (VRAM + 0x1000, VROM_BASE + (mmc2_4_latch1hi * 0x1000), 0x1000);
       }
     }
-        
+
   if (addr >= 0xF000 && addr <= 0xFFFF)
     {
       if (val == 0)
@@ -987,7 +987,7 @@ mmc4(int addr, int val)
         memcpy (VRAM + 0x1000, VROM_BASE + (mmc2_4_latch1hi * 0x1000), 0x1000);
       }
     }
-        
+
   if (addr >= 0xF000 && addr <= 0xFFFF)
     {
       if (val == 0)

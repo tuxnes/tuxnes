@@ -34,9 +34,9 @@ ziploader (unzFile file, char *zipname)
   char *ptr;
   int res;
   char romname[1024];
-  
+
   file_marker = unzGoToFirstFile (file);
-  
+
   /* Search .zip file and file the ROM file with extension .nes */
   while(file_marker == UNZ_OK)
     {
@@ -53,14 +53,14 @@ ziploader (unzFile file, char *zipname)
       file_marker = unzGoToNextFile(file);
     }
 
-  if (!(file_marker == UNZ_END_OF_LIST_OF_FILE 
+  if (!(file_marker == UNZ_END_OF_LIST_OF_FILE
     || file_marker == UNZ_OK) || fsize == 0)
     return (0);
-    
+
   ptr = ROM;
   unzLocateFile (file,romname,1);
   unzGetCurrentFileInfo (file, &fileinfo, romname,128, NULL,0, NULL,0);
-  
+
   if (unzOpenCurrentFile(file) != UNZ_OK)
     {
       printf("Error in zip file\n");
@@ -73,7 +73,7 @@ ziploader (unzFile file, char *zipname)
       fprintf (stderr,"ZIP file has a CRC error.\n");
       return (0);
     }
-  
+
   if (res <= 0 || res != fsize)
     {
       fprintf (stderr,"Error reading ZIP file.\n");
