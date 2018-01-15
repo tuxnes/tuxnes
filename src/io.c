@@ -153,7 +153,7 @@ input(int addr)
 		 * on a portion of the screen.  We need to convert the scanline
 		 * address into horizontal/vertical offsets.
 		 */
-		if (CLOCK < VBL && (RAM[0x2001] & 8) != 0) {
+		if (CLOCK < VBL && (RAM[0x2001] & 8)) {
 			for (x = (CLOCK * 3 / HCYCLES) + 1; x < 240; x++) {
 				hscroll[x] = (hscroll[x] & 0xff) | ((VRAMPTR & 0x400) >> 2);
 				vscroll[x] = (480 + 480 + (((VRAMPTR & 0x800) >> 11) * 240) + ((VRAMPTR & 0x3e0) >> 2) - ((CLOCK * 3 / HCYCLES) + 1)) % 480;

@@ -167,7 +167,7 @@ MapRom(int page, unsigned loc, unsigned size)
 		return -1;
 	}
 
-	if (size % 4096 != 0) {
+	if (size % 4096) {
 		return -1;
 	}
 

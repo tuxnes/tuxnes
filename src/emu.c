@@ -760,7 +760,7 @@ restoresavedgame(void)
 	struct stat statbuf;
 	*savefile = 0;
 	strncpy(buffer, homedir, 1010);
-	if (*buffer != 0 && buffer[strlen(buffer) - 1] == '/')
+	if (*buffer && buffer[strlen(buffer) - 1] == '/')
 		buffer[strlen(buffer) - 1] = 0;
 	strcat(buffer, "/.tuxnes");
 	result = stat(buffer, &statbuf);

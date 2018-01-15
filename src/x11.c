@@ -1629,7 +1629,7 @@ DoBackgroundOldX11(void)
 					               blackgc, x * 8 * magstep, v * 8 * magstep,
 					               16 * magstep, 16 * magstep);
 
-					if (color1 != 0) {
+					if (color1) {
 						XSetBackground(display, color1gc, black);
 						XSetForeground(display, color1gc, color1);
 						XCopyPlane(display, plane1, background[currentcache], color1gc,
@@ -1637,7 +1637,7 @@ DoBackgroundOldX11(void)
 						           16 * magstep, 16 * magstep,
 						           x * 8 * magstep, v * 8 * magstep, 1);
 					}
-					if (color2 != 0) {
+					if (color2) {
 						XSetBackground(display, color2gc, black);
 						XSetForeground(display, color2gc, color2);
 						XCopyPlane(display, plane2, background[currentcache], color2gc,
@@ -1645,7 +1645,7 @@ DoBackgroundOldX11(void)
 						           16 * magstep, 16 * magstep,
 						           x * 8 * magstep, v * 8 * magstep, 1);
 					}
-					if (color3 != 0) {
+					if (color3) {
 						XSetBackground(display, color3gc, black);
 						XSetForeground(display, color3gc, color3);
 						XCopyPlane(display, plane3, background[currentcache], color3gc,
@@ -1984,7 +1984,7 @@ LayoutBackgroundOldX11(void)
 		    && (redrawall || scanline_diff[y] == scanline_diff[z]))
 			z++;
 
-		if (y != 0 && (linereg[y] & 0x10) != last) {
+		if (y && (linereg[y] & 0x10) != last) {
 			currentline = y;
 			last = linereg[y] & 0x10;
 			UpdateTilesOldX11();

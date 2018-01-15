@@ -83,7 +83,7 @@ translate(int addr)
 			bptr = cptr;
 			while (dlen--)
 				*(cptr++) = *(sptr++);
-			while (*sptr != 0) {
+			while (*sptr) {
 				m = *(sptr++);
 				l = *(sptr++);
 				o = *(sptr++);
@@ -142,7 +142,7 @@ translate(int addr)
 			addr = saddr + slen;
 		}
 	}
-	while (((int)cptr & 15) != 0)
+	while ((int)cptr & 15)
 		*(cptr++) = NOP;
 	next_code_alloc = cptr;
 }
