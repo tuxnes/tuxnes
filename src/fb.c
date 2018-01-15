@@ -170,29 +170,21 @@ fbinit(void)
 {
 	/* this is the default inter-line skip */
 	nextline = bytes_per_line;
-	if ((renderer->_flags & RENDERER_OLD) ||
-	    (renderer->InitDisplay == InitDisplayNone))
-	{
+	if ((renderer->_flags & RENDERER_OLD)
+	 || (renderer->InitDisplay == InitDisplayNone)) {
 		/* Point drawimage to the no-op version */
 		drawimage = drawimage_old;
-	}
-	else if (renderer->_flags & RENDERER_DIFF)
-	{
+	} else if (renderer->_flags & RENDERER_DIFF) {
 		/* Current: Point drawimage to the 8bpp version */
 		/* Ideal: for !indexedcolor, should be drawimage6 with nextline=192 */
 		/*        for indexedcolor, should be drawimage5 with nextline=160 */
 		nextline = 256;
 		drawimage = drawimage8;
-	}
-	else
-	{
+	} else {
 		/* Point drawimage to the correct version for the bpp used: */
-		if (bpp == 1)
-		{
+		if (bpp == 1) {
 			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage1s : &drawimage1d : &drawimage1;
-		}
-		else if (bpp == 4)
-		{
+		} else if (bpp == 4) {
 			fprintf(stderr,
 			        "======================================================\n"
 			        "Warning: Using untested 4bpp rendering code\n"
@@ -217,35 +209,24 @@ fbinit(void)
 			fprintf(stderr, "======================================================\n");
 			fflush(stderr);
 			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage4s : &drawimage4d : &drawimage4;
-		}
-		else if (bpp == 8)
-		{
+		} else if (bpp == 8) {
 			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage8s : &drawimage8d : &drawimage8;
-		}
-		else if (bpp == 16)
-		{
+		} else if (bpp == 16) {
 			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage16s : &drawimage16d : &drawimage16;
 			nextline = bytes_per_line / 2;
-		}
-		else if (bpp == 24)
-		{
+		} else if (bpp == 24) {
 			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage24s : &drawimage24d : &drawimage24;
-		}
-		else if (bpp == 32)
-		{
+		} else if (bpp == 32) {
 			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage32s : &drawimage32d : &drawimage32;
 			nextline = bytes_per_line / 4;
-		}
-		else
-		{
+		} else {
 			fprintf(stderr, "Don't know how to handle %dbpp\n", bpp);
 			fprintf(stderr,
 			        "As a temporary workaround, try --renderer=diff\n"
 			        "                            or --renderer=old\n");
 			exit(EXIT_FAILURE);
 		}
-		if ((bpp == 1) && (bpu > 8) && pix_swab)
-		{
+		if ((bpp == 1) && (bpu > 8) && pix_swab) {
 			fprintf(stderr,
 			        "Don't know how to handle pix_swabbed %dbpp/%dbpu\n",
 			        bpp, bpu);

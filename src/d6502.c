@@ -17,8 +17,7 @@
 
 void    disas(int);
 
-static char Opcodes_6502[256][4] =
-{
+static char Opcodes_6502[256][4] = {
 	"BRK", "ORA", "BAD", "BAD", "BAD", "ORA", "ASL", "BAD",
 	"PHP", "ORA", "ASL", "BAD", "BAD", "ORA", "ASL", "BAD",
 	"BPL", "ORA", "BAD", "BAD", "BAD", "ORA", "ASL", "BAD",
@@ -50,7 +49,8 @@ static char Opcodes_6502[256][4] =
 	"CPX", "SBC", "BAD", "BAD", "CPX", "SBC", "INC", "BAD",
 	"INX", "SBC", "NOP", "BAD", "CPX", "SBC", "INC", "BAD",
 	"BEQ", "SBC", "BAD", "BAD", "BAD", "SBC", "INC", "BAD",
-	"SED", "SBC", "BAD", "BAD", "BAD", "SBC", "INC", "BAD"};
+	"SED", "SBC", "BAD", "BAD", "BAD", "SBC", "INC", "BAD"
+};
 
 /* Addressing modes */
 #define ZP 1
@@ -64,8 +64,7 @@ static char Opcodes_6502[256][4] =
 #define IND 9
 #define REL 10
 #define IMM 11
-static unsigned char Modes_6502[256] =
-{
+static unsigned char Modes_6502[256] = {
 	0, ZPIx, 0, 0, 0, ZP, ZP, 0,
 	0, IMM, 0, 0, 0, ABS, ABS, 0,
 	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
@@ -97,7 +96,8 @@ static unsigned char Modes_6502[256] =
 	IMM, ZPIx, 0, 0, ZP, ZP, ZP, 0,
 	0, IMM, 0, 0, ABS, ABS, ABS, 0,
 	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
-	0, ABSy, 0, 0, 0, ABSx, ABSx, 0};
+	0, ABSy, 0, 0, 0, ABSx, ABSx, 0
+};
 
 void
 disas(int loc)
@@ -105,12 +105,10 @@ disas(int loc)
 	unsigned char *ptr;
 	int x;
 	ptr = MAPTABLE[loc >> 12];
-	while (loc < 0x10000)
-	{
+	while (loc < 0x10000) {
 		x = ptr[loc];
 		printf("%4x: %1x%1x-%s ", loc++, x >> 4, x & 15, Opcodes_6502[x]);
-		switch (Modes_6502[x])
-		{
+		switch (Modes_6502[x]) {
 		case ZP:
 			printf("%1x%1x\n", ptr[loc] >> 4, ptr[loc] & 15);
 			loc++;
@@ -156,8 +154,7 @@ disas(int loc)
 				printf("%4x (+%1x%1x)\n", loc + ptr[loc] + 1, ptr[loc] >> 4,
 				       ptr[loc] & 15);
 			else
-				printf("%4x (-%1x%1x)\n", loc + ptr[loc] - 255, ((ptr[loc] - 1)
-				                                                 >> 4) ^ 15,
+				printf("%4x (-%1x%1x)\n", loc + ptr[loc] - 255, ((ptr[loc] - 1) >> 4) ^ 15,
 				       ((ptr[loc] - 1) & 15) ^ 15);
 			loc++;
 			break;

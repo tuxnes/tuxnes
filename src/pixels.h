@@ -233,8 +233,7 @@ drawimage32(int endclock)
 	int pix_byte;
 #endif
 
-	if (frameskip)
-	{
+	if (frameskip) {
 		return;
 	}
 
@@ -249,8 +248,7 @@ drawimage32(int endclock)
 		curclock = 0;
 	if (endclock <= curclock)
 		return;
-	if (curclock == 0)
-	{
+	if (curclock == 0) {
 		/* Begin new frame */
 		vline = vscrollreg >> 3;
 		vscan = vscrollreg & 7;
@@ -270,16 +268,13 @@ drawimage32(int endclock)
 		rptr0 = rptr = rpixmap;
 		ptr0 = ptr = pixmap;
 #if (BPP==1)
-		if (lsb_first)
-			{
+		if (lsb_first) {
 #if DOUBLE
 			pix_mask = 3;
 #else
 			pix_mask = 1;
 #endif
-			}
-		else
-		{
+		} else {
 #if DOUBLE
 			pix_mask = 0xc0;
 #else
@@ -291,25 +286,19 @@ drawimage32(int endclock)
 #if DOUBLE
 		pix_mask = 0xff;
 #else
-		if (lsn_first)
-		{
+		if (lsn_first) {
 			pix_mask = 0x0f;
-		}
-		else
-		{
+		} else {
 			pix_mask = 0xf0;
 		}
 #endif
 #endif
 	}
 
-	if (hposition >= 85)
-	{
+	if (hposition >= 85) {
 		/* In scanline */
 		x = hposition - 85 + curhscroll;
-	}
-	else
-	{
+	} else {
 		/* In hblank */
 		curhscroll = hscrollreg;
 		x = curhscroll;
@@ -321,12 +310,7 @@ drawimage32(int endclock)
 		bit = (~x) & 7;
 		curclock += 85 - hposition;
 		hposition = 85;
-		tilecolor = VRAM[scanpage + 0x3C0 + ((x & 255) >> 5) + ((vline & 28)
-		                                                        << 1)] >>
-		  ((vline
-		    &
-		    2)
-		   << 1);
+		tilecolor = VRAM[scanpage + 0x3C0 + ((x & 255) >> 5) + ((vline & 28) << 1)] >> ((vline & 2) << 1);
 		if (x & 16)
 			tilecolor >>= 2;
 		curpal[1] = endian_fix(palette[3 * (tilecolor & 3)]);
@@ -339,170 +323,139 @@ drawimage32(int endclock)
 #endif
 	}
 
-	while (curclock < endclock)
-	{
-		while (hposition < HCYCLES && curclock < endclock)
-		{
-			if (RAM[0x2001] & 8)
-			{
+	while (curclock < endclock) {
+		while (hposition < HCYCLES && curclock < endclock) {
+			if (RAM[0x2001] & 8) {
 				bit--;
 #if (BPP==1)
 #if (DOUBLE && !SCANLINES)
 				ptr[nextline] =
 #endif
-				  *ptr = (*rptr & ~pix_mask) |
-				  ((curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >>
-				                                      7) | ((byte2 &
-				                                             0x80) >> 6))]) ?
-				   pix_mask : 0);
+				*ptr = (*rptr & ~pix_mask)
+				     | ((curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >> 7) | ((byte2 & 0x80) >> 6))]) ? pix_mask : 0);
 #if (DOUBLE && SCANLINES)
-				ptr[nextline] = (rptr[nextline] & ~pix_mask) |
-				  ((curpal2[bgmask[hposition - 85]]) ? pix_mask : 0);
+				ptr[nextline] = (rptr[nextline] & ~pix_mask)
+				              | ((curpal2[bgmask[hposition - 85]]) ? pix_mask : 0);
 #endif
 #elif (BPP==4)
 #if (DOUBLE && !SCANLINES)
 				ptr[nextline] =
 #endif
-				  *ptr = (*rptr & ~pix_mask) |
-				  ((curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >>
-				                                      7) | ((byte2 &
-				                                             0x80) >> 6))]) &
-				   pix_mask);
+				*ptr = (*rptr & ~pix_mask)
+				     | ((curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >> 7) | ((byte2 & 0x80) >> 6))]) & pix_mask);
 #if (DOUBLE && SCANLINES)
-				ptr[nextline] = (rptr[nextline] & ~pix_mask) |
-				  ((curpal2[bgmask[hposition - 85]]) & pix_mask);
+				ptr[nextline] = (rptr[nextline] & ~pix_mask)
+				              | ((curpal2[bgmask[hposition - 85]]) & pix_mask);
 #endif
 #elif (BPP == 24)
-				bgmask[hposition - 85] =
-				  (((byte1 & 0x80) >> 7) |
-				   ((byte2 & 0x80) >> 6));
-				for (pix_byte = 0; pix_byte < 3; pix_byte ++)
-				{
+				bgmask[hposition - 85] = (((byte1 & 0x80) >> 7)
+				                       |  ((byte2 & 0x80) >> 6));
+				for (pix_byte = 0; pix_byte < 3; pix_byte++) {
 #if DOUBLE
 #if !SCANLINES
 					ptr[nextline + 3 + pix_byte] =
-					  ptr[nextline + pix_byte] =
+					ptr[nextline + pix_byte] =
 #endif
-					  ptr[3 + pix_byte] =
+					ptr[3 + pix_byte] =
 #endif
-					  ptr[pix_byte] =
-					  (curpal[bgmask[hposition - 85]]) >> (8 * pix_byte);
+					ptr[pix_byte] = (curpal[bgmask[hposition - 85]]) >> (8 * pix_byte);
 #if DOUBLE && SCANLINES
 					ptr[nextline + 3 + pix_byte] =
-					  ptr[nextline + pix_byte] =
-					  (curpal2[bgmask[hposition - 85]]) >> (8 * pix_byte);
+					ptr[nextline + pix_byte] = (curpal2[bgmask[hposition - 85]]) >> (8 * pix_byte);
 #endif
 				}
 #else /* (BPP != 1) && (BPP != 24) */
 #if DOUBLE
 #if !SCANLINES
 				ptr[nextline + 1] =
-				  ptr[nextline] =
+				ptr[nextline] =
 #endif
-				  ptr[1] =
+				ptr[1] =
 #endif
-				  *ptr = curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >>
-				                                           7) | ((byte2 &
-				                                                  0x80) >> 6))];
+				*ptr = curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >> 7) | ((byte2 & 0x80) >> 6))];
 #if DOUBLE && SCANLINES
 				ptr[nextline + 1] =
-				  ptr[nextline] = curpal2[bgmask[hposition - 85]];
+				ptr[nextline] = curpal2[bgmask[hposition - 85]];
 #endif
 #endif
 				byte1 <<= 1;
 				byte2 <<= 1;
-			}
-			else
-			{
+			} else {
 				/* Blank screen / Background color */
 #if (BPP==1)
 #if DOUBLE && !SCANLINES
 				ptr[nextline] =
 #endif
-				  *ptr = (*rptr & ~pix_mask) |
-				  (*curpal ?
-				   pix_mask : 0);
+				*ptr = (*rptr & ~pix_mask)
+				     | (*curpal ? pix_mask : 0);
 #if DOUBLE && SCANLINES
-				ptr[nextline] = (rptr[nextline] & ~pix_mask) |
-				  (*curpal2 ?
-				   pix_mask : 0);
+				ptr[nextline] = (rptr[nextline] & ~pix_mask)
+				              | (*curpal2 ? pix_mask : 0);
 #endif
 #elif (BPP==4)
 #if DOUBLE && !SCANLINES
 				ptr[nextline] =
 #endif
-				  *ptr = (*rptr & ~pix_mask) |
-				  (*curpal & pix_mask);
+				*ptr = (*rptr & ~pix_mask)
+				     | (*curpal & pix_mask);
 #if DOUBLE && SCANLINES
-				ptr[nextline] = (rptr[nextline] & ~pix_mask) |
-				  (*curpal2 & pix_mask);
+				ptr[nextline] = (rptr[nextline] & ~pix_mask)
+				              | (*curpal2 & pix_mask);
 #endif
 #elif (BPP==24)
-				for (pix_byte = 0; pix_byte < 3; pix_byte ++)
-				{
+				for (pix_byte = 0; pix_byte < 3; pix_byte++) {
 #if DOUBLE
 #if !SCANLINES
 					ptr[nextline + 3 + pix_byte] =
-					  ptr[nextline + pix_byte] =
+					ptr[nextline + pix_byte] =
 #endif
-					  ptr[3 + pix_byte] =
+					ptr[3 + pix_byte] =
 #endif
-					  ptr[pix_byte] = (*curpal) >> (8 * pix_byte);
+					ptr[pix_byte] = (*curpal) >> (8 * pix_byte);
 #if DOUBLE && SCANLINES
 					ptr[nextline + 3 + pix_byte] =
-					  ptr[nextline + pix_byte] =
-					  (*curpal2) >> (8 * pix_byte);
+					ptr[nextline + pix_byte] = (*curpal2) >> (8 * pix_byte);
 #endif
 				}
 #else /* (BPP != 1) && (BPP != 24) */
 #if DOUBLE
 #if !SCANLINES
 				ptr[nextline + 1] =
-				  ptr[nextline] =
+				ptr[nextline] =
 #endif
-				  ptr[1] =
+				ptr[1] =
 #endif
-				  *ptr = *curpal;
+				*ptr = *curpal;
 #if DOUBLE && SCANLINES
 				ptr[nextline + 1] =
-				  ptr[nextline] = *curpal2;
+				ptr[nextline] = *curpal2;
 #endif
 #endif
 			}
 #if (BPP==1)
 #if DOUBLE
-			if (lsb_first)
-			{
-				if (!(pix_mask <<= 2))
-				{
+			if (lsb_first) {
+				if (!(pix_mask <<= 2)) {
 					pix_mask = 3;
 					rptr++;
 					ptr++;
 				}
-			}
-			else
-			{
-				if (!(pix_mask >>= 2))
-				{
+			} else {
+				if (!(pix_mask >>= 2)) {
 					pix_mask = 0xc0;
 					rptr++;
 					ptr++;
 				}
 			}
 #else
-			if (lsb_first)
-			{
-				if (!(pix_mask <<= 1))
-				{
+			if (lsb_first) {
+				if (!(pix_mask <<= 1)) {
 					pix_mask = 1;
 					rptr++;
 					ptr++;
 				}
-			}
-			else
-			{
-				if (!(pix_mask >>= 1))
-				{
+			} else {
+				if (!(pix_mask >>= 1)) {
 					pix_mask = 0x80;
 					rptr++;
 					ptr++;
@@ -514,19 +467,14 @@ drawimage32(int endclock)
 			rptr++;
 			ptr++;
 #else
-			if (lsb_first)
-			{
-				if (!(pix_mask <<= 4))
-				{
+			if (lsb_first) {
+				if (!(pix_mask <<= 4)) {
 					pix_mask = 0x0f;
 					rptr++;
 					ptr++;
 				}
-			}
-			else
-			{
-				if (!(pix_mask >>= 4))
-				{
+			} else {
+				if (!(pix_mask >>= 4)) {
 					pix_mask = 0xf0;
 					rptr++;
 					ptr++;
@@ -554,23 +502,16 @@ drawimage32(int endclock)
 			if (x == 256)
 				if ((!osmirror) && (nomirror || !hvmirror))
 					scanpage ^= 0x400;        /* bit 8 of x -> bit 10 of addr */
-			if (bit < 0)
-			{
+			if (bit < 0) {
 				tile = VRAM[scanpage + ((x & 255) >> 3) + (vline << 5)];
 				mmc2_4_latch(baseaddr + (tile << 4) + vscan);
 				mmc2_4_latch(baseaddr + (tile << 4) + vscan + 8);
 				byte1 = VRAM[baseaddr + (tile << 4) + vscan];
 				byte2 = VRAM[baseaddr + (tile << 4) + vscan + 8];
 				bit = 7;
-				if ((x & 0xf) == 0)
-				{
+				if ((x & 0xf) == 0) {
 					if ((x & 0x1f) == 0)
-						tilecolor = VRAM[scanpage + 0x3C0 + ((x & 255) >> 5) +
-						                 ((vline
-						                   &
-						                   28)
-						                  <<
-						                  1)] >> ((vline & 2) << 1);
+						tilecolor = VRAM[scanpage + 0x3C0 + ((x & 255) >> 5) + ((vline & 28) << 1)] >> ((vline & 2) << 1);
 					else
 						tilecolor >>= 2;
 					curpal[1] = endian_fix(palette[3 * (tilecolor & 3)]);
@@ -585,30 +526,26 @@ drawimage32(int endclock)
 			}
 		}
 
-		if (hposition == HCYCLES)
-		{
-			if (RAM[0x2001] & 16)
-			{
+		if (hposition == HCYCLES) {
+			if (RAM[0x2001] & 16) {
 				/* Draw sprites */
 				memset(linebuffer, 0, 256);      /* Clear buffer for this scanline */
 				for (s = 0; s < 64; s++) {
-					if (spriteram[s * 4] < currentline && spriteram[s * 4] <
-					  240 && spriteram[s * 4 + 3] < 249
-					      && (spriteram[s * 4] + spritesize >= currentline))
-					{
+					if (spriteram[s * 4] < currentline
+					 && spriteram[s * 4] < 240
+					 && spriteram[s * 4 + 3] < 249
+					 && (spriteram[s * 4] + spritesize >= currentline)) {
 						spritetile = spriteram[s * 4 + 1];
 						if ((spritetile == 0xfd) || (spritetile == 0xfe)) {
 							mmc2_4_latchspr(spritetile);
 						}
 					}
 				}
-				for (s = 63; s >= 0; s--)
-				{
-					if (spriteram[s * 4] < currentline && spriteram[s * 4] <
-					    240 && spriteram[s * 4 + 3] < 249)
-					{
-						if (spriteram[s * 4] + spritesize >= currentline)
-						{
+				for (s = 63; s >= 0; s--) {
+					if (spriteram[s * 4] < currentline
+					 && spriteram[s * 4] < 240
+					 && spriteram[s * 4 + 3] < 249) {
+						if (spriteram[s * 4] + spritesize >= currentline) {
 							spritetile = spriteram[s * 4 + 1];
 							if (spritesize == 16)
 								spritebase = (spritetile & 1) << 12;
@@ -618,91 +555,34 @@ drawimage32(int endclock)
 
 							/* This finds the memory location of the tiles, taking into account
 							   that vertically flipped sprites are in reverse order. */
-							if (vflip)
-							{
-								if (spriteram[s << 2] >= ((signed int)
-								                          currentline) - 8)       /* 8x8 sprites and first half of 8x16 sprites */
-								{
-									d1 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									          spritesize * 2 - 8 - currentline
-									          + spriteram[s * 4]];
-									d2 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									          spritesize * 2 - currentline +
-									          spriteram[s * 4]];
+							if (vflip) {
+								if (spriteram[s << 2] >= ((signed int)currentline) - 8) {
+									/* 8x8 sprites and first half of 8x16 sprites */
+									d1 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - 8 - currentline + spriteram[s * 4]];
+									d2 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - currentline + spriteram[s * 4]];
+								} else {
+									/* Do second half of 8x16 sprites */
+									d1 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - 16 - currentline + spriteram[s * 4]];
+									d2 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - 8 - currentline + spriteram[s * 4]];
 								}
-								else
-								/* Do second half of 8x16 sprites */
-								{
-									d1 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									          spritesize * 2 - 16 -
-									          currentline + spriteram[s * 4]];
-									d2 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									          spritesize * 2 - 8 - currentline
-									          + spriteram[s * 4]];
+							} else {
+								if (spriteram[s << 2] >= ((signed int)currentline) - 8) {
+									/* 8x8 sprites and first half of 8x16 sprites */
+									d1 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + currentline - 1 - spriteram[s * 4]];
+									d2 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + currentline + 7 - spriteram[s * 4]];
+								} else {
+									/* Do second half of 8x16 sprites */
+									d1 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + currentline + 7 - spriteram[s * 4]];
+									d2 = VRAM[spritebase + ((spritetile & (~(spritesize >> 4))) << 4) + currentline + 15 - spriteram[s * 4]];
 								}
 							}
-							else
-							{
-								if (spriteram[s << 2] >= ((signed int)
-								                          currentline) - 8)       /* 8x8 sprites and first half of 8x16 sprites */
-								{
-									d1 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									      currentline - 1 - spriteram[s * 4]];
-									d2 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									      currentline + 7 - spriteram[s * 4]];
-								}
-								else
-								/* Do second half of 8x16 sprites */
-								{
-									d1 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									      currentline + 7 - spriteram[s * 4]];
-									d2 = VRAM[spritebase + ((spritetile &
-									                         (~(spritesize
-									                            >>
-									                            4))) << 4) +
-									     currentline + 15 - spriteram[s * 4]];
-								}
-							}
-							for (x = 7 * (!hflip); x < 8 && x >= 0; x += 1 -
-							     ((!hflip) << 1))
-							{
+							for (x = 7 * (!hflip); x < 8 && x >= 0; x += 1 - ((!hflip) << 1)) {
 								if (d1 & d2 & 1)
-									linebuffer[spriteram[s * 4 + 3] + x] = 12 +
-									  2 + ((spriteram[s * 4 + 2] & 3) * 3);
+									linebuffer[spriteram[s * 4 + 3] + x] = 12 + 2 + ((spriteram[s * 4 + 2] & 3) * 3);
 								else if (d1 & 1)
-									linebuffer[spriteram[s * 4 + 3] + x] = 12 +
-									  ((spriteram[s
-									              *
-									              4
-									              +
-									              2]
-									    &
-									    3)
-									   * 3);
+									linebuffer[spriteram[s * 4 + 3] + x] = 12 + ((spriteram[s * 4 + 2] & 3) * 3);
 								else if (d2 & 1)
-									linebuffer[spriteram[s * 4 + 3] + x] = 12 +
-									  1 + ((spriteram[s * 4 + 2] & 3) * 3);
+									linebuffer[spriteram[s * 4 + 3] + x] = 12 + 1 + ((spriteram[s * 4 + 2] & 3) * 3);
 								if (behind && (d1 | d2))
 									if (bgmask[spriteram[s * 4 + 3] + x])
 										linebuffer[spriteram[s * 4 + 3] + x] = 0;     /* Sprite hidden behind background */
@@ -713,10 +593,8 @@ drawimage32(int endclock)
 					}
 				}
 
-				for (x = 0; x < 256; x++)
-				{
-					if (linebuffer[x])
-					{
+				for (x = 0; x < 256; x++) {
+					if (linebuffer[x]) {
 #if (BPP==1)
 #if DOUBLE
 						unsigned int offset = spriteram[s * 4 + 3] + x;
@@ -730,12 +608,11 @@ drawimage32(int endclock)
 #if !SCANLINES
 						ptr0[offset + nextline] =
 #endif
-						  ptr0[offset] = (rptr0[offset] & ~mask) |
-						  endian_fix(palette[linebuffer[x]] ? mask : 0);
+						ptr0[offset] = (rptr0[offset] & ~mask)
+						             | endian_fix(palette[linebuffer[x]] ? mask : 0);
 #if SCANLINES
-						ptr0[offset + nextline] =
-						  (rptr0[offset + nextline] & ~mask) |
-						  endian_fix(palette2[linebuffer[x]] ? mask : 0);
+						ptr0[offset + nextline] = (rptr0[offset + nextline] & ~mask)
+						                        | endian_fix(palette2[linebuffer[x]] ? mask : 0);
 #endif
 #else
 						unsigned int offset = spriteram[s * 4 + 3] + x;
@@ -746,19 +623,17 @@ drawimage32(int endclock)
 						else
 							mask = 0x80 >> (offset & 7);
 						offset = (offset >> 3);
-						ptr0[offset] = (rptr0[offset] & ~mask) |
-						  endian_fix(palette[linebuffer[x]] ? mask : 0);
+						ptr0[offset] = (rptr0[offset] & ~mask)
+						             | endian_fix(palette[linebuffer[x]] ? mask : 0);
 #endif
 #elif (BPP==4)
 #if DOUBLE
 #if !SCANLINES
 						ptr0[spriteram[s * 4 + 3] + x + nextline] =
 #endif
-						  ptr0[spriteram[s * 4 + 3] + x] =
-						  endian_fix(palette[linebuffer[x]]);
+						ptr0[spriteram[s * 4 + 3] + x] = endian_fix(palette[linebuffer[x]]);
 #if SCANLINES
-						ptr0[spriteram[s * 4 + 3] + x + nextline] =
-						  endian_fix(palette2[linebuffer[x]]);
+						ptr0[spriteram[s * 4 + 3] + x + nextline] = endian_fix(palette2[linebuffer[x]]);
 #endif
 #else
 						unsigned int offset = spriteram[s * 4 + 3] + x;
@@ -769,54 +644,40 @@ drawimage32(int endclock)
 						else
 							mask = 0xf0 >> ((offset & 1) << 2);
 						offset = (offset >> 1);
-						ptr0[offset] = (rptr0[offset] & ~mask) |
-						  endian_fix(palette[linebuffer[x]] & mask);
+						ptr0[offset] = (rptr0[offset] & ~mask)
+						             | endian_fix(palette[linebuffer[x]] & mask);
 #endif
 #elif (BPP==24)
-						for (pix_byte = 0; pix_byte < 3; pix_byte ++)
-						{
+						for (pix_byte = 0; pix_byte < 3; pix_byte++) {
 #if DOUBLE
 #if !SCANLINES
-							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3
-							    + nextline + pix_byte] =
-							  ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3
-							      + nextline + pix_byte] =
+							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3 + nextline + pix_byte] =
+							ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3 + nextline + pix_byte] =
 #endif
-							  ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3
-							      + pix_byte] =
-							  ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3
-							      + pix_byte] =
-							  endian_fix(palette[linebuffer[x]]) >> (8 * pix_byte);
+							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3 + pix_byte] =
+							ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3 + pix_byte] = endian_fix(palette[linebuffer[x]]) >> (8 * pix_byte);
 #if SCANLINES
-							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3
-							    + nextline + pix_byte] =
-							  ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3
-							      + nextline + pix_byte] =
-							  endian_fix(palette2[linebuffer[x]]) >> (8 * pix_byte);
+							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3 + nextline + pix_byte] =
+							ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3 + nextline + pix_byte] = endian_fix(palette2[linebuffer[x]]) >> (8 * pix_byte);
 #endif
 #else
-							ptr0[(spriteram[s * 4 + 3] + x) * 3
-							    + pix_byte] =
-							  endian_fix(palette[linebuffer[x]]) >> (8 * pix_byte);
+							ptr0[(spriteram[s * 4 + 3] + x) * 3 + pix_byte] = endian_fix(palette[linebuffer[x]]) >> (8 * pix_byte);
 #endif
 						}
 #else /* (BPP != 1) && (BPP != 24) */
 #if DOUBLE
 #if !SCANLINES
 						ptr0[(spriteram[s * 4 + 3] + x) * 2 + 1 + nextline] =
-						  ptr0[(spriteram[s * 4 + 3] + x) * 2 + nextline] =
+						ptr0[(spriteram[s * 4 + 3] + x) * 2 + nextline] =
 #endif
-						  ptr0[(spriteram[s * 4 + 3] + x) * 2 + 1] =
-						  ptr0[(spriteram[s * 4 + 3] + x) * 2] =
-						  endian_fix(palette[linebuffer[x]]);
+						ptr0[(spriteram[s * 4 + 3] + x) * 2 + 1] =
+						ptr0[(spriteram[s * 4 + 3] + x) * 2] = endian_fix(palette[linebuffer[x]]);
 #if SCANLINES
 						ptr0[(spriteram[s * 4 + 3] + x) * 2 + 1 + nextline] =
-						  ptr0[(spriteram[s * 4 + 3] + x) * 2 + nextline] =
-						  endian_fix(palette2[linebuffer[x]]);
+						ptr0[(spriteram[s * 4 + 3] + x) * 2 + nextline] = endian_fix(palette2[linebuffer[x]]);
 #endif
 #else
-						ptr0[spriteram[s * 4 + 3] + x] =
-						  endian_fix(palette[linebuffer[x]]);
+						ptr0[spriteram[s * 4 + 3] + x] = endian_fix(palette[linebuffer[x]]);
 #endif
 #endif
 					}
@@ -836,13 +697,11 @@ drawimage32(int endclock)
 			curhscroll = hscrollreg;
 			x = curhscroll;
 			vscan++;
-			if (vscan >= 8)
-			{
+			if (vscan >= 8) {
 				vscan = 0;
 				vline++;
 				vline &= 31;
-				if (vline == 30)
-				{
+				if (vline == 30) {
 					vline = 0;
 					vwrap ^= 1;
 				}
@@ -861,9 +720,7 @@ drawimage32(int endclock)
 			byte1 = VRAM[baseaddr + (tile << 4) + vscan] << (x & 7);
 			byte2 = VRAM[baseaddr + (tile << 4) + vscan + 8] << (x & 7);
 			bit = (~x) & 7;
-			tilecolor = VRAM[scanpage + 0x3C0 + ((x & 255) >> 5) + ((vline &
-			                                                         28) << 1)]
-			  >> ((vline & 2) << 1);
+			tilecolor = VRAM[scanpage + 0x3C0 + ((x & 255) >> 5) + ((vline & 28) << 1)] >> ((vline & 2) << 1);
 			if (x & 16)
 				tilecolor >>= 2;
 			curpal[1] = endian_fix(palette[3 * (tilecolor & 3)]);

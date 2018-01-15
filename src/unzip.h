@@ -69,8 +69,7 @@ typedef voidp unzFile;
 #define UNZ_CRCERROR                    (-105)
 
 /* tm_unz contain date/time info */
-typedef struct tm_unz_s
-{
+typedef struct tm_unz_s {
 	uInt tm_sec;            /* seconds after the minute - [0,59] */
 	uInt tm_min;            /* minutes after the hour - [0,59] */
 	uInt tm_hour;           /* hours since midnight - [0,23] */
@@ -81,8 +80,7 @@ typedef struct tm_unz_s
 
 /* unz_global_info structure contain global data about the ZIPfile
    These data comes from the end of central dir */
-typedef struct unz_global_info_s
-{
+typedef struct unz_global_info_s {
 	uLong number_entry;         /* total number of entries in
 	                               the central dir on this disk */
 	uLong size_comment;         /* size of the global comment of the zipfile */
@@ -90,8 +88,7 @@ typedef struct unz_global_info_s
 
 
 /* unz_file_info contain information about a file in the zipfile */
-typedef struct unz_file_info_s
-{
+typedef struct unz_file_info_s {
 	uLong version;              /* version made by                 2 bytes */
 	uLong version_needed;       /* version needed to extract       2 bytes */
 	uLong flag;                 /* general purpose bit flag        2 bytes */

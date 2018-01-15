@@ -77,15 +77,11 @@ static void
 SaveScreenshotW(void)
 {
 	screenshot_new();
-	if (!w_writepbm(screenshotfile, bitmapW))
-	{
-		if (verbose)
-		{
+	if (!w_writepbm(screenshotfile, bitmapW)) {
+		if (verbose) {
 			fprintf(stderr, "Wrote screenshot to %s\n", screenshotfile);
 		}
-	}
-	else
-	{
+	} else {
 		fprintf(stderr, "%s: w_writepbm failed\n", screenshotfile);
 	}
 }
@@ -95,8 +91,7 @@ HandleKeyboardW(WEVENT *ev)
 {
 	_Bool press = ev->type == EVENT_KEY;
 
-	if (press && ev->key == 27)
-	{
+	if (press && ev->key == 27) {
 		if (winW != WROOT) w_delete(winW);
 		w_exit();
 		quit();                    /* ESC */
@@ -104,8 +99,7 @@ HandleKeyboardW(WEVENT *ev)
 
 	/* the coin and dipswitch inputs work only in VS UniSystem mode */
 	if (unisystem)
-		switch (ev->key)
-		{
+		switch (ev->key) {
 		case '[':
 		case '{':
 			ctl_coinslot(0x01, press);
@@ -250,8 +244,7 @@ HandleKeyboardW(WEVENT *ev)
 
 	/* emulator keys */
 	if (press)
-		switch (ev->key)
-		{
+		switch (ev->key) {
 /*		case WKEY_F1: */
 /*			debug_bgoff = 1; */
 /*			break; */
@@ -363,8 +356,7 @@ InitDisplayW(int argc, char **argv)
 		        magstep);
 		magstep = maxsize;
 	}
-	if (!(serverW = w_init()))
-	{
+	if (!(serverW = w_init())) {
 		fprintf(stderr, "%s: W initialization failed\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -382,24 +374,20 @@ InitDisplayW(int argc, char **argv)
 		        (indexedcolor && (bpp > 1)) ? "dynamic" : "static",
 		        serverW->sharedcolors,
 		        (serverW->flags & WSERVER_SHM) ? "shared" : "normal");
-	if (renderer_config.inroot)
-	{
+	if (renderer_config.inroot) {
 		width = serverW->width;
 		height = serverW->height;
 		x0 = 0;
 		y0 = 0;
 		winW = WROOT;
-	}
-	else
-	{
+	} else {
 		WFONT *fontW;
 
 		width = UNDEF;
 		height = UNDEF;
 		x0 = UNDEF;
 		y0 = UNDEF;
-		if (renderer_config.geometry)
-		{
+		if (renderer_config.geometry) {
 			char *s;
 			int c;
 
@@ -418,8 +406,7 @@ InitDisplayW(int argc, char **argv)
 		if ((height == UNDEF) || !height)
 			height = 240 * magstep;
 		if (!(fontW = w_loadfont("lucidat", 13, F_BOLD)))
-			if (!(fontW = w_loadfont(0, 0, 0)))
-			{
+			if (!(fontW = w_loadfont(0, 0, 0))) {
 				w_exit();
 				fprintf(stderr, "%s: failed to acquire font\n", argv[0]);
 				exit(EXIT_FAILURE);
@@ -427,8 +414,7 @@ InitDisplayW(int argc, char **argv)
 		if ((iconW = w_create(w_strlen(fontW, PACKAGE) + 4,
 		                      fontW->height + 2,
 		                      W_MOVE | EV_MOUSE
-		                      | EV_KEYS | EV_MODIFIERS)))
-		{
+		                      | EV_KEYS | EV_MODIFIERS))) {
 			w_setfont(iconW, fontW);
 			w_printstring(iconW, 2, 1, PACKAGE);
 		}
@@ -437,8 +423,7 @@ InitDisplayW(int argc, char **argv)
 		                      W_MOVE | W_TITLE | W_CLOSE
 		                      | (iconW ? W_ICON : 0)
 		                      | W_RESIZE
-		                      | EV_KEYS | EV_MODIFIERS)))
-		{
+		                      | EV_KEYS | EV_MODIFIERS))) {
 			if (iconW) w_delete(iconW);
 			w_exit();
 			fprintf(stderr, "%s: failed to create window\n", argv[0]);
@@ -453,27 +438,26 @@ InitDisplayW(int argc, char **argv)
 	                          ((serverW->type == BM_DIRECT8) ||
 	                           (serverW->type == BM_PACKEDCOLOR))
 	                          ? 1 << serverW->planes
-	                          : 0)))
-	{
-		w_delete(winW); if (iconW) w_delete(iconW);
+	                          : 0))) {
+		w_delete(winW);
+		if (iconW)
+			w_delete(iconW);
 		w_exit();
 		fprintf(stderr, "%s: failed to allocate bitmap\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	/* Allocate black and white pixels */
-	for (blackpixel = 0; blackpixel < serverW->sharedcolors; blackpixel ++)
+	for (blackpixel = 0; blackpixel < serverW->sharedcolors; blackpixel++)
 		if (!w_getColor(winW, blackpixel,
-		                &(color.red), &(color.green), &(color.blue)))
-		{
-			if ((color.red <= 0x0FU) &&
-			    (color.green <= 0x0FU) &&
-			    (color.blue <= 0x0FU))
+		                &(color.red), &(color.green), &(color.blue))) {
+			if ((color.red <= 0x0FU)
+			 && (color.green <= 0x0FU)
+			 && (color.blue <= 0x0FU))
 				break;
 		}
 	if (blackpixel == serverW->sharedcolors)
 		blackpixel = w_allocColor(winW, 0x00U, 0x00U, 0x00U);
-	if (blackpixel < 0)
-	{
+	if (blackpixel < 0) {
 		if (bpp > 1)
 			fprintf(stderr,
 			        "W: can't allocate black pixel -- using index 1\n");
@@ -482,19 +466,17 @@ InitDisplayW(int argc, char **argv)
 	color.red = color.green = color.blue = 0x00U;
 	if (bitmapW->palette)
 		bitmapW->palette[blackpixel] = color;
-	for (whitepixel = 0; whitepixel < serverW->sharedcolors; whitepixel ++)
+	for (whitepixel = 0; whitepixel < serverW->sharedcolors; whitepixel++)
 		if (!w_getColor(winW, whitepixel,
-		                &(color.red), &(color.green), &(color.blue)))
-		{
-			if ((color.red >= 0xF0U) &&
-			    (color.green >= 0xF0U) &&
-			    (color.blue >= 0xF0U))
+		                &(color.red), &(color.green), &(color.blue))) {
+			if ((color.red >= 0xF0U)
+			 && (color.green >= 0xF0U)
+			 && (color.blue >= 0xF0U))
 				break;
 		}
 	if (whitepixel == serverW->sharedcolors)
 		whitepixel = w_allocColor(winW, 0xFFU, 0xFFU, 0xFFU);
-	if (whitepixel < 0)
-	{
+	if (whitepixel < 0) {
 		if (bpp > 1)
 			fprintf(stderr,
 			        "W: can't allocate white pixel -- using index 0\n");
@@ -503,66 +485,57 @@ InitDisplayW(int argc, char **argv)
 	color.red = color.green = color.blue = 0xFFU;
 	if (bitmapW->palette)
 		bitmapW->palette[whitepixel] = color;
-	for (x=0; x < 24; x++)
-	{
+	for (x=0; x < 24; x++) {
 		palette[x] = palette2[x] = whitepixel;
 	}
-	if (indexedcolor && (bpp > 1))
-	{
+	if (indexedcolor && (bpp > 1)) {
 		/* Pre-initialize the colormap to known values */
 		oldbgcolor = currentbgcolor = NES_palette[0];
 		color.red = ((NES_palette[0] & 0xFF0000) >> 16);
 		color.green = ((NES_palette[0] & 0xFF00) >> 8);
 		color.blue = (NES_palette[0] & 0xFF);
-		for (x = 0; x <= 24; x++)
-		{
+		for (x = 0; x <= 24; x++) {
 			palette[x] =
 			  w_allocColor(winW, color.red, color.green, color.blue);
 			palette2[x] = blackpixel;
-			if (palette[x] < 0)
-			{
-				if (winW != WROOT) w_delete(winW); if (iconW) w_delete(iconW);
+			if (palette[x] < 0) {
+				if (winW != WROOT)
+					w_delete(winW);
+				if (iconW)
+					w_delete(iconW);
 				w_exit();
 				fprintf(stderr, "Can't allocate colors!\n");
 				exit(EXIT_FAILURE);
-			}
-			else if (bitmapW->palette)
-			  bitmapW->palette[palette[x]] = color;
+			} else if (bitmapW->palette)
+				bitmapW->palette[palette[x]] = color;
 		}
-		if (scanlines && (scanlines != 100))
-		{
+		if (scanlines && (scanlines != 100)) {
 			fprintf(stderr, "Warning: Scanline intensity is ignored in indexed-color modes!\n");
 			scanlines = 0;
 		}
-	}
-	else /* truecolor */
-	{
+	} else /* truecolor */ {
 		indexedcolor = 0;
-		for (x=0; x < 64; x++)
-		{
+		for (x=0; x < 64; x++) {
 			short pixel;
 			rgb_t desired;
 
 			desired.red = ((NES_palette[x] & 0xFF0000) >> 16);
 			desired.green = ((NES_palette[x] & 0xFF00) >> 8);
 			desired.blue = (NES_palette[x] & 0xFF);
-			for (pixel = 0; pixel < serverW->sharedcolors; pixel ++)
+			for (pixel = 0; pixel < serverW->sharedcolors; pixel++)
 				if (!w_getColor(winW, pixel,
-				                &(color.red), &(color.green), &(color.blue)))
-				{
-					if ((color.red == desired.red) &&
-					    (color.green == desired.green) &&
-					    (color.blue == desired.blue))
+				                &(color.red), &(color.green), &(color.blue))) {
+					if ((color.red == desired.red)
+					 && (color.green == desired.green)
+					 && (color.blue == desired.blue))
 						break;
 				}
-			if (pixel == serverW->sharedcolors)
-			{
+			if (pixel == serverW->sharedcolors) {
 				pixel =
 				     w_allocColor(winW,
 				                  desired.red, desired.green, desired.blue);
 			}
-			if (pixel < 0)
-			{
+			if (pixel < 0) {
 				if ((0.299 * desired.red +
 				     0.587 * desired.green +
 				     0.114 * desired.blue) >= 0x80U)
@@ -573,15 +546,13 @@ InitDisplayW(int argc, char **argv)
 					fprintf(stderr,
 					        "Can't allocate color %d, using %s!\n", x,
 					        pixel == blackpixel ? "black" : "white");
-			}
-			else if (bitmapW->palette)
+			} else if (bitmapW->palette)
 				bitmapW->palette[pixel] = desired;
 			paletteW[x] = pixel;
 			palette2W[x] = blackpixel;
 		}
 		if (scanlines && (scanlines != 100))
-			for (x = 0; x < 64; x++)
-			{
+			for (x = 0; x < 64; x++) {
 				short pixel;
 				rgb_t desired;
 				unsigned long r, g, b;
@@ -598,23 +569,20 @@ InitDisplayW(int argc, char **argv)
 				if (b > 0xFFFF)
 					b = 0xFFFF;
 				desired.blue = (b + 0x7F) >> 8;
-				for (pixel = 0; pixel < serverW->sharedcolors; pixel ++)
+				for (pixel = 0; pixel < serverW->sharedcolors; pixel++)
 					if (!w_getColor(winW, pixel,
-					                &(color.red), &(color.green), &(color.blue)))
-					{
-						if ((color.red == desired.red) &&
-						    (color.green == desired.green) &&
-						    (color.blue == desired.blue))
+					                &(color.red), &(color.green), &(color.blue))) {
+						if ((color.red == desired.red)
+						 && (color.green == desired.green)
+						 && (color.blue == desired.blue))
 							break;
 					}
-				if (pixel == serverW->sharedcolors)
-				{
+				if (pixel == serverW->sharedcolors) {
 					pixel =
 					     w_allocColor(winW,
 					                  desired.red, desired.green, desired.blue);
 				}
-				if (pixel < 0)
-				{
+				if (pixel < 0) {
 					if ((0.299 * desired.red +
 					     0.587 * desired.green +
 					     0.114 * desired.blue) >= 0x80U)
@@ -625,15 +593,15 @@ InitDisplayW(int argc, char **argv)
 						fprintf(stderr,
 						        "Can't allocate color extra %d, using %s!\n", x,
 						        pixel == blackpixel ? "black" : "white");
-				}
-				else if (bitmapW->palette)
+				} else if (bitmapW->palette)
 					bitmapW->palette[pixel] = desired;
 				palette2W[x] = pixel;
 			}
 	}
-	if ((winW != WROOT) && w_open(winW, x0, y0))
-	{
-		w_delete(winW); if (iconW) w_delete(iconW);
+	if ((winW != WROOT) && w_open(winW, x0, y0)) {
+		w_delete(winW);
+		if (iconW)
+			w_delete(iconW);
 		w_exit();
 		fprintf(stderr, "%s: failed to open window\n", argv[0]);
 		exit(EXIT_FAILURE);
@@ -692,47 +660,35 @@ UpdateColorsW(void)
 
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
-	if (indexedcolor)
-	{
+	if (indexedcolor) {
 		c = VRAM[0x3f00] & 63;
 		currentbgcolor = NES_palette[c];
-		if (currentbgcolor != oldbgcolor)
-		{
+		if (currentbgcolor != oldbgcolor) {
 			color.red = ((currentbgcolor & 0xFF0000) >> 16);
 			color.green = ((currentbgcolor & 0xFF00) >> 8);
 			color.blue = (currentbgcolor & 0xFF);
 			if (w_changeColor(winW, palette[24],
-			                  color.red, color.green, color.blue)
-			    < 0)
-			{
+			                  color.red, color.green, color.blue) < 0) {
 				fprintf(stderr,
 				        "W: w_changeColor failed for background color!\n");
-			}
-			else if (bitmapW->palette)
+			} else if (bitmapW->palette)
 				bitmapW->palette[palette[24]] = color;
 		}
-	}
-	else
-	/* truecolor */
-	{
+	} else /* truecolor */ {
 		palette[24] = currentbgcolor = paletteW[VRAM[0x3f00] & 63];
 		if (scanlines && (scanlines != 100))
 			palette2[24] = palette2W[VRAM[0x3f00] & 63];
-		if (oldbgcolor != currentbgcolor)
-		{
+		if (oldbgcolor != currentbgcolor) {
 			redrawbackground = 1;
 			needsredraw = 1;
 		}
 	}
 
 	/* Tile colors */
-	if (indexedcolor)
-	{
-		for (x = 0; x < 24; x++)
-		{
+	if (indexedcolor) {
+		for (x = 0; x < 24; x++) {
 			c = VRAM[0x3f01 + x + (x / 3)] & 63;
-			if (c != (palette_cache[0][1 + x + (x / 3)] & 63))
-			{
+			if (c != (palette_cache[0][1 + x + (x / 3)] & 63)) {
 				color.red = ((NES_palette[c] &
 				              0xFF0000) >> 16);
 				color.green = ((NES_palette[c] &
@@ -740,16 +696,16 @@ UpdateColorsW(void)
 				color.blue = (NES_palette[c] &
 				              0xFF);
 				if (w_changeColor(winW, palette[x],
-				                  color.red, color.green, color.blue)
-				    < 0)
-				{
-					if (winW != WROOT) w_delete(winW); if (iconW) w_delete(iconW);
+				                  color.red, color.green, color.blue) < 0) {
+					if (winW != WROOT)
+						w_delete(winW);
+					if (iconW)
+						w_delete(iconW);
 					w_exit();
 					fprintf(stderr,
 					        "W: w_changeColor failed!\n");
 					exit(EXIT_FAILURE);
-				}
-				else if (bitmapW->palette)
+				} else if (bitmapW->palette)
 					bitmapW->palette[palette[x]] = color;
 			}
 		}
@@ -757,15 +713,10 @@ UpdateColorsW(void)
 	}
 
 	/* Set palette tables */
-	if (indexedcolor)
-	{
+	if (indexedcolor) {
 		/* Already done in InitDisplayW */
-	}
-	else
-	/* truecolor */
-	{
-		for (x = 0; x < 24; x++)
-		{
+	} else /* truecolor */ {
+		for (x = 0; x < 24; x++) {
 			palette[x] = paletteW[VRAM[0x3f01 + x + (x / 3)] & 63];
 			if (scanlines && (scanlines != 100))
 				palette2[x] = palette2W[VRAM[0x3f01 + x + (x / 3)] & 63];
@@ -801,11 +752,9 @@ UpdateDisplayW(void)
 	if (frame < timeframe - 20 && frame % 20 == 0)
 		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
 
-	if (!nodisplay)
-	{
+	if (!nodisplay) {
 		drawimage(PBL);
-		if (!frameskip)
-		{
+		if (!frameskip) {
 			UpdateColorsW();
 			w_putblock(bitmapW, winW,
 			           (256 * magstep - width) / -2,
@@ -820,8 +769,7 @@ UpdateDisplayW(void)
 	redrawall = 0;
 
 	/* Slow down if we're getting ahead */
-	if (frame > timeframe + 1 && frameskip == 0)
-	{
+	if (frame > timeframe + 1 && frameskip == 0) {
 		usleep(16666 * (frame - timeframe - 1));
 	}
 
@@ -834,8 +782,7 @@ UpdateDisplayW(void)
 
 		/* Handle W input */
 		while ((ev = w_queryevent(0, 0, 0, 0))) {
-			switch (ev->type)
-			{
+			switch (ev->type) {
 			case EVENT_RESIZE:
 				width = ev->w;
 				height = ev->w;
@@ -848,17 +795,16 @@ UpdateDisplayW(void)
 				HandleKeyboardW(ev);
 				break;
 			case EVENT_GADGET:
-				switch (ev->key)
-				{
+				switch (ev->key) {
 				case GADGET_CLOSE:
-					if (winW != WROOT) w_delete(winW); if (iconW) w_delete(iconW);
+					if (winW != WROOT) w_delete(winW);
+					if (iconW) w_delete(iconW);
 				case GADGET_EXIT:
 					w_exit();
 					quit();
 					break;
 				case GADGET_ICON:
-					if (iconW && !nodisplay)
-					{
+					if (iconW && !nodisplay) {
 						w_querywindowpos(winW, 1, &x0, &y0);
 						w_close(winW);
 						w_open(iconW, x0, y0);
@@ -870,8 +816,7 @@ UpdateDisplayW(void)
 				}
 				break;
 			case EVENT_MRELEASE:
-				if (nodisplay && iconW)
-				{
+				if (nodisplay && iconW) {
 					w_querywindowpos(iconW, 1, &x0, &y0);
 					w_close(iconW);
 					w_open(winW, x0, y0);

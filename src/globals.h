@@ -73,8 +73,7 @@ extern signed int       CTNI;         /* Cycles to next interrupt */
 extern unsigned int     VRAMPTR;    /* address to read/write video memory */
 
 /* configuration variables */
-struct configvars
-{
+struct configvars {
 	char *tuxnesdir;  /* the home directory */
 	char *savegamedir; /* directory for saved game files */
 	char *screenshotdir;  /* directory for screenshot files */

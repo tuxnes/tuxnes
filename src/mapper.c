@@ -163,23 +163,19 @@ MapRom(int page, unsigned loc, unsigned size)
 {
 	int x;
 
-	if ((page < 8) || (page > 15))
-	{
+	if ((page < 8) || (page > 15)) {
 		return -1;
 	}
 
-	if (size % 4096 != 0)
-	{
+	if (size % 4096 != 0) {
 		return -1;
 	}
 
-	if ((size / 4096) > (16 - page))
-	{
+	if ((size / 4096) > (16 - page)) {
 		return -1;
 	}
 
-	for (x = page; x < page + (size / 4096); x++)
-	{
+	for (x = page; x < page + (size / 4096); x++) {
 		MAPTABLE[x] = ROM_BASE + loc - (page * 4096);
 	}
 
@@ -191,12 +187,9 @@ MapRom(int page, unsigned loc, unsigned size)
 static void
 init_none(void)
 {
-	if (ROM_PAGES < 2)
-	{
+	if (ROM_PAGES < 2) {
 		MapRom(PAGE_C000, 0, SIZE_16K);
-	}
-	else
-	{
+	} else {
 		MapRom(PAGE_8000, 0, SIZE_32K);
 	}
 
@@ -228,8 +221,7 @@ mmc1(int addr, int val)
 	/*printf("Mapper: %4x,%2x stack at %x, shift %d,%d,%d,%d\n", addr, val, STACKPTR,
 	   mmc1shc[0], mmc1shc[1], mmc1shc[2], mmc1shc[3]); */
 
-	if (val & 0x80)
-	{
+	if (val & 0x80) {
 		/* Reset Mapper */
 		mmc1reg[0] |= 12;
 		mmc1shc[0] = 0;
@@ -242,73 +234,69 @@ mmc1(int addr, int val)
 		/* MMC1 always has mirroring */
 		nomirror = 0;
 		/*printf("Mapper: MMC1 reset\n"); */
-	}
-	else
-	{
+	} else {
 		mmc1reg[(addr >> 13) & 3] >>= 1;
 		mmc1reg[(addr >> 13) & 3] |= (val & 1) << 4;
 		mmc1shc[(addr >> 13) & 3]++;
-		if (mmc1shc[(addr >> 13) & 3] % 5 == 0)
-		{
-			if (((addr >> 13) & 3) == 0)
-			{
+		if (mmc1shc[(addr >> 13) & 3] % 5 == 0) {
+			if (((addr >> 13) & 3) == 0) {
 				drawimage(CLOCK * 3);
 				hvmirror = mmc1reg[0] & 1;
 				osmirror = (~mmc1reg[0] & 2) >> 1;
-			}
-			else if (VROM_PAGES)
-			{
+			} else if (VROM_PAGES) {
 				drawimage(CLOCK * 3);
 				if (((addr >> 13) & 3) == 1)
-					memcpy(VRAM, VROM_BASE + (mmc1reg[1] & 31) * 0x1000, 4096
-					       << ((mmc1reg[0] & 16) == 0));
+					memcpy(VRAM, VROM_BASE + (mmc1reg[1] & 31) * 0x1000, 4096 << ((mmc1reg[0] & 16) == 0));
 				if (((addr >> 13) & 3) == 2 && (mmc1reg[0] & 16) == 16)
-					memcpy(VRAM + 0x1000, VROM_BASE + (mmc1reg[2] & 31) *
-					       0x1000, 4096);
+					memcpy(VRAM + 0x1000, VROM_BASE + (mmc1reg[2] & 31) * 0x1000, 4096);
 			}
 
 			/* Set Map Table */
 
-			if (mmc1reg[0] & 8)   /* Swap 16K rom */
-			{
-				if (mmc1reg[0] & 4)
-				{               /* Swap $8000 */
-					MAPTABLE[8] = MAPTABLE[9] = MAPTABLE[10] = MAPTABLE[11] =
-					  ROM_BASE + ((mmc1reg[3] & ROM_MASK) << 14) - 0x8000;
-					MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15]
-					  = ROM_BASE + (ROM_PAGES << 14) - 0x10000;   /* Last Page hardwired */
-					if (ROM_PAGES > 16)   /* 512K roms */
-					{
-						MAPTABLE[8] = MAPTABLE[9] = MAPTABLE[10] =
-						  MAPTABLE[11] = ROM_BASE + (mmc1reg[3] << 14) +
-						  ((mmc1reg[1]
-						    &
-						    16)
-						   <<
-						   14) - 0x8000;
-						MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] =
-						  MAPTABLE[15] = ROM_BASE + 262144 + ((mmc1reg[1] &
-						                                 16) << 14) - 0x10000;    /* Last Page semi-hardwired */
+			if (mmc1reg[0] & 8) {
+				/* Swap 16K rom */
+				if (mmc1reg[0] & 4) {
+					/* Swap $8000 */
+					MAPTABLE[8] =
+					MAPTABLE[9] =
+					MAPTABLE[10] =
+					MAPTABLE[11] = ROM_BASE + ((mmc1reg[3] & ROM_MASK) << 14) - 0x8000;
+					MAPTABLE[12] =
+					MAPTABLE[13] =
+					MAPTABLE[14] =
+					MAPTABLE[15] = ROM_BASE + (ROM_PAGES << 14) - 0x10000;   /* Last Page hardwired */
+					if (ROM_PAGES > 16) {
+						/* 512K roms */
+						MAPTABLE[8] =
+						MAPTABLE[9] =
+						MAPTABLE[10] =
+						MAPTABLE[11] = ROM_BASE + (mmc1reg[3] << 14) + ((mmc1reg[1] & 16) << 14) - 0x8000;
+						MAPTABLE[12] =
+						MAPTABLE[13] =
+						MAPTABLE[14] =
+						MAPTABLE[15] = ROM_BASE + 262144 + ((mmc1reg[1] & 16) << 14) - 0x10000;    /* Last Page semi-hardwired */
 					}
+				} else {
+					/* Swap $C000 */
+					MAPTABLE[8] =
+					MAPTABLE[9] =
+					MAPTABLE[10] =
+					MAPTABLE[11] = ROM_BASE - 0x8000;  /* First page hardwired */
+					MAPTABLE[12] =
+					MAPTABLE[13] =
+					MAPTABLE[14] =
+					MAPTABLE[15] = ROM_BASE + ((mmc1reg[3] & ROM_MASK) << 14) + (((mmc1reg[1] & 16) << 14) & ((ROM_PAGES > 16) << 18)) - 0xC000;
 				}
-				else
-				{               /* Swap $C000 */
-					MAPTABLE[8] = MAPTABLE[9] = MAPTABLE[10] = MAPTABLE[11] =
-					  ROM_BASE - 0x8000;  /* First page hardwired */
-					MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15]
-					  = ROM_BASE + ((mmc1reg[3] & ROM_MASK) << 14)
-					  + (((mmc1reg[1] & 16) << 14) & ((ROM_PAGES > 16) << 18))
-					  - 0xC000;
-				}
-			}
-			else
-			/* Swap 32K rom */
-			{
-				MAPTABLE[8] = MAPTABLE[9] = MAPTABLE[10] = MAPTABLE[11] =
-				  MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15] =
-				  ROM_BASE + ((mmc1reg[3] & ROM_MASK & (~1)) << 14)
-				  + (((mmc1reg[1] & 16) << 14) & ((ROM_PAGES > 16) << 18))
-				  - 0x8000;
+			} else {
+				/* Swap 32K rom */
+				MAPTABLE[8] =
+				MAPTABLE[9] =
+				MAPTABLE[10] =
+				MAPTABLE[11] =
+				MAPTABLE[12] =
+				MAPTABLE[13] =
+				MAPTABLE[14] =
+				MAPTABLE[15] = ROM_BASE + ((mmc1reg[3] & ROM_MASK & (~1)) << 14) + (((mmc1reg[1] & 16) << 14) & ((ROM_PAGES > 16) << 18)) - 0x8000;
 			}
 		}
 	}
@@ -321,8 +309,7 @@ init_unrom(void)
 {
 	/* figure out if the PRG bank should be masked */
 	prgmask = 0;
-	while (ROM_PAGES - 1 > prgmask)
-	{
+	while (ROM_PAGES - 1 > prgmask) {
 		prgmask = (prgmask << 1) | 1;
 	}
 
@@ -341,8 +328,7 @@ unrom(int addr, int val)
 	val &= 0x0f;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
@@ -357,8 +343,7 @@ init_cnrom(void)
 {
 	/* figure out if the CHR bank should be masked */
 	chrmask = 0;
-	while (VROM_PAGES - 1 > chrmask)
-	{
+	while (VROM_PAGES - 1 > chrmask) {
 		chrmask = (chrmask << 1) | 1;
 	}
 
@@ -372,8 +357,7 @@ cnrom(int addr, int val)
 	val &= 0xff;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
@@ -388,8 +372,7 @@ static void
 init_mmc3(void)
 {
 	/* this is a quick hack to satisfy a technical purity issue */
-	if (ROM_PAGES < 2)
-	{
+	if (ROM_PAGES < 2) {
 		MapRom(PAGE_C000, 0, SIZE_16K);
 		return;
 	}
@@ -397,26 +380,46 @@ init_mmc3(void)
 	/* First page is mapped to second-to-last page of rom */
 	MAPTABLE[8] = MAPTABLE[9] = ROM_BASE - 0x4000;
 	if (ROM_PAGES > 2)
-		MAPTABLE[8] = MAPTABLE[9] = ROM_BASE + 0x4000;
+		MAPTABLE[8] =
+		MAPTABLE[9] = ROM_BASE + 0x4000;
 	if (ROM_PAGES > 4)
-		MAPTABLE[8] = MAPTABLE[9] = ROM_BASE + 0x14000;
+		MAPTABLE[8] =
+		MAPTABLE[9] = ROM_BASE + 0x14000;
 	if (ROM_PAGES > 8)
-		MAPTABLE[8] = MAPTABLE[9] = ROM_BASE + 0x34000;
+		MAPTABLE[8] =
+		MAPTABLE[9] = ROM_BASE + 0x34000;
 	if (ROM_PAGES > 16)
-		MAPTABLE[8] = MAPTABLE[9] = ROM_BASE + 0x74000;
+		MAPTABLE[8] =
+		MAPTABLE[9] = ROM_BASE + 0x74000;
 
-	MAPTABLE[10] = MAPTABLE[11] = ROM_BASE + (ROM_PAGES << 14) - 0xE000;
+	MAPTABLE[10] =
+	MAPTABLE[11] = ROM_BASE + (ROM_PAGES << 14) - 0xE000;
 
 	/* Last page is mapped to last page of rom */
-	MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15] = ROM_BASE - 0x4000;
+	MAPTABLE[12] =
+	MAPTABLE[13] =
+	MAPTABLE[14] =
+	MAPTABLE[15] = ROM_BASE - 0x4000;
 	if (ROM_PAGES > 2)
-		MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15] = ROM_BASE;
+		MAPTABLE[12] =
+		MAPTABLE[13] =
+		MAPTABLE[14] =
+		MAPTABLE[15] = ROM_BASE;
 	if (ROM_PAGES > 4)
-		MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15] = ROM_BASE + 0x10000;
+		MAPTABLE[12] =
+		MAPTABLE[13] =
+		MAPTABLE[14] =
+		MAPTABLE[15] = ROM_BASE + 0x10000;
 	if (ROM_PAGES > 8)
-		MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15] = ROM_BASE + 0x30000;
+		MAPTABLE[12] =
+		MAPTABLE[13] =
+		MAPTABLE[14] =
+		MAPTABLE[15] = ROM_BASE + 0x30000;
 	if (ROM_PAGES > 16)
-		MAPTABLE[12] = MAPTABLE[13] = MAPTABLE[14] = MAPTABLE[15] = ROM_BASE + 0x70000;
+		MAPTABLE[12] =
+		MAPTABLE[13] =
+		MAPTABLE[14] =
+		MAPTABLE[15] = ROM_BASE + 0x70000;
 
 	mapmirror = 1;
 }
@@ -431,16 +434,14 @@ mmc3(int addr, int val)
 	val &= 0xff;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
 
 	if (addr == 0x8000)
 		mmc3cmd = val;
-	if (addr == 0x8001)
-	{
+	if (addr == 0x8001) {
 		if ((mmc3cmd & 7) < 6)
 			drawimage(CLOCK * 3);
 
@@ -471,64 +472,49 @@ mmc3(int addr, int val)
 			memcpy(VRAM + 3072, VROM_BASE + (val & VROM_MASK_1k) * 1024, 1024);
 
 		if ((mmc3cmd & 0x47) == 0x06)     /* Switch $8000 */
-			MAPTABLE[8] = MAPTABLE[9] = ROM_BASE + 8192 * (val & LAST_HALF_PAGE)
-			  - 0x8000;
+			MAPTABLE[8] =
+			MAPTABLE[9] = ROM_BASE + 8192 * (val & LAST_HALF_PAGE) - 0x8000;
 		if ((mmc3cmd & 0x47) == 0x46)     /* Switch $C000 */
-			MAPTABLE[12] = MAPTABLE[13] = ROM_BASE + 8192 * (val &
-			                                           LAST_HALF_PAGE) - 0xC000;
-
+			MAPTABLE[12] =
+			MAPTABLE[13] = ROM_BASE + 8192 * (val & LAST_HALF_PAGE) - 0xC000;
 		if ((mmc3cmd & 7) == 7)   /* Switch $A000 */
-			MAPTABLE[10] = MAPTABLE[11] = ROM_BASE + 8192 * (val &
-			                                           LAST_HALF_PAGE) - 0xA000;
+			MAPTABLE[10] =
+			MAPTABLE[11] = ROM_BASE + 8192 * (val & LAST_HALF_PAGE) - 0xA000;
 
 	}
-	if (addr == 0xA000)
-	{
+	if (addr == 0xA000) {
 		hvmirror = val & 1;
 	}
-	if (addr == 0xC000)
-	{
+	if (addr == 0xC000) {
 		irqval = val;
-		if (irqenabled)
-		{
-			if (CLOCK >= VBL)
-			{
+		if (irqenabled) {
+			if (CLOCK >= VBL) {
 				irqflag = 1;
 				CTNI = -((PPF - CLOCK * 3 + HCYCLES * (irqval)) / 3);
-			}
-			else
-			{
-				if ((CLOCK * 3 + (irqval + 1) * HCYCLES) < PBL)
-				{
+			} else {
+				if ((CLOCK * 3 + (irqval + 1) * HCYCLES) < PBL) {
 					irqflag = 1;
-					CTNI = -((HCYCLES * (irqval + 1) - ((CLOCK * 3) %
-					                                    HCYCLES)) / 3);
+					CTNI = -((HCYCLES * (irqval + 1) - ((CLOCK * 3) % HCYCLES)) / 3);
 				}
 				/*printf("clock %d irqval %d set\n", CLOCK, irqval); */
 			}
 		}
 	}
 
-	if (addr == 0xE000)
-	{
+	if (addr == 0xE000) {
 		irqenabled = 0;
 		irqflag = 0;
 		CTNI = -((VBL - CLOCK + CPF) % CPF);
 	}
 
-	if (addr == 0xE001)
-	{
+	if (addr == 0xE001) {
 		irqenabled = 1;
-		if (CLOCK >= VBL)
-		{
+		if (CLOCK >= VBL) {
 			irqflag = 1;
 			CTNI = -((PPF - CLOCK * 3 + HCYCLES * (irqval)) / 3);
 			/*printf("%d %d \n", CLOCK, CTNI); */
-		}
-		else
-		{
-			if ((CLOCK * 3 + (irqval + 1) * HCYCLES) < PBL)
-			{
+		} else {
+			if ((CLOCK * 3 + (irqval + 1) * HCYCLES) < PBL) {
 				irqflag = 1;
 				CTNI = -((HCYCLES * (irqval + 1) - ((CLOCK * 3) % HCYCLES)) / 3);
 				/*printf("%d %d \n", CLOCK, CTNI); */
@@ -571,8 +557,7 @@ init_mmc5(void)
 
 	/* figure out if the PRG bank should be masked */
 	prgmask = 0;
-	while (ROM_PAGES - 1 > prgmask)
-	{
+	while (ROM_PAGES - 1 > prgmask) {
 		prgmask = (prgmask << 1) | 1;
 	}
 
@@ -581,8 +566,7 @@ init_mmc5(void)
 	prgmask32 = prgmask >> 2;
 
 	blankbank = malloc(4096);
-	for (i = 0; i < 4096; i++)
-	{
+	for (i = 0; i < 4096; i++) {
 		blankbank[i] = 0xFF;
 	}
 
@@ -599,14 +583,12 @@ mmc5(int addr, int val)
 	val &= 0xff;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("address = %04X, value = %02X\n", addr, val);
 	}
 #endif
 
-	switch (addr)
-	{
+	switch (addr) {
 	/* mapper registers */
 	case 0x5100:
 		prgbanksize = val & 0x03;
@@ -634,142 +616,106 @@ mmc5(int addr, int val)
 
 	/* PRG bank switching */
 	case 0x5114:
-		if (prgbanksize >= PRG_8K)
-		{
+		if (prgbanksize >= PRG_8K) {
 			MapRom(PAGE_8000, (val & prgmask8) * 8192, SIZE_8K);
 		}
 		break;
 	case 0x5115:
-		if (prgbanksize >= PRG_8K)
-		{
+		if (prgbanksize >= PRG_8K) {
 			MapRom(PAGE_A000, (val & prgmask8) * 8192, SIZE_8K);
-		}
-		else if (prgbanksize == PRG_16K)
-		{
+		} else if (prgbanksize == PRG_16K) {
 			MapRom(PAGE_8000, ((val >> 1) & prgmask16) * 16384, SIZE_16K);
 		}
 		break;
 	case 0x5116:
-		if (prgbanksize >= PRG_8K)
-		{
+		if (prgbanksize >= PRG_8K) {
 			MapRom(PAGE_C000, (val & prgmask8) * 8192, SIZE_8K);
 		}
 		break;
 	case 0x5117:
-		if (prgbanksize >= PRG_8K)
-		{
+		if (prgbanksize >= PRG_8K) {
 			MapRom(PAGE_E000, (val & prgmask8) * 8192, SIZE_8K);
-		}
-		else if (prgbanksize == PRG_16K)
-		{
+		} else if (prgbanksize == PRG_16K) {
 			MapRom(PAGE_8000, ((val >> 1) & prgmask16) * 16384, SIZE_16K);
-		}
-		else
-		{
+		} else {
 			MapRom(PAGE_8000, ((val >> 2) & prgmask32) * 32768, SIZE_32K);
 		}
 		break;
 
 	/* CHR bank switching for sprites */
 	case 0x5120:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x0000, VROM_BASE + val * 1024, 1024);
 		}
 		break;
 	case 0x5121:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x0400, VROM_BASE + val * 1024, 1024);
-		}
-		else if (chrbanksize == CHR_2K)
-		{
+		} else if (chrbanksize == CHR_2K) {
 			memcpy(VRAM + 0x0000, VROM_BASE + val * 2048, 2048);
 		}
 		break;
 	case 0x5122:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x0800, VROM_BASE + val * 1024, 1024);
 		}
 		break;
 	case 0x5123:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x0C00, VROM_BASE + val * 1024, 1024);
-		}
-		else if (chrbanksize == CHR_2K)
-		{
+		} else if (chrbanksize == CHR_2K) {
 			memcpy(VRAM + 0x0800, VROM_BASE + val * 2048, 2048);
-		}
-		else if (chrbanksize == CHR_4K)
-		{
+		} else if (chrbanksize == CHR_4K) {
 			memcpy(VRAM + 0x0000, VROM_BASE + val * 4096, 4096);
 		}
 		break;
 	case 0x5124:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x1000, VROM_BASE + val * 1024, 1024);
 		}
 		break;
 	case 0x5125:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x1400, VROM_BASE + val * 1024, 1024);
-		}
-		else if (chrbanksize == CHR_2K)
-		{
+		} else if (chrbanksize == CHR_2K) {
 			memcpy(VRAM + 0x1000, VROM_BASE + val * 2048, 2048);
 		}
 		break;
 	case 0x5126:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x1800, VROM_BASE + val * 1024, 1024);
 		}
 		break;
 	case 0x5127:
-		if (chrbanksize == CHR_1K)
-		{
+		if (chrbanksize == CHR_1K) {
 			memcpy(VRAM + 0x1C00, VROM_BASE + val * 1024, 1024);
-		}
-		else if (chrbanksize == CHR_2K)
-		{
+		} else if (chrbanksize == CHR_2K) {
 			memcpy(VRAM + 0x1800, VROM_BASE + val * 2048, 2048);
-		}
-		else if (chrbanksize == CHR_4K)
-		{
+		} else if (chrbanksize == CHR_4K) {
 			memcpy(VRAM + 0x1000, VROM_BASE + val * 4096, 4096);
-		}
-		else if (chrbanksize == CHR_8K)
-		{
+		} else if (chrbanksize == CHR_8K) {
 			memcpy(VRAM + 0x1000, VROM_BASE + val * 4096, 4096);
 		}
 		break;
 
 	/* CHR bank switching for nametables */
 	case 0x5128:
-		if ((exramselect & 0x01) == 0)
-		{
+		if ((exramselect & 0x01) == 0) {
 			memcpy(VRAM + 0x0000, VROM_BASE + val * 2048, 2048);
 		}
 		break;
 	case 0x5129:
-		if ((exramselect & 0x01) == 0)
-		{
+		if ((exramselect & 0x01) == 0) {
 			memcpy(VRAM + 0x0800, VROM_BASE + val * 2048, 2048);
 		}
 		break;
 	case 0x512A:
-		if ((exramselect & 0x01) == 0)
-		{
+		if ((exramselect & 0x01) == 0) {
 			memcpy(VRAM + 0x1000, VROM_BASE + val * 2048, 2048);
 		}
 		break;
 	case 0x512B:
-		if ((exramselect & 0x01) == 0)
-		{
+		if ((exramselect & 0x01) == 0) {
 			memcpy(VRAM + 0x1800, VROM_BASE + val * 2048, 2048);
 		}
 		break;
@@ -793,8 +739,7 @@ aorom(int addr, int val)
 	char temp[1024];
 	/*val&=0xff;printf("Mapper AOROM:%4x,%2x (%d)\n", addr, val, CLOCK); */
 	val &= 0x1f;
-	if ((val >> 4) != mirrorbit)
-	{
+	if ((val >> 4) != mirrorbit) {
 		drawimage(CLOCK * 3);
 		memcpy(temp, VRAM + 0x2000, 1024);
 		memcpy(VRAM + 0x2000, VRAM + 0x2400, 1024);
@@ -820,11 +765,15 @@ static void
 init_mmc2(void)
 {
 	/* the first page is at the start of the rom */
-	MAPTABLE[8] = MAPTABLE[9] = ROM_BASE - 0x8000;
+	MAPTABLE[8] =
+	MAPTABLE[9] = ROM_BASE - 0x8000;
 	/* the last three pages are at the end of the rom */
-	MAPTABLE[10] = MAPTABLE[11] =
-	  MAPTABLE[12] = MAPTABLE[13] =
-	  MAPTABLE[14] = MAPTABLE[15] = ROM_BASE + 0x10000;
+	MAPTABLE[10] =
+	MAPTABLE[11] =
+	MAPTABLE[12] =
+	MAPTABLE[13] =
+	MAPTABLE[14] =
+	MAPTABLE[15] = ROM_BASE + 0x10000;
 
 	mmc2_4_latch1 = 1;
 	mmc2_4_latch1low = 0;
@@ -856,13 +805,10 @@ mmc2_4_latch(int addr)
 	if (mmc2_4_init == 0)
 		return;
 	addr = addr & 0xfff;
-	if (addr >= 0xfd0 && addr <= 0xfdf)
-	{
+	if (addr >= 0xfd0 && addr <= 0xfdf) {
 		mmc2_4_latch1 = 0;
 		memcpy(VRAM + 0x1000, VROM_BASE + (mmc2_4_latch1low * 0x1000), 0x1000);
-	}
-	else if (addr >= 0xfe0 && addr <= 0xfef)
-	{
+	} else if (addr >= 0xfe0 && addr <= 0xfef) {
 		mmc2_4_latch1 = 1;
 		memcpy(VRAM + 0x1000, VROM_BASE + (mmc2_4_latch1hi * 0x1000), 0x1000);
 	}
@@ -873,13 +819,10 @@ mmc2_4_latchspr(int tile)
 {
 	if (mmc2_4_init == 0)
 		return;
-	if (tile == 0xfd)
-	{
+	if (tile == 0xfd) {
 		mmc2_4_latch2 = 0;
 		memcpy(VRAM, VROM_BASE + (mmc2_4_latch2low * 0x1000), 0x1000);
-	}
-	else if (tile == 0xfe)
-	{
+	} else if (tile == 0xfe) {
 		mmc2_4_latch2 = 1;
 		memcpy(VRAM, VROM_BASE + (mmc2_4_latch2hi * 0x1000), 0x1000);
 	}
@@ -888,24 +831,21 @@ mmc2_4_latchspr(int tile)
 void
 mmc2(int addr, int val)
 {
-	if (addr >= 0xA000 && addr <= 0xAFFF)
-	{
+	if (addr >= 0xA000 && addr <= 0xAFFF) {
 		/* switch $8000 */
-		MAPTABLE[8] = MAPTABLE[9] = ROM_BASE - 0x8000 + (val * 0x2000);
+		MAPTABLE[8] =
+		MAPTABLE[9] = ROM_BASE - 0x8000 + (val * 0x2000);
 		return;
 	}
-	if (addr >= 0xB000 && addr <= 0xBFFF)
-	{
+	if (addr >= 0xB000 && addr <= 0xBFFF) {
 		/* switch ppu $0000 */
 		mmc2_4_latch2low = val;   /* #1 */
 	}
-	if (addr >= 0xC000 && addr <= 0xCFFF)
-	{
+	if (addr >= 0xC000 && addr <= 0xCFFF) {
 		/* switch ppu $0000 */
 		mmc2_4_latch2hi = val;    /* #2 */
 	}
-	if (addr >= 0xB000 && addr <= 0xCFFF)
-	{
+	if (addr >= 0xB000 && addr <= 0xCFFF) {
 		/* switch ppu $0000 */
 		if (!mmc2_4_latch2) {
 			memcpy(VRAM, VROM_BASE + (mmc2_4_latch2low * 0x1000), 0x1000);
@@ -913,18 +853,15 @@ mmc2(int addr, int val)
 			memcpy(VRAM, VROM_BASE + (mmc2_4_latch2hi * 0x1000), 0x1000);
 		}
 	}
-	if (addr >= 0xD000 && addr <= 0xDFFF)
-	{
+	if (addr >= 0xD000 && addr <= 0xDFFF) {
 		/* switch ppu $1000 */
 		mmc2_4_latch1low = val;   /* #1 */
 	}
-	if (addr >= 0xE000 && addr <= 0xEFFF)
-	{
+	if (addr >= 0xE000 && addr <= 0xEFFF) {
 		/* switch ppu $1000 */
 		mmc2_4_latch1hi = val;    /* #2 */
 	}
-	if (addr >= 0xd000 && addr <= 0xefff)
-	{
+	if (addr >= 0xd000 && addr <= 0xefff) {
 		if (!mmc2_4_latch1) {
 			memcpy(VRAM + 0x1000, VROM_BASE + (mmc2_4_latch1low * 0x1000), 0x1000);
 		} else {
@@ -932,8 +869,7 @@ mmc2(int addr, int val)
 		}
 	}
 
-	if (addr >= 0xF000 && addr <= 0xFFFF)
-	{
+	if (addr >= 0xF000 && addr <= 0xFFFF) {
 		if (val == 0)
 			hvmirror = 0;
 		else
@@ -944,24 +880,20 @@ mmc2(int addr, int val)
 void
 mmc4(int addr, int val)
 {
-	if (addr >= 0xA000 && addr <= 0xAFFF)
-	{
+	if (addr >= 0xA000 && addr <= 0xAFFF) {
 		/* switch $8000 */
 		MapRom(PAGE_8000, val * 16384, SIZE_16K);
 		return;
 	}
-	if (addr >= 0xB000 && addr <= 0xBFFF)
-	{
+	if (addr >= 0xB000 && addr <= 0xBFFF) {
 		/* switch ppu $0000 */
 		mmc2_4_latch2low = val;   /* #1 */
 	}
-	if (addr >= 0xC000 && addr <= 0xCFFF)
-	{
+	if (addr >= 0xC000 && addr <= 0xCFFF) {
 		/* switch ppu $0000 */
 		mmc2_4_latch2hi = val;    /* #2 */
 	}
-	if (addr >= 0xB000 && addr <= 0xCFFF)
-	{
+	if (addr >= 0xB000 && addr <= 0xCFFF) {
 		/* switch ppu $0000 */
 		if (!mmc2_4_latch2) {
 			memcpy(VRAM, VROM_BASE + (mmc2_4_latch2low * 0x1000), 0x1000);
@@ -969,18 +901,15 @@ mmc4(int addr, int val)
 			memcpy(VRAM, VROM_BASE + (mmc2_4_latch2hi * 0x1000), 0x1000);
 		}
 	}
-	if (addr >= 0xD000 && addr <= 0xDFFF)
-	{
+	if (addr >= 0xD000 && addr <= 0xDFFF) {
 		/* switch ppu $1000 */
 		mmc2_4_latch1low = val;   /* #1 */
 	}
-	if (addr >= 0xE000 && addr <= 0xEFFF)
-	{
+	if (addr >= 0xE000 && addr <= 0xEFFF) {
 		/* switch ppu $1000 */
 		mmc2_4_latch1hi = val;    /* #2 */
 	}
-	if (addr >= 0xd000 && addr <= 0xefff)
-	{
+	if (addr >= 0xd000 && addr <= 0xefff) {
 		if (!mmc2_4_latch1) {
 			memcpy(VRAM + 0x1000, VROM_BASE + (mmc2_4_latch1low * 0x1000), 0x1000);
 		} else {
@@ -988,8 +917,7 @@ mmc4(int addr, int val)
 		}
 	}
 
-	if (addr >= 0xF000 && addr <= 0xFFFF)
-	{
+	if (addr >= 0xF000 && addr <= 0xFFFF) {
 		if (val == 0)
 			hvmirror = 0;
 		else
@@ -1005,8 +933,7 @@ init_clrdrms(void)
 {
 	/* figure out if the PRG bank should be masked */
 	prgmask = 0;
-	while (ROM_PAGES - 1 > prgmask)
-	{
+	while (ROM_PAGES - 1 > prgmask) {
 		prgmask = (prgmask << 1) | 1;
 	}
 	/* this mapper uses 32K pages, so shift once more */
@@ -1014,8 +941,7 @@ init_clrdrms(void)
 
 	/* figure out if the CHR bank should be masked */
 	chrmask = 0;
-	while (VROM_PAGES - 1 > chrmask)
-	{
+	while (VROM_PAGES - 1 > chrmask) {
 		chrmask = (chrmask << 1) | 1;
 	}
 
@@ -1028,8 +954,7 @@ clrdrms(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
@@ -1051,8 +976,7 @@ init_cprom(void)
 void
 cprom(int addr, int val)
 {
-	if (addr & 0x8000)
-	{
+	if (addr & 0x8000) {
 		MapRom(PAGE_8000, (val >> 4) & 0x03, SIZE_32K);
 		memcpy(VRAM, VROM_BASE + (4096 * (val & 0x03)), 4096);
 	}
@@ -1080,13 +1004,11 @@ m100in1(int addr, int val)
 
 	val &= 0xff;
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
-	if (addr == 0x8000)
-	{
+	if (addr == 0x8000) {
 		hvmirror = (~val & 0x40) >> 6;
 		MapRom(PAGE_8000, 16384 * (val & 0x1F), SIZE_32K);
 
@@ -1096,16 +1018,13 @@ m100in1(int addr, int val)
 		locE000 = locC000 + 0x2000;
 
 /*
-		if (val & 0x80)
-		{
+		if (val & 0x80) {
 			MapRom(PAGE_C000, locE000, SIZE_8K);
 			MapRom(PAGE_E000, locC000, SIZE_8K);
 			locswap = locC000;
 			locC000 = locE000;
 			locE000 = locswap;
-		}
-		else
-		{
+		} else {
 			MapRom(PAGE_8000, locA000, SIZE_8K);
 			MapRom(PAGE_A000, loc8000, SIZE_8K);
 			locswap = loc8000;
@@ -1120,8 +1039,7 @@ m100in1(int addr, int val)
 		locC000 = 16384 * (val & 0x1F);
 		locE000 = locE000 + 0x2000;
 /*
-		if (val & 0x80)
-		{
+		if (val & 0x80) {
 			MapRom(PAGE_C000, locE000, SIZE_8K);
 			MapRom(PAGE_E000, locC000, SIZE_8K);
 			locswap = locC000;
@@ -1144,8 +1062,7 @@ m100in1(int addr, int val)
 		locC000 = 16384 * (val & 0x1F);
 		locE000 = locE000 + 0x2000;
 /*
-		if (val & 0x80)
-		{
+		if (val & 0x80) {
 			MapRom(PAGE_C000, locE000, SIZE_8K);
 			MapRom(PAGE_E000, locC000, SIZE_8K);
 			locswap = locC000;
@@ -1164,8 +1081,7 @@ init_namcot106(void)
 {
 	/* figure out if the PRG bank should be masked */
 	prgmask = 0;
-	while (ROM_PAGES - 1 > prgmask)
-	{
+	while (ROM_PAGES - 1 > prgmask) {
 		prgmask = (prgmask << 1) | 1;
 	}
 	/* this mapper uses 8K pages, so shift once more */
@@ -1182,13 +1098,11 @@ namcot106(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
-	switch (addr & 0xF800)
-	{
+	switch (addr & 0xF800) {
 	case 0x5000:
 		printf("addr = %04X, val = %02X\n", addr, val);
 		break;
@@ -1274,19 +1188,16 @@ vrc2_a(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
-	switch (addr)
-	{
+	switch (addr) {
 	case 0x8000:
 		MapRom(PAGE_8000, (val & 0x0F) * 8192, SIZE_8K);
 		break;
 	case 0x9000:
-		switch (val & 0x03)
-		{
+		switch (val & 0x03) {
 		case 0:
 			hvmirror = 1;
 			break;
@@ -1418,14 +1329,12 @@ vrc2_b(int addr, int val)
 	static int reg1C00;
 
 	val &= 0xFF;
-	switch (addr)
-	{
+	switch (addr) {
 	case 0x8000:
 		MapRom(PAGE_8000, (val & 0x0F) * 8192, SIZE_8K);
 		break;
 	case 0x9000:
-		switch (val & 0x03)
-		{
+		switch (val & 0x03) {
 		case 0:
 			hvmirror = 1;
 			break;
@@ -1460,7 +1369,7 @@ vrc2_b(int addr, int val)
 		memcpy(VRAM + 0x0400, VROM_BASE + (reg0400 >> 1) * 1024, 1024);
 		break;
 
-case 0xC000:
+	case 0xC000:
 		reg0800 = val & 0x0F;
 		break;
 	case 0xC001:
@@ -1526,15 +1435,11 @@ g101(int addr, int val)
 {
 	static int switchmode = 0;
 
-	switch (addr)
-	{
+	switch (addr) {
 	case 0x8FFF:
-		if (switchmode)
-		{
+		if (switchmode) {
 			MapRom(PAGE_C000, val * 8192, SIZE_8K);
-		}
-		else
-		{
+		} else {
 			MapRom(PAGE_8000, val * 8192, SIZE_8K);
 		}
 		break;
@@ -1580,8 +1485,7 @@ init_taito_tc0190(void)
 {
 	/* figure out if the PRG bank should be masked */
 	prgmask = 0;
-	while (ROM_PAGES - 1 > prgmask)
-	{
+	while (ROM_PAGES - 1 > prgmask) {
 		prgmask = (prgmask << 1) | 1;
 	}
 	/* this mapper uses 8K pages, so shift once more */
@@ -1598,13 +1502,11 @@ taito_tc0190(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
-	switch (addr)
-	{
+	switch (addr) {
 	case 0x8000:
 		MapRom(PAGE_8000, (val & prgmask) * 8192, SIZE_8K);
 		break;
@@ -1652,8 +1554,7 @@ init_tengen_rambo1(void)
 	MapRom(PAGE_C000, (ROM_PAGES - 1) * 16384 + 8192, SIZE_8K);
 	MapRom(PAGE_E000, (ROM_PAGES - 1) * 16384 + 8192, SIZE_8K);
 
-	if (VROM_PAGES)
-	{
+	if (VROM_PAGES) {
 		memcpy(VRAM, VROM_BASE, 8192);
 	}
 
@@ -1665,87 +1566,63 @@ void tengen_rambo1(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
-	if (addr == 0x8000)
-	{
+	if (addr == 0x8000) {
 		commandregister = val;
-	}
-	else if (addr == 0x8001)
-	{
-		switch (commandregister & 0x0F)
-		{
+	} else if (addr == 0x8001) {
+		switch (commandregister & 0x0F) {
 		case 0:
-			memcpy(VRAM + (0x0000 ^ (val & 0x80 << 5)),
-			  VROM_BASE + val * 1024, 2048);
+			memcpy(VRAM + (0x0000 ^ (val & 0x80 << 5)), VROM_BASE + val * 1024, 2048);
 			break;
 		case 1:
-			memcpy(VRAM + (0x0800 ^ (val & 0x80 << 5)),
-			  VROM_BASE + val * 1024, 2048);
+			memcpy(VRAM + (0x0800 ^ (val & 0x80 << 5)), VROM_BASE + val * 1024, 2048);
 			break;
 		case 2:
-			memcpy(VRAM + (0x1000 ^ (val & 0x80 << 5)),
-			  VROM_BASE + val * 1024, 1024);
+			memcpy(VRAM + (0x1000 ^ (val & 0x80 << 5)), VROM_BASE + val * 1024, 1024);
 			break;
 		case 3:
-			memcpy(VRAM + (0x1400 ^ (val & 0x80 << 5)),
-			  VROM_BASE + val * 1024, 1024);
+			memcpy(VRAM + (0x1400 ^ (val & 0x80 << 5)), VROM_BASE + val * 1024, 1024);
 			break;
 		case 4:
-			memcpy(VRAM + (0x1800 ^ (val & 0x80 << 5)),
-			  VROM_BASE + val * 1024, 1024);
+			memcpy(VRAM + (0x1800 ^ (val & 0x80 << 5)), VROM_BASE + val * 1024, 1024);
 			break;
 		case 5:
-			memcpy(VRAM + (0x1C00 ^ (val & 0x80 << 5)),
-			  VROM_BASE + val * 1024, 1024);
+			memcpy(VRAM + (0x1C00 ^ (val & 0x80 << 5)), VROM_BASE + val * 1024, 1024);
 			break;
 		case 6:
-			if (commandregister & 0x40)
-			{
+			if (commandregister & 0x40) {
 				MapRom(PAGE_A000, val * 8192, SIZE_8K);
-			}
-			else
-			{
+			} else {
 				MapRom(PAGE_8000, val * 8192, SIZE_8K);
 			}
 			break;
 		case 7:
-			if (commandregister & 0x40)
-			{
+			if (commandregister & 0x40) {
 				MapRom(PAGE_C000, val * 8192, SIZE_8K);
-			}
-			else
-			{
+			} else {
 				MapRom(PAGE_A000, val * 8192, SIZE_8K);
 			}
 			break;
 		case 8:
-			memcpy(VRAM + 0x0400,
-			  VROM_BASE + val * 1024, 1024);
+			memcpy(VRAM + 0x0400, VROM_BASE + val * 1024, 1024);
 			break;
 		case 9:
-			memcpy(VRAM + 0x0C00,
-			  VROM_BASE + val * 1024, 1024);
+			memcpy(VRAM + 0x0C00, VROM_BASE + val * 1024, 1024);
 			break;
 		case 15:
-			if (commandregister & 0x40)
-			{
+			if (commandregister & 0x40) {
 				MapRom(PAGE_8000, val * 8192, SIZE_8K);
-			}
-			else
-			{
+			} else {
 				MapRom(PAGE_C000, val * 8192, SIZE_8K);
 			}
 			break;
 		default:
 			break;
 		}
-	}
-	else if (addr == 0xA000)
-	{
+	} else if (addr == 0xA000) {
 		hvmirror = val & 0x01;
 	}
 }
@@ -1764,8 +1641,7 @@ init_gnrom(void)
 void
 gnrom(int addr, int val)
 {
-	if (addr > 0x8000)
-	{
+	if (addr > 0x8000) {
 		MapRom(PAGE_8000, (val >> 4 & 0x03) * 32768, SIZE_32K);
 		memcpy(VRAM, VROM_BASE + (val & 0x03) * 8192, 8192);
 	}
@@ -1788,14 +1664,12 @@ sunsoft4(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
 
-	switch (addr)
-	{
+	switch (addr) {
 	case 0x8000:
 		memcpy(VRAM + 0x0000, VROM_BASE + (val * 2048), 8192);
 		break;
@@ -1809,8 +1683,7 @@ sunsoft4(int addr, int val)
 		memcpy(VRAM + 0x1800, VROM_BASE + (val * 2048), 8192);
 		break;
 	case 0xE000:
-		switch (val & 0x03)
-		{
+		switch (val & 0x03) {
 		case 0:
 			osmirror = 0;
 			hvmirror = 0;
@@ -1831,8 +1704,7 @@ sunsoft4(int addr, int val)
 		break;
 	case 0xF000:
 #if DEBUG_MAPPER
-		if (verbose)
-		{
+		if (verbose) {
 			printf("addr = %04X, val = %02X\n", addr, val);
 		}
 #endif
@@ -1856,14 +1728,10 @@ void
 fme7(int addr, int val)
 {
 	val &= 0xFF;
-	if (addr == 0x8000)
-	{
+	if (addr == 0x8000) {
 		commandregister = val;
-	}
-	else if (addr == 0xA000)
-	{
-		switch (commandregister)
-		{
+	} else if (addr == 0xA000) {
+		switch (commandregister) {
 		case 0:
 			memcpy(VRAM + 0x0000, VROM_BASE + val * 1024, 1024);
 			break;
@@ -1928,14 +1796,12 @@ camerica(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
 
-	if (addr > 0xC000)
-	{
+	if (addr > 0xC000) {
 		MapRom(PAGE_8000, val * 16384, SIZE_16K);
 	}
 }
@@ -1948,8 +1814,7 @@ init_irem_74hc161_32(void)
 {
 	/* figure out if the PRG bank should be masked */
 	prgmask = 0;
-	while (ROM_PAGES - 1 > prgmask)
-	{
+	while (ROM_PAGES - 1 > prgmask) {
 		prgmask = (prgmask << 1) | 1;
 	}
 
@@ -1964,14 +1829,12 @@ void irem_74hc161_32(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
 
-	if (addr & 0x8000)
-	{
+	if (addr & 0x8000) {
 		MapRom(PAGE_8000, (val & prgmask) * 16384, SIZE_16K);
 		memcpy(VRAM, VROM_BASE + (val >> 4) * 8192, 8192);
 	}
@@ -1995,10 +1858,8 @@ init_vs(void)
 void
 vs(int addr, int val)
 {
-	if (addr == 0x4016)
-	{
-		if (vsreg != (val & 0x04))
-		{
+	if (addr == 0x4016) {
+		if (vsreg != (val & 0x04)) {
 			if (vsreg)
 				memcpy(VRAM, VROM_BASE, 8192);
 			else
@@ -2023,30 +1884,21 @@ init_supervision(void)
 void supervision(int addr, int val)
 {
 #if DEBUG_MAPPER
-/*	if (verbose)
-	{
+/*	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	} */
 #endif
 
-	if (addr & 0x8000)
-	{
+	if (addr & 0x8000) {
 		/* take care of the mirroring */
 		hvmirror = (addr & 0x2000) > 13;
 
 		/* take care of the PRG switching */
-		if (addr & 0x1000)
-		{
+		if (addr & 0x1000) {
 			/* printf("(a) 32kB page = %02X\n", (addr >> 7) & 0x001F); */
-			MapRom(PAGE_8000,
-			  ((addr >> 7) & 0x001F) * 32768 + ((addr >> 6) & 0x0001 * 16384),
-			  SIZE_16K);
-			MapRom(PAGE_C000,
-			  ((addr >> 7) & 0x001F) * 32768 + ((addr >> 6) & 0x0001 * 16384),
-			  SIZE_16K);
-		}
-		else
-		{
+			MapRom(PAGE_8000, ((addr >> 7) & 0x001F) * 32768 + ((addr >> 6) & 0x0001 * 16384), SIZE_16K);
+			MapRom(PAGE_C000, ((addr >> 7) & 0x001F) * 32768 + ((addr >> 6) & 0x0001 * 16384), SIZE_16K);
+		} else {
 			/* printf("(b) 32kB page = %02X\n", (addr >> 7) & 0x001F); */
 			MapRom(PAGE_8000, ((addr >> 7) & 0x001F) * 32768, SIZE_32K);
 		}
@@ -2071,17 +1923,14 @@ void nina7(int addr, int val)
 	val &= 0xFF;
 
 #if DEBUG_MAPPER
-	if (verbose)
-	{
+	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
 #endif
 
-	if (addr & 0x8000)
-	{
+	if (addr & 0x8000) {
 		MapRom(PAGE_8000, ((val & 0x03) | ((val & 0x80) >> 5)) * 32768, SIZE_32K);
-		if (VROM_PAGES)
-		{
+		if (VROM_PAGES) {
 			memcpy(VRAM, VROM_BASE + ((val & 0x70) >> 4) * 8192, 8192);
 		}
 	}
@@ -2089,10 +1938,9 @@ void nina7(int addr, int val)
 
 /****************************************************************************/
 /*
-  if (verbose)
-    {
-      printf("addr = %04X, val = %02X\n", addr, val);
-    }
+	if (verbose) {
+		printf("addr = %04X, val = %02X\n", addr, val);
+	}
 */
 
 /*
@@ -2105,8 +1953,7 @@ InitMapperSubsystem(void)
 	int x;
 
 	/* clear them all to zero */
-	for (x = 0; x < MAXMAPPER; x++)
-	{
+	for (x = 0; x < MAXMAPPER; x++) {
 		MapperInit[x] = 0;
 		Mapper[x] = 0;
 		MapperName[x][0] = '\0';

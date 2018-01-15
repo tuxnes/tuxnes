@@ -151,13 +151,10 @@ void    START(void);
 void    translate(int);
 
 /* color palettes */
-struct
-{
+struct {
 	const char *name, *desc;
 	unsigned int data[64];
-}
-palettes[] =
-{
+} palettes[] = {
   /* The default NES palette must be the first entry in the array */
 	{ "loopy", "Loopy's NES palette",
 	{ 0x757575, 0x271b8f, 0x0000ab, 0x47009f,
@@ -389,8 +386,7 @@ void (*oldtraphandler)(int);
 static void
 traphandler(int signum)
 {
-	if (signal(SIGTRAP, &traphandler) == SIG_ERR)
-	{
+	if (signal(SIGTRAP, &traphandler) == SIG_ERR) {
 		perror("signal");
 	}
 	if (ignorebadinstr)
@@ -435,12 +431,11 @@ quit(void)
 	free(basefilename);
 
 	/* Save ram */
-	for (x = 0; ((long long *) (RAM + 0x6000))[x] == 0; x++)
+	for (x = 0; ((long long *)(RAM + 0x6000))[x] == 0; x++)
 		if (x >= 1023)
 			exit(EXIT_SUCCESS);      /* Nothing to save */
 	fd = open(savefile, O_CREAT | O_RDWR, 0666);
-	if (fd > 0)
-	{
+	if (fd > 0) {
 		write(fd, RAM + 0x6000, 8192);
 		close(fd);
 		exit(EXIT_SUCCESS);
@@ -463,9 +458,8 @@ help(const char *progname, const char *topic)
 	if (!topic)
 		topic = "";
 	len = strlen(topic);
-	if ((!*topic) ||
-	    ((*topic == '-') &&
-	     !topic[1])) {
+	if ((!*topic)
+	 || ((*topic == '-') && !topic[1])) {
 		terse = 1;
 		if (isatty(STDOUT_FILENO))
 			topic = topics[0].name;
@@ -473,21 +467,17 @@ help(const char *progname, const char *topic)
 			topic = topics[ARRAY_LEN(topics) - 1].name;
 	} else if (*topic == '-') {
 		terse = 1;
-		topic ++;
-		len --;
+		topic++;
+		len--;
 	}
 	for (size_t i = 0; i < ARRAY_LEN(topics); i++)
-		if (terse ? topics[i].is_terse : 1)
-		{
-			if (!strcmp(topics[i].name, topic))
-			{
+		if (terse ? topics[i].is_terse : 1) {
+			if (!strcmp(topics[i].name, topic)) {
 				desc = topics[i].desc;
 				dfn = topics[i].dfn;
 				dfns = 1;
 				break;
-			}
-			else if (!strncmp(topics[i].name, topic, len))
-			{
+			} else if (!strncmp(topics[i].name, topic, len)) {
 				desc = topics[i].desc;
 				dfn = topics[i].dfn;
 				dfns++;
@@ -504,16 +494,12 @@ help(const char *progname, const char *topic)
 		exit(EX_USAGE);
 	}
 	printf(USAGE, progname);
-	if (dfn)
-	{
+	if (dfn) {
 		printf("\n%s:\n", desc);
 		dfn(terse);
-	}
-	else
-	{
+	} else {
 		for (size_t i = 0; i < ARRAY_LEN(topics); i++)
-			if (topics[i].dfn && (terse ? topics[i].is_terse : 1))
-			{
+			if (topics[i].dfn && (terse ? topics[i].is_terse : 1)) {
 				printf("\n%s:\n", topics[i].desc);
 				topics[i].dfn(terse);
 			}
@@ -569,8 +555,7 @@ help_options(int terse)
 	printf("  -I, --in-root       Display in root window\n");
 	printf("  -K, --sticky-keys   Hit keys once to press buttons, again to release\n");
 	printf("  -X, --swap-inputs   Swap P1 and P2 controls\n");
-	if (terse)
-	{
+	if (terse) {
 		printf("  -1, --js1[=FILE]    Use P1 joystick FILE (default: %s)\n", JS1);
 		printf("  -2, --js2[=FILE]    Use P2 joystick FILE (default: %s)\n", JS2);
 	}
@@ -779,17 +764,14 @@ restoresavedgame(void)
 		buffer[strlen(buffer) - 1] = 0;
 	strcat(buffer, "/.tuxnes");
 	result = stat(buffer, &statbuf);
-	if (result == 0)
-	{
-		for (x = strlen(filename) - 1; x > 0 && filename[x - 1] != '/';
-		     x--);
+	if (result == 0) {
+		for (x = strlen(filename) - 1; x > 0 && filename[x - 1] != '/'; x--);
 		strcat(buffer, "/");
 		strncat(buffer, filename + x, 1019 - strlen(buffer));
 		strcat(buffer, ".sav");
 		strcpy(savefile, buffer);
 	}
-	if (!*savefile)
-	{
+	if (!*savefile) {
 		strncpy(buffer, filename, 1013);
 		savefile[1013] = 0;
 		for (x = strlen(buffer); x >= 0 && buffer[x] != '/'; x--)
@@ -797,39 +779,31 @@ restoresavedgame(void)
 		strcat(buffer, "tuxnes.tmp");
 		result = open(buffer, O_CREAT | O_RDWR, 0666);
 		unlink(buffer);
-		if (result < 0)
-		{
+		if (result < 0) {
 			buffer[strlen(buffer) - 10] = 0;
 			fprintf(stderr, "Warning: can not write to directory %s\n", buffer);
 			fprintf(stderr,
 			        "Create directory ~/.tuxnes if you want to save games there instead.\n");
-		}
-		else
+		} else
 			close(result);
 		strncpy(savefile, filename, 1019);
 		savefile[1019] = 0;
 		strcat(savefile, ".sav");
 	}
-	if ((fd = open(savefile, O_RDWR)) >= 0)
-	{
+	if ((fd = open(savefile, O_RDWR)) >= 0) {
 		read(fd, RAM + 0x6000, 8192);
 		close(fd);
-	}
-	else
-	{
+	} else {
 		/* In this special case, there is a ~/.tuxnes directory but no save
 		   file in it.  If there is a save file in the romfile directory,
 		   copy it into the ~/.tuxnes directory. */
 		strncpy(buffer, filename, 1019);
 		buffer[1019] = 0;
 		strcat(buffer, ".sav");
-		if ((fd = open(buffer, O_RDWR)) >= 0)
-		{
+		if ((fd = open(buffer, O_RDWR)) >= 0) {
 			read(fd, RAM + 0x6000, 8192);
 			close(fd);
-		}
-		else
-		{
+		} else {
 			/* Finally, if no save file is found either place, look for a
 			   iNES-type save file. */
 			strncpy(buffer, filename, 1023);
@@ -858,47 +832,38 @@ loadpal(char *palfile)
 		NES_palette = palettes[ARRAY_LEN(palettes) - 1].data;
 	else
 		NES_palette = palettes[0].data;
-	if (palfile)
-	{
+	if (palfile) {
 		char *buffer;
 
 		len = strlen(palfile) + 1;
-		if (!(buffer = malloc(len)))
-		{
+		if (!(buffer = malloc(len))) {
 			perror("loadpal: malloc");
 			return;
 		}
 		memcpy(buffer, palfile, len);
 		palfile = buffer;
-	}
-	if (palfile)
-	{
-		if ((fd = open(palfile, O_RDONLY)) < 0)
-		{
+	} if (palfile) {
+		if ((fd = open(palfile, O_RDONLY)) < 0) {
 			perror(palfile);
 			free(palfile);
 			palfile = 0;
 		}
 	}
-	if (paldata && !palfile)
-	{
+	if (paldata && !palfile) {
 		char *buffer;
 
 		len = strlen(filename) + 1;
-		if (!(buffer = malloc(len)))
-		{
+		if (!(buffer = malloc(len))) {
 			perror("loadpal: malloc");
 			return;
 		}
 		memcpy(buffer, filename, len);
 		palfile = buffer;
 	}
-	if (!palfile)
-	{
+	if (!palfile) {
 		if (palremap)
 			return;
-		if (!(palfile = malloc((len = strlen(filename)) + 11)))
-		{
+		if (!(palfile = malloc((len = strlen(filename)) + 11))) {
 			perror("loadpal: malloc");
 			return;
 		}
@@ -912,41 +877,33 @@ loadpal(char *palfile)
 			palfile[len -= 4] = '\0';
 		strcat(palfile + len, ".pal");
 		if ((fd = open(palfile, O_RDONLY)) < 0) {
-			if ((fd = open("tuxnes.pal", O_RDONLY)) < 0)
-			{
+			if ((fd = open("tuxnes.pal", O_RDONLY)) < 0) {
 				while (len && (palfile[len] != '/'))
 					len--;
 				palfile[len] = '/';
 				palfile[len + 1] = '\0';
 				strcat(palfile + len, "tuxnes.pal");
-				if ((fd = open(palfile, O_RDONLY)) < 0)
-				{
+				if ((fd = open(palfile, O_RDONLY)) < 0) {
 					free(palfile);
 					return;
 				}
-			}
-			else
-			{
+			} else {
 				strcpy(palfile, "tuxnes.pal");
 			}
 		}
 	}
-	if (verbose)
-	{
+	if (verbose) {
 		fprintf(stderr, "Reading palette from %s\n", palfile);
 	}
 	/* read the raw palette data -- it's ok if it's short */
-	if ((fd < 0) && paldata)
-	{
+	if ((fd < 0) && paldata) {
 		memcpy(palette, paldata, 192);
 		pens = 64;
-	}
-	else {
+	} else {
 		char buf[9];
 		ssize_t count;
 
-		if ((count = read(fd, buf, 9)) < 0)
-		{
+		if ((count = read(fd, buf, 9)) < 0) {
 			perror(palfile);
 			free(palfile);
 			return;
@@ -963,38 +920,33 @@ loadpal(char *palfile)
 		 && isxdigit(buf[7])
 		 && ((buf[8] == '\r')
 		  || (buf[8] == '\n')
-		  || isspace(buf[8])))
-		{
-			for (pens = 0; pens < 64; pens ++)
-			{
+		  || isspace(buf[8]))) {
+			for (pens = 0; pens < 64; pens++) {
 				int r, g, b;
 
-				if (pens)
-				{
-					if ((count = read(fd, buf, 9)) < 0)
-					{
+				if (pens) {
+					if ((count = read(fd, buf, 9)) < 0) {
 						perror(palfile);
 						free(palfile);
 						return;
 					}
-					if (count == 8)
-					{
-						buf[count ++] = '\n';
+					if (count == 8) {
+						buf[count++] = '\n';
 					}
-					if (count < 9) break;
+					if (count < 9)
+						break;
 					while ((*buf == '\r')
-					       || (*buf == '\n')
-					       || isspace(*buf))
-					{
+					    || (*buf == '\n')
+					    || isspace(*buf)) {
 						memmove(buf, buf + 1, 8);
-						if ((count = read(fd, buf + 8, 1)) < 0)
-						{
+						if ((count = read(fd, buf + 8, 1)) < 0) {
 							perror(palfile);
 							free(palfile);
 							return;
 						}
 					}
-					if (count < 1) break;
+					if (count < 1)
+						break;
 					if (!(isxdigit(buf[0])
 					   && isxdigit(buf[1])
 					   && (buf[2] == ',')
@@ -1005,20 +957,18 @@ loadpal(char *palfile)
 					   && isxdigit(buf[7])
 					   && ((buf[8] == '\r')
 					    || (buf[8] == '\n')
-					    || isspace(buf[8])))) break;
+					    || isspace(buf[8]))))
+						break;
 				}
 				sscanf(buf, "%x,%x,%x", &r, &g, &b);
 				palette [pens * 3] = r;
 				palette [pens * 3 + 1] = g;
 				palette [pens * 3 + 2] = b;
 			}
-		}
-		/* handler for Nesticle-style raw palette files */
-		else
-		{
-			if (count) memcpy((char *) palette, buf, count);
-			if ((pens = read(fd, (char *) palette + count, 192 - count) / 3) < 0)
-			{
+		} else {
+			/* handler for Nesticle-style raw palette files */
+			if (count) memcpy((char *)palette, buf, count);
+			if ((pens = read(fd, (char *)palette + count, 192 - count) / 3) < 0) {
 				perror(palfile);
 				free(palfile);
 				return;
@@ -1029,23 +979,18 @@ loadpal(char *palfile)
 	}
 
 	/* convert the palette */
-	if (!(NES_palette = malloc(64 * sizeof (*NES_palette))))
-	{
+	if (!(NES_palette = malloc(64 * sizeof (*NES_palette)))) {
 		perror("malloc");
 		free(palfile);
 		return;
 	}
-	for (pen = 0; pen < 64; pen++)
-	{
-		if (pen < pens)
-		{
+	for (pen = 0; pen < 64; pen++) {
+		if (pen < pens) {
 			NES_palette[pen] =
-			  (((unsigned long) palette[pen * 3]) << 16) |
-			  (((unsigned long) palette[pen * 3 + 1]) << 8) |
-			  (((unsigned long) palette[pen * 3 + 2]));
-		}
-		else
-		{
+			  (((unsigned long)palette[pen * 3]) << 16) |
+			  (((unsigned long)palette[pen * 3 + 1]) << 8) |
+			  (((unsigned long)palette[pen * 3 + 2]));
+		} else {
 			if (unisystem)
 				NES_palette[pen] = palettes[ARRAY_LEN(palettes) - 1].data[pen];
 			else
@@ -1093,8 +1038,7 @@ main(int argc, char **argv)
 	InitMapperSubsystem();
 
 	/* Find the user's home directory */
-	if (!(homedir = getenv("HOME")))
-	{
+	if (!(homedir = getenv("HOME"))) {
 		struct passwd *pwent = getpwuid(getuid());
 
 		if (pwent)
@@ -1104,32 +1048,22 @@ main(int argc, char **argv)
 	}
 
 	/* Make sure there's a ~/.tuxnes directory */
-	if ((tuxnesdir = malloc(strlen(homedir) + strlen("/.tuxnes/") + 1))
-	    == NULL)
-	{
+	if ((tuxnesdir = malloc(strlen(homedir) + strlen("/.tuxnes/") + 1)) == NULL) {
 		fprintf(stderr, "Out of memory\n");
 		return (EXIT_FAILURE);
 	}
 	sprintf(tuxnesdir, "%s%s", homedir, "/.tuxnes/");
 	dir = opendir(tuxnesdir);
-	if ((dir == NULL)
-	    && (errno == ENOENT))
-	{
+	if ((dir == NULL) && (errno == ENOENT)) {
 		mkdir(tuxnesdir, 0777);
-		if ((dir = opendir(tuxnesdir)) == NULL)
-		{
+		if ((dir = opendir(tuxnesdir)) == NULL) {
 			fprintf(stderr, "Cannot open directory %s\n", tuxnesdir);
 			return (EXIT_FAILURE);
 		}
-	}
-	else if ((dir == NULL)
-	         && (errno == ENOENT))
-	{
+	} else if ((dir == NULL) && (errno == ENOENT)) {
 		fprintf(stderr, "Cannot open directory %s\n", tuxnesdir);
 		return (EXIT_FAILURE);
-	}
-	else
-	{
+	} else {
 		closedir(dir);
 	}
 
@@ -1154,11 +1088,9 @@ main(int argc, char **argv)
 	 * the long option handling has been removed, since having duplicate code
 	 * for equivalent long and short options can only lead to inconsistency
 	 */
-	while (1)
-	{
+	while (1) {
 		int option_index = 0;
-		static struct option long_options[] =
-		{
+		static struct option long_options[] = {
 			{"help", 2, 0, 'h'},
 			{"controls", 0, 0, 'c'},
 			{"joystick", 1, 0, 'j'},
@@ -1210,8 +1142,7 @@ main(int argc, char **argv)
 		if (parseret == -1)
 			break;
 
-		switch (parseret)
-		{
+		switch (parseret) {
 		case 'b':
 			monochrome = 1;
 			break;
@@ -1265,8 +1196,7 @@ main(int argc, char **argv)
 			ignorebadinstr = 1;
 			break;
 		case 'm':
-			switch (*optarg ? optarg[1] ? 0 : *optarg : 0)
-			{
+			switch (*optarg ? optarg[1] ? 0 : *optarg : 0) {
 			case 'h':
 				cmirror = 1;
 				break;
@@ -1293,8 +1223,8 @@ main(int argc, char **argv)
 			verbose = 1;
 			break;
 		case 's':
-			if (optarg &&
-			    ((strcmp(optarg, "mute") == 0)
+			if (optarg
+			 && ((strcmp(optarg, "mute") == 0)
 			  || (strcmp(optarg, "none") == 0)))
 				sound_config.audiofile = NULL;
 			else
@@ -1308,16 +1238,14 @@ main(int argc, char **argv)
 			break;
 		case 'R':
 			sound_config.audiorate = atoi(optarg);
-			if (sound_config.audiorate < 1)
-			{
+			if (sound_config.audiorate < 1) {
 				fprintf(stderr, "%s: not a valid audio rate (need a positive integer)\n", optarg);
 				exit(EX_USAGE);
 			}
 			break;
 		case 'D':
 			sound_config.max_sound_delay = atof(optarg);
-			if (sound_config.max_sound_delay < 0.0)
-			{
+			if (sound_config.max_sound_delay < 0.0) {
 				fprintf(stderr, "%s: not a valid delay (must be non-negative))\n", optarg);
 				exit(EX_USAGE);
 			}
@@ -1330,8 +1258,7 @@ main(int argc, char **argv)
 			NES_palette = 0;
 			break;
 		case 'P':
-			if (optarg && *optarg)
-			{
+			if (optarg && *optarg) {
 				unsigned int *partial = 0;
 				int partials = 0;
 				size_t len;
@@ -1340,20 +1267,16 @@ main(int argc, char **argv)
 				NES_palette = 0;
 				len = strlen(optarg);
 				for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
-					if (!strcmp(palettes[i].name, optarg))
-					{
+					if (!strcmp(palettes[i].name, optarg)) {
 						NES_palette = palettes[i].data;
 						break;
-					}
-					else if (!strncmp(palettes[i].name, optarg, len))
-					{
+					} else if (!strncmp(palettes[i].name, optarg, len)) {
 						partial = palettes[i].data;
 						partials++;
 					}
 				if ((partials == 1) && !NES_palette)
 					NES_palette = partial;
-				if (!NES_palette)
-				{
+				if (!NES_palette) {
 					if (partials)
 						fprintf(stderr, "%s: palette name `%s' is ambiguous\n",
 						        *argv, optarg);
@@ -1390,34 +1313,27 @@ main(int argc, char **argv)
 			break;
 #ifdef HAVE_LIBM
 		case 'N':
-			if (optarg)
-			{
+			if (optarg) {
 				char *p;
 				double foo;
 
 				foo = strtod(optarg, &p);
-				if (optarg != p)
-				{
+				if (optarg != p) {
 					hue = foo;
 					while (hue < 0.0) hue += 360.0;
 					while (hue >= 360.0) hue -= 360.0;
 				}
-				if (*p == ',')
-				{
+				if (*p == ',') {
 					optarg = p+1;
 					foo = strtod(optarg, &p);
-					if (optarg != p)
-					{
+					if (optarg != p) {
 						tint = foo;
 					}
-					if (*p || (tint < 0.0) || (tint > 1.0))
-					{
+					if (*p || (tint < 0.0) || (tint > 1.0)) {
 						fprintf(stderr, "%s: not a valid tint level (must be a number from 0 to 1)\n", optarg);
 						exit(EX_USAGE);
 					}
-				}
-				else if (*p)
-				{
+				} else if (*p) {
 					fprintf(stderr, "%s: not a valid hue angle (must be an angle in degrees)\n", optarg);
 					exit(EX_USAGE);
 				}
@@ -1426,8 +1342,7 @@ main(int argc, char **argv)
 			break;
 #endif
 		case 0: /* long options with no short equivalents */
-			if (!strcmp(long_options[option_index].name, "display"))
-			{
+			if (!strcmp(long_options[option_index].name, "display")) {
 				renderer_config.display_id = optarg;
 				break;
 			}
@@ -1438,13 +1353,11 @@ main(int argc, char **argv)
 		}
 	}
 
-	if ((scanlines != 100) && !magstep)
-	{
+	if ((scanlines != 100) && !magstep) {
 		magstep = 2;
 	}
 
-	if ((argc - optind) != 1)
-	{
+	if ((argc - optind) != 1) {
 		fprintf(stderr, "%s: too %s arguments\n", *argv, (argc > optind) ? "many" : "few");
 		fprintf(stderr, USAGE, *argv);
 		exit(EX_USAGE);
@@ -1462,21 +1375,16 @@ main(int argc, char **argv)
 
 		basename = filename;
 		baselen = namelen = strlen(filename);
-		for (size_t i = 0; i < namelen; i++)
-		{
-			if (filename[i] == '/')
-			{
+		for (size_t i = 0; i < namelen; i++) {
+			if (filename[i] == '/') {
 				basename = &filename[i + 1];
 				baselen = namelen - i - 1;
-			}
-			else if (filename[i] == '.')
-			{
+			} else if (filename[i] == '.') {
 				baselen -= namelen - i;
 			}
 		}
 
-		if (!(basefilename = malloc(baselen + 1)))
-		{
+		if (!(basefilename = malloc(baselen + 1))) {
 			perror("main: malloc");
 			exit(EXIT_FAILURE);
 		}
@@ -1495,33 +1403,27 @@ main(int argc, char **argv)
 
 		len = strlen(sample_format_name);
 		for (sample_format = sample_formats; sample_format->name; sample_format++)
-			if (!strcmp(sample_format->name, sample_format_name))
-			{
+			if (!strcmp(sample_format->name, sample_format_name)) {
 				break;
-			}
-			else if (!strncmp(sample_format->name, sample_format_name, len))
-			{
+			} else if (!strncmp(sample_format->name, sample_format_name, len)) {
 				match = sample_format;
 				partials++;
 			}
-		if (*sample_format_name && !sample_format->name)
-		{
+		if (*sample_format_name && !sample_format->name) {
 			char *tail;
 			int sample_format_number;
 
 			sample_format_number = strtoul(sample_format_name, &tail, 0);
-			if (!*tail)
-			{
-				for (sample_format = sample_formats; sample_format->name; sample_format ++)
-				{
-					if (sample_format_number == sample_format->number) break;
+			if (!*tail) {
+				for (sample_format = sample_formats; sample_format->name; sample_format++) {
+					if (sample_format_number == sample_format->number)
+						break;
 				}
 			}
 		}
 		if ((partials == 1) && !sample_format->name)
 			sample_format = match;
-		if (!sample_format->name)
-		{
+		if (!sample_format->name) {
 			if (partials)
 				fprintf(stderr, "%s: sound sample format name `%s' is ambiguous\n",
 				        *argv, sample_format_name);
@@ -1536,20 +1438,17 @@ main(int argc, char **argv)
 #ifdef HAVE_LIBZ
 	extension = strrchr(filename, '.');
 
-	/* If the extension is .zip open the file */
 	if (extension && !strcasecmp(extension, ".zip")) {
+		/* If the extension is .zip open the file */
 		rom_file_zip = unzOpen(filename);
 		if (rom_file_zip == NULL) {
 			perror(filename);
 			exit(EXIT_FAILURE);
 		}
-	}
-	/* If its not a .zip file treat it as a .gz */
-	else {
+	} else {
+		/* If its not a .zip file treat it as a .gz */
 		rom_file_gz = gzopen(filename, "rb");
-
-		if (rom_file_gz == NULL)
-		{
+		if (rom_file_gz == NULL) {
 			perror(filename);
 			exit(EXIT_FAILURE);
 		}
@@ -1558,9 +1457,7 @@ main(int argc, char **argv)
 	/* FIXME: Error */
 #else
 	romfd = open(filename, O_RDONLY);
-
-	if (romfd < 0)
-	{
+	if (romfd < 0) {
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
@@ -1575,24 +1472,21 @@ main(int argc, char **argv)
 	size = lseek(romfd, 0, SEEK_END);
 	lseek(romfd, 0, SEEK_SET);   /* Get file size */
 
-	if (size < 0)
-	{
+	if (size < 0) {
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	if (size == 0)
-	{
+	if (size == 0) {
 		fprintf(stderr, "Unable to read %s (empty file)\n", filename);
 		exit(EXIT_FAILURE);
 	}
 #endif
 
 	/* allocate space for the ROM */
-	if ((r = (int) mmap(ROM, 0x300000,
-	                    PROT_READ | PROT_WRITE | PROT_EXEC,
-	                    MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	                    -1, 0)) < 0)
-	{
+	if ((r = (int)mmap(ROM, 0x300000,
+	                   PROT_READ | PROT_WRITE | PROT_EXEC,
+	                   MAP_FIXED | MAP_PRIVATE | MAP_ANON,
+	                   -1, 0)) < 0) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
@@ -1601,17 +1495,15 @@ main(int argc, char **argv)
 #if HAVE_LIBZ
 
 
-	/* Treat as a .zip file */
 	if (extension && !strcasecmp(extension, ".zip")) {
+		/* Treat as a .zip file */
 		ziploader(rom_file_zip, filename);
 		unzClose(rom_file_zip);
-	}
-	/* Treat as a .gz file */
-	else {
+	} else {
+		/* Treat as a .gz file */
 		int c;
 		int i = 0;
-		while ((c = gzgetc(rom_file_gz)) != -1)
-		{
+		while ((c = gzgetc(rom_file_gz)) != -1) {
 			ROM[i++] = c;
 		}
 		size = i;
@@ -1620,8 +1512,7 @@ main(int argc, char **argv)
 	}
 
 #else
-	if (read(romfd, ROM, size) != size)
-	{
+	if (read(romfd, ROM, size) != size) {
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
@@ -1633,54 +1524,47 @@ main(int argc, char **argv)
 		fprintf(stderr, "Rom size: %d\n", size);
 
 	/* Allocate memory */
-	r = (int) mmap(RAM, 0x8000,
-	               PROT_READ | PROT_WRITE,
-	               MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	               -1, 0);
-	if (r <= 0)
-	{
+	r = (int)mmap(RAM, 0x8000,
+	              PROT_READ | PROT_WRITE,
+	              MAP_FIXED | MAP_PRIVATE | MAP_ANON,
+	              -1, 0);
+	if (r <= 0) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	r = (int) mmap(CODE_BASE, 0x800000,
-	               PROT_READ | PROT_WRITE | PROT_EXEC,
-	               MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	               -1, 0);
-	if (r <= 0)
-	{
+	r = (int)mmap(CODE_BASE, 0x800000,
+	              PROT_READ | PROT_WRITE | PROT_EXEC,
+	              MAP_FIXED | MAP_PRIVATE | MAP_ANON,
+	              -1, 0);
+	if (r <= 0) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	r = (int) mmap((void *) INT_MAP, 0x400000,
-	               PROT_READ | PROT_WRITE,
-	               MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	               -1, 0);
-	if (r <= 0)
-	{
+	r = (int)mmap((void *)INT_MAP, 0x400000,
+	              PROT_READ | PROT_WRITE,
+	              MAP_FIXED | MAP_PRIVATE | MAP_ANON,
+	              -1, 0);
+	if (r <= 0) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
 
 	/* Initialize sound playback */
-	if (InitAudio(argc, argv))
-	{
+	if (InitAudio(argc, argv)) {
 		fprintf(stderr,
 		        "%s: warning: failed to initialize sound playback\n",
 		        *argv);
 	}
 
 	/* if the user requested header bytes, show them */
-	if (showheader)
-	{
+	if (showheader) {
 		fprintf(stderr,
 		        "iNES header bytes:\n  0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F\n  ");
-		for (x = 0; x < 16; x++)
-		{
+		for (x = 0; x < 16; x++) {
 			fprintf(stderr, "%02X  ", ROM[x]);
 		}
 		fprintf(stderr, "\n ");
-		for (x = 0; x < 16; x++)
-		{
+		for (x = 0; x < 16; x++) {
 			if ((ROM[x] >= 0x20) && (ROM[x] <= 0x7F))
 				fprintf(stderr, " %c  ", ROM[x]);
 			else
@@ -1699,8 +1583,7 @@ main(int argc, char **argv)
 	MAPTABLE[3] = RAM + 0x2000;
 	MAPTABLE[5] = RAM;            /* 3xxx and 5xxx really shouldn't be mapped to anything, but they're mapped to some unused ram just to prevent pagefaults by weird code that tries to access these areas. */
 	SRAM_ENABLED = 1;
-	if (!strncmp("NES\x1a", (char *) ROM, 4))    /* .NES */
-	{
+	if (!strncmp("NES\x1a", (char *)ROM, 4)) {  /* .NES */
 		int used;
 
 		ROM_BASE = ROM + 16;      /* 16 bytes for .nes header */
@@ -1710,10 +1593,8 @@ main(int argc, char **argv)
 			SRAM_ENABLED = 0;
 
 		/* check for a 512-byte trainer */
-		if (ROM[6] & 4)
-		{
-			if (verbose)
-			{
+		if (ROM[6] & 4) {
+			if (verbose) {
 				fprintf(stderr, "512-byte trainer present\n");
 			}
 			memcpy(RAM + 0x7000, ROM_BASE, 512);
@@ -1723,8 +1604,7 @@ main(int argc, char **argv)
 		/* figure out the mapper */
 		if (!mapperoverride && dirtyheader)
 			MAPPERNUMBER = ROM[6] >> 4;
-		else if (!mapperoverride)
-		{
+		else if (!mapperoverride) {
 			MAPPERNUMBER = (ROM[6] >> 4) | (ROM[7] & 0xf0);
 			if ((ROM[7] & 0x0c) || ROM[8] | ROM[9])
 				fprintf(stderr, "Warning: may need -f to force 4-bit mapper\n");
@@ -1732,8 +1612,7 @@ main(int argc, char **argv)
 			if ((ROM[10] & 0x10) && verbose)
 				fprintf(stderr,
 				        "Cartridge has bus conflicts (not emulated)\n");
-			switch (ROM[7] & 0x03)
-			{
+			switch (ROM[7] & 0x03) {
 			case 0x00:
 				if (verbose)
 					fprintf(stderr, "NES/Famicom ROM\n");
@@ -1752,8 +1631,7 @@ main(int argc, char **argv)
 				        ROM[7] & 0x03);
 			}
 		}
-		if (MAPPERNUMBER == 99)
-		{
+		if (MAPPERNUMBER == 99) {
 			unisystem = 1;
 		}
 
@@ -1781,15 +1659,11 @@ main(int argc, char **argv)
 
 		hvmirror = (ROM[6] & 1) ^ 1;
 		nomirror = ROM[6] & 8;
-	}
-	else if (!strncmp("FDS\x1a", (char *) ROM, 4))       /* .FDS */
-	{
+	} else if (!strncmp("FDS\x1a", (char *)ROM, 4)) {  /* .FDS */
 		fprintf(stderr,
 		        "Famicom Disk System (FDS) disk images aren't yet supported\n");
 		exit(EXIT_FAILURE);
-	}
-	else if (size == 40960)
-	{
+	} else if (size == 40960) {
 		/* No header, assume raw image */
 		ROM_BASE = ROM;
 		MAPPERNUMBER = 0;
@@ -1799,21 +1673,17 @@ main(int argc, char **argv)
 		VROM_BASE = ROM + 32768;
 		nomirror = 1;
 		mapmirror = 0;
-	}
-	else
-	{
+	} else {
 		fprintf(stderr, "Unrecognized ROM file format\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (MAPPERNUMBER > MAXMAPPER || ((int *) MapperInit)[MAPPERNUMBER] == 0)
-	{
+	if (MAPPERNUMBER > MAXMAPPER || ((int *)MapperInit)[MAPPERNUMBER] == 0) {
 		fprintf(stderr, "Unknown Mapper: %d (0x%02X)\n", MAPPERNUMBER,
 		        MAPPERNUMBER);
 		exit(EXIT_FAILURE);
 	}
-	if (verbose)
-	{
+	if (verbose) {
 		fprintf(stderr, "Mapper %d (%s)  Program ROM %dk  Video ROM %dk\n",
 		        MAPPERNUMBER, MapperName[MAPPERNUMBER], ROM_PAGES * 16,
 		        VROM_PAGES * 8);
@@ -1854,32 +1724,27 @@ main(int argc, char **argv)
 
 	((void (*)(void))(MapperInit[MAPPERNUMBER]))();
 
-	if (cmirror == 1 && mapmirror == 0)
-	{
+	if (cmirror == 1 && mapmirror == 0) {
 		if (verbose && !hvmirror)
 			fprintf(stderr, "Overriding default vertical mirroring.\n");
 		hvmirror = 1;
 	}
-	if (cmirror == 2 && mapmirror == 0)
-	{
+	if (cmirror == 2 && mapmirror == 0) {
 		if (verbose && hvmirror)
 			fprintf(stderr, "Overriding default horizontal mirroring.\n");
 		hvmirror = 0;
 	}
-	if (cmirror == 3 && mapmirror == 0)
-	{
+	if (cmirror == 3 && mapmirror == 0) {
 		if (verbose && !nomirror && !osmirror)
 			fprintf(stderr, "Overriding default mirroring.\n");
 		osmirror = 1;
 	}
-	if (cmirror == 4 && mapmirror == 0)
-	{
+	if (cmirror == 4 && mapmirror == 0) {
 		if (verbose && !nomirror)
 			fprintf(stderr, "Overriding default mirroring.\n");
 		nomirror = 1;
 	}
-	if (verbose && mapmirror == 0)
-	{
+	if (verbose && mapmirror == 0) {
 		if (nomirror)
 			fprintf(stderr, "Using no mirroring.\n");
 		else if (osmirror)
@@ -1894,11 +1759,9 @@ main(int argc, char **argv)
 		restoresavedgame();
 	if (!NES_palette)
 		loadpal(palfile);
-	if (verbose)
-	{
+	if (verbose) {
 		for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
-			if (NES_palette == palettes[i].data)
-			{
+			if (NES_palette == palettes[i].data) {
 				fprintf(stderr, "Using built-in palette \"%s\"\n", palettes[i].name);
 				break;
 			}
@@ -1907,17 +1770,14 @@ main(int argc, char **argv)
 		unsigned int *new_palette;
 		int pen;
 
-		if (!(new_palette = malloc(64 * sizeof (*new_palette))))
-		{
+		if (!(new_palette = malloc(64 * sizeof (*new_palette)))) {
 			fprintf(stderr, "Can't remap palette: ");
 			fflush(stderr);
 			perror("malloc");
-		}
-		else
-		{
+		} else {
 			if (verbose)
 				fprintf(stderr, "Remapping palette\n");
-			for (pen = 0; pen < 64; pen ++)
+			for (pen = 0; pen < 64; pen++)
 				new_palette[pen] = (palremap[pen] <= 64)
 				  ? NES_palette[palremap[pen]]
 				  : NES_palette[pen];
@@ -1929,12 +1789,10 @@ main(int argc, char **argv)
 	}
 
 	/* (Possibly) convert palette to monochrome */
-	if (monochrome)
-	{
+	if (monochrome) {
 		int pen;
 
-		for (pen = 0; pen < 64; pen ++)
-		{
+		for (pen = 0; pen < 64; pen++) {
 			unsigned long red, blue, green, gray;
 
 			red = (NES_palette[pen] & 0xFF0000) >> 16;
@@ -1948,38 +1806,29 @@ main(int argc, char **argv)
 	}
 
 	/* enter the Game Genie codes */
-	if (gamegenie)
-	{
+	if (gamegenie) {
 		ggret = DecodeGameGenieCode(ggcode, &address, &data, &compare);
-		if (ggret == GAME_GENIE_BAD_CODE)
-		{
+		if (ggret == GAME_GENIE_BAD_CODE) {
 			fprintf(stderr, "invalid Game Genie code: %s\n", ggcode);
 		}
-		else if (ggret == GAME_GENIE_8_CHAR)
-		{
-			if (verbose)
-			{
+		else if (ggret == GAME_GENIE_8_CHAR) {
+			if (verbose) {
 				fprintf(stderr, "Game Genie: address = %04X, data = %02X\n",
 				        address, data);
 				fprintf(stderr, "Game Genie: compare value = %02X\n", compare);
 				fprintf(stderr, "Game Genie: value at %04X = %02X\n",
 				        address, MAPTABLE[address >> 12][address]);
 			}
-			if (MAPTABLE[address >> 12][address] == compare)
-			{
+			if (MAPTABLE[address >> 12][address] == compare) {
 				MAPTABLE[address >> 12][address] = data;
-				if (verbose)
-				{
+				if (verbose) {
 					fprintf(stderr, "Game Genie: replacing...\n");
 					fprintf(stderr, "Game Genie: value at %04X = %02X\n",
 					        address, MAPTABLE[address >> 12][address]);
 				}
 			}
-		}
-		else
-		{
-			if (verbose)
-			{
+		} else {
+			if (verbose) {
 				fprintf(stderr, "Game Genie: address = %04X, data = %02X\n",
 				        address, data);
 				fprintf(stderr, "Game Genie: replacing...\n");
@@ -2019,8 +1868,7 @@ main(int argc, char **argv)
 	}
 
 	/* Initialize graphic display */
-	if (renderer->InitDisplay(argc, argv))
-	{
+	if (renderer->InitDisplay(argc, argv)) {
 		fprintf(stderr,
 		        "%s: failed to initialize renderer `%s'\n",
 		        *argv, renderer->name);
@@ -2029,14 +1877,13 @@ main(int argc, char **argv)
 
 	/* trap traps */
 	if (!disassemble)
-		if ((oldtraphandler = signal(SIGTRAP, &traphandler)) == SIG_ERR)
-		{
+		if ((oldtraphandler = signal(SIGTRAP, &traphandler)) == SIG_ERR) {
 			perror("signal");
 		}
 
 	/* start the show */
-	STACKPTR = (int) STACK + 0xFF;
-	translate(*((unsigned short *) (MAPTABLE[15] + 0xFFFC)));
+	STACKPTR = (int)STACK + 0xFF;
+	translate(*((unsigned short *)(MAPTABLE[15] + 0xFFFC)));
 	START();                     /* execute translated code */
 
 	/* Not Reached, but return something anyway to get rid of warnings */

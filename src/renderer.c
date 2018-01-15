@@ -121,17 +121,15 @@ InitDisplayAuto(int argc, char **argv)
 #ifdef HAVE_W
 	{
 		struct stat statbuf;
-		if (getenv("WDISPLAY") ||
-		    (!access("/tmp/wserver", F_OK | W_OK) &&
-		     (!stat("/tmp/wserver", &statbuf)) &&
-		     S_ISSOCK(statbuf.st_mode)))
-		{
+		if (getenv("WDISPLAY")
+		 || (!access("/tmp/wserver", F_OK | W_OK)
+		  && (!stat("/tmp/wserver", &statbuf))
+		  && S_ISSOCK(statbuf.st_mode))) {
 			rendname = "w";
 		}
 	}
 #endif
-	if (getenv("DISPLAY"))
-	{
+	if (getenv("DISPLAY")) {
 #ifdef HAVE_X
 		rendname = "x11";
 #endif
@@ -143,9 +141,7 @@ InitDisplayAuto(int argc, char **argv)
 		if (!rendname)
 			rendname = "w";
 #endif
-	}
-	else if (!rendname)
-	{
+	} else if (!rendname) {
 #ifdef HAVE_GGI
 		rendname = "ggi";
 #endif
@@ -154,8 +150,7 @@ InitDisplayAuto(int argc, char **argv)
 			rendname = "w";
 #endif
 	}
-	if (!rendname)
-	{
+	if (!rendname) {
 		rendname = "none";
 		fprintf(stderr,
 		        "======================================================\n"
@@ -174,8 +169,7 @@ InitDisplayAuto(int argc, char **argv)
 	for (renderer = renderers; renderer->name; renderer++)
 		if (!strcmp(renderer->name, rendname))
 			break;
-	if (!renderer)
-	{
+	if (!renderer) {
 		fprintf(stderr, "%s: unrecognized renderer name `%s'\n",
 		        *argv, rendname);
 		return 1;
@@ -218,8 +212,7 @@ UpdateDisplayNone(void)
 		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
 
 	/* Slow down if we're getting ahead */
-	if (frame > timeframe + 1 && frameskip == 0)
-	{
+	if (frame > timeframe + 1 && frameskip == 0) {
 		usleep(16666 * (frame - timeframe - 1));
 	}
 

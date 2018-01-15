@@ -398,15 +398,11 @@ int
 InitAudio(int argc, char **argv)
 {
 	/* Open an audio stream */
-	if (sound_config.audiofile)
-	{
-		if ((audiofd = open(sound_config.audiofile, O_WRONLY | O_APPEND)) < 0)
-		{
+	if (sound_config.audiofile) {
+		if ((audiofd = open(sound_config.audiofile, O_WRONLY | O_APPEND)) < 0) {
 			perror(sound_config.audiofile);
 			return 1;
-		}
-		else
-		{
+		} else {
 			int desired_fragmentsize = 0;
 #ifdef SNDCTL_DSP_RESET
 			if (!ioctl(audiofd, SNDCTL_DSP_RESET)) {
@@ -419,8 +415,7 @@ InitAudio(int argc, char **argv)
 					perror(sound_config.audiofile);
 
 
-				if (sound_config.audiorate != desired_audiorate)
-				{
+				if (sound_config.audiorate != desired_audiorate) {
 					fprintf(stderr, "%s: wanted %d Hz, got %d Hz\n",
 					        sound_config.audiofile,
 					        desired_audiorate,
@@ -442,22 +437,21 @@ InitAudio(int argc, char **argv)
 					perror(sound_config.audiofile);
 
 				/* set bytes_per_sample */
-				if (sample_format_number == AFMT_U16_LE ||
-				    sample_format_number == AFMT_U16_BE ||
-				    sample_format_number == AFMT_S16_LE ||
-				    sample_format_number == AFMT_S16_BE)
+				if (sample_format_number == AFMT_U16_LE
+				 || sample_format_number == AFMT_U16_BE
+				 || sample_format_number == AFMT_S16_LE
+				 || sample_format_number == AFMT_S16_BE)
 					bytes_per_sample = 2;
 				/* set signed */
-				if (sample_format_number == AFMT_S8     ||
-				    sample_format_number == AFMT_S16_LE ||
-				    sample_format_number == AFMT_S16_BE)
+				if (sample_format_number == AFMT_S8
+				 || sample_format_number == AFMT_S16_LE
+				 || sample_format_number == AFMT_S16_BE)
 					signed_samples = 1;
 
-				if (sample_format_number != sample_format->number)
-				{
-					for (sample_format = sample_formats; sample_format->name; sample_format ++)
-					{
-						if (sample_format->number == sample_format_number) break;
+				if (sample_format_number != sample_format->number) {
+					for (sample_format = sample_formats; sample_format->name; sample_format++) {
+						if (sample_format->number == sample_format_number)
+							break;
 					}
 					fprintf(stderr, "%s: wanted %s samples [%d], got %s samples [%d]\n",
 					        sound_config.audiofile,
@@ -663,8 +657,10 @@ UpdateAudio(void) /* called freq times a sec */
 			hz_120 = hz_120_set; /* 240hz hits on 120hz (and on 60hz) */
 			hz_240 = 0;
 			/* frequency sweep sq1 : wavelen_sq1 */
-			if (sq1_sweep_enabled && sq1_len_counter && sq1_right_shift &&
-			        sq1_sw_no_carry && wavelen_sq1 > 0x07) {
+			if (sq1_sweep_enabled
+			 && sq1_len_counter
+			 && sq1_right_shift
+			 && sq1_sw_no_carry && wavelen_sq1 > 0x07) {
 				--sq1_sw_counter;
 				if (sq1_sw_counter == 0) {
 					sq1_sw_counter = sq1_sw_update_rate;
@@ -673,8 +669,7 @@ UpdateAudio(void) /* called freq times a sec */
 						wavelen_sq1 -= ((wavelen_sq1 >> sq1_right_shift) + 1);
 						if (wavelen_sq1 < 0) wavelen_sq1 = 0;
 					} else {
-						temp_wavelen = wavelen_sq1 +
-						                   (wavelen_sq1 >> sq1_right_shift);
+						temp_wavelen = wavelen_sq1 + (wavelen_sq1 >> sq1_right_shift);
 						if (temp_wavelen >= 0x0800) {
 							sq1_sw_no_carry = 0;
 						} else {
@@ -687,8 +682,10 @@ UpdateAudio(void) /* called freq times a sec */
 			}
 
 			/* frequency sweep sq2 : wavelen_sq2 */
-			if (sq2_sweep_enabled && sq2_len_counter && sq2_right_shift &&
-			        sq2_sw_no_carry && wavelen_sq2 > 0x07) {
+			if (sq2_sweep_enabled
+			 && sq2_len_counter
+			 && sq2_right_shift
+			 && sq2_sw_no_carry && wavelen_sq2 > 0x07) {
 				--sq2_sw_counter;
 				if (sq2_sw_counter == 0) {
 					sq2_sw_counter = sq2_sw_update_rate;
@@ -711,8 +708,11 @@ UpdateAudio(void) /* called freq times a sec */
 
 			/* frequency sweep noi : wavelen_noi */
 #if 0
-			if (noi_sweep_enabled && noi_len_counter && noi_right_shift &&
-			        noi_sw_no_carry && wavelen_noi > 0x07) {
+			if (noi_sweep_enabled
+			 && noi_len_counter
+			 && noi_right_shift
+			 && noi_sw_no_carry
+			 && wavelen_noi > 0x07) {
 				--noi_sw_counter;
 				if (noi_sw_counter == 0) {
 					noi_sw_counter = noi_sw_update_rate;
@@ -770,8 +770,10 @@ UpdateAudio(void) /* called freq times a sec */
 				}
 			}
 			/* this is optimized from the docs */
-			if (tri_mode_count && tri_lin_counter &&
-			     !tri_lin_cnt_strt) --tri_lin_counter;
+			if (tri_mode_count
+			 && tri_lin_counter
+			 && !tri_lin_cnt_strt)
+				--tri_lin_counter;
 		}
 
 		/* set up audio values for this cycle */
@@ -807,8 +809,7 @@ UpdateAudio(void) /* called freq times a sec */
 					break;
 
 				case 0x4003:
-					wavelen_sq1 = ((wavelen_sq1 & 0x00FF) |
-					               ((CUR_EVENT.value & 0x07) << 8));
+					wavelen_sq1 = ((wavelen_sq1 & 0x00FF) | ((CUR_EVENT.value & 0x07) << 8));
 					sq1_sw_no_carry = 1;
 					sq1_len_cnt_ld_reg = (CUR_EVENT.value >> 3);
 					sq1_len_counter = length_precalc[ sq1_len_cnt_ld_reg ];
@@ -846,8 +847,7 @@ UpdateAudio(void) /* called freq times a sec */
 					break;
 
 				case 0x4007:
-					wavelen_sq2 = ((wavelen_sq2 & 0x00FF) |
-					                   ((CUR_EVENT.value & 0x07) << 8));
+					wavelen_sq2 = ((wavelen_sq2 & 0x00FF) | ((CUR_EVENT.value & 0x07) << 8));
 					sq2_len_cnt_ld_reg = (CUR_EVENT.value >> 3);
 					sq2_len_counter = length_precalc[ sq2_len_cnt_ld_reg ];
 					sq2_env_dec_volume = volume_max;
@@ -885,9 +885,7 @@ UpdateAudio(void) /* called freq times a sec */
 					step_tri = freq_buffer_tri[wavelen_tri];
 					break;
 				case 0x400B:
-					wavelen_tri = ((wavelen_tri & 0x00FF) |
-					               ((CUR_EVENT.value & 0x07) << 8));
-
+					wavelen_tri = ((wavelen_tri & 0x00FF) | ((CUR_EVENT.value & 0x07) << 8));
 					tri_len_cnt_ld_reg = CUR_EVENT.value >> 3;
 					tri_len_counter = length_precalc[ tri_len_cnt_ld_reg ];
 
@@ -937,15 +935,12 @@ UpdateAudio(void) /* called freq times a sec */
 				/* DMC channel */
 				case 0x4010:
 					dmc_loop_sample   = (CUR_EVENT.value & 0x40);
-					dmc_gen_interrupt = (dmc_loop_sample ? 0 :
-					                          CUR_EVENT.value & 0x80);
+					dmc_gen_interrupt = (dmc_loop_sample ? 0 : CUR_EVENT.value & 0x80);
 					if (!dmc_gen_interrupt)
 						dmc_interrupt = DMC_INTERRUPT_FALSE;
 
 					dmc_clk_for_fetch = 1;
-					dmc_clk_register  = dmc_samples_wait[
-					                        (CUR_EVENT.value & 0x0F)
-					                    ];
+					dmc_clk_register  = dmc_samples_wait[(CUR_EVENT.value & 0x0F)];
 					if (freq_buffer_dmc[(CUR_EVENT.value & 0x0F)] == 0) {
 						freq_buffer_dmc[(CUR_EVENT.value & 0x0F)] =
 						    (MAGIC_dmc * CYCLES_PER_SAMPLE * magic_adjust) /
@@ -1010,8 +1005,10 @@ UpdateAudio(void) /* called freq times a sec */
 		if (tri_mode_count == 0) {
 			tri_lin_counter = tri_lin_cnt_ld_reg;
 		}
-		if ((tri_enabled && tri_len_counter &&
-		        tri_lin_counter) || tri_index > step_tri) {
+		if ((tri_enabled
+		  && tri_len_counter
+		  && tri_lin_counter)
+		 || tri_index > step_tri) {
 			tri_index += step_tri;
 			tri_index &= 0x1FFFFFFF;
 			samp_temp = triangle_50[tri_index >> 24];
@@ -1020,9 +1017,11 @@ UpdateAudio(void) /* called freq times a sec */
 		}
 
 		/* next do sq1 */
-		if ((sq1_enabled && sq1_len_counter && wavelen_sq1 > 0x07 &&
-		             sq1_sw_no_carry) || sq1_index > step_sq1) {
-
+		if ((sq1_enabled
+		  && sq1_len_counter
+		  && wavelen_sq1 > 0x07
+		  && sq1_sw_no_carry)
+		 || sq1_index > step_sq1) {
 			sq1_index += step_sq1;
 			sq1_index &= 0x1FFFFFFF; /* fast modulus of a power of 2 */
 
@@ -1039,8 +1038,11 @@ UpdateAudio(void) /* called freq times a sec */
 		}
 
 		/* do sq2 */
-		if ((sq2_enabled && sq2_len_counter && wavelen_sq2 > 0x07 &&
-		             sq2_sw_no_carry) || sq2_index > step_sq2) {
+		if ((sq2_enabled
+		  && sq2_len_counter
+		  && wavelen_sq2 > 0x07
+		  && sq2_sw_no_carry)
+		 || sq2_index > step_sq2) {
 			sq2_index += step_sq2;
 			sq2_index &= 0x1FFFFFFF; /* fast modulus of a power of 2 */
 			if (sq2_index <= sq2_duty_cycle) {
@@ -1058,9 +1060,7 @@ UpdateAudio(void) /* called freq times a sec */
 		if (noi_enabled) {
 			noi_index += step_noi;
 			if (noi_index > 0x1FFFFFFF) {
-				noi_state_reg =
-				    shift_register15(noi_number_type ? 0x40 : 0x02);
-
+				noi_state_reg = shift_register15(noi_number_type ? 0x40 : 0x02);
 				noi_index &= 0x1FFFFFFF;
 			}
 
@@ -1106,8 +1106,9 @@ UpdateAudio(void) /* called freq times a sec */
 				}
 			}
 
-			while (dmc_shiftcnt > 0 && (dmcs_index >= MAGIC_dmc ||
-			        dmc_index >= MAGIC_dmc)) {
+			while (dmc_shiftcnt > 0
+			    && (dmcs_index >= MAGIC_dmc
+			     || dmc_index >= MAGIC_dmc)) {
 				if (dmc_shift & 1) {
 					if (dmc_delta != 0x3F) {
 						++dmc_delta;
@@ -1128,8 +1129,8 @@ UpdateAudio(void) /* called freq times a sec */
 			*((short*)(audio_buffer + sample)) = (samp_temp / 5);
 #if BYTE_ORDER == BIG_ENDIAN
 			/* swap order */
-			if (sample_format_number == AFMT_U16_BE ||
-			    sample_format_number == AFMT_S16_BE) {
+			if (sample_format_number == AFMT_U16_BE
+			 || sample_format_number == AFMT_S16_BE) {
 				audio_buffer[sample]     ^= audio_buffer[sample + 1];
 				audio_buffer[sample + 1] ^= audio_buffer[sample];
 				audio_buffer[sample]     ^= audio_buffer[sample + 1];
@@ -1159,15 +1160,14 @@ UpdateAudio(void) /* called freq times a sec */
 
 		++frame_count;
 
-		if ((frame_count & 0x0F) == 0x0F && /* check it every few frames */
-		    !ioctl (audiofd, SNDCTL_DSP_GETODELAY, &odelay)) {
+		if ((frame_count & 0x0F) == 0x0F  /* check it every few frames */
+		 && !ioctl (audiofd, SNDCTL_DSP_GETODELAY, &odelay)) {
 			if (odelay > maxdelay) {
 				maxdelay = odelay;
 			}
 			if (odelay * 1.0 / (sound_config.audiorate * bytes_per_sample) >=
 			    sound_config.max_sound_delay) {
-				skip_count = odelay * UPDATE_FREQ / (sound_config.audiorate
-				             * bytes_per_sample) + 1;
+				skip_count = odelay * UPDATE_FREQ / (sound_config.audiorate * bytes_per_sample) + 1;
 
 				if (verbose) {
 					fprintf(stderr,

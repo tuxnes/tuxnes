@@ -91,15 +91,11 @@ InitScreenshotGGI(void)
 
 	screenshot_init(".ppm");
 
-	if (!(pixels = ppm_allocarray(256 * magstep, 240 * magstep)))
-	{
+	if (!(pixels = ppm_allocarray(256 * magstep, 240 * magstep))) {
 		perror("ppm_allocarray");
 		fprintf(stderr, "GGI: screenshots are disabled\n");
-	}
-	else
-	{
-		if (!(cols = malloc(256 * magstep * sizeof (*cols))))
-		{
+	} else {
+		if (!(cols = malloc(256 * magstep * sizeof (*cols)))) {
 			perror("malloc");
 			pixels = 0;
 		}
@@ -115,8 +111,7 @@ SaveScreenshotGGI(void)
 	int w, h;
 	FILE *f = 0;
 
-	if (!pixels)
-	{
+	if (!pixels) {
 		fprintf(stderr, "GGI: screenshots are disabled\n");
 		return;
 	}
@@ -125,38 +120,29 @@ SaveScreenshotGGI(void)
 	w = 256 * magstep;
 	h = 240 * magstep;
 	/* default (fast-ish) color decoding */
-	if (bpp > 1)
-	{
-		for (y = 0; y < h; y ++)
-		{
-			if (ggiUnpackPixels(visualGGI, (void *)(rfb + y * bytes_per_line),
-			                    cols, w))
-			{
+	if (bpp > 1) {
+		for (y = 0; y < h; y++) {
+			if (ggiUnpackPixels(visualGGI, (void *)(rfb + y * bytes_per_line), cols, w)) {
 				/* indicates ggiUnpackPixels failed */
 				break;
 			}
-			for (x = 0; x < w; x ++)
-			{
+			for (x = 0; x < w; x++) {
 				PPM_ASSIGN(pixels[y][x],
 				           cols[x].r >> 8, cols[x].g >> 8, cols[x].b >> 8);
 			}
 		}
-	}
-	else
-	{
+	} else {
 		y = 0;
 	}
 	/* fallback for crappy visuals */
-	if (y < h)
-	{
+	if (y < h) {
 		int x0, y0;
 		int x1, y1;
 		int w0, h0;
 
-		if ((modeGGI.frames > 1) &&
-		    (ggiGetReadFrame(visualGGI) != frameno) &&
-		    ggiSetReadFrame(visualGGI, frameno))
-		{
+		if ((modeGGI.frames > 1)
+		 && (ggiGetReadFrame(visualGGI) != frameno)
+		 && ggiSetReadFrame(visualGGI, frameno)) {
 			fprintf(stderr,
 			        "GGI: ggiSetReadFrame failed for frame %d, no screenshot\n",
 			        frameno);
@@ -164,49 +150,37 @@ SaveScreenshotGGI(void)
 		}
 		w0 = modeGGI.visible.x;
 		h0 = modeGGI.visible.y;
-		if (w0 < w)
-		{
+		if (w0 < w) {
 			x1 = 0;
-		}
-		else
-		{
+		} else {
 			x1 = (w0 - w) / 2;
 		}
-		if (h0 < h)
-		{
+		if (h0 < h) {
 			y1 = 0;
-		}
-		else
-		{
+		} else {
 			y1 = (h0 - h) / 2;
 		}
 		for (y0 = y; y0 < h; y0 += h0)
-			for (x0 = 0; x0 < w; x0 += w0)
-			{
-				if ((h > h0) || (w > w0))
-				{
+			for (x0 = 0; x0 < w; x0 += w0) {
+				if ((h > h0) || (w > w0)) {
 					ggiPutBox(visualGGI,
 					          x1 - x0, y1 - y0,
 					          256 * magstep, 240 * magstep,
 					          fb);
 					ggiFlush(visualGGI);
 				}
-				for (y = 0; (y < h0) && ((y + y0) < h); y ++)
-					for (x = 0; (x < w0) && ((x + x0) < w); x ++)
-					{
+				for (y = 0; (y < h0) && ((y + y0) < h); y++)
+					for (x = 0; (x < w0) && ((x + x0) < w); x++) {
 						ggi_pixel pix;
 
 						cols[x + x0].r = cols[x + x0].b = 0xFFFF;
 						cols[x + x0].g = 0x0000;
-						if (ggiGetPixel(visualGGI, x + x1, y + y1, &pix))
-						{
+						if (ggiGetPixel(visualGGI, x + x1, y + y1, &pix)) {
 							if (verbose)
 								fprintf(stderr,
 								        "GGI: can't get pixel at (%d,%d)!\n",
 								        x + x1, y + y1);
-						}
-						else if (ggiUnmapPixel(visualGGI, pix, cols + x + x0))
-						{
+						} else if (ggiUnmapPixel(visualGGI, pix, cols + x + x0)) {
 							if (verbose)
 								fprintf(stderr,
 								        "GGI: can't unmap color %d!\n",
@@ -220,17 +194,13 @@ SaveScreenshotGGI(void)
 			}
 	}
 	f = fopen(screenshotfile, "wb");
-	if (f)
-	{
+	if (f) {
 		ppm_writeppm(f, pixels, w, h, 255, 0);
-		if (verbose)
-		{
+		if (verbose) {
 			fprintf(stderr, "Wrote screenshot to %s\n", screenshotfile);
 		}
 		fclose(f);
-	}
-	else
-	{
+	} else {
 		perror(screenshotfile);
 	}
 #else
@@ -244,8 +214,7 @@ HandleKeyboardGGI(ggi_event ev)
 {
 	_Bool press = ev.any.type == evKeyPress;
 
-	if (press && ev.key.sym == GIIUC_Escape)
-	{
+	if (press && ev.key.sym == GIIUC_Escape) {
 		ggiClose(visualGGI);
 		ggiExit();
 		quit();                    /* ESC */
@@ -253,8 +222,7 @@ HandleKeyboardGGI(ggi_event ev)
 
 	/* the coin and dipswitch inputs work only in VS UniSystem mode */
 	if (unisystem)
-		switch (ev.key.sym)
-		{
+		switch (ev.key.sym) {
 		case '[':
 		case '{':
 			ctl_coinslot(0x01, press);
@@ -301,8 +269,7 @@ HandleKeyboardGGI(ggi_event ev)
 			break;
 		}
 
-	switch (ev.key.sym)
-	{
+	switch (ev.key.sym) {
 		/* controller 1 keyboard mapping */
 	case GIIUC_Return:
 	case GIIK_PEnter:
@@ -412,8 +379,7 @@ HandleKeyboardGGI(ggi_event ev)
 
 	/* emulator keys */
 	if (press)
-		switch (ev.key.sym)
-		{
+		switch (ev.key.sym) {
 /*		case GIIK_F1: */
 /*			debug_bgoff = 1; */
 /*			break; */
@@ -527,13 +493,11 @@ InitDisplayGGI(int argc, char **argv)
 		        magstep);
 		magstep = maxsize;
 	}
-	if (ggiInit())
-	{
+	if (ggiInit()) {
 		fprintf(stderr, "%s: GGI initialization failed\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	if (!(visualGGI = ggiOpen(renderer_config.display_id, 0)))
-	{
+	if (!(visualGGI = ggiOpen(renderer_config.display_id, 0))) {
 		fprintf(stderr, "%s: Can't open visual on %s%s%s target\n",
 		        argv[0],
 		        renderer_config.display_id ? "\"" : "",
@@ -559,17 +523,14 @@ InitDisplayGGI(int argc, char **argv)
 	ggiSetFlags(visualGGI, GGIFLAG_ASYNC);
 	ggiCheckMode(visualGGI, &modeGGI);
 	if (ggiSetMode(visualGGI, &modeGGI) < 0) {
-		if (verbose)
-		{
+		if (verbose) {
 			fprintf(stderr, "GGI: ggiSetMode failed, trying ggiSetSimpleMode.\n");
 		}
 		if (ggiSetSimpleMode(visualGGI,
 		                     modeGGI.visible.x,
 		                     modeGGI.visible.y,
 		                     modeGGI.frames,
-		                     GT_AUTO)
-		    < 0)
-		{
+		                     GT_AUTO) < 0) {
 			ggiClose(visualGGI);
 			ggiExit();
 			fprintf(stderr, "%s: requested GGI mode refused.\n", argv[0]);
@@ -577,20 +538,16 @@ InitDisplayGGI(int argc, char **argv)
 		}
 	}
 	ggiGetMode(visualGGI, &modeGGI);
-	if (verbose)
-	{
+	if (verbose) {
 		fprintf(stderr, "GGI mode: \"");
 		ggiFPrintMode(stderr, &modeGGI);
 		fprintf(stderr, "\"\n");
 	}
-	if ((GT_SCHEME(modeGGI.graphtype) == GT_PALETTE) && indexedcolor)
-	{
+	if ((GT_SCHEME(modeGGI.graphtype) == GT_PALETTE) && indexedcolor) {
 		colormapGGI[0].r = colormapGGI[0].g = colormapGGI[0].b = 0x0000;
 		colormapGGI[1].r = colormapGGI[1].g = colormapGGI[1].b = 0xFFFF;
 		if ((basepixel = ggiSetPalette(visualGGI, GGI_PALETTE_DONTCARE, 27,
-		                               colormapGGI))
-		    < 0)
-		{
+		                               colormapGGI)) < 0) {
 			ggiClose(visualGGI);
 			ggiExit();
 			fprintf(stderr, "Can't allocate colors!\n");
@@ -603,14 +560,12 @@ InitDisplayGGI(int argc, char **argv)
 		color.r = ((NES_palette[0] & 0xFF0000) >> 8);
 		color.g = (NES_palette[0] & 0xFF00);
 		color.b = ((NES_palette[0] & 0xFF) << 8);
-		for (x = 0; x <= 24; x++)
-		{
+		for (x = 0; x <= 24; x++) {
 			palette[x] = x + basepixel + 2;
 			colormapGGI[x + 2] = color;
 			palette2[x] = blackpixel;
 		}
-		if (ggiSetPalette(visualGGI, basepixel, 27, colormapGGI) < 0)
-		{
+		if (ggiSetPalette(visualGGI, basepixel, 27, colormapGGI) < 0) {
 			fprintf(stderr,
 			        "======================================================\n"
 			        "GGI: ggiSetPalette failed in GT_PALETTE mode!\n"
@@ -625,17 +580,14 @@ InitDisplayGGI(int argc, char **argv)
 			        );
 			indexedcolor = 0;
 		}
-		if (scanlines && (scanlines != 100))
-		{
+		if (scanlines && (scanlines != 100)) {
 			fprintf(stderr, "Warning: Scanline intensity is ignored in indexed-color modes!\n");
 			scanlines = 0;
 		}
 	}
-	if ((GT_SCHEME(modeGGI.graphtype) != GT_PALETTE) || !indexedcolor)
-	{
+	if ((GT_SCHEME(modeGGI.graphtype) != GT_PALETTE) || !indexedcolor) {
 		indexedcolor = 0;
-		if (GT_SCHEME(modeGGI.graphtype) == GT_PALETTE)
-		{
+		if (GT_SCHEME(modeGGI.graphtype) == GT_PALETTE) {
 			/* setup GGI palette -- should handle indexed-color visuals */
 			ggiSetColorfulPalette(visualGGI);
 		}
@@ -643,12 +595,10 @@ InitDisplayGGI(int argc, char **argv)
 		blackpixel = ggiMapColor(visualGGI, &color);
 		color.r = color.g = color.b = 0xFFFF;
 		whitepixel = ggiMapColor(visualGGI, &color);
-		for (x=0; x < 24; x++)
-		{
+		for (x=0; x < 24; x++) {
 			palette[x] = palette2[x] = blackpixel;
 		}
-		for (x=0; x < 64; x++)
-		{
+		for (x=0; x < 64; x++) {
 			color.r = ((NES_palette[x] & 0xFF0000) >> 8);
 			color.g = (NES_palette[x] & 0xFF00);
 			color.b = ((NES_palette[x] & 0xFF) << 8);
@@ -656,8 +606,7 @@ InitDisplayGGI(int argc, char **argv)
 			palette2GGI[x] = blackpixel;
 		}
 		if (scanlines && (scanlines != 100))
-			for (x = 0; x < 64; x++)
-			{
+			for (x = 0; x < 64; x++) {
 				unsigned long r, g, b;
 
 				r = ((NES_palette[x] & 0xFF0000) >> 8) * (scanlines / 100.0);
@@ -682,53 +631,41 @@ InitDisplayGGI(int argc, char **argv)
 	if (numbuffersGGI > 2)
 		numbuffersGGI = 2;
 	if ((numbuffersGGI > 0)
-	    && (modeGGI.visible.x >= 256 * magstep)
-	    && (modeGGI.visible.x <= 400 * magstep)
-	    && (modeGGI.visible.y >= 240 * magstep)
-	    && (modeGGI.visible.y <= 300 * magstep))
-	{
+	 && (modeGGI.visible.x >= 256 * magstep)
+	 && (modeGGI.visible.x <= 400 * magstep)
+	 && (modeGGI.visible.y >= 240 * magstep)
+	 && (modeGGI.visible.y <= 300 * magstep)) {
 		int buffer;
 
 		frameno = 0;
-		for (buffer = 0; buffer < numbuffersGGI; buffer ++)
-		{
-			if ((bufferGGI[frameno] = ggiDBGetBuffer(visualGGI, buffer)))
-			{
-				if (bufferGGI[frameno]->type & GGI_DB_SIMPLE_PLB)
-				{
-					frameno ++;
+		for (buffer = 0; buffer < numbuffersGGI; buffer++) {
+			if ((bufferGGI[frameno] = ggiDBGetBuffer(visualGGI, buffer))) {
+				if (bufferGGI[frameno]->type & GGI_DB_SIMPLE_PLB) {
+					frameno++;
 				}
 			}
 		}
 		numbuffersGGI = frameno;
 		frameno = 0;
 		if (ggiResourceAcquire(bufferGGI[frameno]->resource,
-		                       GGI_ACTYPE_READ | GGI_ACTYPE_WRITE))
-		{
+		                       GGI_ACTYPE_READ | GGI_ACTYPE_WRITE)) {
 			fprintf(stderr, "GGI: failed to acquire directbuffer\n");
-		}
-		else
-		{
-			if (bufferGGI[frameno]->write && bufferGGI[frameno]->read)
-			{
+		} else {
+			if (bufferGGI[frameno]->write && bufferGGI[frameno]->read) {
 				formatGGI = bufferGGI[frameno]->buffer.plb.pixelformat;
 				bytes_per_line = bufferGGI[frameno]->buffer.plb.stride;
 				bpp = formatGGI->size;
-				if (!bpp)
-				{
+				if (!bpp) {
 					bpp = GT_SIZE(modeGGI.graphtype);
 				}
-				rfb = (char *)bufferGGI[frameno]->read +
-				  bytes_per_line *
-				  ((240 * magstep - modeGGI.visible.y) / -2) +
-				  (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
-				fb = (char *)bufferGGI[frameno]->write +
-				  bytes_per_line *
-				  ((240 * magstep - modeGGI.visible.y) / -2) +
-				  (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
+				rfb = (char *)bufferGGI[frameno]->read
+				    + bytes_per_line * ((240 * magstep - modeGGI.visible.y) / -2)
+				    + (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
+				fb = (char *)bufferGGI[frameno]->write
+				   + bytes_per_line * ((240 * magstep - modeGGI.visible.y) / -2)
+				   + (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
 				directGGI = 1;
-			}
-			else
+			} else
 				ggiResourceRelease(bufferGGI[frameno]->resource);
 		}
 	}
@@ -736,21 +673,17 @@ InitDisplayGGI(int argc, char **argv)
 	lsb_first = formatGGI->flags & GGI_PF_HIGHBIT_RIGHT;
 	lsn_first = lsb_first; /* who knows? packed 4bpp is really an obscure case */
 	bpu = 8;
-	if (!fb)
-	{
+	if (!fb) {
 		bpp = formatGGI->size;
-		if (!bpp)
-		{
+		if (!bpp) {
 			bpp = GT_SIZE(modeGGI.graphtype);
 		}
 	}
 	depth = formatGGI->depth;
-	if (!depth)
-	{
+	if (!depth) {
 		depth = GT_DEPTH(modeGGI.graphtype);
 	}
-	if (verbose)
-	{
+	if (verbose) {
 		fprintf(stderr,
 		        "GGI: %s scheme, depth %d, %dbpp, %s colors, %d %s%s\n",
 		        (GT_SCHEME(modeGGI.graphtype) == GT_TEXT) ? "Text" :
@@ -766,11 +699,9 @@ InitDisplayGGI(int argc, char **argv)
 		        directGGI ? "direct buffer" : "frame",
 		        ((directGGI ? numbuffersGGI : modeGGI.frames) == 1) ? "" : "s");
 	}
-	if (!fb)
-	{
+	if (!fb) {
 		bytes_per_line = 256 / 8 * magstep * bpp;
-		if (!(rfb = (fb = malloc(bytes_per_line * 240 * magstep))))
-		{
+		if (!(rfb = (fb = malloc(bytes_per_line * 240 * magstep)))) {
 			ggiClose(visualGGI);
 			ggiExit();
 			perror("malloc");
@@ -779,12 +710,9 @@ InitDisplayGGI(int argc, char **argv)
 	}
 	InitScreenshotGGI();
 	fbinit();
-	if ((modeGGI.frames > 1) &&
-	    (ggiGetWriteFrame(visualGGI) !=
-	     (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
-	    ggiSetWriteFrame(visualGGI,
-	                     directGGI ? bufferGGI[frameno]->frame : frameno))
-	{
+	if ((modeGGI.frames > 1)
+	 && (ggiGetWriteFrame(visualGGI) != (directGGI ? bufferGGI[frameno]->frame : frameno))
+	 && ggiSetWriteFrame(visualGGI, directGGI ? bufferGGI[frameno]->frame : frameno)) {
 		ggiClose(visualGGI);
 		ggiExit();
 		fprintf(stderr,
@@ -810,52 +738,36 @@ UpdateColorsGGI(void)
 
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
-	if (indexedcolor)
-	{
+	if (indexedcolor) {
 		currentbgcolor = NES_palette[VRAM[0x3f00] & 63];
-		if (currentbgcolor != oldbgcolor)
-		{
+		if (currentbgcolor != oldbgcolor) {
 			colormapGGI[24 + 2].r = ((currentbgcolor & 0xFF0000) >> 8);
 			colormapGGI[24 + 2].g = (currentbgcolor & 0xFF00);
 			colormapGGI[24 + 2].b = ((currentbgcolor & 0xFF) << 8);
 			if (ggiSetPalette(visualGGI, 24 + basepixel + 2, 1,
-			                  colormapGGI + 24 + 2)
-			    < 0)
-			{
+			                  colormapGGI + 24 + 2) < 0) {
 				fprintf(stderr,
 				        "GGI: ggiSetPalette failed in GT_PALETTE mode!\n");
 			}
 		}
-	}
-	else
-	/* truecolor */
-	{
+	} else /* truecolor */ {
 		palette[24] = currentbgcolor = paletteGGI[VRAM[0x3f00] & 63];
 		if (scanlines && (scanlines != 100))
 			palette2[24] = palette2GGI[VRAM[0x3f00] & 63];
-		if (oldbgcolor != currentbgcolor /*||currentbgcolor!=bgcolor[currentcache] */)
-		{
+		if (oldbgcolor != currentbgcolor /*||currentbgcolor!=bgcolor[currentcache] */) {
 			redrawbackground = 1;
 			needsredraw = 1;
 		}
 	}
 
 	/* Tile colors */
-	if (indexedcolor)
-	{
-		for (x = 0; x < 24; x++)
-		{
-			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)])
-			{
-				colormapGGI[x+2].r = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] &
-				                       0xFF0000) >> 8);
-				colormapGGI[x+2].g = (NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] &
-				                      0xFF00);
-				colormapGGI[x+2].b = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] &
-				                       0xFF) << 8);
-				if (ggiSetPalette(visualGGI, x + basepixel + 2, 1, colormapGGI + x + 2)
-				    < 0)
-				{
+	if (indexedcolor) {
+		for (x = 0; x < 24; x++) {
+			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
+				colormapGGI[x+2].r = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF0000) >> 8);
+				colormapGGI[x+2].g = (NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF00);
+				colormapGGI[x+2].b = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF) << 8);
+				if (ggiSetPalette(visualGGI, x + basepixel + 2, 1, colormapGGI + x + 2) < 0) {
 					ggiClose(visualGGI);
 					ggiExit();
 					fprintf(stderr,
@@ -868,15 +780,10 @@ UpdateColorsGGI(void)
 	}
 
 	/* Set palette tables */
-	if (indexedcolor)
-	{
+	if (indexedcolor) {
 		/* Already done in InitDisplayGGI */
-	}
-	else
-	/* truecolor */
-	{
-		for (x = 0; x < 24; x++)
-		{
+	} else /* truecolor */ {
+		for (x = 0; x < 24; x++) {
 			palette[x] = paletteGGI[VRAM[0x3f01 + x + (x / 3)] & 63];
 			if (scanlines && (scanlines != 100))
 				palette2[x] = palette2GGI[VRAM[0x3f01 + x + (x / 3)] & 63];
@@ -912,22 +819,16 @@ UpdateDisplayGGI(void)
 	if (frame < timeframe - 20 && frame % 20 == 0)
 		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
 
-	if (!nodisplay)
-	{
+	if (!nodisplay) {
 		drawimage(PBL);
-		if (!frameskip)
-		{
+		if (!frameskip) {
 			UpdateColorsGGI();
-			if (directGGI)
-			{
+			if (directGGI) {
 				ggiResourceRelease(bufferGGI[frameno]->resource);
 				ggiFlush(visualGGI);
-				if ((modeGGI.frames > 1) &&
-				    (ggiGetDisplayFrame(visualGGI) !=
-				     (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
-				    ggiSetDisplayFrame(visualGGI,
-				                       bufferGGI[frameno]->frame))
-				{
+				if ((modeGGI.frames > 1)
+				 && (ggiGetDisplayFrame(visualGGI) != (directGGI ? bufferGGI[frameno]->frame : frameno))
+				 && ggiSetDisplayFrame(visualGGI, bufferGGI[frameno]->frame)) {
 					ggiClose(visualGGI);
 					ggiExit();
 					fprintf(stderr,
@@ -937,46 +838,35 @@ UpdateDisplayGGI(void)
 				}
 				frameno = (frameno + 1) % numbuffersGGI;
 				if (ggiResourceAcquire(bufferGGI[frameno]->resource,
-				                       GGI_ACTYPE_READ | GGI_ACTYPE_WRITE))
-				{
+				                       GGI_ACTYPE_READ | GGI_ACTYPE_WRITE)) {
 					fprintf(stderr, "GGI: failed to acquire directbuffer\n");
 					ggiClose(visualGGI);
 					ggiExit();
 					exit(EXIT_FAILURE);
-				}
-				else
-				{
-					if (bufferGGI[frameno]->write && bufferGGI[frameno]->read)
-					{
+				} else {
+					if (bufferGGI[frameno]->write && bufferGGI[frameno]->read) {
 						formatGGI = bufferGGI[frameno]->buffer.plb.pixelformat;
 						bytes_per_line = bufferGGI[frameno]->buffer.plb.stride;
 						bpp = formatGGI->size;
-						if (!bpp)
-						{
+						if (!bpp) {
 							bpp = GT_SIZE(modeGGI.graphtype);
 						}
-						rfb = (char *)bufferGGI[frameno]->read +
-						  bytes_per_line *
-						  ((240 * magstep - modeGGI.visible.y) / -2) +
-						  (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
-						fb = (char *)bufferGGI[frameno]->write +
-						  bytes_per_line *
-						  ((240 * magstep - modeGGI.visible.y) / -2) +
-						  (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
+						rfb = (char *)bufferGGI[frameno]->read
+						    + bytes_per_line * ((240 * magstep - modeGGI.visible.y) / -2)
+						    + (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
+						fb = (char *)bufferGGI[frameno]->write
+						   + bytes_per_line * ((240 * magstep - modeGGI.visible.y) / -2)
+						   + (bpp * ((256 * magstep - modeGGI.visible.x) / -2)) / 8;
 						pix_swab = formatGGI->flags & GGI_PF_REVERSE_ENDIAN;
 						lsb_first = formatGGI->flags & GGI_PF_HIGHBIT_RIGHT;
 						bpu = 8;
-						if (formatGGI->depth)
-						{
+						if (formatGGI->depth) {
 							depth = formatGGI->depth;
 						}
 						fbinit();
-						if ((modeGGI.frames > 1) &&
-						    (ggiGetWriteFrame(visualGGI) !=
-						     (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
-						    ggiSetWriteFrame(visualGGI,
-						                     bufferGGI[frameno]->frame))
-						{
+						if ((modeGGI.frames > 1)
+						 && (ggiGetWriteFrame(visualGGI) != (directGGI ? bufferGGI[frameno]->frame : frameno))
+						 && ggiSetWriteFrame(visualGGI, bufferGGI[frameno]->frame)) {
 							ggiClose(visualGGI);
 							ggiExit();
 							fprintf(stderr,
@@ -984,29 +874,23 @@ UpdateDisplayGGI(void)
 							        bufferGGI[frameno]->frame);
 							exit(EXIT_FAILURE);
 						}
-					}
-					else
-					{
+					} else {
 						fprintf(stderr, "GGI: bad directbuffer pointers\n");
 						ggiClose(visualGGI);
 						ggiExit();
 						exit(EXIT_FAILURE);
 					}
 				}
-			}
-			else
-			{
+			} else {
 				ggiPutBox(visualGGI,
 				          (256 * magstep - modeGGI.visible.x) / -2,
 				          (240 * magstep - modeGGI.visible.y) / -2,
 				          256 * magstep, 240 * magstep,
 				          fb);
 				ggiFlush(visualGGI);
-				if ((modeGGI.frames > 1) &&
-				    (ggiGetDisplayFrame(visualGGI) !=
-				     (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
-				    ggiSetDisplayFrame(visualGGI, frameno))
-				{
+				if ((modeGGI.frames > 1)
+				 && (ggiGetDisplayFrame(visualGGI) != (directGGI ? bufferGGI[frameno]->frame : frameno))
+				 && ggiSetDisplayFrame(visualGGI, frameno)) {
 					ggiClose(visualGGI);
 					ggiExit();
 					fprintf(stderr,
@@ -1015,11 +899,9 @@ UpdateDisplayGGI(void)
 					exit(EXIT_FAILURE);
 				}
 				frameno = (frameno + 1) % modeGGI.frames;
-				while ((modeGGI.frames > 1) &&
-				    (ggiGetWriteFrame(visualGGI) !=
-				     (directGGI ? bufferGGI[frameno]->frame : frameno)) &&
-				    ggiSetWriteFrame(visualGGI, frameno))
-				{
+				while ((modeGGI.frames > 1)
+				 && (ggiGetWriteFrame(visualGGI) != (directGGI ? bufferGGI[frameno]->frame : frameno))
+				 && ggiSetWriteFrame(visualGGI, frameno)) {
 					frameno = (frameno + 1) % modeGGI.frames;
 				}
 			}
@@ -1032,8 +914,7 @@ UpdateDisplayGGI(void)
 	redrawall = 0;
 
 	/* Slow down if we're getting ahead */
-	if (frame > timeframe + 1 && frameskip == 0)
-	{
+	if (frame > timeframe + 1 && frameskip == 0) {
 		usleep(16666 * (frame - timeframe - 1));
 	}
 

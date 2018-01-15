@@ -223,12 +223,10 @@ static XImage *shm_image = 0;
 static void
 cleanup_shm(void)
 {
-	if (shminfo.shmid >= 0)
-	{
+	if (shminfo.shmid >= 0) {
 		if (shm_attached)
 			XShmDetach(display, &shminfo);
-		if (shm_image)
-		{
+		if (shm_image) {
 			XDestroyImage(shm_image);
 			shm_image = 0;
 		}
@@ -254,10 +252,8 @@ SaveScreenshotX11(void)
 	int status;
 
 	screenshot_new();
-	if (renderer->_flags & RENDERER_OLD)
-	{
-		if (depth == 1)
-		{
+	if (renderer->_flags & RENDERER_OLD) {
+		if (depth == 1) {
 			int x, y;
 			XImage *im;
 
@@ -265,32 +261,22 @@ SaveScreenshotX11(void)
 			                0, 0,
 			                256 * magstep, 240 * magstep,
 			                ~0, ZPixmap);
-			for (y = 0; y < 240 * magstep; y ++)
-				for (x = 0; x < 256 * magstep; x ++)
+			for (y = 0; y < 240 * magstep; y++)
+				for (x = 0; x < 256 * magstep; x++)
 					XPutPixel(image, x, y, XGetPixel(im, x, y));
-			status =
-			  XpmWriteFileFromImage(display, screenshotfile, image, NULL, NULL);
+			status = XpmWriteFileFromImage(display, screenshotfile, image, NULL, NULL);
+		} else {
+			status = XpmWriteFileFromPixmap(display, screenshotfile, layout, 0, NULL);
 		}
-		else
-		{
-			status =
-			  XpmWriteFileFromPixmap(display, screenshotfile, layout, 0, NULL);
-		}
-	}
-	else
-	{
+	} else {
 		status =
 		  XpmWriteFileFromImage(display, screenshotfile, image, NULL, NULL);
 	}
-	if (status == XpmSuccess)
-	{
-		if (verbose)
-		{
+	if (status == XpmSuccess) {
+		if (verbose) {
 			fprintf(stderr, "Wrote screenshot to %s\n", screenshotfile);
 		}
-	}
-	else
-	{
+	} else {
 		fprintf(stderr, "%s: %s\n", screenshotfile, XpmGetErrorString(status));
 	}
 #else
@@ -303,17 +289,15 @@ static int
 handler(Display *display, XErrorEvent *ev)
 {
 #if HAVE_SHM
-	if (shm_attaching &&
-	    (ev->error_code == BadAccess) &&
-	    /* (ev->request_code == Find_the_request_code_for_MIT_SHM) && */
-	    (ev->minor_code == X_ShmAttach))
-	{
+	if (shm_attaching
+	 && (ev->error_code == BadAccess)
+	/* && (ev->request_code == Find_the_request_code_for_MIT_SHM) */
+	 && (ev->minor_code == X_ShmAttach)) {
 		shm_attached = False;
 		return 0;
 	}
 #endif
-	if (oldhandler)
-	{
+	if (oldhandler) {
 		return oldhandler(display, ev);
 	}
 	return 0;
@@ -334,8 +318,7 @@ InitDisplayX11(int argc, char **argv)
 
 	display = XOpenDisplay(renderer_config.display_id);
 	oldhandler = XSetErrorHandler(handler);
-	if (display == NULL)
-	{
+	if (display == NULL) {
 		fprintf(stderr,
 		        "%s: [%s] Can't open display: %s\n",
 		        argv[0],
@@ -345,8 +328,7 @@ InitDisplayX11(int argc, char **argv)
 	}
 	screen = XDefaultScreen(display);
 #ifdef HAVE_SHM
-	shm_status =
-	  XShmQueryVersion(display, &shm_major, &shm_minor, &shm_pixmaps);
+	shm_status = XShmQueryVersion(display, &shm_major, &shm_minor, &shm_pixmaps);
 #endif /* HAVE_SHM */
 	visual = XDefaultVisual(display, screen);
 	rootwindow = RootWindow(display, screen);
@@ -369,16 +351,14 @@ InitDisplayX11(int argc, char **argv)
 		XPixmapFormatValues *xpfv = XListPixmapFormats(display, &formats);
 
 		for (i = 0; i < formats; i++)
-			if (xpfv[i].depth == depth)
-			{
+			if (xpfv[i].depth == depth) {
 				bpp = xpfv[i].bits_per_pixel;
 				break;
 			}
 	}
 	if ((BYTE_ORDER != BIG_ENDIAN) && (BYTE_ORDER != LITTLE_ENDIAN)
-	    && (bpp == 32)
-	    && !renderer->_flags)
-	{
+	 && (bpp == 32)
+	 && !renderer->_flags) {
 		fprintf(stderr,
 		        "======================================================\n"
 		        "Warning: %s-endian Host Detected\n"
@@ -391,16 +371,13 @@ InitDisplayX11(int argc, char **argv)
 		        (BYTE_ORDER == PDP_ENDIAN) ? "PDP" : "Obscure");
 		fflush(stderr);
 	}
-	if ((renderer->_flags & RENDERER_OLD) && (scanlines && (scanlines != 100)))
-	{
+	if ((renderer->_flags & RENDERER_OLD) && (scanlines && (scanlines != 100))) {
 		fprintf(stderr, "[%s] Scanline intensity is ignored by this renderer\n",
 		        renderer->name);
 		scanlines = 0;
 	}
-	if ((visual->class & 1) && indexedcolor)
-	{
-		if (XAllocColorCells(display, colormap, 0, 0, 0, colortableX11, 25) == 0)
-		{
+	if ((visual->class & 1) && indexedcolor) {
+		if (XAllocColorCells(display, colormap, 0, 0, 0, colortableX11, 25) == 0) {
 			fprintf(stderr, "%s: [%s] Can't allocate colors!\n",
 			        *argv, renderer->name);
 			exit(EXIT_FAILURE);
@@ -410,8 +387,7 @@ InitDisplayX11(int argc, char **argv)
 		color.green = (NES_palette[0] & 0xFF00);
 		color.blue = ((NES_palette[0] & 0xFF) << 8);
 		color.flags = DoRed | DoGreen | DoBlue;
-		for (x = 0; x <= 24; x++)
-		{
+		for (x = 0; x <= 24; x++) {
 			color.pixel = colortableX11[x];
 			if ((renderer->_flags & RENDERER_DIFF) && ((bpp != 8) || (magstep > 1)))
 				palette[x] = x;
@@ -420,27 +396,22 @@ InitDisplayX11(int argc, char **argv)
 			XStoreColor(display, colormap, &color);
 			palette2[x] = BlackPixel(display, screen);
 		}
-		if (scanlines && (scanlines != 100))
-		{
+		if (scanlines && (scanlines != 100)) {
 			fprintf(stderr,
 			        "[%s] Scanline intensity is ignored in indexed-color modes!\n",
 			        renderer->name);
 			scanlines = 0;
 		}
-	}
-	else
-	{
+	} else {
 		indexedcolor = 0;
 		/* convert palette to local color format */
-		for (x = 0; x < 64; x++)
-		{
+		for (x = 0; x < 64; x++) {
 			color.pixel = x;
 			color.red = ((NES_palette[x] & 0xFF0000) >> 8);
 			color.green = (NES_palette[x] & 0xFF00);
 			color.blue = ((NES_palette[x] & 0xFF) << 8);
 			color.flags = DoRed | DoGreen | DoBlue;
-			if (XAllocColor(display, colormap, &color) == 0)
-			{
+			if (XAllocColor(display, colormap, &color) == 0) {
 				fprintf(stderr, "%s: [%s] Can't allocate colors!\n",
 				        *argv, renderer->name);
 				exit(EXIT_FAILURE);
@@ -449,8 +420,7 @@ InitDisplayX11(int argc, char **argv)
 			palette2X11[x] = BlackPixel(display, screen);
 		}
 		if (scanlines && (scanlines != 100))
-			for (x = 0; x < 64; x++)
-			{
+			for (x = 0; x < 64; x++) {
 				unsigned long r, g, b;
 
 				color.pixel = x;
@@ -467,8 +437,7 @@ InitDisplayX11(int argc, char **argv)
 					b = 0xFFFF;
 				color.blue = b;
 				color.flags = DoRed | DoGreen | DoBlue;
-				if (XAllocColor(display, colormap, &color) == 0)
-				{
+				if (XAllocColor(display, colormap, &color) == 0) {
 					fprintf(stderr, "[%s] Can't allocate extra colors!\n",
 					        renderer->name);
 					break;
@@ -492,12 +461,9 @@ InitDisplayX11(int argc, char **argv)
 	geometry_mask = HeightValue | WidthValue;
 	if (renderer_config.geometry)
 		geometry_mask |= XParseGeometry(renderer_config.geometry, &x, &y, &width, &height);
-	if (renderer_config.inroot)
-	{
+	if (renderer_config.inroot) {
 		w = rootwindow;
-	}
-	else
-	{
+	} else {
 		XSetWindowAttributes attrs;
 
 		attrs.backing_store = WhenMapped;
@@ -536,8 +502,7 @@ InitDisplayX11(int argc, char **argv)
 	spritecolor2gc = XCreateGC(display, w, GCFunction, &GCValues);
 	spritecolor3gc = XCreateGC(display, w, GCFunction, &GCValues);
 
-	if (!renderer_config.inroot)
-	{
+	if (!renderer_config.inroot) {
 		/* set aspect ratio */
 		/* sizehints.flags = PMinSize | PMaxSize | PResizeInc | PAspect | PBaseSize; */
 		/*   sizehints.min_width = 256; */
@@ -568,49 +533,31 @@ InitDisplayX11(int argc, char **argv)
 		classhints.res_class = wname[0];
 		classhints.res_name = wname[1];
 		XSetClassHint(display, w, &classhints);
-		if (!XStringListToTextProperty(wname, 1, name))
-		{
+		if (!XStringListToTextProperty(wname, 1, name)) {
 			fprintf(stderr, "[%s] Can't set window name property\n",
 			        renderer->name);
-		}
-		else
-		{
+		} else {
 			XSetWMName(display, w, name);
 		}
-		if (!XStringListToTextProperty(wname + 1, 1, name + 1))
-		{
+		if (!XStringListToTextProperty(wname + 1, 1, name + 1)) {
 			fprintf(stderr, "[%s] Can't set icon name property\n",
 			        renderer->name);
-		}
-		else
-		{
+		} else {
 			XSetWMIconName(display, w, name + 1);
 		}
 	}
 
-	if (renderer->_flags & RENDERER_OLD)
-	{
-		for (x = 0; x < tilecachedepth; x++)
-		{
-			background[x] = XCreatePixmap(display, w,
-			                              512 * maxsize, 480 * maxsize,
-			                              depth);
-			bgplane1[x] = XCreatePixmap(display, w,
-			                            512 * maxsize, 480 * maxsize, 1);
-			bgplane2[x] = XCreatePixmap(display, w,
-			                            512 * maxsize, 480 * maxsize, 1);
-			bgplane3[x] = XCreatePixmap(display, w,
-			                            512 * maxsize, 480 * maxsize, 1);
-			bgmask[x] = XCreatePixmap(display, w,
-			                          512 * maxsize, 480 * maxsize, 1);
-			tilecache1[x] = XCreatePixmap(display, w,
-			                              256 * maxsize, 64 * maxsize, 1);
-			tilecache2[x] = XCreatePixmap(display, w,
-			                              256 * maxsize, 64 * maxsize, 1);
-			tilecache3[x] = XCreatePixmap(display, w,
-			                              256 * maxsize, 64 * maxsize, 1);
-			tilebgmask[x] = XCreatePixmap(display, w,
-			                              256 * maxsize, 64 * maxsize, 1);
+	if (renderer->_flags & RENDERER_OLD) {
+		for (x = 0; x < tilecachedepth; x++) {
+			background[x] = XCreatePixmap(display, w, 512 * maxsize, 480 * maxsize, depth);
+			bgplane1[x] = XCreatePixmap(display, w, 512 * maxsize, 480 * maxsize, 1);
+			bgplane2[x] = XCreatePixmap(display, w, 512 * maxsize, 480 * maxsize, 1);
+			bgplane3[x] = XCreatePixmap(display, w, 512 * maxsize, 480 * maxsize, 1);
+			bgmask[x] = XCreatePixmap(display, w, 512 * maxsize, 480 * maxsize, 1);
+			tilecache1[x] = XCreatePixmap(display, w, 256 * maxsize, 64 * maxsize, 1);
+			tilecache2[x] = XCreatePixmap(display, w, 256 * maxsize, 64 * maxsize, 1);
+			tilecache3[x] = XCreatePixmap(display, w, 256 * maxsize, 64 * maxsize, 1);
+			tilebgmask[x] = XCreatePixmap(display, w, 256 * maxsize, 64 * maxsize, 1);
 		}
 		planegc = XCreateGC(display, tilebgmask[0], 0, 0);
 		XSetForeground(display, planegc, 1);
@@ -642,11 +589,9 @@ InitDisplayX11(int argc, char **argv)
 			tiledirty[y][x] = 1;
 	gettimeofday(&time, NULL);
 	renderer_data.basetime = time.tv_sec;
-	layout =
-	  XCreatePixmap(display, w, 256 * magstep, 240 * magstep, depth);
+	layout = XCreatePixmap(display, w, 256 * magstep, 240 * magstep, depth);
 #ifdef HAVE_SHM
-	if ((shm_status == True) && !(renderer->_flags & RENDERER_OLD))
-	{
+	if ((shm_status == True) && !(renderer->_flags & RENDERER_OLD)) {
 		if (depth == 1)
 			shm_image = XShmCreateImage(display, visual, depth,
 			                         XYBitmap, NULL, &shminfo,
@@ -655,18 +600,14 @@ InitDisplayX11(int argc, char **argv)
 			shm_image = XShmCreateImage(display, visual, depth,
 			                         ZPixmap, NULL, &shminfo,
 			                         256 * magstep, 240 * magstep);
-		if (shm_image)
-		{
+		if (shm_image) {
 			bytes_per_line = shm_image->bytes_per_line;
 			shminfo.shmid = -1;
 			shminfo.shmid = shmget(IPC_PRIVATE, bytes_per_line * shm_image->height,
 			                       IPC_CREAT|0777);
-			if (shminfo.shmid < 0)
-			{
+			if (shminfo.shmid < 0) {
 				perror("shmget");
-			}
-			else
-			{
+			} else {
 				shminfo.shmaddr = 0;
 				switch (fork()) {
 				case -1:
@@ -689,9 +630,8 @@ InitDisplayX11(int argc, char **argv)
 					}
 				}
 				xfb =
-				  shminfo.shmaddr =
-				  shm_image->data =
-				  shmat(shminfo.shmid, 0, 0);
+				shminfo.shmaddr =
+				shm_image->data = shmat(shminfo.shmid, 0, 0);
 				shminfo.readOnly = False;
 				XSync(display, False);
 				shm_attaching = 1;
@@ -704,8 +644,7 @@ InitDisplayX11(int argc, char **argv)
 		}
 	}
 #endif /* HAVE_SHM */
-	if (verbose)
-	{
+	if (verbose) {
 		fprintf(stderr,
 		        "[%s] %s visual, depth %d, %dbpp, %s colors, %s %s\n",
 		        renderer->name,
@@ -721,11 +660,9 @@ InitDisplayX11(int argc, char **argv)
 		        image ? "shared-memory" : "plain",
 		        (renderer->_flags & RENDERER_OLD) ? "Pixmap" : "XImage");
 	}
-	if (!image)
-	{
+	if (!image) {
 		bytes_per_line = 256 / 8 * magstep * bpp;
-		if (!(xfb = malloc(bytes_per_line * 240 * magstep)))
-		{
+		if (!(xfb = malloc(bytes_per_line * 240 * magstep))) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
@@ -738,31 +675,23 @@ InitDisplayX11(int argc, char **argv)
 			                     ZPixmap, 0, xfb, 256 * magstep, 240 * magstep,
 			                     bpp, bytes_per_line);
 	}
-	if (renderer->_flags & RENDERER_DIFF)
-	{
+	if (renderer->_flags & RENDERER_DIFF) {
 		int f;
 
-		for (f = 0; f < ARRAY_LEN(xdfb); f ++)
-		{
-			if ((bpp == 8) && (f == 0) && (bytes_per_line == 256))
-			{
+		for (f = 0; f < ARRAY_LEN(xdfb); f++) {
+			if ((bpp == 8) && (f == 0) && (bytes_per_line == 256)) {
 				xdfb[f] = xfb;
-			}
-			else
-			{
-				if (!(xdfb[f] = malloc((size_t) 256 * 240)))
-				{
+			} else {
+				if (!(xdfb[f] = malloc((size_t)256 * 240))) {
 					perror("malloc");
 					exit(EXIT_FAILURE);
 				}
-				memset((void *) xdfb[f], 64, (size_t) 256 * 240);
+				memset((void *)xdfb[f], 64, (size_t)256 * 240);
 			}
 		}
 		xdfb_frame = 0;
 		rfb = fb = xdfb[xdfb_frame];
-	}
-	else
-	{
+	} else {
 		rfb = fb = xfb;
 	}
 	XFillRectangle(display, w,
@@ -784,8 +713,7 @@ HandleKeyboardX11(XEvent ev)
 
 	/* the coin and dipswitch inputs work only in VS UniSystem mode */
 	if (unisystem)
-		switch (keysym)
-		{
+		switch (keysym) {
 		case XK_bracketleft:
 		case XK_braceleft:
 			ctl_coinslot(0x01, press);
@@ -832,8 +760,7 @@ HandleKeyboardX11(XEvent ev)
 			break;
 		}
 
-	switch (keysym)
-	{
+	switch (keysym) {
 		/* controller 1 keyboard mapping */
 	case XK_Return:
 	case XK_KP_Enter:
@@ -962,8 +889,7 @@ HandleKeyboardX11(XEvent ev)
 
 	/* emulator keys */
 	if (press)
-		switch (keysym)
-		{
+		switch (keysym) {
 		case XK_F1:
 			debug_bgoff = 1;
 			break;
@@ -1092,11 +1018,9 @@ UpdateDisplayX11(void)
 	if (frame < timeframe - 20 && frame % 20 == 0)
 		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
 
-	if (!nodisplay)
-	{
+	if (!nodisplay) {
 		drawimage(PBL);
-		if (!frameskip)
-		{
+		if (!frameskip) {
 			int r, r0;
 			int x, y, c;
 
@@ -1105,24 +1029,20 @@ UpdateDisplayX11(void)
 			y = 0;
 			UpdateColorsX11();
 			/* differential X11 renderer "diff" */
-			if (renderer->_flags & RENDERER_DIFF)
-			{
+			if (renderer->_flags & RENDERER_DIFF) {
 				int next_frame;
 				static int virgin = 1;
 
 				next_frame = (xdfb_frame + 1) % ARRAY_LEN(xdfb);
 				/* This horrible hack checks for updates one scanline at a time. */
 				/* Obviously, that only works well for some programs... */
-				for (y = 0; y < 240; y ++)
-					if (virgin ||
-					    memcmp((void *) fb + (y << 8),
-					           (void *) xdfb[next_frame] + (y << 8),
-					           (size_t) 256))
-					{
-						if ((bpp != 8) || (magstep > 1))
-						{
-							for (x = 0; x < 256; x ++)
-							{
+				for (y = 0; y < 240; y++)
+					if (virgin
+					 || memcmp((void *)fb + (y << 8),
+					           (void *)xdfb[next_frame] + (y << 8),
+					           (size_t)256)) {
+						if ((bpp != 8) || (magstep > 1)) {
+							for (x = 0; x < 256; x++) {
 								int c1, c2;
 
 								c = fb[(y << 8) + x];
@@ -1148,8 +1068,7 @@ UpdateDisplayX11(void)
 										          x * magstep + xxx,
 										          y * magstep,
 										          c1);
-										if (scanlines || virgin)
-										{
+										if (scanlines || virgin) {
 											int yyy;
 
 											for (yyy = 1; yyy < magstep; yyy++)
@@ -1162,27 +1081,22 @@ UpdateDisplayX11(void)
 								}
 							}
 						}
-						else if (xdfb_frame || (bytes_per_line != 256))
-						{
-							memcpy((void *) xfb + y * bytes_per_line,
-							       (void *) xdfb[xdfb_frame] + (y << 8),
-							       (size_t) 256);
+						else if (xdfb_frame || (bytes_per_line != 256)) {
+							memcpy((void *)xfb + y * bytes_per_line,
+							       (void *)xdfb[xdfb_frame] + (y << 8),
+							       (size_t)256);
 						}
-						r ++;
-					}
-					else if (r)
-					{
+						r++;
+					} else if (r) {
 						r0 += r;
 #if HAVE_SHM
-						if (shm_attached)
-						{
+						if (shm_attached) {
 							XShmPutImage(display, w, gc, image, 0, (y - r) * magstep,
 							             (256 * magstep - width) / -2,
 							             ((240 - 2 * (y - r)) * magstep - height) / -2,
 							             256 * magstep, r * magstep,
 							             True);
-						}
-						else
+						} else
 #endif
 						{
 							XPutImage(display, w, gc, image, 0, (y - r) * magstep,
@@ -1195,26 +1109,21 @@ UpdateDisplayX11(void)
 				virgin = 0;
 				xdfb_frame = next_frame;
 				rfb = fb = xdfb[xdfb_frame];
-			}
-			/* new X11 renderer "x11" */
-			else
-			{
+			} else {
+				/* new X11 renderer "x11" */
 				r = 240;
 				y += r;
 			}
-			if (r)
-			{
+			if (r) {
 				r0 += r;
 #if HAVE_SHM
-				if (shm_attached)
-				{
+				if (shm_attached) {
 					XShmPutImage(display, w, gc, image, 0, (y - r) * magstep,
 					             (256 * magstep - width) / -2,
 					             ((240 - 2 * (y - r)) * magstep - height) / -2,
 					             256 * magstep, r * magstep,
 					             True);
-				}
-				else
+				} else
 #endif
 				{
 					XPutImage(display, w, gc, image, 0, (y - r) * magstep,
@@ -1222,16 +1131,12 @@ UpdateDisplayX11(void)
 					          ((240 - 2 * (y - r)) * magstep - height) / -2,
 					          256 * magstep, r * magstep);
 				}
-			}
-			if (r0)
-			{
+			} if (r0) {
 #if HAVE_SHM
-				if (shm_attached)
-				{
+				if (shm_attached) {
 					/* hang the event loop until we get a ShmCompletion */
 					ev.type = -1;
-				}
-				else
+				} else
 #endif
 				{
 					XFlush(display);
@@ -1242,8 +1147,7 @@ UpdateDisplayX11(void)
 	}
 
 	/* Slow down if we're getting ahead */
-	if (frame > timeframe + 1 && frameskip == 0)
-	{
+	if (frame > timeframe + 1 && frameskip == 0) {
 		usleep(16666 * (frame - timeframe - 1));
 	}
 
@@ -1253,8 +1157,7 @@ UpdateDisplayX11(void)
 		js_handle_input();
 
 		/* Handle X input */
-		while (XPending(display) || ev.type == -1)
-		{
+		while (XPending(display) || ev.type == -1) {
 			XNextEvent(display, &ev);
 			/*printf("event %d\n", ev.type); */
 			if (ev.type == DestroyNotify)
@@ -1266,38 +1169,31 @@ UpdateDisplayX11(void)
 			if (ev.type == FocusOut)
 				sleep = desync = 1;
 #endif
-			if (ev.type == MapNotify)
-			{
+			if (ev.type == MapNotify) {
 				XExposeEvent *xev = (XExposeEvent *) &ev;
 
 				xev->type = Expose;
 				xev->count = 0;
 				nodisplay = 0;
 				needsredraw = redrawall = 1;
-			}
-			else if (ev.type == UnmapNotify)
-			{
+			} else if (ev.type == UnmapNotify) {
 				nodisplay = 1;
 				needsredraw = redrawall = 0;
 			}
 			/* Handle keyboard input */
-			if (ev.type == KeyPress || ev.type == KeyRelease)
-			{
+			if (ev.type == KeyPress || ev.type == KeyRelease) {
 				HandleKeyboardX11(ev);
 			}
-			if (ev.type == KeymapNotify)
-			{
+			if (ev.type == KeymapNotify) {
 				memcpy(keystate, ((XKeymapEvent *) & ev)->key_vector, 32);
 				controller[0] = controller[1] = 0;
 				controllerd[0] = controllerd[1] = 0;
 			}
-			if (ev.type == ConfigureNotify)
-			{
+			if (ev.type == ConfigureNotify) {
 				XConfigureEvent *ce = (XConfigureEvent *)&ev;
 
-				if ((ce->width != width) ||
-				    (ce->height != height))
-				{
+				if ((ce->width != width)
+				 || (ce->height != height)) {
 					width = ce->width;
 					height = ce->height;
 					XFillRectangle(display, w,
@@ -1305,15 +1201,12 @@ UpdateDisplayX11(void)
 					               width, height);
 				}
 			}
-			if (ev.type == Expose)
-			{
+			if (ev.type == Expose) {
 				XExposeEvent *xev = (XExposeEvent *) &ev;
 
-				if (!xev->count)
-				{
+				if (!xev->count) {
 #if HAVE_SHM
-					if (shm_attached)
-					{
+					if (shm_attached) {
 						XShmPutImage(display, w, gc, image, 0, 0,
 						             (256 * magstep - width) / -2,
 						             (240 * magstep - height) / -2,
@@ -1321,8 +1214,7 @@ UpdateDisplayX11(void)
 						             True);
 						/* hang the event loop until we get a ShmCompletion */
 						ev.type = -1;
-					}
-					else
+					} else
 #endif
 					{
 						XPutImage(display, w, gc, image, 0, 0,
@@ -1333,8 +1225,7 @@ UpdateDisplayX11(void)
 					}
 				}
 			}
-			if ((sleep || renderer_data.pause_display) && needsredraw)
-			{
+			if ((sleep || renderer_data.pause_display) && needsredraw) {
 				XCopyArea(display, layout, w, gc,
 				          0, 0,
 				          256 * magstep, 240 * magstep,
@@ -1409,10 +1300,8 @@ UpdateDisplayOldX11(void)
 	if (frame < timeframe - 20 && frame % 20 == 0)
 		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
 
-	if (!nodisplay)
-	{
-		if (frame >= timeframe || frame % 20 == 0)
-		{
+	if (!nodisplay) {
+		if (frame >= timeframe || frame % 20 == 0) {
 			/* If mode settings are different, force a redraw. */
 			DiffUpdateOldX11();
 
@@ -1429,8 +1318,7 @@ UpdateDisplayOldX11(void)
 	}
 
 	/* Slow down if we're getting ahead */
-	if (frame > timeframe + 1)
-	{
+	if (frame > timeframe + 1) {
 		usleep(16666 * (frame - timeframe - 1));
 	}
 
@@ -1440,8 +1328,7 @@ UpdateDisplayOldX11(void)
 		js_handle_input();
 
 		/* Handle X input */
-		while (XPending(display) || ev.type == -1)
-		{
+		while (XPending(display) || ev.type == -1) {
 			XNextEvent(display, &ev);
 			/*printf("event %d\n", ev.type); */
 			if (ev.type == DestroyNotify)
@@ -1462,23 +1349,19 @@ UpdateDisplayOldX11(void)
 			}
 
 			/* Handle keyboard input */
-			if (ev.type == KeyPress || ev.type == KeyRelease)
-			{
+			if (ev.type == KeyPress || ev.type == KeyRelease) {
 				HandleKeyboardX11(ev);
 			}
-			if (ev.type == KeymapNotify)
-			{
+			if (ev.type == KeymapNotify) {
 				memcpy(keystate, ((XKeymapEvent *) & ev)->key_vector, 32);
 				controller[0] = controller[1] = 0;
 				controllerd[0] = controllerd[1] = 0;
 			}
-			if (ev.type == ConfigureNotify)
-			{
+			if (ev.type == ConfigureNotify) {
 				XConfigureEvent *ce = (XConfigureEvent *)&ev;
 
-				if ((ce->width != width) ||
-				    (ce->height != height))
-				{
+				if ((ce->width != width)
+				 || (ce->height != height)) {
 					width = ce->width;
 					height = ce->height;
 					XFillRectangle(display, w,
@@ -1488,8 +1371,7 @@ UpdateDisplayOldX11(void)
 			}
 			if (ev.type == Expose)
 				needsredraw = 1;
-			if ((sleep || renderer_data.pause_display) && needsredraw)
-			{
+			if ((sleep || renderer_data.pause_display) && needsredraw) {
 				XCopyArea(display, layout, w, gc,
 				          0, 0,
 				          256 * magstep, 240 * magstep,
@@ -1500,8 +1382,7 @@ UpdateDisplayOldX11(void)
 		}
 	} while (sleep || renderer_data.pause_display);
 
-	if (needsredraw)
-	{
+	if (needsredraw) {
 		XCopyArea(display, layout, w, gc,
 		          0, 0,
 		          256 * magstep, 240 * magstep,
@@ -1551,13 +1432,11 @@ DoBackgroundOldX11(void)
 	bgplane = bgmask[currentcache];
 
 	/* Go thru all rows and render any exposed tiles */
-	for (y = 0; y < 60; y += 2)
-	{
+	for (y = 0; y < 60; y += 2) {
 		c = ((tileline_end[y] - tileline_begin[y]) >> 4);
 		if (c < 0)
 			c = 0;
-		else if (c < 16)
-		{
+		else if (c < 16) {
 			fprintf(stderr, "Error: Short scanline!\n");
 			exit(EXIT_FAILURE);
 		}                       /* Sanity check */
@@ -1565,46 +1444,33 @@ DoBackgroundOldX11(void)
 			c = 32;
 		else if (tileline_end[y] & 15)
 			c++;
-		for (x = h = (tileline_begin[y] >> 3) & 62; c--; x = (x + 2) & 62)
-		{
+		for (x = h = (tileline_begin[y] >> 3) & 62; c--; x = (x + 2) & 62) {
 			if (h > 63)
 				exit(EXIT_FAILURE);  /* shouldn't happen */
 			v = y;
 
 			/* Colors are assigned to a group of four tiles, so we use
 			   "groupptr" to point to this group. */
-			if (nomirror)
-			{
-				vramgroupptr = VRAM + 0x2000 + ((x & 32) << 5) + ((v & ~1) %
-				                    30) * 32 + (x & 30) + (0x800 * (v >= 30));
+			if (nomirror) {
+				vramgroupptr = VRAM + 0x2000 + ((x & 32) << 5) + ((v & ~1) % 30) * 32 + (x & 30) + (0x800 * (v >= 30));
 				colorptr = VRAM + 0x23C0 + ((x & 32) << 5) + ((v % 30) & 28) *
 				  2 + ((x & 28) >> 2) + (0x800 * (v >= 30));
-			}
-			else if (hvmirror == 0)
-			{
-				vramgroupptr = VRAM + 0x2000 + ((x & 32) << 5) + ((v & ~1) %
-				                                          30) * 32 + (x & 30);
-				colorptr = VRAM + 0x23C0 + ((x & 32) << 5) + ((v % 30) & 28) *
-				  2 + ((x & 28) >> 2);
-			}
-			else
-			{
-				vramgroupptr = VRAM + ((0x2000 + ((v & ~1) % 30) * 32 + (x &
-				                                  30)) ^ (0x400 * (v >= 30)));
-				colorptr = VRAM + ((0x23C0 + ((v % 30) & 28) * 2 + ((x & 28)
-				                                                    >> 2)) ^
-				                   (0x400 * (v >= 30)));
+			} else if (hvmirror == 0) {
+				vramgroupptr = VRAM + 0x2000 + ((x & 32) << 5) + ((v & ~1) % 30) * 32 + (x & 30);
+				colorptr = VRAM + 0x23C0 + ((x & 32) << 5) + ((v % 30) & 28) * 2 + ((x & 28) >> 2);
+			} else {
+				vramgroupptr = VRAM + ((0x2000 + ((v & ~1) % 30) * 32 + (x & 30)) ^ (0x400 * (v >= 30)));
+				colorptr = VRAM + ((0x23C0 + ((v % 30) & 28) * 2 + ((x & 28) >> 2)) ^ (0x400 * (v >= 30)));
 			}
 			cachegroupptr = ntcache[currentcache] + (v & ~1) * 64 + (x & ~1);
 			tilecolor = ((*colorptr) >> ((((v % 30) & 2) << 1) | (x & 2))) & 3;
 
 			if (tilecolor != displaycolorcache[currentcache][(v & ~1) * 32 +
-			                                                 (x >> 1)])
-			{
+			                                                 (x >> 1)]) {
 				displaycachevalid[currentcache][(v & ~1) * 64 + (x & ~1)] =
-				  displaycachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
-				  displaycachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
-				  displaycachevalid[currentcache][(v | 1) * 64 + (x | 1)] = 0;
+				displaycachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
+				displaycachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
+				displaycachevalid[currentcache][(v | 1) * 64 + (x | 1)] = 0;
 			}
 
 			/* When a new tile is exposed, first check to see if it's already
@@ -1613,20 +1479,18 @@ DoBackgroundOldX11(void)
 			   the bitplanes and colormaps.  Since a group of 4 tiles share the
 			   same colormap, we do all four at once to keep things simpler. */
 
-			if ((!displaycachevalid[currentcache][v * 64 + x]) ||
-			    cachegroupptr[0] != vramgroupptr[0] ||
-			    cachegroupptr[1] != vramgroupptr[1] ||
-			    cachegroupptr[64] != vramgroupptr[32] ||
-			    cachegroupptr[65] != vramgroupptr[33])
-			{
+			if ((!displaycachevalid[currentcache][v * 64 + x])
+			 || cachegroupptr[0] != vramgroupptr[0]
+			 || cachegroupptr[1] != vramgroupptr[1]
+			 || cachegroupptr[64] != vramgroupptr[32]
+			 || cachegroupptr[65] != vramgroupptr[33]) {
 				/* This only checks tiles in the same row.  The efficiency could be
 				   improved by copying larger areas at once when possible. */
 				for (z = 0; z < 64; z += 2)
 					if (displaytilecache[currentcache][(v & ~1) * 32 + (z >> 1)]
 					    == ((vramgroupptr[0] << 24) | (vramgroupptr[1] << 16) |
 					        (vramgroupptr[32] << 8) | (vramgroupptr[33]))
-					    && displaycolorcache[currentcache][(v & ~1) * 32 + (z >>
-					                                            1)] == tilecolor
+					    && displaycolorcache[currentcache][(v & ~1) * 32 + (z >> 1)] == tilecolor
 					    && displaycachevalid[currentcache][(v & ~1) * 64 + z]
 					    && displaycachevalid[currentcache][(v & ~1) * 64 + z + 1]
 					    && displaycachevalid[currentcache][(v | 1) * 64 + z]
@@ -1634,28 +1498,21 @@ DoBackgroundOldX11(void)
 					    && z != (x & ~1))
 						break;
 
-				if (z < 64)
-				{
+				if (z < 64) {
 					count++;      /* For profiling/debugging */
 					XCopyArea(display, background[currentcache],
 					          background[currentcache], gc, z * 8 * magstep,
 					          (v & ~1) * 8 * magstep, 16 * magstep, 16 *
 					 magstep, (x & ~1) * 8 * magstep, (v & ~1) * 8 * magstep);
 					/* If only the color attributes changed, then the bitmaps do not need to be redrawn */
-					if (cachegroupptr[0] != vramgroupptr[0] ||
-					    cachegroupptr[1] != vramgroupptr[1] ||
-					    cachegroupptr[64] != vramgroupptr[32] ||
-					    cachegroupptr[65] != vramgroupptr[33] ||
-					    (!bitplanecachevalid[currentcache][(v & ~1) * 64 + (x
-					                                                        &
-					                                                  ~1)]) ||
-					    (!bitplanecachevalid[currentcache][(v | 1) * 64 + (x |
-					                                                   1)]) ||
-					    (!bitplanecachevalid[currentcache][(v & ~1) * 64 + (x
-					                                                        &
-					                                                  ~1)]) ||
-					    (!bitplanecachevalid[currentcache][(v | 1) * 64 + (x | 1)]))
-					{
+					if (cachegroupptr[0] != vramgroupptr[0]
+					 || cachegroupptr[1] != vramgroupptr[1]
+					 || cachegroupptr[64] != vramgroupptr[32]
+					 || cachegroupptr[65] != vramgroupptr[33]
+					 || (!bitplanecachevalid[currentcache][(v & ~1) * 64 + (x & ~1)])
+					 || (!bitplanecachevalid[currentcache][(v | 1) * 64 + (x | 1)])
+					 || (!bitplanecachevalid[currentcache][(v & ~1) * 64 + (x & ~1)])
+					 || (!bitplanecachevalid[currentcache][(v | 1) * 64 + (x | 1)])) {
 						XCopyArea(display, plane1, plane1, planegc,
 						          z * 8 * magstep, (v & ~1) * 8 * magstep,
 						          16 * magstep, 16 * magstep,
@@ -1673,24 +1530,16 @@ DoBackgroundOldX11(void)
 						          16 * magstep, 16 * magstep,
 						          (x & ~1) * 8 * magstep, (v & ~1) * 8 * magstep);
 						bgmask_changed[currentcache] = 1;
-						bitplanecachevalid[currentcache][(v & ~1) * 64 + (x &
-						                                                ~1)] =
-						  bitplanecachevalid[currentcache][(v & ~1) * 64 + (x
-						                                                    |
-						                                                 1)] =
-						  bitplanecachevalid[currentcache][(v | 1) * 64 + (x &
-						                                                ~1)] =
-						  bitplanecachevalid[currentcache][(v | 1) * 64 + (x |
-						                                              1)] = 1;
+						bitplanecachevalid[currentcache][(v & ~1) * 64 + (x & ~1)] =
+						bitplanecachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
+						bitplanecachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
+						bitplanecachevalid[currentcache][(v | 1) * 64 + (x | 1)] = 1;
 					}
 					displaycachevalid[currentcache][(v & ~1) * 64 + (x & ~1)] =
-					  displaycachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
-					  displaycachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
-					  displaycachevalid[currentcache][(v | 1) * 64 + (x | 1)]
-					  = 1;
-				}
-				else
-				{
+					displaycachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
+					displaycachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
+					displaycachevalid[currentcache][(v | 1) * 64 + (x | 1)] = 1;
+				} else {
 					/* Assemble a group of 4 tiles from the respective bitplanes */
 					count++;      /* For profiling/debugging */
 
@@ -1767,63 +1616,51 @@ DoBackgroundOldX11(void)
 					          8 * magstep, 8 * magstep, (x + 1) * 8 * magstep, (v + 1) * 8 * magstep);
 
 					bgmask_changed[currentcache] = 1;
-					if (indexedcolor)
-					{
+					if (indexedcolor) {
 						color1 = colortableX11[tilecolor * 3];
 						color2 = colortableX11[tilecolor * 3 + 1];
 						color3 = colortableX11[tilecolor * 3 + 2];
-					}
-					else
-					{
-						color1 =
-						  paletteX11[VRAM[0x3f01 + (tilecolor << 2)] & 63];
-						color2 =
-						  paletteX11[VRAM[0x3f02 + (tilecolor << 2)] & 63];
-						color3 =
-						  paletteX11[VRAM[0x3f03 + (tilecolor << 2)] & 63];
+					} else {
+						color1 = paletteX11[VRAM[0x3f01 + (tilecolor << 2)] & 63];
+						color2 = paletteX11[VRAM[0x3f02 + (tilecolor << 2)] & 63];
+						color3 = paletteX11[VRAM[0x3f03 + (tilecolor << 2)] & 63];
 					}
 					XFillRectangle(display, background[currentcache],
 					               blackgc, x * 8 * magstep, v * 8 * magstep,
 					               16 * magstep, 16 * magstep);
 
-					if (color1 != 0)
-					{
+					if (color1 != 0) {
 						XSetBackground(display, color1gc, black);
 						XSetForeground(display, color1gc, color1);
-						XCopyPlane(display, plane1, background[currentcache],
-						           color1gc, x * 8 * magstep, v * 8 *
-						           magstep, 16 * magstep, 16 * magstep, x * 8
-						           * magstep, v * 8 * magstep, 1);
+						XCopyPlane(display, plane1, background[currentcache], color1gc,
+						           x * 8 * magstep, v * 8 * magstep,
+						           16 * magstep, 16 * magstep,
+						           x * 8 * magstep, v * 8 * magstep, 1);
 					}
-					if (color2 != 0)
-					{
+					if (color2 != 0) {
 						XSetBackground(display, color2gc, black);
 						XSetForeground(display, color2gc, color2);
-						XCopyPlane(display, plane2, background[currentcache],
-						           color2gc, x * 8 * magstep, v * 8 *
-						           magstep, 16 * magstep, 16 * magstep, x * 8
-						           * magstep, v * 8 * magstep, 1);
+						XCopyPlane(display, plane2, background[currentcache], color2gc,
+						           x * 8 * magstep, v * 8 * magstep,
+						           16 * magstep, 16 * magstep,
+						           x * 8 * magstep, v * 8 * magstep, 1);
 					}
-					if (color3 != 0)
-					{
+					if (color3 != 0) {
 						XSetBackground(display, color3gc, black);
 						XSetForeground(display, color3gc, color3);
-						XCopyPlane(display, plane3, background[currentcache],
-						           color3gc, x * 8 * magstep, v * 8 *
-						           magstep, 16 * magstep, 16 * magstep, x * 8
-						           * magstep, v * 8 * magstep, 1);
+						XCopyPlane(display, plane3, background[currentcache], color3gc,
+						           x * 8 * magstep, v * 8 * magstep,
+						           16 * magstep, 16 * magstep,
+						           x * 8 * magstep, v * 8 * magstep, 1);
 					}
-					XCopyPlane(display, bgplane, background[currentcache],
-					           bgcolorgc,
+					XCopyPlane(display, bgplane, background[currentcache], bgcolorgc,
 					           x * 8 * magstep, v * 8 * magstep,
 					           16 * magstep, 16 * magstep,
 					           x * 8 * magstep, v * 8 * magstep, 1);
-					if ((scanlines != 100) && (magstep > 1))
-					{
+					if ((scanlines != 100) && (magstep > 1)) {
 						int y;
 
-						for (y = 0; y < 16; y ++)
-						{
+						for (y = 0; y < 16; y++) {
 							XFillRectangle(display, background[currentcache],
 							               blackgc,
 							               x * 8 * magstep,
@@ -1833,17 +1670,13 @@ DoBackgroundOldX11(void)
 						}
 					}
 					bitplanecachevalid[currentcache][(v & ~1) * 64 + (x & ~1)] =
-					  bitplanecachevalid[currentcache][(v & ~1) * 64 + (x |
-					                                                    1)] =
-					  bitplanecachevalid[currentcache][(v | 1) * 64 + (x &
-					                                                   ~1)] =
-					  bitplanecachevalid[currentcache][(v | 1) * 64 + (x | 1)]
-					  = 1;
+					bitplanecachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
+					bitplanecachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
+					bitplanecachevalid[currentcache][(v | 1) * 64 + (x | 1)] = 1;
 					displaycachevalid[currentcache][(v & ~1) * 64 + (x & ~1)] =
-					  displaycachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
-					  displaycachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
-					  displaycachevalid[currentcache][(v | 1) * 64 + (x | 1)]
-					  = 1;
+					displaycachevalid[currentcache][(v & ~1) * 64 + (x | 1)] =
+					displaycachevalid[currentcache][(v | 1) * 64 + (x & ~1)] =
+					displaycachevalid[currentcache][(v | 1) * 64 + (x | 1)] = 1;
 				}
 				cachegroupptr[0] = vramgroupptr[0];
 				cachegroupptr[1] = vramgroupptr[1];
@@ -1852,21 +1685,11 @@ DoBackgroundOldX11(void)
 				redrawbackground = 1;
 				redrawall = 1;
 				displaytilecache[currentcache][(v & ~1) * 32 + (x >> 1)] =
-				  ((cachegroupptr[0]
-				    <<
-				    24)
-				   |
-				   (cachegroupptr[1]
-				    <<
-				    16)
-				   |
-				   (cachegroupptr[64]
-				    <<
-				    8)
-				   |
+				  ((cachegroupptr[0] << 24) |
+				   (cachegroupptr[1] << 16) |
+				   (cachegroupptr[64] << 8) |
 				   (cachegroupptr[65]));
-				displaycolorcache[currentcache][(v & ~1) * 32 + (x >> 1)] =
-				  tilecolor;
+				displaycolorcache[currentcache][(v & ~1) * 32 + (x >> 1)] = tilecolor;
 			}
 		}
 	}
@@ -1887,8 +1710,7 @@ UpdateTilesOldX11(void)
 	int hlastchange = 0;
 	/*unsigned char transparent, opaque; */
 	unsigned char *vramptr;
-	int baseaddr = ((linereg[currentline] & 0x10) << 8) ^ (debug_switchtable
-                                                         << 12);        /* 0 or 0x1000 */
+	int baseaddr = ((linereg[currentline] & 0x10) << 8) ^ (debug_switchtable << 12);        /* 0 or 0x1000 */
 
 	static int count = 0;
 	/* This can be used to skip frames for testing purposes */
@@ -1900,43 +1722,26 @@ UpdateTilesOldX11(void)
 	   hence the use of multiple caches.  The size of the cache is defined
 	   by tilecachedepth. */
 
-	for (x = 0; x < 256; x++)
-	{
-		if ((((long long *) (VRAM + baseaddr))[x * 2] != ((long long *)
-		                                          (vramcache[currentcache]))[x
-		                                                                     *
-		                                                                2]) ||
-		    (((long long *) (VRAM + 8 + baseaddr))[x * 2] != ((long long *)
-		                                              (vramcache[currentcache]
-		                                               + 8))[x * 2]))
+	for (x = 0; x < 256; x++) {
+		if ((((long long *)(VRAM + baseaddr))[x * 2] != ((long long *)(vramcache[currentcache]))[x * 2])
+		 || (((long long *)(VRAM + 8 + baseaddr))[x * 2] != ((long long *)(vramcache[currentcache] + 8))[x * 2]))
 			break;
 	}
-	if (x < 256)
-	{
-		for (y = (currentcache + 1) % tilecachedepth; y != (currentcache +
-		                                                    tilecachedepth -
-		                    1) % tilecachedepth; y = (y + 1) % tilecachedepth)
-		{
-			for (x = 0; x < 256 && (
-			                         (((long long *) (VRAM + baseaddr))[x * 2]
-			                          == ((long long *) (vramcache[y]))[x *
-			                                                            2]) &&
-			                         (((long long *) (VRAM + 8 + baseaddr))[x
-			                                                                *
-			                              2] == ((long long *) (vramcache[y] +
-			                                                    8))[x
-			                                                        * 2])
-			     ); x++)
-			{
-			}
-			if (x == 256)
-			{
+	if (x < 256) {
+		for (y = (currentcache + 1) % tilecachedepth;
+		     y != (currentcache + tilecachedepth - 1) % tilecachedepth;
+		     y = (y + 1) % tilecachedepth) {
+			for (x = 0;
+			     x < 256
+			  && ((((long long *)(VRAM + baseaddr))[x * 2] == ((long long *)(vramcache[y]))[x * 2])
+			   && (((long long *)(VRAM + 8 + baseaddr))[x * 2] == ((long long *)(vramcache[y] + 8))[x * 2]));
+			     x++);
+			if (x == 256) {
 				currentcache = y;
 				break;
 			}
 		}
-		if (x < 256)
-		{
+		if (x < 256) {
 			/* When the cache is full, a cache entry must be overwritten to
 			   make room for a new one.  Copy the current image to the new
 			   cache entry. */
@@ -1947,10 +1752,10 @@ UpdateTilesOldX11(void)
 				tiledirty[nextcache][x] = tiledirty[currentcache][x];
 			bgcolor[nextcache] = bgcolor[currentcache];
 			bgmask_changed[nextcache] =
-			  tilebgmask_changed[nextcache] =
-			  tilemask1_changed[nextcache] =
-			  tilemask2_changed[nextcache] =
-			  tilemask3_changed[nextcache] = 1;
+			tilebgmask_changed[nextcache] =
+			tilemask1_changed[nextcache] =
+			tilemask2_changed[nextcache] =
+			tilemask3_changed[nextcache] = 1;
 			memcpy(ntcache[nextcache], ntcache[currentcache],
 			       sizeof(ntcache[nextcache]));
 			memcpy(vramcache[nextcache], vramcache[currentcache],
@@ -2002,28 +1807,15 @@ UpdateTilesOldX11(void)
 	   graphics for that tile. */
 
 	for (x = 0; x < 256; x++)
-		if ((((long long *) (VRAM + baseaddr))[x * 2] != ((long long *)
-		                                            (vramcache[currentcache]))[x
-		                                                                       *
-		                                                                  2]) ||
-		    (((long long *) (VRAM + 8 + baseaddr))[x * 2] != ((long long *)
-		                                                (vramcache[currentcache]
-		                                                 + 8))[x * 2]))
-		{
+		if ((((long long *)(VRAM + baseaddr))[x * 2] != ((long long *)(vramcache[currentcache]))[x * 2])
+		 || (((long long *)(VRAM + 8 + baseaddr))[x * 2] != ((long long *)(vramcache[currentcache] + 8))[x * 2])) {
 			tiledirty[currentcache][x] = 1;
-			((long long *) (vramcache[currentcache]))[x * 2] = ((long long *)
-			                                                    (VRAM +
-			                                                  baseaddr))[x * 2];
-			((long long *) (vramcache[currentcache] + 8))[x * 2] = ((long long
-			                                                         *) (VRAM + 8
-			                                                             +
-			                                                  baseaddr))[x * 2];
+			((long long *)(vramcache[currentcache]))[x * 2] = ((long long *)(VRAM + baseaddr))[x * 2];
+			((long long *)(vramcache[currentcache] + 8))[x * 2] = ((long long *)(VRAM + 8 + baseaddr))[x * 2];
 		}
 
-	for (x = 0; x < 256; x++)
-	{
-		if (tiledirty[currentcache][x])
-		{
+	for (x = 0; x < 256; x++) {
+		if (tiledirty[currentcache][x]) {
 			v = ((x & 7) << 3);
 			h = (x & 0xf8);
 			if (h < hfirstchange)
@@ -2039,13 +1831,10 @@ UpdateTilesOldX11(void)
 				exit(EXIT_FAILURE);  /* sanity check - this should not happen! */
 		}
 	}
-	for (h = hfirstchange; h <= hlastchange; h += 8)
-	{
-		for (v = vfirstchange; v <= vlastchange; v += 8)
-		{
+	for (h = hfirstchange; h <= hlastchange; h += 8) {
+		for (v = vfirstchange; v <= vlastchange; v += 8) {
 			x = h | ((v >> 3) & 7);
-			for (l = 0; l < 8; l++)
-			{
+			for (l = 0; l < 8; l++) {
 				int xo, yo;
 				int c;
 
@@ -2055,8 +1844,7 @@ UpdateTilesOldX11(void)
 					for (yo = 0;
 					     yo < ((scanlines == 100) ? magstep : 1);
 					     yo++)
-						for (xo = 0; xo < magstep; xo++)
-						{
+						for (xo = 0; xo < magstep; xo++) {
 							XPutPixel(tilebitimage,
 							          (h + n) * magstep + xo,
 							          (v + l) * magstep + yo,
@@ -2072,12 +1860,11 @@ UpdateTilesOldX11(void)
 		}
 	}
 
-	if (hfirstchange <= hlastchange)
-	{
+	if (hfirstchange <= hlastchange) {
 		tilebgmask_changed[currentcache] =
-		  tilemask1_changed[currentcache] =
-		  tilemask2_changed[currentcache] =
-		  tilemask3_changed[currentcache] = 1;
+		tilemask1_changed[currentcache] =
+		tilemask2_changed[currentcache] =
+		tilemask3_changed[currentcache] = 1;
 		/* debug */
 		/*printf("UpdateTilesOldX11: h=%d-%d (%d) v=%d-%d (%d),\n", hfirstchange, hlastchange, hlastchange-hfirstchange+8, vfirstchange, vlastchange, vlastchange-vfirstchange+8); */
 		XPutImage(display, tilecache1[currentcache], planegc, tilebitimage,
@@ -2130,22 +1917,16 @@ UpdateTilesOldX11(void)
 		          (vlastchange - vfirstchange + 8) * magstep,
 		          hfirstchange * magstep, vfirstchange * magstep);
 		/* Invalidate the cache */
-		for (y = 0; y < 60; y++)
-		{
-			for (x = 0; x < 63; x++)
-			{
-				if (hvmirror == 0)
-				{
+		for (y = 0; y < 60; y++) {
+			for (x = 0; x < 63; x++) {
+				if (hvmirror == 0) {
 					vramptr = VRAM + 0x2000 + ((x & 32) << 5) + (y % 30) * 32
 					  + 0x400 * (y >= 30) + (x & 31);
-				}
-				else
-				{
+				} else {
 					vramptr = VRAM + ((0x2000 + (y % 30) * 32 + (x & 31)) ^
 					                  (0x400 * (y >= 30)));
 				}
-				if (tilechanged[*vramptr])
-				{
+				if (tilechanged[*vramptr]) {
 					displaycachevalid[currentcache][y * 64 + x] = 0;
 					bitplanecachevalid[currentcache][y * 64 + x] = 0;
 					tilechanged[*vramptr] = 0;
@@ -2164,20 +1945,17 @@ LayoutBackgroundOldX11(void)
 	unsigned int last;
 	static int linecache[240];
 
-	if ((!screen_on) || debug_bgoff)
-	{
+	if ((!screen_on) || debug_bgoff) {
 		if (redrawbackground == 0)
 			return;
 		XFillRectangle(display, layout,
 		               solidbggc,
 		               0, 0,
 		               256 * magstep, 240 * magstep);
-		if ((scanlines != 100) && (magstep > 1))
-		{
+		if ((scanlines != 100) && (magstep > 1)) {
 			int y;
 
-			for (y = 0; y < 240; y ++)
-			{
+			for (y = 0; y < 240; y++) {
 				XFillRectangle(display, layout,
 				               blackgc,
 				               0, y * magstep + 1,
@@ -2186,9 +1964,7 @@ LayoutBackgroundOldX11(void)
 		}
 		needsredraw = 1;
 		return;
-	}
-	else
-	{
+	} else {
 		currentline = 0;
 		UpdateTilesOldX11();
 		if (!indexedcolor)
@@ -2199,16 +1975,16 @@ LayoutBackgroundOldX11(void)
 	}
 
 	last = linereg[0] & 0x10;
-	for (y = 0; y < 240; y++)
-	{
+	for (y = 0; y < 240; y++) {
 		z = y + 1;
-		while (hscroll[y] == hscroll[z] && vscroll[y] == vscroll[z] && z < 240
+		while (hscroll[y] == hscroll[z]
+		    && vscroll[y] == vscroll[z]
+		    && z < 240
 		    && (linereg[y] & 0x10) == (linereg[z] & 0x10)
 		    && (redrawall || scanline_diff[y] == scanline_diff[z]))
 			z++;
 
-		if (y != 0 && (linereg[y] & 0x10) != last)
-		{
+		if (y != 0 && (linereg[y] & 0x10) != last) {
 			currentline = y;
 			last = linereg[y] & 0x10;
 			UpdateTilesOldX11();
@@ -2221,121 +1997,86 @@ LayoutBackgroundOldX11(void)
 			if (linecache[y] != currentcache)
 				redrawall = 1;
 
-		if (scanline_diff[y] || redrawall)
-		{
+		if (scanline_diff[y] || redrawall) {
 			for (x = y; x < z; x++)
 				linecache[y] = currentcache;
 
-			if (!osmirror)
-			{
+			if (!osmirror) {
 				if (vscroll[y] + z <= 480 || vscroll[y] + y >= 480)
-					if (hscroll[y] <= 256)
-					{
-						XCopyArea(display, background[currentcache], layout,
-						          gc, hscroll[y] * magstep, ((vscroll[y] + y) %
-						               480) * magstep, 256 * magstep, (z - y) *
-						          magstep, 0, y * magstep);
+					if (hscroll[y] <= 256) {
+						XCopyArea(display, background[currentcache], layout, gc,
+						          hscroll[y] * magstep, ((vscroll[y] + y) % 480) * magstep,
+						          256 * magstep, (z - y) * magstep,
+						          0, y * magstep);
+					} else {
+						XCopyArea(display, background[currentcache], layout, gc,
+						          hscroll[y] * magstep, ((vscroll[y] + y) % 480) * magstep,
+						          (512 - hscroll[y]) * magstep, (z - y) * magstep,
+						          0, y * magstep);
+						XCopyArea(display, background[currentcache], layout, gc,
+						          0, ((vscroll[y] + y) % 480) * magstep,
+						          (hscroll[y] - 256) * magstep, (z - y) * magstep,
+						          (512 - hscroll[y]) * magstep, y * magstep);
 					}
-					else
-					{
-						XCopyArea(display, background[currentcache], layout,
-						          gc, hscroll[y] * magstep, ((vscroll[y] + y) %
-						          480) * magstep, (512 - hscroll[y]) * magstep,
-						          (z - y) * magstep, 0, y * magstep);
-						XCopyArea(display, background[currentcache], layout,
-						          gc, 0, ((vscroll[y] + y) % 480) * magstep,
-						          (hscroll[y] - 256) * magstep, (z - y) *
-						    magstep, (512 - hscroll[y]) * magstep, y * magstep);
-					}
-				else if (hscroll[y] <= 256)
-				{
+				else if (hscroll[y] <= 256) {
 					XCopyArea(display, background[currentcache], layout, gc,
-					          hscroll[y] * magstep, (vscroll[y] + y) *
-					          magstep, 256 * magstep, (480 - vscroll[y] - y)
-					          * magstep, 0, y * magstep);
+					          hscroll[y] * magstep, (vscroll[y] + y) * magstep,
+					          256 * magstep, (480 - vscroll[y] - y) * magstep,
+					          0, y * magstep);
 					XCopyArea(display, background[currentcache], layout, gc,
-					          hscroll[y] * magstep, 0, 256 * magstep,
-					          (vscroll[y] + z - 480) * magstep, 0, (480 -
-					                                              vscroll[y])
-					          * magstep);
+					          hscroll[y] * magstep, 0,
+					          256 * magstep, (vscroll[y] + z - 480) * magstep,
+					          0, (480 - vscroll[y]) * magstep);
+				} else {
+					XCopyArea(display, background[currentcache], layout, gc,
+					          hscroll[y] * magstep, (vscroll[y] + y) * magstep,
+					          (512 - hscroll[y]) * magstep, (480 - vscroll[y] - y) * magstep,
+					          0, y * magstep);
+					XCopyArea(display, background[currentcache], layout, gc,
+					          hscroll[y] * magstep, 0,
+					          (512 - hscroll[y]) * magstep, (vscroll[y] + z - 480) * magstep,
+					          0, (480 - vscroll[y]) * magstep);
+					XCopyArea(display, background[currentcache], layout, gc,
+					          0, (vscroll[y] + y) * magstep,
+					          (hscroll[y] - 256) * magstep, (480 - vscroll[y] - y) * magstep,
+					          (512 - hscroll[y]) * magstep, y * magstep);
+					XCopyArea(display, background[currentcache], layout, gc,
+					          0, 0,
+					          (hscroll[y] - 256) * magstep, (vscroll[y] + z - 480) * magstep,
+					          (512 - hscroll[y]) * magstep, (480 - vscroll[y]) * magstep);
 				}
-				else
-				{
-					XCopyArea(display, background[currentcache], layout, gc,
-					          hscroll[y] * magstep, (vscroll[y] + y) *
-					          magstep, (512 - hscroll[y]) * magstep, (480 -
-					                                               vscroll[y]
-					                                                  - y) *
-					          magstep, 0, y * magstep);
-					XCopyArea(display, background[currentcache], layout, gc,
-					          hscroll[y] * magstep, 0, (512 - hscroll[y]) *
-					          magstep, (vscroll[y] + z - 480) * magstep, 0,
-					          (480 - vscroll[y]) * magstep);
-					XCopyArea(display, background[currentcache], layout, gc,
-					          0, (vscroll[y] + y) * magstep, (hscroll[y] -
-					                 256) * magstep, (480 - vscroll[y] - y) *
-					      magstep, (512 - hscroll[y]) * magstep, y * magstep);
-					XCopyArea(display, background[currentcache], layout, gc,
-					          0, 0, (hscroll[y] - 256) * magstep, (vscroll[y]
-					                                               + z - 480)
-					          * magstep, (512 - hscroll[y]) * magstep, (480 -
-					                                              vscroll[y])
-					          * magstep);
-				}
-			}
-			else
-			/*if(osmirror) */
-			{
+			} else /*if(osmirror) */ {
 				if ((vscroll[y] + z - 1) % 240 >= (vscroll[y] + y) % 240)
 					XCopyArea(display, background[currentcache], layout, gc,
-					          (hscroll[y] & 255) * magstep, ((vscroll[y] + y) %
-					               240) * magstep, (256 - (hscroll[y] & 255)) *
-					        magstep, (z - y) * magstep, 0, (y % 240) * magstep);
-				else
-				{
+					          (hscroll[y] & 255) * magstep, ((vscroll[y] + y) % 240) * magstep,
+					          (256 - (hscroll[y] & 255)) * magstep, (z - y) * magstep,
+					          0, (y % 240) * magstep);
+				else {
 					XCopyArea(display, background[currentcache], layout, gc,
-					          (hscroll[y] & 255) * magstep, ((vscroll[y] + y)
-					                                         % 240) *
-					          magstep, (256 - (hscroll[y] & 255)) * magstep,
-					          ((480
-					            -
-					            vscroll[y]
-					            -
-					            y)
-					           %
-					           240) * magstep, 0, (y % 240) * magstep);
+					          (hscroll[y] & 255) * magstep, ((vscroll[y] + y) % 240) * magstep,
+					          (256 - (hscroll[y] & 255)) * magstep, ((480 - vscroll[y] - y) % 240) * magstep,
+					          0, (y % 240) * magstep);
 					XCopyArea(display, background[currentcache], layout, gc,
-					          (hscroll[y] & 255) * magstep, 0, (256 -
-					                                            (hscroll[y] &
-					              255)) * magstep, ((vscroll[y] + z) % 240) *
-					        magstep, 0, ((480 - vscroll[y]) % 240) * magstep);
+					          (hscroll[y] & 255) * magstep, 0,
+					          (256 - (hscroll[y] & 255)) * magstep, ((vscroll[y] + z) % 240) * magstep,
+					          0, ((480 - vscroll[y]) % 240) * magstep);
 				}
 
-				if (hscroll[y] & 255)
-				{
+				if (hscroll[y] & 255) {
 					if ((vscroll[y] + z - 1) % 240 >= (vscroll[y] + y) % 240)
-						XCopyArea(display, background[currentcache], layout,
-						          gc, 0, ((vscroll[y] + y) % 240) * magstep,
-						          (hscroll[y] & 255) * magstep, (z - y) *
-						          magstep, ((512 - hscroll[y]) & 255) *
-						          magstep, (y % 240) * magstep);
-					else
-					{
-						XCopyArea(display, background[currentcache], layout,
-						          gc, 0, ((vscroll[y] + y) % 240) * magstep,
-						          (hscroll[y] & 255) * magstep, ((480 -
-						                                          vscroll[y]
-						                                          - y) % 240)
-						          * magstep, ((512 - hscroll[y]) & 255) *
-						          magstep, (y % 240) * magstep);
-						XCopyArea(display, background[currentcache], layout,
-						          gc, 0, 0, (hscroll[y] & 255) * magstep,
-						          ((vscroll[y]
-						            +
-						            z)
-						           %
-						           240) * magstep, ((512 - hscroll[y]) & 255)
-						     * magstep, ((480 - vscroll[y]) % 240) * magstep);
+						XCopyArea(display, background[currentcache], layout, gc,
+						          0, ((vscroll[y] + y) % 240) * magstep,
+						          (hscroll[y] & 255) * magstep, (z - y) * magstep,
+						          ((512 - hscroll[y]) & 255) * magstep, (y % 240) * magstep);
+					else {
+						XCopyArea(display, background[currentcache], layout, gc,
+						          0, ((vscroll[y] + y) % 240) * magstep,
+						          (hscroll[y] & 255) * magstep, ((480 - vscroll[y] - y) % 240) * magstep,
+						          ((512 - hscroll[y]) & 255) * magstep, (y % 240) * magstep);
+						XCopyArea(display, background[currentcache], layout, gc,
+						          0, 0,
+						          (hscroll[y] & 255) * magstep, ((vscroll[y] + z) % 240) * magstep,
+						          ((512 - hscroll[y]) & 255) * magstep, ((480 - vscroll[y]) % 240) * magstep);
 					}
 				}
 			}
@@ -2354,8 +2095,7 @@ UpdateColorsX11(void)
 
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
-	if (indexedcolor)
-	{
+	if (indexedcolor) {
 		color.pixel = currentbgcolor = colortableX11[24];
 		color.red = ((NES_palette[VRAM[0x3f00] & 63] & 0xFF0000) >> 8);
 		color.green = (NES_palette[VRAM[0x3f00] & 63] & 0xFF00);
@@ -2365,10 +2105,7 @@ UpdateColorsX11(void)
 		XSetForeground(display, solidbggc, currentbgcolor);
 		XSetForeground(display, bgcolorgc, currentbgcolor);
 		XSetForeground(display, backgroundgc, currentbgcolor);
-	}
-	else
-	/* truecolor */
-	{
+	} else /* truecolor */ {
 		currentbgcolor = paletteX11[VRAM[0x3f00] & 63];
 		if ((renderer->_flags & RENDERER_DIFF) && ((bpp != 8) || (magstep > 1)))
 			palette[24] = VRAM[0x3f00] & 63;
@@ -2376,8 +2113,7 @@ UpdateColorsX11(void)
 			palette[24] = currentbgcolor;
 		if (scanlines && (scanlines != 100))
 			palette2[24] = palette2X11[VRAM[0x3f00] & 63];
-		if (oldbgcolor != currentbgcolor /*||currentbgcolor!=bgcolor[currentcache] */)
-		{
+		if (oldbgcolor != currentbgcolor /*||currentbgcolor!=bgcolor[currentcache] */) {
 			XSetForeground(display, solidbggc, currentbgcolor);
 			XSetForeground(display, bgcolorgc, currentbgcolor);
 			XSetForeground(display, backgroundgc, currentbgcolor);
@@ -2387,18 +2123,13 @@ UpdateColorsX11(void)
 	}
 
 	/* Tile colors */
-	if (indexedcolor)
-	{
-		for (x = 0; x < 24; x++)
-		{
-			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)])
-			{
+	if (indexedcolor) {
+		for (x = 0; x < 24; x++) {
+			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
 				color.pixel = colortableX11[x];
-				color.red = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] &
-				              0xFF0000) >> 8);
+				color.red = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF0000) >> 8);
 				color.green = (NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF00);
-				color.blue = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] &
-				               0xFF) << 8);
+				color.blue = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF) << 8);
 				color.flags = DoRed | DoGreen | DoBlue;
 				XStoreColor (display, colormap, &color);
 				/*printf("color %d (%d) = %6x\n", x, colortableX11[x], paletteX11[VRAM[0x3f01+x+(x/3)]&63]); */
@@ -2408,15 +2139,10 @@ UpdateColorsX11(void)
 	}
 
 	/* Set palette tables */
-	if (indexedcolor)
-	{
+	if (indexedcolor) {
 		/* Already done in InitDisplayX11 */
-	}
-	else
-	/* truecolor */
-	{
-		for (x = 0; x < 24; x++)
-		{
+	} else /* truecolor */ {
+		for (x = 0; x < 24; x++) {
 			if ((renderer->_flags & RENDERER_DIFF) && ((bpp != 8) || (magstep > 1)))
 				palette[x] = VRAM[0x3f01 + x + (x / 3)] & 63;
 			else
@@ -2436,13 +2162,11 @@ UpdateTileColorsOldX11(void)
 
 	/* Set Background color */
 
-	if (currentbgcolor != bgcolor[currentcache])
-	{
+	if (currentbgcolor != bgcolor[currentcache]) {
 		bgcolor[currentcache] = currentbgcolor;
 		redrawbackground = 1;
 		needsredraw = 1;
-		if (bgmask_changed[currentcache] || currentcache != current_bgmask)
-		{
+		if (bgmask_changed[currentcache] || currentcache != current_bgmask) {
 			XSetClipMask(display, backgroundgc, bgmask[currentcache]);
 			bgmask_changed[current_bgmask = currentcache] = 0;
 		}
@@ -2450,12 +2174,10 @@ UpdateTileColorsOldX11(void)
 		               backgroundgc,
 		               0, 0,
 		               512 * magstep, 480 * magstep);
-		if ((scanlines != 100) && (magstep > 1))
-		{
+		if ((scanlines != 100) && (magstep > 1)) {
 			int y;
 
-			for (y = 0; y < 480; y ++)
-			{
+			for (y = 0; y < 480; y++) {
 				XFillRectangle(display, background[currentcache],
 				               blackgc,
 				               0, y * magstep + 1,
@@ -2475,18 +2197,12 @@ UpdateTileColorsOldX11(void)
 	   best.  This only affects truecolor mode; for 8-bit mode, just change
 	   the palettes. */
 
-	for (y = 0; y < 30; y++)
-	{
-		for (x = 0; x < 32; x++)
-		{
+	for (y = 0; y < 30; y++) {
+		for (x = 0; x < 32; x++) {
 			t = displaycolorcache[currentcache][y * 64 + x];
-			if (palette_cache[currentcache][t * 4 + 1] != VRAM[0x3f00 + t * 4
-			                                                   + 1] ||
-			    palette_cache[currentcache][t * 4 + 2] != VRAM[0x3f00 + t * 4
-			                                                   + 2] ||
-			    palette_cache[currentcache][t * 4 + 3] != VRAM[0x3f00 + t * 4
-			                                                   + 3])
-			{
+			if (palette_cache[currentcache][t * 4 + 1] != VRAM[0x3f00 + t * 4 + 1]
+			 || palette_cache[currentcache][t * 4 + 2] != VRAM[0x3f00 + t * 4 + 2]
+			 || palette_cache[currentcache][t * 4 + 3] != VRAM[0x3f00 + t * 4 + 3]) {
 				displaycachevalid[currentcache][y * 128 + x * 2] = 0;
 			}
 		}
@@ -2551,42 +2267,33 @@ DrawSpritesOldX11(void)
 
 	/* If the sprite palette changed, we must redraw the sprites in
 	   static color mode.  This isn't necessary for indexed color mode */
-	if (!indexedcolor &&
-	    (*((long long *) (VRAM + 0x3f10)) != sprite_palette_cache[0] ||
-	     *((long long *) (VRAM + 0x3f18)) != sprite_palette_cache[1]))
-	{
+	if (!indexedcolor
+	 && (*((long long *)(VRAM + 0x3f10)) != sprite_palette_cache[0]
+	  || *((long long *)(VRAM + 0x3f18)) != sprite_palette_cache[1])) {
 		memcpy(sprite_palette_cache, VRAM + 0x3f10, 16);
 		redrawall = needsredraw = 1;
 	}
 
 	/* If any sprite entries have changed since last time, redraw */
-	for (s = 0; s < 64; s++)
-	{
-		if (spriteram[s * 4] < 240 || spritecache[s * 4] < 240)
-		{
-			if (((int *) spriteram)[s] != ((int *) spritecache)[s])
-			{
+	for (s = 0; s < 64; s++) {
+		if (spriteram[s * 4] < 240 || spritecache[s * 4] < 240) {
+			if (((int *)spriteram)[s] != ((int *)spritecache)[s]) {
 				redrawall = needsredraw = 1;
-				((int *) spritecache)[s] = ((int *) spriteram)[s];
+				((int *)spritecache)[s] = ((int *)spriteram)[s];
 			}
 		}
 	}
 
-	if (redrawbackground || redrawall)
-	{
-		for (y = 1; y < 240; y++)
-		{
-			if (redrawall || scanline_diff[y])
-			{
+	if (redrawbackground || redrawall) {
+		for (y = 1; y < 240; y++) {
+			if (redrawall || scanline_diff[y]) {
 				memset(linebuffer, 0, 256);      /* Clear buffer for this scanline */
 				baseaddr = ((linereg[y] & 0x08) << 9);    /* 0 or 0x1000 */
-				for (s = 63; s >= 0; s--)
-				{
-					if (spriteram[s * 4] < y && spriteram[s * 4] < 240 &&
-					    spriteram[s * 4 + 3] < 249)
-					{
-						if (spriteram[s * 4] + spritesize >= y)
-						{
+				for (s = 63; s >= 0; s--) {
+					if (spriteram[s * 4] < y
+					 && spriteram[s * 4] < 240
+					 && spriteram[s * 4 + 3] < 249) {
+						if (spriteram[s * 4] + spritesize >= y) {
 							spritetile = spriteram[s * 4 + 1];
 							if (spritesize == 16)
 								baseaddr = (spritetile & 1) << 12;
@@ -2599,103 +2306,34 @@ DrawSpritesOldX11(void)
 
 							/* This finds the memory location of the tiles, taking into account
 							   that vertically flipped sprites are in reverse order. */
-							if (vflip)
-							{
-								if (spriteram[s << 2] >= y - 8)   /* 8x8 sprites and first half of 8x16 sprites */
-								{
-									d1 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                          4))) << 4) +
-									          spritesize * 2 - 8 - y +
-									          spriteram[s * 4]];
-									d2 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                          4))) << 4) +
-									          spritesize * 2 - y + spriteram[s
-									                                    * 4]];
+							if (vflip) {
+								if (spriteram[s << 2] >= y - 8) {
+									/* 8x8 sprites and first half of 8x16 sprites */
+									d1 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - 8 - y + spriteram[s * 4]];
+									d2 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - y + spriteram[s * 4]];
+								} else {
+									/* Do second half of 8x16 sprites */
+									d1 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - 16 - y + spriteram[s * 4]];
+									d2 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + spritesize * 2 - 8 - y + spriteram[s * 4]];
 								}
-								else
-								/* Do second half of 8x16 sprites */
-								{
-									d1 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                          4))) << 4) +
-									          spritesize * 2 - 16 - y +
-									          spriteram[s * 4]];
-									d2 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                          4))) << 4) +
-									          spritesize * 2 - 8 - y +
-									          spriteram[s * 4]];
+							} else {
+								if (spriteram[s << 2] >= y - 8) {
+									/* 8x8 sprites and first half of 8x16 sprites */
+									d1 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + y - 1 - spriteram[s * 4]];
+									d2 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + y + 7 - spriteram[s * 4]];
+								} else {
+									/* Do second half of 8x16 sprites */
+									d1 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + y + 7 - spriteram[s * 4]];
+									d2 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + y + 15 - spriteram[s * 4]];
 								}
 							}
-							else
-							{
-								if (spriteram[s << 2] >= y - 8)   /* 8x8 sprites and first half of 8x16 sprites */
-								{
-									d1 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                      4))) << 4) + y - 1 -
-									          spriteram[s * 4]];
-									d2 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                      4))) << 4) + y + 7 -
-									          spriteram[s * 4]];
-								}
-								else
-								/* Do second half of 8x16 sprites */
-								{
-									d1 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                      4))) << 4) + y + 7 -
-									          spriteram[s * 4]];
-									d2 = VRAM[baseaddr + ((spritetile &
-									                       (~(spritesize
-									                          >>
-									                       4))) << 4) + y + 15
-									          - spriteram[s * 4]];
-								}
-							}
-							for (x = 7 * (!hflip); x < 8 && x >= 0; x += 1 -
-							     ((!hflip) << 1))
-							{
+							for (x = 7 * (!hflip); x < 8 && x >= 0; x += 1 - ((!hflip) << 1)) {
 								if (d1 & d2 & 1)
-									linebuffer[spriteram[s * 4 + 3] + x] = 3 +
-									  ((spriteram[s
-									              *
-									              4
-									              +
-									              2]
-									    &
-									    3)
-									   << 2);
+									linebuffer[spriteram[s * 4 + 3] + x] = 3 + ((spriteram[s * 4 + 2] & 3) << 2);
 								else if (d1 & 1)
-									linebuffer[spriteram[s * 4 + 3] + x] = 1 +
-									  ((spriteram[s
-									              *
-									              4
-									              +
-									              2]
-									    &
-									    3)
-									   << 2);
+									linebuffer[spriteram[s * 4 + 3] + x] = 1 + ((spriteram[s * 4 + 2] & 3) << 2);
 								else if (d2 & 1)
-									linebuffer[spriteram[s * 4 + 3] + x] = 2 +
-									  ((spriteram[s
-									              *
-									              4
-									              +
-									              2]
-									    &
-									    3)
-									   << 2);
+									linebuffer[spriteram[s * 4 + 3] + x] = 2 + ((spriteram[s * 4 + 2] & 3) << 2);
 								if (behind && (d1 | d2))
 									if (InForegroundOldX11(spriteram[s * 4 + 3] + x, y))
 										linebuffer[spriteram[s * 4 + 3] + x] = 0;     /* Sprite hidden behind background */
@@ -2706,16 +2344,12 @@ DrawSpritesOldX11(void)
 					}
 				}
 
-				for (x = 0; x < 256; x++)
-				{
-					if (linebuffer[x])
-					{
+				for (x = 0; x < 256; x++) {
+					if (linebuffer[x]) {
 						if (indexedcolor)
-							color1 = colortableX11[(linebuffer[x] >> 2) * 3 + 11 +
-							                    (linebuffer[x] & 3)];
+							color1 = colortableX11[(linebuffer[x] >> 2) * 3 + 11 + (linebuffer[x] & 3)];
 						else
-							color1 = paletteX11[VRAM[0x3f10 + (linebuffer[x] &
-							                                    15)] & 63];
+							color1 = paletteX11[VRAM[0x3f10 + (linebuffer[x] & 15)] & 63];
 						if (color1 != currentcolor1)
 							XSetForeground(display, spritecolor1gc,
 							               currentcolor1 = color1);
@@ -2750,21 +2384,18 @@ DiffUpdateOldX11(void)
 		redrawall = redrawbackground = 1;
 	old_screen_on = screen_on;
 
-	if (screen_on)
-	{
+	if (screen_on) {
 		if (old_sprites_on != sprites_on)
 			redrawall = needsredraw = 1;
 		old_sprites_on = sprites_on;
 	}
 
 	/* Update scanline redraw info */
-	for (x = 0; x < 60; x++)
-	{
+	for (x = 0; x < 60; x++) {
 		tileline_begin[x] = 512;
 		tileline_end[x] = 256;
 	}
-	for (x = 0; x < 240; x++)
-	{
+	for (x = 0; x < 240; x++) {
 		scanline_diff[x] = 0;
 		if (oldhscroll[x] != hscroll[x])
 			redrawbackground = scanline_diff[x] = 1;
@@ -2772,26 +2403,18 @@ DiffUpdateOldX11(void)
 		if (oldvscroll[x] != vscroll[x])
 			redrawbackground = scanline_diff[x] = 1;
 		oldvscroll[x] = vscroll[x];
-		if (osmirror)
-		{
+		if (osmirror) {
 			tileline_begin[((vscroll[x] + x) % 240) >> 3] = 0;
 			tileline_end[((vscroll[x] + x) % 240) >> 3] = 256;
-		}
-		else
-		{
+		} else {
 			if (tileline_begin[((vscroll[x] + x) % 480) >> 3] > hscroll[x])
 				tileline_begin[((vscroll[x] + x) % 480) >> 3] = hscroll[x];
-			if (tileline_end[((vscroll[x] + x) % 480) >> 3] < hscroll[x] +
-			    256)
+			if (tileline_end[((vscroll[x] + x) % 480) >> 3] < hscroll[x] + 256)
 				tileline_end[((vscroll[x] + x) % 480) >> 3] = hscroll[x] + 256;
-			if (tileline_begin[(((vscroll[x] + x) % 480) >> 3) & 62] >
-			    hscroll[x])
-				tileline_begin[(((vscroll[x] + x) % 480) >> 3) & 62]
-				  = hscroll[x];
-			if (tileline_end[(((vscroll[x] + x) % 480) >> 3) & 62] <
-			    hscroll[x] + 256)
-				tileline_end[(((vscroll[x] + x) % 480) >> 3) & 62] = hscroll[x]
-				  + 256;
+			if (tileline_begin[(((vscroll[x] + x) % 480) >> 3) & 62] > hscroll[x])
+				tileline_begin[(((vscroll[x] + x) % 480) >> 3) & 62] = hscroll[x];
+			if (tileline_end[(((vscroll[x] + x) % 480) >> 3) & 62] < hscroll[x] + 256)
+				tileline_end[(((vscroll[x] + x) % 480) >> 3) & 62] = hscroll[x] + 256;
 		}
 		if (oldlinereg[x] != linereg[x])
 			redrawbackground = scanline_diff[x] = 1;
@@ -2802,15 +2425,11 @@ DiffUpdateOldX11(void)
 	/* those scanlines for redraw. */
 	if (debug_spritesoff || !sprites_on)
 		return;
-	for (s = 0; s < 64; s++)
-	{
-		if (spritecache[s * 4] < 240)
-		{
-			if (((int *) spriteram)[s] != ((int *) spritecache)[s])
-			{
+	for (s = 0; s < 64; s++) {
+		if (spritecache[s * 4] < 240) {
+			if (((int *)spriteram)[s] != ((int *)spritecache)[s]) {
 				redrawbackground = 1;
-				for (x = 1; x <= spritesize && x + spritecache[s * 4] < 240;
-				     x++)
+				for (x = 1; x <= spritesize && x + spritecache[s * 4] < 240; x++)
 					scanline_diff[x + spritecache[s * 4]] = 1;
 			}
 		}

@@ -67,8 +67,7 @@ input(int addr)
 	INRET = 0;
 
 	/* Read PPU status register */
-	if (addr == 0x2002)
-	{
+	if (addr == 0x2002) {
 		/* +40 is to account for the latency of the PPU; from the time it reads
 		   the background tile to the time the flag is set is about 40 cycles,
 		   give or take a few. */
@@ -77,14 +76,12 @@ input(int addr)
 			ptr = VRAM + ((spriteram[1] & 0xFE) << 4) + ((spriteram[1] & 1) << 12);         /* 8x16 sprites */
 		else
 			ptr = VRAM + (spriteram[1] << 4) + ((RAM[0x2000] & 0x08) << 9);         /* 8x8 sprites */
-		if ((RAM[0x2000] & 0x20) && (((long long *) ptr)[0] | ((long long *)
-		                                                       ptr)[8]) == 0)
-		{
+		if ((RAM[0x2000] & 0x20)
+		 && (((long long *)ptr)[0] | ((long long *)ptr)[8]) == 0) {
 			sprite0hit += 8 * HCYCLES;
 			ptr += 16;
 		}
-		while ((ptr[0] | ptr[8]) == 0 && sprite0hit < spriteram[0] * HCYCLES + 5797)
-		{
+		while ((ptr[0] | ptr[8]) == 0 && sprite0hit < spriteram[0] * HCYCLES + 5797) {
 			sprite0hit += HCYCLES;
 			ptr++;
 		}
@@ -98,16 +95,13 @@ input(int addr)
 		/*            vbl--; */
 		/*          } */
 
-		if ((CLOCK >= 27393) &&
-		    (last_clock >= CLOCK || last_clock <= 27393))
-		{
+		if ((CLOCK >= 27393)
+		 && (last_clock >= CLOCK || last_clock <= 27393)) {
 			vbl=1;
 		}
 		last_clock=CLOCK;
-		if (vbl &&
-		    (CLOCK > 27393))
-		{
-			INRET |= (signed char) 0x80;
+		if (vbl && (CLOCK > 27393)) {
+			INRET |= (signed char)0x80;
 			vbl--;
 		}
 
@@ -121,8 +115,7 @@ input(int addr)
 		   okay, I think I'll use it. */
 		if ((CLOCK * 3 >= sprite0hit) && (CLOCK < 27742))
 			INRET|=(signed char)0x40;
-		if (CLOCK > VBL && !(RAM[0x2000] & 0x80))
-		{
+		if (CLOCK > VBL && !(RAM[0x2000] & 0x80)) {
 			/* This is totally wierd, but SMB and Zelda depend on it. */
 			RAM[0x2000] &= 0xFE;
 			for (x = 0; x < 240; x++)
@@ -136,8 +129,7 @@ input(int addr)
 	}
 
 	/* Read from VRAM */
-	if (addr == 0x2007)
-	{
+	if (addr == 0x2007) {
 		INRET = vram_read;
 		VRAMPTR &= 0x3fff;
 		if (osmirror && VRAMPTR >= 0x2000 && VRAMPTR <= 0x2FFF)
@@ -148,7 +140,7 @@ input(int addr)
 			vram_read = VRAM[VRAMPTR - 0x400];
 		else
 			vram_read = VRAM[VRAMPTR];
-		VRAMPTR += 1 << (((*((unsigned char *) REG1) & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
+		VRAMPTR += 1 << (((*((unsigned char *)REG1) & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
 		if (VRAMPTR > 0x3FFF)
 			VRAMPTR &= 0x3fff;
 		/*printf("VRAM Read: %4x=%2x (scan %d)\n", VRAMPTR, INRET, CLOCK); */
@@ -161,17 +153,10 @@ input(int addr)
 		 * on a portion of the screen.  We need to convert the scanline
 		 * address into horizontal/vertical offsets.
 		 */
-		if (CLOCK < VBL && (RAM[0x2001] & 8) != 0)
-		{
-			for (x = (CLOCK * 3 / HCYCLES) + 1; x < 240; x++)
-			{
+		if (CLOCK < VBL && (RAM[0x2001] & 8) != 0) {
+			for (x = (CLOCK * 3 / HCYCLES) + 1; x < 240; x++) {
 				hscroll[x] = (hscroll[x] & 0xff) | ((VRAMPTR & 0x400) >> 2);
-				vscroll[x] = (480 + 480 + (((VRAMPTR & 0x800) >> 11) * 240) +
-				              ((VRAMPTR
-				                &
-				                0x3e0)
-				               >>
-				               2) - ((CLOCK * 3 / HCYCLES) + 1)) % 480;
+				vscroll[x] = (480 + 480 + (((VRAMPTR & 0x800) >> 11) * 240) + ((VRAMPTR & 0x3e0) >> 2) - ((CLOCK * 3 / HCYCLES) + 1)) % 480;
 			}
 
 			drawimage(CLOCK * 3);
@@ -190,8 +175,7 @@ input(int addr)
 		INRET = SoundGetLengthReg();
 	}
 #if 0
-	if ((addr >= 0x4000) && (addr <= 0x4015))
-	{
+	if ((addr >= 0x4000) && (addr <= 0x4015)) {
 		INRET = RAM[addr];
 		/*       fprintf(stderr, "Read from pAPU register 0x%2.2x: 0x%4.4x\n", */
 		/*               addr - 0x4000, INRET); */
@@ -199,14 +183,11 @@ input(int addr)
 #endif
 
 	/* Read joypad controller, dipswitches and coinslot */
-	if (addr == 0x4016)
-	{
-		INRET = (RAM[0x4016] & 1) | ((coinslot & 3) << 5) | ((dipswitches & 3) << 3) |
-		  (coinslot & 4);
+	if (addr == 0x4016) {
+		INRET = (RAM[0x4016] & 1) | ((coinslot & 3) << 5) | ((dipswitches & 3) << 3) | (coinslot & 4);
 		RAM[0x4016] >>= 1;
 	}
-	if (addr == 0x4017)
-	{
+	if (addr == 0x4017) {
 		INRET = (RAM[0x4017] & 1) | (dipswitches & ~3);
 		RAM[0x4017] >>= 1;
 	}
@@ -233,8 +214,7 @@ output(int addr, int val)
 		scanline = 0;
 
 	/* Select pattern table */
-	if (addr == 0x2000)
-	{
+	if (addr == 0x2000) {
 		drawimage(CLOCK * 3);
 
 		/* Ugly kludge - bit 1 of 2000 does not take effect until the
@@ -253,34 +233,28 @@ output(int addr, int val)
 		/*printf("Write: %4x,%2x (scan %d)\n", addr, val, CLOCK); */
 	}
 
-	if (addr == 0x2001)
-	{
+	if (addr == 0x2001) {
 		drawimage(CLOCK * 3);
 		RAM[0x2001] = val;
 	}
 
 	/* Set horizontal/vertical scroll */
-	if (addr == 0x2005)
-	{
-		if (hvscroll ^= 1)
-		{
+	if (addr == 0x2005) {
+		if (hvscroll ^= 1) {
 			drawimage(CLOCK * 3);
 			hscrollreg = val;
 			hscrollval = ((RAM[0x2000] & 1) << 8) + val;
 			for (x = scanline; x < 240; x++)
 				hscroll[x] = hscrollval;
 			/*printf("hscroll: %d\n", hscrollval); */
-		}
-		else
-		{
+		} else {
 			vscrollreg = val;
 			/* A little kludge here... It appears that the PPU will actually
 			   accept bogus vscroll values above 240, wrapping around to 0
 			   when it reaches 256, without the usual page flip at line 240.
 			   The val+224 hack below is to compensate for this, so that the
 			   rest of the lines end up where they're supposed to be. */
-			vscrollval = ((RAM[0x2000] & 2) * 120 + ((val < 240) ? val : val +
-			                                         224)) % 480;
+			vscrollval = ((RAM[0x2000] & 2) * 120 + ((val < 240) ? val : val + 224)) % 480;
 			if (scanline < 1)
 				for (x = scanline; x < 240; x++)
 					vscroll[x] = vscrollval;
@@ -296,19 +270,15 @@ output(int addr, int val)
 	}
 
 	/* Load VRAM target address */
-	if (addr == 0x2006)
-	{
+	if (addr == 0x2006) {
 		drawimage(CLOCK * 3);
 		/* VRAMPTR = ((VRAMPTR & 0x3f) << 8) | (val & 0xff); */
 
 		/* It appears that h/v scroll and the VRAM address registers share
 		   a common toggle-bit which deterines which byte is written to. */
-		if (hvscroll ^= 1)
-		{
+		if (hvscroll ^= 1) {
 			vramlatch = (vramlatch & 0xFF) | ((val & 0xff) << 8);
-		}
-		else
-		{
+		} else {
 			vramlatch = (vramlatch & 0xFF00) | (val & 0xff);
 		}
 
@@ -318,17 +288,14 @@ output(int addr, int val)
 		   register load is followed by a read of 2005, then the scanline
 		   number is reset to zero and the scan starts with the top of the
 		   current char/tile line. (see above) */
-		if (hvscroll)
-		{
+		if (hvscroll) {
 			/* Set page only on first write */
 			/* This is guesswork, but seems to function correctly. */
 			RAM[0x2000] = (RAM[0x2000] & 0xFC) | ((vramlatch & 0xC00) >> 10);
 			vscan = vramlatch >> 12;
 			vwrap = 0;
 			/*vscrollreg=(vscrollreg&0x3F)|((VRAMPTR&3)<<6);*/
-		}
-		else
-		{
+		} else {
 			/* Set offset on second write */
 			hscrollreg = (hscrollreg & 7) | ((vramlatch & 31) << 3);
 			vline = (vramlatch & 0x3e0) >> 5;
@@ -356,8 +323,7 @@ output(int addr, int val)
 	   completely correct. */
 
 	/* Write VRAM */
-	if (addr == 0x2007)
-	{
+	if (addr == 0x2007) {
 		/* A little bit about VRAM:
 
 		   The NES has two pages of internal VRAM.  The emulator always stores
@@ -376,59 +342,56 @@ output(int addr, int val)
 		/*if(CLOCK<VBL&&(RAM[0x2001]&8)) printf("vram write during refresh! "); */
 		/*printf("VRAM: %4x=%2x (+%d) scan %d\n", VRAMPTR, val, 1<<(((*((unsigned char *)REG1)&4)>>2)*5), CLOCK); */
 		if ((VRAMPTR & 0x3f0f) == 0x3f00)
-			VRAM[0x3f00] = VRAM[0x3f10] = (unsigned char) val;      /* Background color is mirrored between palettes */
-		else if ((VRAMPTR & 0x3f00) == 0x3f00)
-		{
+			VRAM[0x3f00] =
+			VRAM[0x3f10] = (unsigned char)val;      /* Background color is mirrored between palettes */
+		else if ((VRAMPTR & 0x3f00) == 0x3f00) {
 			/* Write to color palette */
 
 			/* FIXME: when CLOCK<VBL we should switch into static-color mode */
-			VRAM[VRAMPTR & 0x3f1f] = (unsigned char) val;
+			VRAM[VRAMPTR & 0x3f1f] = (unsigned char)val;
 
 			/* FIXME - This might flicker on palettized displays; see
 			 * above for suggested fix, or use the "--static-color"
 			 * command-line parameter as a workaround.
 			 */
 			renderer->UpdateColors();
-		}
-		else if (VRAMPTR >= 0x2000 && VRAMPTR < 0x3000)
-		{
+		} else if (VRAMPTR >= 0x2000 && VRAMPTR < 0x3000) {
 			if (nomirror)
-				VRAM[VRAMPTR] = (unsigned char) val;
+				VRAM[VRAMPTR] = (unsigned char)val;
 			else if (osmirror)
-				VRAM[VRAMPTR & 0x23FF] = (unsigned char) val;       /* One-Screen Mirroring */
+				VRAM[VRAMPTR & 0x23FF] = (unsigned char)val;       /* One-Screen Mirroring */
 			else if (!hvmirror)
-				VRAM[VRAMPTR] = VRAM[VRAMPTR ^ 0x800] = (unsigned char) val;
-			else if (hvmirror)
-			{
+				VRAM[VRAMPTR] =
+				VRAM[VRAMPTR ^ 0x800] = (unsigned char)val;
+			else if (hvmirror) {
 				if (VRAMPTR >= 0x2000 && VRAMPTR < 0x2400)
-					VRAM[VRAMPTR] = VRAM[VRAMPTR ^ 0x800] = (unsigned char) val;
+					VRAM[VRAMPTR] =
+					VRAM[VRAMPTR ^ 0x800] = (unsigned char)val;
 				if (VRAMPTR >= 0x2400 && VRAMPTR < 0x2800)
-					VRAM[VRAMPTR - 0x400] = VRAM[VRAMPTR + 0x400] = (unsigned
-					                                                 char) val;
+					VRAM[VRAMPTR - 0x400] =
+					VRAM[VRAMPTR + 0x400] = (unsigned char)val;
 				if (VRAMPTR >= 0x2800 && VRAMPTR < 0x2c00)
-					VRAM[VRAMPTR - 0x400] = VRAM[VRAMPTR + 0x400] = (unsigned
-					                                                 char) val;
+					VRAM[VRAMPTR - 0x400] =
+					VRAM[VRAMPTR + 0x400] = (unsigned char)val;
 				if (VRAMPTR >= 0x2c00 && VRAMPTR < 0x3000)
-					VRAM[VRAMPTR] = VRAM[VRAMPTR ^ 0x800] = (unsigned char) val;
+					VRAM[VRAMPTR] =
+					VRAM[VRAMPTR ^ 0x800] = (unsigned char)val;
 			}
-		}
-		else
-			VRAM[VRAMPTR] = (unsigned char) val;
+		} else
+			VRAM[VRAMPTR] = (unsigned char)val;
 
-		VRAMPTR += 1 << (((*((unsigned char *) REG1) & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
-		if (VRAMPTR > 0x3FFF)
-		{                       /* printf("help - vramptr >0x3fff!\n"); exit(EXIT_FAILURE); */
+		VRAMPTR += 1 << (((*((unsigned char *)REG1) & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
+		if (VRAMPTR > 0x3FFF) {
+			/* printf("help - vramptr >0x3fff!\n"); exit(EXIT_FAILURE); */
 			VRAMPTR &= 0x3fff;
 		}
 	}
 
 	/* Write to pAPU registers */
-	if ((addr >= 0x4000) && (addr <= 0x4015))
-	{
+	if ((addr >= 0x4000) && (addr <= 0x4015)) {
 		/* Sprite DMA */
-		if (addr == 0x4014)
-		/* I'm not entirely sure of this, but it seems accurate. */
-		{
+		if (addr == 0x4014) {
+			/* I'm not entirely sure of this, but it seems accurate. */
 			drawimage(CLOCK * 3);
 			if (val < 0x80)
 				memcpy(spriteram, RAM + (val << 8), 256);
@@ -436,9 +399,7 @@ output(int addr, int val)
 				memcpy(spriteram, MAPTABLE[val >> 4] + (val << 8), 256);
 			CLOCK += 514;
 			CTNI += 514;
-		}
-		else
-		{
+		} else {
 			/* SOUND WRITE */
 			SoundEvent(addr, val);
 		}
@@ -454,8 +415,7 @@ output(int addr, int val)
 		vs(addr, val);
 
 	/* Reset controller */
-	if ((addr | 1) == 0x4017)
-	{
+	if ((addr | 1) == 0x4017) {
 		RAM[0x4016] = controller[0] | controllerd[0];
 		RAM[0x4017] = controller[1] | controllerd[1];
 	}
@@ -493,15 +453,14 @@ donmi(void)
 
 	/* reset scroll registers */
 	/*hvscroll = 0;*/
-	for (x = 0; x < 240; x++)
-	{
+	for (x = 0; x < 240; x++) {
 		hscroll[x] = hscrollval;
 		vscroll[x] = vscrollval;
 		linereg[x] = RAM[0x2000];
 	}
 
 	/* Is an NMI to be generated?  Return 1 if so. */
-	if (((*((unsigned char *) (REG1))) & 0x80) != 0)
+	if (((*((unsigned char *)(REG1))) & 0x80) != 0)
 		return 1;
 	else
 		return 0;
@@ -523,6 +482,6 @@ trace(s)
 	 */
 	unsigned int x;
 	char hex[17] = "0123456789ABCDEF";
-	x = ((int *) (&s))[4];
+	x = ((int *)(&s))[4];
 	printf("%c%c%c%c\n", hex[x >> 12], hex[(x & 0xf00) >> 8], hex[(x & 0xf0) >> 4], hex[x & 0xf]);
 }
