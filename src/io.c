@@ -460,10 +460,7 @@ donmi(void)
 	}
 
 	/* Is an NMI to be generated?  Return 1 if so. */
-	if (((*((unsigned char *)(REG1))) & 0x80) != 0)
-		return 1;
-	else
-		return 0;
+	return ((*((unsigned char *)(REG1))) & 0x80) != 0;
 }
 
 /*
