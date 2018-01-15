@@ -472,8 +472,7 @@ donmi(void)
  * implementation!
  */
 void
-trace(s)
-	int             s;
+trace(int s)
 {
 	/*
 	   printf("branch, stack: %x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x\n",

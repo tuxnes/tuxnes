@@ -38,7 +38,6 @@ unsigned int LASTBANK;          /* Last memory page code executed in */
 
 /* forward and external declarations */
 void disas(int);
-void translate(int);
 
 void
 translate(int addr)

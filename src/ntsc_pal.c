@@ -50,7 +50,8 @@ static const double br[3][4] = {
 
 static unsigned int ntsc_palette_data[64];
 
-unsigned int *ntsc_palette(double hue, double tint)
+unsigned int *
+ntsc_palette(double hue, double tint)
 {
 
 /******/

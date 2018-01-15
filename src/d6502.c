@@ -15,8 +15,6 @@
 #include <stdio.h>
 #include "globals.h"
 
-void    disas(int);
-
 static char Opcodes_6502[256][4] = {
 	"BRK", "ORA", "BAD", "BAD", "BAD", "ORA", "ASL", "BAD",
 	"PHP", "ORA", "ASL", "BAD", "BAD", "ORA", "ASL", "BAD",

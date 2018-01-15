@@ -576,7 +576,8 @@ InitAudio(int argc, char **argv)
 }
 
 
-inline void SoundEvent(long addr, unsigned char value)
+inline void
+SoundEvent(long addr, unsigned char value)
 {
 	snd_event_buf[tail].count = CLOCK;
 	snd_event_buf[tail].addr = addr;
@@ -584,7 +585,8 @@ inline void SoundEvent(long addr, unsigned char value)
 	if (++tail == SND_BUF_SIZE) tail = 0;
 }
 
-inline char SoundGetLengthReg(void)
+inline char
+SoundGetLengthReg(void)
 {
 	return (sq1_enabled && sq1_len_counter ? 0x01 : 0x00) |
 	       (sq2_enabled && sq2_len_counter ? 0x02 : 0x00) |
