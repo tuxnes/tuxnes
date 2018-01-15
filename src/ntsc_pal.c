@@ -35,7 +35,7 @@
 /**********************************************************/
 /* Read our colour angles from the data table.  First data entry goes into */
 /* cols(1), second data entry goes into cols(2), etc */
-static const double cols[16] = {0,240,210,180,150,120,90,60,30,0,330,300,270,0,0,0};
+static const double cols[16] = {0, 240, 210, 180, 150, 120, 90, 60, 30, 0, 330, 300, 270, 0, 0, 0};
 
 /**********************************************************/
 /* Our brightness table. */
@@ -43,9 +43,9 @@ static const double cols[16] = {0,240,210,180,150,120,90,60,30,0,330,300,270,0,0
 /* br2 is for X1h thru XCh */
 /* br3 is for XDh */
 static const double br[3][4] = {
-     {0.50, 0.75, 1.00, 1.00},
-     {0.29, 0.45, 0.73, 0.90},
-     {0.00, 0.24, 0.47, 0.77}
+	{0.50, 0.75, 1.00, 1.00},
+	{0.29, 0.45, 0.73, 0.90},
+	{0.00, 0.24, 0.47, 0.77}
 };
 
 static unsigned int ntsc_palette_data[64];
@@ -76,31 +76,31 @@ unsigned int *ntsc_palette(double hue, double tint)
 /* our palette.  Ok, in the code, X is the "brightness bits" of the colour, */
 /* and Z is our actual colour... i.e. XZh represents the NES colour value. */
 
-     int x, z;
+	int x, z;
 
-     for (x=0; x<4; x++) {
-     for (z=0; z<16; z++) {
-         double s, y, theta;
-         unsigned int r, g, b;
+	for (x=0; x<4; x++) {
+		for (z=0; z<16; z++) {
+			double s, y, theta;
+			unsigned int r, g, b;
 
-         /* grab tint */
-         s = tint;
-         /* grab default luminance */
-         y = br[1][x];
-         /* is it colour XDh? if so, get luma */
-         if (z == 0) { s = 0.0; y = br[0][x]; }
-         /* is it colour X0h? if so, get luma */
-         if (z == 13) { s = 0.0; y = br[2][x]; }
-         /* is it colour XEh? if so, set to black */
-         /* is it colour XFh? if so, set to black */
-         if ((z == 14) || (z == 15)) { y = s = 0.0; }
+			/* grab tint */
+			s = tint;
+			/* grab default luminance */
+			y = br[1][x];
+			/* is it colour XDh? if so, get luma */
+			if (z == 0) { s = 0.0; y = br[0][x]; }
+			/* is it colour X0h? if so, get luma */
+			if (z == 13) { s = 0.0; y = br[2][x]; }
+			/* is it colour XEh? if so, set to black */
+			/* is it colour XFh? if so, set to black */
+			if ((z == 14) || (z == 15)) { y = s = 0.0; }
 /******/
 /* This does a couple calculations. (working out from the parens) */
 /* first, it grabs the angle for the colour we're working on out of the */
 /* array that holds our angles.  Then, it divides by 180 and multiplies by */
 /* pi to turn the angle which was in degrees, into radians. */
 
-         theta = M_PI * ((cols[z] + hue) / 180.0);
+			theta = M_PI * ((cols[z] + hue) / 180.0);
 
 /******/
 /* This next part is where the real work is done.  It is a mathematical */
@@ -111,23 +111,23 @@ unsigned int *ntsc_palette(double hue, double tint)
 /* First, we multiply by 256, then make sure they don't wrap or go negative. */
 /* Finally, they are integerized. */
 
-         r = 256 * (y + s * sin(theta));
-         g = 256 * (y - (27.0 / 53.0) * s * sin(theta) + (10.0 / 53.0) * s * cos(theta));
-         b = 256 * (y - s * cos(theta));
+			r = 256 * (y + s * sin(theta));
+			g = 256 * (y - (27.0 / 53.0) * s * sin(theta) + (10.0 / 53.0) * s * cos(theta));
+			b = 256 * (y - s * cos(theta));
 
-         if (r > 255) r = 255;
-         if (g > 255) g = 255;
-         if (b > 255) b = 255;
-         if (r < 0) r = 0;
-         if (g < 0) g = 0;
-         if (b < 0) b = 0;
+			if (r > 255) r = 255;
+			if (g > 255) g = 255;
+			if (b > 255) b = 255;
+			if (r < 0) r = 0;
+			if (g < 0) g = 0;
+			if (b < 0) b = 0;
 
-         ntsc_palette_data[(x<<4)|z] = (r << 16) | (g << 8) | b;
+			ntsc_palette_data[(x<<4)|z] = (r << 16) | (g << 8) | b;
 
-/* The variables R,G, and B now contain our actual RGB values. */
-       }
-     }
-     return ntsc_palette_data;
+/* The variables R, G, and B now contain our actual RGB values. */
+		}
+	}
+	return ntsc_palette_data;
 }
 
 #endif /* HAVE_LIBM */

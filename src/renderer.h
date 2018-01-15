@@ -31,20 +31,20 @@
 #endif
 
 /* only the no-op renderer `none' is universally known */
-extern int	InitDisplayNone(int argc, char **argv);
-extern void	UpdateColorsNone(void);
-extern void	UpdateDisplayNone(void);
+extern int      InitDisplayNone(int argc, char **argv);
+extern void     UpdateColorsNone(void);
+extern void     UpdateDisplayNone(void);
 
 /* renderer flags */
-#define RENDERER_OLD		1
-#define RENDERER_DIFF		2
+#define RENDERER_OLD            1
+#define RENDERER_DIFF           2
 
 struct Renderer {
-     const char *name, *fullname;
-     int _flags;
-     int (*InitDisplay)(int argc, char **argv);
-     void (*UpdateDisplay)(void);
-     void (*UpdateColors)(void);
+	const char *name, *fullname;
+	int _flags;
+	int (*InitDisplay)(int argc, char **argv);
+	void (*UpdateDisplay)(void);
+	void (*UpdateColors)(void);
 };
 
 /* the currently selected renderer */
@@ -55,15 +55,15 @@ extern struct Renderer renderers[];
 
 /* global renderer parameters */
 extern struct RendererConfig {
-     int	inroot;
-     char	*geometry;
-     char	*display_id;
+	int        inroot;
+	char       *geometry;
+	char       *display_id;
 } renderer_config;
 
 /* global renderer data */
 extern struct RendererData {
-     int	basetime;
-     int	pause_display;
+	int        basetime;
+	int        pause_display;
 } renderer_data;
 
 /* only 1x1 or 2x2 integer scaling is permitted for now */
@@ -71,14 +71,14 @@ extern struct RendererData {
 
 #define tilecachedepth 25
 
-extern int	indexedcolor;
-extern int	magstep;
-extern int	halfspeed, doublespeed;
-extern int	desync;
-extern unsigned int	currentbgcolor, oldbgcolor;
-extern unsigned char	needsredraw;		/* Refresh screen display */
-extern unsigned char	redrawbackground;	/* Redraw tile background */
-extern unsigned char	redrawall;		/* Redraw all scanlines */
-extern unsigned char	palette_cache[tilecachedepth][32];
+extern int              indexedcolor;
+extern int              magstep;
+extern int              halfspeed, doublespeed;
+extern int              desync;
+extern unsigned int     currentbgcolor, oldbgcolor;
+extern unsigned char    needsredraw;            /* Refresh screen display */
+extern unsigned char    redrawbackground;       /* Redraw tile background */
+extern unsigned char    redrawall;              /* Redraw all scanlines */
+extern unsigned char    palette_cache[tilecachedepth][32];
 
 #endif

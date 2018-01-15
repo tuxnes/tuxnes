@@ -130,224 +130,224 @@
 
 # 00 - BRK
 00,1:
-	8b 1d [S]		# movl   [S],%ebx
-	50			# pushl  %eax
-	b8 [P+2]		# movl   $[P+2],%eax
-	88 23			# movb   %ah,(%ebx)
-	4b			# decl   %ebx
-	81 cb 00 01 00 00	# orl    $0x100,%ebx
-	88 03			# movb   %al,(%ebx)
-	fe cb			# decb   %bl
-	a1 [F]			# movl   [F],%eax
-	88 1d [S]		# movb   %bl,[S]
-	83 e0 3C   	    	# andl   $0x3C,%eax
-	31 db	          	# xorl   %ebx,%ebx
-	83 c8 14	       	# orl    $0x14,%eax
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	89 c5			# movl   %eax,%ebp
-	a3 [F]			# movl   %eax,[F]
-	58			# popl   %eax
-	83 d5 00		# adcl   $0x0,%ebp
-	f7 c7 ff 00 00 00	# testl  $0xff,%edi
-	0f 94 c3		# setz   %bl
-	8d 6c 5d 00		# leal   0x0(%ebp,%ebx,2),%ebp
-	89 fb			# movl   %edi,%ebx
-	d1 eb			# shrl   %ebx
-	81 e3 80 00 00 00	# andl   $0x80,%ebx
-	09 dd			# orl    %ebx,%ebp
-	8b 1d [V]		# movl   [V],%ebx
-	81 c3 80 00 00 00	# addl   $0x80,%ebx
-	81 c3 00 ff ff ff	# addl   $0xffffff00,%ebx
-	19 db			# sbbl   %ebx,%ebx
-	83 e3 40		# andl   $0x40,%ebx
-	09 eb			# orl    %ebp,%ebx
-	8b 2d [S]		# movl   [S],%ebp
-	88 5d 00		# movb   %bl,(%ebp)
-	83 e3 01		# andl   $0x1,%ebx
-	fe 0d [S]		# decb   [S]
-	89 dd			# movl   %ebx,%ebp
-	83 c6 07		# addl   $0x7,%esi
-	bb [M]			# movl   $[M],%ebx
-	8b 5b 3c		# movl   0x3c(%ebx),%ebx
-	0f b7 9b fe ff 00 00	# movzwl 0xfffe(%ebx),%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0x0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
-	[!]			#  -STOP-
+	8b 1d [S]               # movl   [S],%ebx
+	50                      # pushl  %eax
+	b8 [P+2]                # movl   $[P+2],%eax
+	88 23                   # movb   %ah,(%ebx)
+	4b                      # decl   %ebx
+	81 cb 00 01 00 00       # orl    $0x100,%ebx
+	88 03                   # movb   %al,(%ebx)
+	fe cb                   # decb   %bl
+	a1 [F]                  # movl   [F],%eax
+	88 1d [S]               # movb   %bl,[S]
+	83 e0 3C                # andl   $0x3C,%eax
+	31 db                   # xorl   %ebx,%ebx
+	83 c8 14                # orl    $0x14,%eax
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	89 c5                   # movl   %eax,%ebp
+	a3 [F]                  # movl   %eax,[F]
+	58                      # popl   %eax
+	83 d5 00                # adcl   $0x0,%ebp
+	f7 c7 ff 00 00 00       # testl  $0xff,%edi
+	0f 94 c3                # setz   %bl
+	8d 6c 5d 00             # leal   0x0(%ebp,%ebx,2),%ebp
+	89 fb                   # movl   %edi,%ebx
+	d1 eb                   # shrl   %ebx
+	81 e3 80 00 00 00       # andl   $0x80,%ebx
+	09 dd                   # orl    %ebx,%ebp
+	8b 1d [V]               # movl   [V],%ebx
+	81 c3 80 00 00 00       # addl   $0x80,%ebx
+	81 c3 00 ff ff ff       # addl   $0xffffff00,%ebx
+	19 db                   # sbbl   %ebx,%ebx
+	83 e3 40                # andl   $0x40,%ebx
+	09 eb                   # orl    %ebp,%ebx
+	8b 2d [S]               # movl   [S],%ebp
+	88 5d 00                # movb   %bl,(%ebp)
+	83 e3 01                # andl   $0x1,%ebx
+	fe 0d [S]               # decb   [S]
+	89 dd                   # movl   %ebx,%ebp
+	83 c6 07                # addl   $0x7,%esi
+	bb [M]                  # movl   $[M],%ebx
+	8b 5b 3c                # movl   0x3c(%ebx),%ebx
+	0f b7 9b fe ff 00 00    # movzwl 0xfffe(%ebx),%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0x0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
+	[!]                     #  -STOP-
 	/
 # 01 - ORA - (Indirect,X)
 01,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	31 db			# xorl   %ebx,%ebx
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	66 8b 9f [L]		# movw   RAM(%edi),%bx
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	66 8b 9f [L]            # movw   RAM(%edi),%bx
 
 # FIXME - trap I/O
- 8d bb 00 e0 ff ff	# leal   0xffffe000(%ebx),%edi
- 81 ff 00 40 00 00	# cmpl   $0x4000,%edi
- 73 01			# jae    +1
- [^]			# int3
+	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
+	[^]                     # int3
 
-	89 df			# movl   %ebx,%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d 76 06		# leal   6(%esi),%esi
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	0a 04 1f		# orb    (%edi,%ebx,1),%al
-	0f be f8		# movsbl %al,%edi
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d 76 06                # leal   6(%esi),%esi
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	0a 04 1f                # orb    (%edi,%ebx,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 02 - (bad)
 # 03 - (bad)
 # 04 - (bad)
 # 05 - ORA - Zero Page
 05,2:
-	0b 05 [Z+1]		# orl    ZP,%eax
-	83 c6 03		# addl   $0x3,%esi
-	0f be f8		# movsbl %al,%edi
+	0b 05 [Z+1]             # orl    ZP,%eax
+	83 c6 03                # addl   $0x3,%esi
+	0f be f8                # movsbl %al,%edi
 	/
 # 06 - ASL - Zero Page
 06,2:
-        31 db			# xorl   %ebx,%ebx
-	8a 1d [Z+1]		# movb   ZP,%bl
-	00 db			# addb   %bl,%bl
-	8d 76 05		# leal   0x5(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	88 1d [Z+1]		# movb   %bl,ZP
-	0f be fb		# movsbl %bl,%edi
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [Z+1]             # movb   ZP,%bl
+	00 db                   # addb   %bl,%bl
+	8d 76 05                # leal   0x5(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	88 1d [Z+1]             # movb   %bl,ZP
+	0f be fb                # movsbl %bl,%edi
 	/
 # 07 - (bad)
 # 08 - PHP
 08,1:
-        83 25 [F] 3C      	# andl   $0x3C,F
-        31 db             	# xorl   %ebx,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8b 2d [F]		# movl   FLAGS,%ebp
-	83 d5 00		# adcl   $0x0,%ebp
-        f7 c7 ff 00 00 00 	# testl  $0xff,%edi
-	0f 94 c3		# setz   %bl
-	8d 76 03		# leal   0x3(%esi),%esi
-	8d 6c 5d 00		# leal   0x0(%ebp,%ebx,2),%ebp
-        89 fb			# movl   %edi,%ebx
-	83 cd 20		# orl    $0x20,%ebp
-        d1 eb			# shrl   %ebx
-	81 e3 80 00 00 00	# andl   $0x80,%ebx
-	09 dd			# orl    %ebx,%ebp
-	8b 1d [V]		# movl   [V],%ebx
-        81 c3 80 00 00 00	# addl   $0x80,%ebx
-        81 c3 00 ff ff ff	# addl   $0xffffff00,%ebx
-        19 db			# sbbl   %ebx,%ebx
-        83 e3 40		# andl   $0x40,%ebx
-        09 eb			# orl    %ebp,%ebx
-        8b 2d [S]		# movl   S,%ebp
-        88 5d 00		# movb   %bl,0x0(%ebp)
-        83 e3 01		# andl   $0x1,%ebx
-        fe 0d [S]		# decb   S
-        89 dd			# movl   %ebx,%ebp
+	83 25 [F] 3C            # andl   $0x3C,F
+	31 db                   # xorl   %ebx,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 2d [F]               # movl   FLAGS,%ebp
+	83 d5 00                # adcl   $0x0,%ebp
+	f7 c7 ff 00 00 00       # testl  $0xff,%edi
+	0f 94 c3                # setz   %bl
+	8d 76 03                # leal   0x3(%esi),%esi
+	8d 6c 5d 00             # leal   0x0(%ebp,%ebx,2),%ebp
+	89 fb                   # movl   %edi,%ebx
+	83 cd 20                # orl    $0x20,%ebp
+	d1 eb                   # shrl   %ebx
+	81 e3 80 00 00 00       # andl   $0x80,%ebx
+	09 dd                   # orl    %ebx,%ebp
+	8b 1d [V]               # movl   [V],%ebx
+	81 c3 80 00 00 00       # addl   $0x80,%ebx
+	81 c3 00 ff ff ff       # addl   $0xffffff00,%ebx
+	19 db                   # sbbl   %ebx,%ebx
+	83 e3 40                # andl   $0x40,%ebx
+	09 eb                   # orl    %ebp,%ebx
+	8b 2d [S]               # movl   S,%ebp
+	88 5d 00                # movb   %bl,0x0(%ebp)
+	83 e3 01                # andl   $0x1,%ebx
+	fe 0d [S]               # decb   S
+	89 dd                   # movl   %ebx,%ebp
 	/
 # 09 - ORA - Immediate
 09,2:
-	83 c8 [B+1]		# orl    $B+1,%eax
-	83 c6 02		# addl   $0x2,%esi
-	0f be f8		# movsbl %al,%edi
+	83 c8 [B+1]             # orl    $B+1,%eax
+	83 c6 02                # addl   $0x2,%esi
+	0f be f8                # movsbl %al,%edi
 	/
 # 0A - ASL - Accumulator
 0A,1:
-	00 c0			# addb   %al,%al
-	8d 76 02		# leal   0x2(%esi),%esi
-        19 ed			# sbbl   %ebp,%ebp
-	0f be f8		# movsbl %al,%edi
+	00 c0                   # addb   %al,%al
+	8d 76 02                # leal   0x2(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be f8                # movsbl %al,%edi
 	/
 # 0B - (bad)
 # 0C - (bad)
 # 0D - ORA - Absolute
 0D,3:
-	8b 1d [X+1]		# movl   XLATADDR,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	0a 83 [W+1] 00 00	# orb    ADDR(%ebx),%al
-	0f be f8		# movsbl %al,%edi
+	8b 1d [X+1]             # movl   XLATADDR,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	0a 83 [W+1] 00 00       # orb    ADDR(%ebx),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 0E - ASL - Absolute
 0E,3:
 # Warning - doesn't check mapper
-	31 db			# xorl   %ebx,%ebx
-	8a 1d [A+1]		# movb   ADDR,%bl
-	00 db			# addb   %bl,%bl
-	8d 76 06		# leal   0x6(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	88 1d [A+1]		# movb   %bl,ADDR
-	0f be fb		# movsbl %bl,%edi
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [A+1]             # movb   ADDR,%bl
+	00 db                   # addb   %bl,%bl
+	8d 76 06                # leal   0x6(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	88 1d [A+1]             # movb   %bl,ADDR
+	0f be fb                # movsbl %bl,%edi
 	/
 # 0F - (bad)
 # 10 - BPL
 10,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	f7 c7 00 01 00 00	# testl  $0x100,%edi
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 84 [U]		# je     U
-	83 ee [>+1] 01		# subl   $1+,%esi
-        /
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	f7 c7 00 01 00 00       # testl  $0x100,%edi
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 84 [U]               # je     U
+	83 ee [>+1] 01          # subl   $1+,%esi
+	/
 # 11 - ORA - (Indirect),Y
 11,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   ZP,%bx
-	8d 3c 1a		# leal   (%edx,%ebx,1),%edi
-	8d 1c 1a		# leal   (%edx,%ebx,1),%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	8d 76 05		# leal   0x5(%esi),%esi
-	8b 3c bd [M]		# movl   MAPTABLE(,%edi,4),%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   ZP,%bx
+	8d 3c 1a                # leal   (%edx,%ebx,1),%edi
+	8d 1c 1a                # leal   (%edx,%ebx,1),%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	8d 76 05                # leal   0x5(%esi),%esi
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
 
 # FIXME - trap I/O
- 81 fb 00 60 00 00 # cmpl   $0x6000,%ebx
- 73 09             # jae    +9
- 81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
- 72 01             # jb     +1
- [^]               # int3
+	81 fb 00 60 00 00       # cmpl   $0x6000,%ebx
+	73 09                   # jae    +9
+	81 fb 00 20 00 00       # cmpl   $0x2000,%ebx
+	72 01                   # jb     +1
+	[^]                     # int3
 
-	0a 04 1f		# orb    (%edi,%ebx,1),%al
-	0f be f8		# movsbl %al,%edi
+	0a 04 1f                # orb    (%edi,%ebx,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 12 - (bad)
 # 13 - (bad)
 # 14 - (bad)
 # 15 - ORA - Zero Page,X
 15,2:
-	8d 59 [B+1]		# leal   operand(%ecx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	0b 83 [L]		# orl    RAM(%ebx),%eax
-	0f be f8		# movsbl %al,%edi
+	8d 59 [B+1]             # leal   operand(%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	0b 83 [L]               # orl    RAM(%ebx),%eax
+	0f be f8                # movsbl %al,%edi
 	/
 # 16 - ASL - Zero Page,X
 16,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	31 db			# xorl   %ebx,%ebx
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	8d 76 06		# leal   6(%esi),%esi
-	8a 9f [L]		# movb   ZP(%edi),%bl
-	00 db			# addb   %bl,%bl
-	19 ed			# sbbl   %ebp,%ebp
-	88 9f [L]		# movb   %bl,ZP(%edi)
-	0f be fb		# movsbl %bl,%edi
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	8d 76 06                # leal   6(%esi),%esi
+	8a 9f [L]               # movb   ZP(%edi),%bl
+	00 db                   # addb   %bl,%bl
+	19 ed                   # sbbl   %ebp,%ebp
+	88 9f [L]               # movb   %bl,ZP(%edi)
+	0f be fb                # movsbl %bl,%edi
 	/
 # 17 - (bad)
 # 18 - CLC
 18,1:
-	31 ed			# xorl   %ebp,%ebp
-	83 c6 02		# addl   $0x2,%esi
+	31 ed                   # xorl   %ebp,%ebp
+	83 c6 02                # addl   $0x2,%esi
 	/
 # 19 - ORA - Absolute,Y
 19,3:
 # FIXME - cycle count wrong
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	8d ba [W+1] 00 00	# leal   ADDR(%edx),%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	0a 04 3b		# orb    (%ebx,%edi,1),%al
-	0f be f8		# movsbl %al,%edi
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	8d ba [W+1] 00 00       # leal   ADDR(%edx),%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	0a 04 3b                # orb    (%ebx,%edi,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 1A - (bad)
 # 1B - (bad)
@@ -355,43 +355,43 @@
 # 1D - ORA - Absolute,X
 1D,3:
 # FIXME - cycle count wrong
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	8d b9 [W+1] 00 00	# leal   ADDR(%ecx),%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	0a 04 3b		# orb    (%ebx,%edi,1),%al
-	0f be f8		# movsbl %al,%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	8d b9 [W+1] 00 00       # leal   ADDR(%ecx),%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	0a 04 3b                # orb    (%ebx,%edi,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 1E - ASL - Absolute,X
 1E,3:
 # warning: assumes RAM target; doesn't check ROM mapper or FFFF->0000 overflow
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c6 07		# addl   $0x7,%esi        (cycle count +7)
-	d0 a1 [A+1]		# shlb   [A+1](%ecx)
-	19 ed			# sbbl   %ebp,%ebp        (saves carry flag)
-	0f be b9 [A+1]		# movsbl [A+1](%ecx),%edi (saves other flags)
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c6 07                # addl   $0x7,%esi        (cycle count +7)
+	d0 a1 [A+1]             # shlb   [A+1](%ecx)
+	19 ed                   # sbbl   %ebp,%ebp        (saves carry flag)
+	0f be b9 [A+1]          # movsbl [A+1](%ecx),%edi (saves other flags)
 	/
 # 1F - (bad)
 # 20 - JSR
 20,3:
-	8b 1d [S]		# movl   S,%ebx
-	50			# pushl  %eax
-	b8 [P+2]		# movl   $[P+2],%eax
-	88 23			# movb   %ah,(%ebx)
-	4b			# decl   %ebx
-	81 cb 00 01 00 00	# orl    $0x100,%ebx
-	88 03			# movb   %al,(%ebx)
-	fe cb			# decb   %bl
-	83 c6 06		# addl   $0x6,%esi
-	58			# popl   %eax
-	88 1d [S]		# movb   %bl,S
-	bb [W+1] 00 00		# movl   $0000[W+1],%ebx
-	0f 89 [N]		# jns    NMI
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    UPDATE/COMPILE
-	[!]			#  -STOP-
+	8b 1d [S]               # movl   S,%ebx
+	50                      # pushl  %eax
+	b8 [P+2]                # movl   $[P+2],%eax
+	88 23                   # movb   %ah,(%ebx)
+	4b                      # decl   %ebx
+	81 cb 00 01 00 00       # orl    $0x100,%ebx
+	88 03                   # movb   %al,(%ebx)
+	fe cb                   # decb   %bl
+	83 c6 06                # addl   $0x6,%esi
+	58                      # popl   %eax
+	88 1d [S]               # movb   %bl,S
+	bb [W+1] 00 00          # movl   $0000[W+1],%ebx
+	0f 89 [N]               # jns    NMI
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    UPDATE/COMPILE
+	[!]                     #  -STOP-
 # It's fairly common for 6502 code to follow a JSR with parameter data,
 # so there's a chance that what follows is not executable code, in which
 # case translation should stop after the JSR.
@@ -401,169 +401,169 @@
 # 23 - (bad)
 # 24 - BIT - Zero Page
 24,2:
-	0f be 3d [Z+1]		# movsbl ZP,%edi
-	0d 00 01 00 00		# orl    $0x100,%eax
-	83 c6 03		# addl   $0x3,%esi
-	8d 1c fd 00 00 00 00	# leal   0x0(,%edi,8),%ebx
-	21 c7			# andl   %eax,%edi
-	81 e3 00 02 00 00	# andl   $0x200,%ebx
-	89 1d [V]		# movl   %ebx,VFLAG
-        /
+	0f be 3d [Z+1]          # movsbl ZP,%edi
+	0d 00 01 00 00          # orl    $0x100,%eax
+	83 c6 03                # addl   $0x3,%esi
+	8d 1c fd 00 00 00 00    # leal   0x0(,%edi,8),%ebx
+	21 c7                   # andl   %eax,%edi
+	81 e3 00 02 00 00       # andl   $0x200,%ebx
+	89 1d [V]               # movl   %ebx,VFLAG
+	/
 # 25 - AND - Zero Page
 25,2:
-        23 05 [Z+1]		# andl   ZP,%eax
-	83 c6 03		# addl   $3,%esi
-	0f be f8		# movsbl %al,%edi
+	23 05 [Z+1]             # andl   ZP,%eax
+	83 c6 03                # addl   $3,%esi
+	0f be f8                # movsbl %al,%edi
 	/
 # 26 - ROL - Zero Page
 26,2:
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	d0 15 [Z+1]		# rclb   ZP
-	8d 76 05		# leal   5(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	0f be 3d [Z+1]		# movsbl ZP,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	d0 15 [Z+1]             # rclb   ZP
+	8d 76 05                # leal   5(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be 3d [Z+1]          # movsbl ZP,%edi
 	/
 # 27 - (bad)
 # 28 - PLP
 28,1:
-        8b 3d [S]           # movl   S,%edi
-        81 ef ff 00 00 00   # subl   $0xff,%edi
-        81 cf 00 01 00 00   # orl    $0x100,%edi
-        89 3d [S]           # movl   %edi,S
-        8b 1f               # movl   (%edi),%ebx
-	8d 76 04	    # leal   0x4(%esi),%esi
-        89 dd               # movl   %ebx,%ebp
-        83 e5 3C            # andl   $0x3C,%ebp
-        8d 3c dd 00 00 00 00# leal   0x0(,%ebx,8),%edi
-        83 f3 02            # xorl   $0x2,%ebx
-        89 2d [F]           # movl   %ebp,F
-        89 dd               # movl   %ebx,%ebp
-        81 e7 00 02 00 00   # andl   $0x200,%edi
-        83 e5 01            # andl   $0x1,%ebp
-        89 3d [V]           # movl   %edi,V
-	8d 3c 1b	    # leal   (%ebx,%ebx,1),%edi
-	81 e7 04 01 00 00   # andl   $0x104,%edi
+	8b 3d [S]               # movl   S,%edi
+	81 ef ff 00 00 00       # subl   $0xff,%edi
+	81 cf 00 01 00 00       # orl    $0x100,%edi
+	89 3d [S]               # movl   %edi,S
+	8b 1f                   # movl   (%edi),%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	89 dd                   # movl   %ebx,%ebp
+	83 e5 3C                # andl   $0x3C,%ebp
+	8d 3c dd 00 00 00 00    # leal   0x0(,%ebx,8),%edi
+	83 f3 02                # xorl   $0x2,%ebx
+	89 2d [F]               # movl   %ebp,F
+	89 dd                   # movl   %ebx,%ebp
+	81 e7 00 02 00 00       # andl   $0x200,%edi
+	83 e5 01                # andl   $0x1,%ebp
+	89 3d [V]               # movl   %edi,V
+	8d 3c 1b                # leal   (%ebx,%ebx,1),%edi
+	81 e7 04 01 00 00       # andl   $0x104,%edi
 	/
 # 29 - AND - Immediate
 29,2:
-	25 [B+1] 00 00 00	# andl   $0x000000[B+1],%eax
-	83 c6 02		# addl   $0x2,%esi
-	0f be f8		# movsbl %al,%edi
+	25 [B+1] 00 00 00       # andl   $0x000000[B+1],%eax
+	83 c6 02                # addl   $0x2,%esi
+	0f be f8                # movsbl %al,%edi
 #Alternate form does same thing:
-#	25 [B+1] 00 00 00	# andl   $0x000000[B+1],%eax
-#	83 c0 80		# addl   $0xffffff80,%eax
-#	83 c6 02		# addl   $0x2,%esi
-#	83 f0 80		# xorl   $0xffffff80,%eax
-#	89 c7			# movl   %eax,%edi
+#	25 [B+1] 00 00 00       # andl   $0x000000[B+1],%eax
+#	83 c0 80                # addl   $0xffffff80,%eax
+#	83 c6 02                # addl   $0x2,%esi
+#	83 f0 80                # xorl   $0xffffff80,%eax
+#	89 c7                   # movl   %eax,%edi
 	/
 # 2A - ROL - Accumulator
 2A,1:
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	d0 d0			# rclb   %al
-	8d 76 02		# leal   2(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	0f be f8		# movsbl %al,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	d0 d0                   # rclb   %al
+	8d 76 02                # leal   2(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be f8                # movsbl %al,%edi
 	/
 # 2B - (bad)
 # 2C - BIT - Absolute
 2C,3:
-	8b 1d [X+1]		# movl   XADDRMAP,%ebx
-	0d 00 01 00 00		# orl    $0x100,%eax
-	0f be bb [W+1] 00 00	# movsbl ADDR(%ebx),%edi
-	83 c6 04		# addl   $0x4,%esi
-	8d 1c fd 00 00 00 00	# leal   0x0(,%edi,8),%ebx
-	21 c7			# andl   %eax,%edi
-	81 e3 00 02 00 00	# andl   $0x200,%ebx
-	89 1d [V]		# movl   %ebx,VFLAG
-        /
+	8b 1d [X+1]             # movl   XADDRMAP,%ebx
+	0d 00 01 00 00          # orl    $0x100,%eax
+	0f be bb [W+1] 00 00    # movsbl ADDR(%ebx),%edi
+	83 c6 04                # addl   $0x4,%esi
+	8d 1c fd 00 00 00 00    # leal   0x0(,%edi,8),%ebx
+	21 c7                   # andl   %eax,%edi
+	81 e3 00 02 00 00       # andl   $0x200,%ebx
+	89 1d [V]               # movl   %ebx,VFLAG
+	/
 # 2D - AND - Absolute
 2D,3:
-	8b 1d [X+1]		# movl   XMAPADDR,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	22 83 [W+1] 00 00	# andb   ADDR(%ebx),%al
-	0f be f8		# movsbl %al,%edi
+	8b 1d [X+1]             # movl   XMAPADDR,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	22 83 [W+1] 00 00       # andb   ADDR(%ebx),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 2E - ROL - Absolute
 2E,3:
 #warning - assumes ram target, doesn't check mapper
-	83 c5 ff	# addl   $0xffffffff,%ebp
-	d0 15 [A+1]	# rclb   ADDR
-	8d 76 06	# leal   6(%esi),%esi
-	19 ed		# sbbl   %ebp,%ebp
-	0f be 3d [A+1]	# movsbl ADDR,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	d0 15 [A+1]             # rclb   ADDR
+	8d 76 06                # leal   6(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be 3d [A+1]          # movsbl ADDR,%edi
 	/
 # 2F - (bad)
 # 30 - BMI
 30,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	f7 c7 00 01 00 00	# testl  $0x100,%edi
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 85 [U]		# jne    U
-	83 ee [>+1] 01		# subl   $1+,%esi
-        /
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	f7 c7 00 01 00 00       # testl  $0x100,%edi
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 85 [U]               # jne    U
+	83 ee [>+1] 01          # subl   $1+,%esi
+	/
 # 31 - AND - (Indirect),Y
 31,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   [Z+1],%bx
-	01 d3			# addl   %edx,%ebx
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   [Z+1],%bx
+	01 d3                   # addl   %edx,%ebx
 
 # FIXME - trap I/O
- 8d bb 00 e0 ff ff	# leal   0xffffe000(%ebx),%edi
- 81 ff 00 40 00 00	# cmpl   $0x4000,%edi
- 73 01			# jae    +1
- [^]			# int3
+	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
+	[^]                     # int3
 
-	89 df			# movl   %ebx,%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	83 c6 05		# addl   $0x5,%esi
-	22 04 3b		# andb   (%ebx,%edi,1),%al
-	0f be f8		# movsbl %al,%edi
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	83 c6 05                # addl   $0x5,%esi
+	22 04 3b                # andb   (%ebx,%edi,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 32 - (bad)
 # 33 - (bad)
 # 34 - (bad)
 # 35 - AND - Zero Page,X
 35,2:
-	8d 59 [B+1]		# leal   operand(%ecx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	23 83 [L]		# andl   RAM(%ebx),%eax
-#				#andb..?
-	0f be f8		# movsbl %al,%edi
+	8d 59 [B+1]             # leal   operand(%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	23 83 [L]               # andl   RAM(%ebx),%eax
+#	                        #andb..?
+	0f be f8                # movsbl %al,%edi
 	/
 # 36 - ROL - Zero Page,X
 36,2:
-	8d 59 [B+1]		# leal   [B+1](%ecx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	d0 93 [L]		# rclb   RAM(%ebx)
-	8d 76 06		# leal   6(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	0f be bb [L]		# movsbl RAM(%ebx),%edi
+	8d 59 [B+1]             # leal   [B+1](%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	d0 93 [L]               # rclb   RAM(%ebx)
+	8d 76 06                # leal   6(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
 	/
 # 37 - (bad)
 # 38 - SEC
 38,1:
-	83 c6 02		# addl   $0x2,%esi
-	83 cd ff		# orl    $0xffffffff,%ebp
+	83 c6 02                # addl   $0x2,%esi
+	83 cd ff                # orl    $0xffffffff,%ebp
 	/
 
 # 39 - AND - Absolute,Y
 39,3:
 # FIXME - cycle count wrong
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d ba [W+1] 00 00	# leal   ADDR(%edx),%edi
-	83 c6 04		# addl   $0x4,%esi
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	22 04 3b		# andb   (%ebx,%edi,1),%al
-	0f be f8		# movsbl %al,%edi
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d ba [W+1] 00 00       # leal   ADDR(%edx),%edi
+	83 c6 04                # addl   $0x4,%esi
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	22 04 3b                # andb   (%ebx,%edi,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 3A - (bad)
 # 3B - (bad)
@@ -571,57 +571,57 @@
 # 3D - AND - Absolute,X
 3D,3:
 # FIXME - cycle count wrong
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d b9 [W+1] 00 00	# leal   ADDR(%ecx),%edi
-	83 c6 04		# addl   $0x4,%esi
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	22 04 3b		# andb   (%ebx,%edi,1),%al
-	0f be f8		# movsbl %al,%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d b9 [W+1] 00 00       # leal   ADDR(%ecx),%edi
+	83 c6 04                # addl   $0x4,%esi
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	22 04 3b                # andb   (%ebx,%edi,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 3E - ROL - Absolute,X
 3E,3:
 # warning: assumes RAM target; doesn't check ROM mapper!
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8d 76 07		# leal   7(%esi),%esi
-	d0 91 [A+1]		# rclb   ADDR(%ecx)
-	19 ed			# sbbl   %ebp,%ebp       (saves carry flag)
-	0f be b9 [A+1]		# movsbl ADDR(%ecx),%edi (saves other flags)
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8d 76 07                # leal   7(%esi),%esi
+	d0 91 [A+1]             # rclb   ADDR(%ecx)
+	19 ed                   # sbbl   %ebp,%ebp       (saves carry flag)
+	0f be b9 [A+1]          # movsbl ADDR(%ecx),%edi (saves other flags)
 	/
 # 3F - (bad)
 # 40 - RTI
 40,1:
-	8b 3d [S]  		# movl   STACKPTR,%edi
-	81 ef ff 00 00 00	# subl   $0xff,%edi
-	81 cf 00 01 00 00	# orl    $0x100,%edi
-	89 3d [S]		# movl   %edi,STACKPTR
-	8b 1f			# movl   (%edi),%ebx
-	89 dd			# movl   %ebx,%ebp
-	83 e5 3C		# andl   $0x3C,%ebp
-	8d 3c dd 00 00 00 00	# leal   0x0(,%ebx,8),%edi
-	83 f3 02		# xorl   $0x2,%ebx
-	89 2d [F]		# movl   %ebp,FLAGS
-	89 dd			# movl   %ebx,%ebp
-	81 e7 00 02 00 00	# andl   $0x200,%edi
-	83 e5 01		# andl   $0x1,%ebp
-	89 3d [V]	 	# movl   %edi,VFLAG
-	8d 3c 5d 00 00 00 00	# leal   0x0(,%ebx,2),%edi
-	81 e7 04 01 00 00	# andl   $0x104,%edi
-	31 db			# xorl   %ebx,%ebx
-	8a 1d [S]		# movb   STACKPTR,%bl
-	fe c3			# incb   %bl
-	8a ab [T]		# movb   STACK(%ebx),%ch
-	fe c3			# incb   %bl
-	8a b3 [T]		# movb   STACK(%ebx),%dh
-	88 1d [S]		# movb   %bl,STACKPTR
-	31 db			# xorl   %ebx,%ebx
-	86 eb			# xchgb  %ch,%bl
-	86 f7			# xchgb  %dh,%bh
-	83 c6 06		# addl   $0x6,%esi
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	8b 3d [S]               # movl   STACKPTR,%edi
+	81 ef ff 00 00 00       # subl   $0xff,%edi
+	81 cf 00 01 00 00       # orl    $0x100,%edi
+	89 3d [S]               # movl   %edi,STACKPTR
+	8b 1f                   # movl   (%edi),%ebx
+	89 dd                   # movl   %ebx,%ebp
+	83 e5 3C                # andl   $0x3C,%ebp
+	8d 3c dd 00 00 00 00    # leal   0x0(,%ebx,8),%edi
+	83 f3 02                # xorl   $0x2,%ebx
+	89 2d [F]               # movl   %ebp,FLAGS
+	89 dd                   # movl   %ebx,%ebp
+	81 e7 00 02 00 00       # andl   $0x200,%edi
+	83 e5 01                # andl   $0x1,%ebp
+	89 3d [V]               # movl   %edi,VFLAG
+	8d 3c 5d 00 00 00 00    # leal   0x0(,%ebx,2),%edi
+	81 e7 04 01 00 00       # andl   $0x104,%edi
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [S]               # movb   STACKPTR,%bl
+	fe c3                   # incb   %bl
+	8a ab [T]               # movb   STACK(%ebx),%ch
+	fe c3                   # incb   %bl
+	8a b3 [T]               # movb   STACK(%ebx),%dh
+	88 1d [S]               # movb   %bl,STACKPTR
+	31 db                   # xorl   %ebx,%ebx
+	86 eb                   # xchgb  %ch,%bl
+	86 f7                   # xchgb  %dh,%bh
+	83 c6 06                # addl   $0x6,%esi
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	[!]
 	/
 # 41 - EOR - (Indirect,X)
@@ -630,701 +630,701 @@
 # 44 - (bad)
 # 45 - EOR - Zero Page
 45,2:
-        33 05 [Z+1]		# xorl   Z,%eax
-	83 c6 03		# addl   $0x3,%esi
-	0f be f8		# movsbl %al,%edi
+	33 05 [Z+1]             # xorl   Z,%eax
+	83 c6 03                # addl   $0x3,%esi
+	0f be f8                # movsbl %al,%edi
 	/
 # 46 - LSR - Zero Page
 46,2:
-	31 db			# xorl   %ebx,%ebx
-	8a 1d [Z+1]		# movb   ZP,%bl
-	d0 eb			# shrb   %bl
-	8d 76 05		# leal   0x5(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	88 1d [Z+1]		# movb   %bl,ZP
-	89 df			# movl   %ebx,%edi
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [Z+1]             # movb   ZP,%bl
+	d0 eb                   # shrb   %bl
+	8d 76 05                # leal   0x5(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	88 1d [Z+1]             # movb   %bl,ZP
+	89 df                   # movl   %ebx,%edi
 	/
 # 47 - (bad)
 # 48 - PHA
 48,1:
-	8b 1d [S]		# movl   STACKPTR,%ebx
-	83 c6 03		# addl   $0x3,%esi
-	88 03			# movb   %al,(%ebx)
-	fe cb			# decb   %bl
-	88 1d [S]		# movb   %bl,STACKPTR
+	8b 1d [S]               # movl   STACKPTR,%ebx
+	83 c6 03                # addl   $0x3,%esi
+	88 03                   # movb   %al,(%ebx)
+	fe cb                   # decb   %bl
+	88 1d [S]               # movb   %bl,STACKPTR
 	/
 # 49 - EOR - Immediate
 49,2:
-	35 [E+1]		# xorl   $imm,%eax
-	83 c6 02		# addl   $0x2,%esi
-	0f be f8		# movsbl %al,%edi
+	35 [E+1]                # xorl   $imm,%eax
+	83 c6 02                # addl   $0x2,%esi
+	0f be f8                # movsbl %al,%edi
 	/
 # 4A - LSR - Accumulator
 4A,1:
-        d1 e8			# shrl   %eax
-        19 ed			# sbbl   %ebp,%ebp
-        83 e0 7f		# andl   $0x7f,%eax
-	8d 76 02		# leal   0x2(%esi),%esi
-	89 c7			# movl   %eax,%edi
+	d1 e8                   # shrl   %eax
+	19 ed                   # sbbl   %ebp,%ebp
+	83 e0 7f                # andl   $0x7f,%eax
+	8d 76 02                # leal   0x2(%esi),%esi
+	89 c7                   # movl   %eax,%edi
 	/
 # 4B - (bad)
 # 4C - JMP - Absolute
 4C,3:
-	83 c6 03		# addl   $3,%esi
-	bb [W+1] 00 00		# movl   $0000[W+1],%ebx
-	0f 89 [N]		# jns    NMI
-	81 fb [P]		# cmpl   $[P],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 85 [U]		# jne    [U]
-	31 f6			# xorl   %esi,%esi
-	e9 [N]			# jmp    NMI
+	83 c6 03                # addl   $3,%esi
+	bb [W+1] 00 00          # movl   $0000[W+1],%ebx
+	0f 89 [N]               # jns    NMI
+	81 fb [P]               # cmpl   $[P],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 85 [U]               # jne    [U]
+	31 f6                   # xorl   %esi,%esi
+	e9 [N]                  # jmp    NMI
 	[!]
 	/
 # 4D - EOR - Absolute
 4D,3:
-	8b 1d [X+1]		# movl   XMAPADDR,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	32 83 [W+1] 00 00	# xorb   ADDR(%ebx),%al
-	0f be f8		# movsbl %al,%edi
+	8b 1d [X+1]             # movl   XMAPADDR,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	32 83 [W+1] 00 00       # xorb   ADDR(%ebx),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 4E - LSR - Absolute
 4E,3:
 # Warning: read-modify-write operation assumes RAM target, does not check mapper table
-	8b 1d [A+1]		# movl   ADDR,%ebx
-	d1 eb			# shrl   %ebx
-	19 ed			# sbbl   %ebp,%ebp
-	83 e3 7f		# andl   $0x7f,%ebx
-	8d 76 06		# leal   6(%esi),%esi
-	88 1d [A+1]		# movb   %bl,ADDR
-	89 df			# movl   %ebx,%edi
+	8b 1d [A+1]             # movl   ADDR,%ebx
+	d1 eb                   # shrl   %ebx
+	19 ed                   # sbbl   %ebp,%ebp
+	83 e3 7f                # andl   $0x7f,%ebx
+	8d 76 06                # leal   6(%esi),%esi
+	88 1d [A+1]             # movb   %bl,ADDR
+	89 df                   # movl   %ebx,%edi
 	/
 # 4F - (bad)
 # 50 - BVC
 50,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	8b 1d [V]		# movl   [V],%ebx
-	81 c3 80 00 00 00	# addl   $0x80,%ebx
-	f7 c3 00 ff ff ff	# testl  $0xffffff00,%ebx
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 84 [U]		# je     U
-	83 ee [>+1] 01		# subl   $1+,%esi
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	8b 1d [V]               # movl   [V],%ebx
+	81 c3 80 00 00 00       # addl   $0x80,%ebx
+	f7 c3 00 ff ff ff       # testl  $0xffffff00,%ebx
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 84 [U]               # je     U
+	83 ee [>+1] 01          # subl   $1+,%esi
 	/
 # 51 - EOR - (Indirect),Y
 51,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   [Z+1],%bx
-	8d 76 05		# leal   0x5(%esi),%esi
-	8d 3c 1a		# leal   (%edx,%ebx,1),%edi
-	c1 ef 0c		# shrl   $0xc,%edi
-	8d 1c 1a		# leal   (%edx,%ebx,1),%ebx
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   [Z+1],%bx
+	8d 76 05                # leal   0x5(%esi),%esi
+	8d 3c 1a                # leal   (%edx,%ebx,1),%edi
+	c1 ef 0c                # shrl   $0xc,%edi
+	8d 1c 1a                # leal   (%edx,%ebx,1),%ebx
 
 # FIXME - trap I/O
- 81 fb 00 60 00 00 # cmpl   $0x6000,%ebx
- 73 09             # jae    +9
- 81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
- 72 01             # jb     +1
- [^]               # int3
+	81 fb 00 60 00 00       # cmpl   $0x6000,%ebx
+	73 09                   # jae    +9
+	81 fb 00 20 00 00       # cmpl   $0x2000,%ebx
+	72 01                   # jb     +1
+	[^]                     # int3
 
-	8b 3c bd [M]		# movl   [M](,%edi,4),%edi
-	32 04 3b		# xorb   (%ebx,%edi,1),%al
-	0f be f8		# movsbl %al,%edi
+	8b 3c bd [M]            # movl   [M](,%edi,4),%edi
+	32 04 3b                # xorb   (%ebx,%edi,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 52 - (bad)
 # 53 - (bad)
 # 54 - (bad)
 # 55 - EOR - Zero Page,X
 55,2:
-	8d 59 [B+1]		# leal   operand(%ecx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	33 83 [L]		# xorl   RAM(%ebx),%eax
-	0f be f8		# movsbl %al,%edi
+	8d 59 [B+1]             # leal   operand(%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	33 83 [L]               # xorl   RAM(%ebx),%eax
+	0f be f8                # movsbl %al,%edi
 	/
 # 56 - LSR - Zero Page,X
 56,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	31 db			# xorl   %ebx,%ebx
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	8d 76 06		# leal   0x6(%esi),%esi
-	8a 9f [L]		# movb   RAM(%edi),%bl
-	d0 eb			# shrb   %bl
-	19 ed			# sbbl   %ebp,%ebp
-	88 9f [L]		# movb   %bl,RAM(%edi)
-	89 df			# movl   %ebx,%edi
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	8d 76 06                # leal   0x6(%esi),%esi
+	8a 9f [L]               # movb   RAM(%edi),%bl
+	d0 eb                   # shrb   %bl
+	19 ed                   # sbbl   %ebp,%ebp
+	88 9f [L]               # movb   %bl,RAM(%edi)
+	89 df                   # movl   %ebx,%edi
 	/
 # 57 - (bad)
 # 58 - CLI
 58,1:
-	83 c6 02		# addl   $0x2,%esi
-	80 25 [F] fb		# andb   $0xfb,F
+	83 c6 02                # addl   $0x2,%esi
+	80 25 [F] fb            # andb   $0xfb,F
 	/
 # 59 - EOR - Absolute,Y
 59,3:
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	8d ba [W+1] 00 00	# leal   ADDR(%edx),%edi
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	38 d3			# cmpb   %dl,%bl
-	83 d6 04		# adcl   $0x4,%esi
-	8b 3c bd [M]		# movl   MAPPER(,%edi,4),%edi
-	32 04 1f		# xorb   (%edi,%ebx,1),%al
-	0f be f8		# movsbl %al,%edi
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	8d ba [W+1] 00 00       # leal   ADDR(%edx),%edi
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	38 d3                   # cmpb   %dl,%bl
+	83 d6 04                # adcl   $0x4,%esi
+	8b 3c bd [M]            # movl   MAPPER(,%edi,4),%edi
+	32 04 1f                # xorb   (%edi,%ebx,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 5A - (bad)
 # 5B - (bad)
 # 5C - (bad)
 # 5D - EOR - Absolute,X
 5D,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	8d b9 [W+1] 00 00	# leal   ADDR(%ecx),%edi
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	38 cb			# cmpb   %cl,%bl
-	83 d6 04		# adcl   $0x4,%esi
-	8b 3c bd [M]		# movl   MAPTABLE(,%edi,4),%edi
-	32 04 1f		# xorb   (%edi,%ebx,1),%al
-	0f be f8		# movsbl %al,%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	8d b9 [W+1] 00 00       # leal   ADDR(%ecx),%edi
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	38 cb                   # cmpb   %cl,%bl
+	83 d6 04                # adcl   $0x4,%esi
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	32 04 1f                # xorb   (%edi,%ebx,1),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 5E - LSR - Absolute,X
 5E,3:
 # Warning- Doesn't check mapper
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	31 db			# xorl   %ebx,%ebx
-	8a 99 [A+1]		# movb   RAM(%ecx),%bl
-	d0 eb			# shrb   %bl
-	8d 76 07		# leal   0x7(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	88 99 [A+1]		# movb   %bl,RAM(%ecx)
-	89 df			# movl   %ebx,%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	31 db                   # xorl   %ebx,%ebx
+	8a 99 [A+1]             # movb   RAM(%ecx),%bl
+	d0 eb                   # shrb   %bl
+	8d 76 07                # leal   0x7(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	88 99 [A+1]             # movb   %bl,RAM(%ecx)
+	89 df                   # movl   %ebx,%edi
 	/
 # 5F - (bad)
 # 60 - RTS
 60,1:
-	31 db			# xorl   %ebx,%ebx
-	50			# pushl  %eax
-	8a 1d [S]		# movb   STACKPTR,%bl
-	31 c0			# xorl   %eax,%eax
-	fe c3			# incb   %bl
-	8a 83 [T]		# movb   STACK(%ebx),%al
-	fe c3			# incb   %bl
-	88 1d [S]		# movb   %bl,STACKPTR
-	8a a3 [T]		# movb   STACK(%ebx),%ah
-	8d 76 06		# leal   0x6(%esi),%esi
-	8d 58 01		# leal   0x1(%eax),%ebx
-	58			# popl   %eax
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-        e9 [U]			# jmp    U
-	[!]			#  end of function; stop translating
-        /
+	31 db                   # xorl   %ebx,%ebx
+	50                      # pushl  %eax
+	8a 1d [S]               # movb   STACKPTR,%bl
+	31 c0                   # xorl   %eax,%eax
+	fe c3                   # incb   %bl
+	8a 83 [T]               # movb   STACK(%ebx),%al
+	fe c3                   # incb   %bl
+	88 1d [S]               # movb   %bl,STACKPTR
+	8a a3 [T]               # movb   STACK(%ebx),%ah
+	8d 76 06                # leal   0x6(%esi),%esi
+	8d 58 01                # leal   0x1(%eax),%ebx
+	58                      # popl   %eax
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    U
+	[!]                     #  end of function; stop translating
+	/
 # 61 - ADC - (Indirect,X)
 61,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	0f b7 bf [L]		# movzwl [L](%edi),%edi
-	89 fb			# movl   %edi,%ebx
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	0f b7 bf [L]            # movzwl [L](%edi),%edi
+	89 fb                   # movl   %edi,%ebx
 
 # FIXME - trap I/O
- 81 fb 00 60 00 00 # cmpl   $0x6000,%ebx
- 73 09             # jae    +9
- 81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
- 72 01             # jb     +1
- [^]               # int3
+	81 fb 00 60 00 00       # cmpl   $0x6000,%ebx
+	73 09                   # jae    +9
+	81 fb 00 20 00 00       # cmpl   $0x2000,%ebx
+	72 01                   # jb     +1
+	[^]                     # int3
 
-	c1 ef 0c		# shrl   $0xc,%edi
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8b 3c bd [M]		# movl   [M](,%edi,4),%edi
-	0f be c0		# movsbl %al,%eax
-	0f be 1c 1f		# movsbl (%edi,%ebx,1),%ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 06		# leal   0x6(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,[V]
-	0f be f8		# movsbl %al,%edi
+	c1 ef 0c                # shrl   $0xc,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 3c bd [M]            # movl   [M](,%edi,4),%edi
+	0f be c0                # movsbl %al,%eax
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 06                # leal   0x6(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,[V]
+	0f be f8                # movsbl %al,%edi
 	/
 # 62 - (bad)
 # 63 - (bad)
 # 64 - (bad)
 # 65 - ADC - Zero Page
 65,2:
-	0f be c0		# movsbl %al,%eax
-	0f be 1d [Z+1]		# movsbl ZP,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	11 d8			# adcl   %ebx,%eax
-	8d 76 03		# leal   3(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	0f be c0                # movsbl %al,%eax
+	0f be 1d [Z+1]          # movsbl ZP,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 03                # leal   3(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # 66 - ROR - Zero Page
 66,2:
-	31 db			# xorl   %ebx,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8a 1d [Z+1]		# movb   ZP,%bl
-	d0 db			# rcrb   %bl
-	8d 76 05		# leal   5(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	88 1d [Z+1]		# movb   %bl,ZP
-	0f be fb		# movsbl %bl,%edi
+	31 db                   # xorl   %ebx,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8a 1d [Z+1]             # movb   ZP,%bl
+	d0 db                   # rcrb   %bl
+	8d 76 05                # leal   5(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	88 1d [Z+1]             # movb   %bl,ZP
+	0f be fb                # movsbl %bl,%edi
 	/
 # 67 - (bad)
 # 68 - PLA
 68,1:
-	31 c0			# xorl   %eax,%eax
-	a0 [S]			# movb   STACKPTR,%al
-	fe c0			# incb   %al
-	8d 76 04		# leal   0x4(%esi),%esi
-	a2 [S]			# movb   %al,STACKPTR
-	8a 80 [T]		# movb   STACK(%eax),%al
-	0f be f8		# movsbl %al,%edi
+	31 c0                   # xorl   %eax,%eax
+	a0 [S]                  # movb   STACKPTR,%al
+	fe c0                   # incb   %al
+	8d 76 04                # leal   0x4(%esi),%esi
+	a2 [S]                  # movb   %al,STACKPTR
+	8a 80 [T]               # movb   STACK(%eax),%al
+	0f be f8                # movsbl %al,%edi
 	/
 # 69 - ADC - Immediate
 69,2:
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	0f be c0		# movsbl %al,%eax
-	83 d0 [B+1]		# adcl   $B+1,%eax
-	8d 76 02		# leal   0x2(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be c0                # movsbl %al,%eax
+	83 d0 [B+1]             # adcl   $B+1,%eax
+	8d 76 02                # leal   0x2(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # 6A - ROR - Accumulator
 6A,1:
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	d0 d8			# rcrb   %al
-	8d 76 02		# leal   0x2(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	0f be f8		# movsbl %al,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	d0 d8                   # rcrb   %al
+	8d 76 02                # leal   0x2(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be f8                # movsbl %al,%edi
 	/
 # 6B - (bad)
 # 6C - JMP - Indirect
 6C,3:
-	8b 1d [X+1]		# movl   [X+1],%ebx
-	83 c6 05		# addl   $0x5,%esi
-	8b 9b [W+1] 00 00	# movl   ADDR(%ebx),%ebx
-	81 e3 ff ff 00 00	# andl   $0xffff,%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    UPDATE/COMPILE
+	8b 1d [X+1]             # movl   [X+1],%ebx
+	83 c6 05                # addl   $0x5,%esi
+	8b 9b [W+1] 00 00       # movl   ADDR(%ebx),%ebx
+	81 e3 ff ff 00 00       # andl   $0xffff,%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    UPDATE/COMPILE
 	[!]
 	/
 # 6D - ADC - Absolute
 6D,3:
-	8b 1d [X+1]		# movl   XMAPADDR,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	0f be c0		# movsbl %al,%eax
-	0f be 9b [W+1] 00 00	# movsbl ADDR(%ebx),%ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	8b 1d [X+1]             # movl   XMAPADDR,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be c0                # movsbl %al,%eax
+	0f be 9b [W+1] 00 00    # movsbl ADDR(%ebx),%ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # 6E - ROR - Absolute
 #warning - assumes ram target, doesn't check mapper
 6E,3:
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	d0 1d [A+1]		# rcrb   ADDR
-	8d 76 06		# leal   6(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	0f be 3d [A+1]		# movsbl ADDR,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	d0 1d [A+1]             # rcrb   ADDR
+	8d 76 06                # leal   6(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be 3d [A+1]          # movsbl ADDR,%edi
 	/
 # 6F - (bad)
 # 70 - BVS
 70,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	8b 1d [V]		# movl   [V],%ebx
-	81 c3 80 00 00 00	# addl   $0x80,%ebx
-	f7 c3 00 ff ff ff	# testl  $0xffffff00,%ebx
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 85 [U]		# jne    U
-	83 ee [>+1] 01		# subl   $1+,%esi
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	8b 1d [V]               # movl   [V],%ebx
+	81 c3 80 00 00 00       # addl   $0x80,%ebx
+	f7 c3 00 ff ff ff       # testl  $0xffffff00,%ebx
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 85 [U]               # jne    U
+	83 ee [>+1] 01          # subl   $1+,%esi
 	/
 # 71 - ADC - (Indirect),Y
 71,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   ZP,%bx
-	01 d3			# addl   %edx,%ebx
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   ZP,%bx
+	01 d3                   # addl   %edx,%ebx
 
 # FIXME - trap I/O
- 8d bb 00 e0 ff ff	# leal   0xffffe000(%ebx),%edi
- 81 ff 00 40 00 00	# cmpl   $0x4000,%edi
- 73 01			# jae    +1
- [^]			# int3
+	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
+	[^]                     # int3
 
-	89 df			# movl   %ebx,%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	0f be c0		# movsbl %al,%eax
-	0f be 1c 3b		# movsbl (%ebx,%edi,1),%ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 05		# leal   0x5(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,V
-	0f be f8		# movsbl %al,%edi
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	0f be c0                # movsbl %al,%eax
+	0f be 1c 3b             # movsbl (%ebx,%edi,1),%ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 05                # leal   0x5(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,V
+	0f be f8                # movsbl %al,%edi
 	/
 # 72 - (bad)
 # 73 - (bad)
 # 74 - (bad)
 # 75 - ADC - Zero Page,X
 75,2:
-	8d 59 [B+1]		# leal   operand(%ecx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	0f be c0		# movsbl %al,%eax
-	0f be 9b [L]		# movsbl RAM(%ebx),%ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	8d 59 [B+1]             # leal   operand(%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be c0                # movsbl %al,%eax
+	0f be 9b [L]            # movsbl RAM(%ebx),%ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # 76 - ROR - Zero Page,X
 76,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	31 db			# xorl   %ebx,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8a 9f [L]		# movb   RAM(%edi),%bl
-	d0 db			# rcrb   %bl
-	8d 76 06		# leal   0x6(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	88 9f [L]		# movb   %bl,RAM(%edi)
-	0f be fb		# movsbl %bl,%edi
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	31 db                   # xorl   %ebx,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8a 9f [L]               # movb   RAM(%edi),%bl
+	d0 db                   # rcrb   %bl
+	8d 76 06                # leal   0x6(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	88 9f [L]               # movb   %bl,RAM(%edi)
+	0f be fb                # movsbl %bl,%edi
 	/
 # 77 - (bad)
 # 78 - SEI
 78,1:
-	83 c6 02		# addl   $0x2,%esi
-	83 0d [F] 04		# or     $0x4,F
+	83 c6 02                # addl   $0x2,%esi
+	83 0d [F] 04            # or     $0x4,F
 	/
 
 # 79 - ADC - Absolute,Y
 79,3: # FIXME - cycle count
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	8d ba [W+1] 00 00	# leal   addr(%edx),%edi
-	8d 9a [W+1] 00 00	# leal   addr(%edx),%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8b 3c bd [M]		# movl   MAPTABLE(,%edi,4),%edi
-	0f be c0		# movsbl %al,%eax
-	0f be 1c 1f		# movsbl (%edi,%ebx,1),%ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	8d ba [W+1] 00 00       # leal   addr(%edx),%edi
+	8d 9a [W+1] 00 00       # leal   addr(%edx),%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	0f be c0                # movsbl %al,%eax
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # 7A - (bad)
 # 7B - (bad)
 # 7C - (bad)
 # 7D - ADC - Absolute,X
 7D,3: # FIXME - cycle count
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	8d b9 [W+1] 00 00	# leal   addr(%ecx),%edi
-	8d 99 [W+1] 00 00	# leal   addr(%ecx),%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8b 3c bd [M]		# movl   MAPTABLE(,%edi,4),%edi
-	0f be c0		# movsbl %al,%eax
-	0f be 1c 1f		# movsbl (%edi,%ebx,1),%ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	8d b9 [W+1] 00 00       # leal   addr(%ecx),%edi
+	8d 99 [W+1] 00 00       # leal   addr(%ecx),%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	0f be c0                # movsbl %al,%eax
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # 7E - ROR - Absolute,X
 7E,3:
 #warning - assumes ram target, no mapper
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	d0 99 [A+1]		# rcrb   ADDR(%ecx)
-	8d 76 07		# leal   7(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	0f be b9 [A+1]		# movsbl ADDR(%ecx),%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	d0 99 [A+1]             # rcrb   ADDR(%ecx)
+	8d 76 07                # leal   7(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be b9 [A+1]          # movsbl ADDR(%ecx),%edi
 	/
 # 7F - (bad)
 # 80 - (bad)
 # 81 - STA - (Indirect,X)
 81,2:
-        8d 59 [B+1]             # leal   [B+1](%ecx),%ebx
-        81 e3 ff 00 00 00       # andl   $0xff,%ebx
-        83 c6 06                # addl   $0x6,%esi
-        0f b7 9b [L]            # movzwl [L](%ebx),%ebx
-        f7 c3 00 80 00 00       # testl  $0x8000,%ebx
-        75 23                   # jne    +35
-        81 eb 00 20 00 00       # subl   $0x2000,%ebx
-        81 fb 00 40 00 00       # cmpl   $0x4000,%ebx
-        8d 9b 00 20 00 00       # leal   0x2000(%ebx),%ebx
-        72 08                   # jb     +8
-        88 83 [L]               # movb   %al,[L](%ebx)
-        eb 0c                   # jmp    +12
-        e8 [O]                  # call   OUTPUT
-        eb 05                   # jmp    +5
-        e8 [Y]                  # call   MAPPER
-        /
+	8d 59 [B+1]             # leal   [B+1](%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	83 c6 06                # addl   $0x6,%esi
+	0f b7 9b [L]            # movzwl [L](%ebx),%ebx
+	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
+	75 23                   # jne    +35
+	81 eb 00 20 00 00       # subl   $0x2000,%ebx
+	81 fb 00 40 00 00       # cmpl   $0x4000,%ebx
+	8d 9b 00 20 00 00       # leal   0x2000(%ebx),%ebx
+	72 08                   # jb     +8
+	88 83 [L]               # movb   %al,[L](%ebx)
+	eb 0c                   # jmp    +12
+	e8 [O]                  # call   OUTPUT
+	eb 05                   # jmp    +5
+	e8 [Y]                  # call   MAPPER
+	/
 # 82 - (bad)
 # 83 - (bad)
 # 84 - STY - Zero Page
 84,2:
-	83 c6 03		# addl   $0x3,%esi  # cycle count +3
-        88 15 [Z+1]		# movb   %dl,ADDR
+	83 c6 03                # addl   $0x3,%esi  # cycle count +3
+	88 15 [Z+1]             # movb   %dl,ADDR
 	/
 # 85 - STA - Zero Page
 85,2:
-	83 c6 03		# addl   $0x3,%esi  # cycle count +3
-        a2 [Z+1]		# movb   %al,ADDR
+	83 c6 03                # addl   $0x3,%esi  # cycle count +3
+	a2 [Z+1]                # movb   %al,ADDR
 	/
 # 86 - STX - Zero Page
 86,2:
-	83 c6 03		# addl   $0x3,%esi  # cycle count +3
-        88 0d [Z+1]		# movb   %cl,ADDR
+	83 c6 03                # addl   $0x3,%esi  # cycle count +3
+	88 0d [Z+1]             # movb   %cl,ADDR
 	/
 # 87 - (bad)
 # 88 - DEY
 88,1:
-	4a			# decl   %edx
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	0f be fa		# movsbl %dl,%edi
+	4a                      # decl   %edx
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	0f be fa                # movsbl %dl,%edi
 	/
 # 89 - (bad)
 # 8A - TXA
 8A,1:
-	0f be c1		# movsbl %cl,%eax
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	89 c7			# movl   %eax,%edi
+	0f be c1                # movsbl %cl,%eax
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	89 c7                   # movl   %eax,%edi
 	/
 # 8B - (bad)
 # 8C - STY - Absolute
 8C,3:
-	83 c6 04		# addl   $0x4,%esi  # cycle count +4
-        88 15 [A+1]		# movb   %dl,ADDR
+	83 c6 04                # addl   $0x4,%esi  # cycle count +4
+	88 15 [A+1]             # movb   %dl,ADDR
 	/
 # 8D - STA - Absolute
 8D,3:
-	83 c6 04		# addl   $0x4,%esi  # cycle count +4
-        a2 [A+1]		# movb   %al,ADDR
+	83 c6 04                # addl   $0x4,%esi  # cycle count +4
+	a2 [A+1]                # movb   %al,ADDR
 	/
 # 8E - STX - Absolute
 8E,3:
-	83 c6 04		# addl   $0x4,%esi  # cycle count +4
-        88 0d [A+1]		# movb   %cl,ADDR
+	83 c6 04                # addl   $0x4,%esi  # cycle count +4
+	88 0d [A+1]             # movb   %cl,ADDR
 	/
 
 # 8F - (bad)
 # 90 - BCC
 90,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	85 ed			# testl  %ebp,%ebp
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 84 [U]		# je     U
-	83 ee [>+1] 01		# subl   $1+,%esi
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	85 ed                   # testl  %ebp,%ebp
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 84 [U]               # je     U
+	83 ee [>+1] 01          # subl   $1+,%esi
 	/
 # 91 - STA - (Indirect),Y
 91,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   [Z+1],%bx
-	66 01 d3		# addw   %dx,%bx
-	83 c6 06		# addl   $0x6,%esi
-        81 eb 00 20 00 00       # subl   $0x2000,%ebx
-        81 fb 00 40 00 00       # cmpl   $0x4000,%ebx
-        72 16                   # jb     +22
-        81 fb 00 60 00 00       # cmpl   $0x6000,%ebx
-        8d 9b 00 20 00 00       # leal   0x2000(%ebx),%ebx
-        7d 15                   # jnl    +21
-        88 83 [L]               # movb   %al,[L](%ebx)
-        eb 12                   # jmp    +18
-        81 c3 00 20 00 00       # addl   $0x2000,%ebx
-        e8 [O]                  # call   OUTPUT
-        eb 05                   # jmp    +5
-	e8 [Y]			# call   MAPPER
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   [Z+1],%bx
+	66 01 d3                # addw   %dx,%bx
+	83 c6 06                # addl   $0x6,%esi
+	81 eb 00 20 00 00       # subl   $0x2000,%ebx
+	81 fb 00 40 00 00       # cmpl   $0x4000,%ebx
+	72 16                   # jb     +22
+	81 fb 00 60 00 00       # cmpl   $0x6000,%ebx
+	8d 9b 00 20 00 00       # leal   0x2000(%ebx),%ebx
+	7d 15                   # jnl    +21
+	88 83 [L]               # movb   %al,[L](%ebx)
+	eb 12                   # jmp    +18
+	81 c3 00 20 00 00       # addl   $0x2000,%ebx
+	e8 [O]                  # call   OUTPUT
+	eb 05                   # jmp    +5
+	e8 [Y]                  # call   MAPPER
 	/
 # 92 - (bad)
 # 93 - (bad)
 # 94 - STY - Zero Page,X
 94,2:
-	8d 59 [B+1]		# leal   operand(%ecx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	88 93 [L]		# movb   %dl,RAM(%ebx)
+	8d 59 [B+1]             # leal   operand(%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	88 93 [L]               # movb   %dl,RAM(%ebx)
 	/
 # 95 - STA - Zero Page,X
 95,2:
-	8d 59 [B+1]		# leal   operand(%ecx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	88 83 [L]		# movb   %al,RAM(%ebx)
+	8d 59 [B+1]             # leal   operand(%ecx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	88 83 [L]               # movb   %al,RAM(%ebx)
 	/
 # 96 - STX - Zero Page,Y
 96,2:
-	8d 5a [B+1]		# leal   operand(%edx),%ebx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	88 8b [L]		# movb   %cl,RAM(%ebx)
+	8d 5a [B+1]             # leal   operand(%edx),%ebx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	88 8b [L]               # movb   %cl,RAM(%ebx)
 	/
 # 97 - (bad)
 # 98 - TYA
 98,1:
-	0f be c2		# movsbl %dl,%eax
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	89 c7			# movl   %eax,%edi
+	0f be c2                # movsbl %dl,%eax
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	89 c7                   # movl   %eax,%edi
 	/
 # 99 - STA - Absolute,Y
 99,3:
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	83 c6 05		# addl   $5,%esi    # cycle count +5
-	88 82 [A+1]		# movb   %al,[A+1](%edx)
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	83 c6 05                # addl   $5,%esi    # cycle count +5
+	88 82 [A+1]             # movb   %al,[A+1](%edx)
 	/
 # 9A - TXS
 9A,1:
-	88 0d [S]		# movb   %cl,S
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
+	88 0d [S]               # movb   %cl,S
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
 	/
 # 9B - (bad)
 # 9C - (bad)
 # 9D - STA - Absolute,X
 9D,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c6 05		# addl   $5,%esi    # cycle count +5
-	88 81 [A+1]		# movb   %al,[A+1](%ecx)
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c6 05                # addl   $5,%esi    # cycle count +5
+	88 81 [A+1]             # movb   %al,[A+1](%ecx)
 	/
 # 9E - (bad)
 # 9F - (bad)
 # A0 - LDY - Immediate
 a0,2:
-	31 d2			# xorl   %edx,%edx
-	83 c6 02		# addl   $0x2,%esi
-	b2 [B+1]		# movb   $[B+1],%dl
-	bf [E+1]		# movl   $[E+1],%edi
+	31 d2                   # xorl   %edx,%edx
+	83 c6 02                # addl   $0x2,%esi
+	b2 [B+1]                # movb   $[B+1],%dl
+	bf [E+1]                # movl   $[E+1],%edi
 	/
 # A1 - LDA - (Indirect,X)
 #   # has wraparound bug (FF->100) but it probably doesn't matter
 A1,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	31 db			# xorl   %ebx,%ebx
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	66 8b 9f [L]		# movw   RAM(%edi),%bx
-	89 df			# movl   %ebx,%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d 76 06		# leal   0x6(%esi),%esi
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	66 8b 9f [L]            # movw   RAM(%edi),%bx
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d 76 06                # leal   0x6(%esi),%esi
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
 
 # FIXME - trap I/O
- 81 fb 00 60 00 00 # cmpl   $0x6000,%ebx
- 73 09             # jae    +9
- 81 fb 00 20 00 00 # cmpl   $0x2000,%ebx
- 72 01             # jb     +1
- [^]               # int3
+	81 fb 00 60 00 00       # cmpl   $0x6000,%ebx
+	73 09                   # jae    +9
+	81 fb 00 20 00 00       # cmpl   $0x2000,%ebx
+	72 01                   # jb     +1
+	[^]                     # int3
 
-	0f be 04 1f		# movsbl (%edi,%ebx,1),%eax
-	89 c7			# movl   %eax,%edi
+	0f be 04 1f             # movsbl (%edi,%ebx,1),%eax
+	89 c7                   # movl   %eax,%edi
 	/
 # A2 - LDX - Immediate
 a2,2:
-	31 c9			# xorl   %ecx,%ecx
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	b1 [B+1]		# movb   $[B+1],%cl
-	bf [E+1]		# movl   $[E+1],%edi
+	31 c9                   # xorl   %ecx,%ecx
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	b1 [B+1]                # movb   $[B+1],%cl
+	bf [E+1]                # movl   $[E+1],%edi
 	/
 # A3 - (bad)
 # A4 - LDY - Zero Page
 A4,2:
-	31 d2			# xorl   %edx,%edx
-	83 c6 03		# addl   $0x3,%esi  # cycle count +3
-	8a 15 [Z+1]		# movb   ZPADDR,%dl
-	0f be fa		# movsbl %dl,%edi
+	31 d2                   # xorl   %edx,%edx
+	83 c6 03                # addl   $0x3,%esi  # cycle count +3
+	8a 15 [Z+1]             # movb   ZPADDR,%dl
+	0f be fa                # movsbl %dl,%edi
 	/
 # A5 - LDA - Zero Page
 A5,2:
-	0f be 05 [Z+1]		# movsbl ZPADDR,%eax
-	83 c6 03		# addl   $0x3,%esi  # cycle count +3
-	89 c7			# movl   %eax,%edi
+	0f be 05 [Z+1]          # movsbl ZPADDR,%eax
+	83 c6 03                # addl   $0x3,%esi  # cycle count +3
+	89 c7                   # movl   %eax,%edi
 	/
 # A6 - LDX - Zero Page
 A6,2:
-	31 c9			# xorl   %ecx,%ecx
-	bf 80 ff ff ff 		# movl   $0xffffff80,%edi
-	8a 0d [Z+1]		# movb   ZP,%cl
-	83 c6 03		# addl   $0x3,%esi  # cycle count +3
-	01 cf			# addl   %ecx,%edi
-	83 f7 80		# xorl   $0xffffff80,%edi
+	31 c9                   # xorl   %ecx,%ecx
+	bf 80 ff ff ff          # movl   $0xffffff80,%edi
+	8a 0d [Z+1]             # movb   ZP,%cl
+	83 c6 03                # addl   $0x3,%esi  # cycle count +3
+	01 cf                   # addl   %ecx,%edi
+	83 f7 80                # xorl   $0xffffff80,%edi
 	/
 # A7 - (bad)
 # A8 - TAY
 A8,1:
-	89 c2			# movl   %eax,%edx
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	0f be fa		# movsbl %dl,%edi
+	89 c2                   # movl   %eax,%edx
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	0f be fa                # movsbl %dl,%edi
 	/
 # A9 - LDA - Immediate
 A9,2:
-	b8 [E+1]		# movl   $[E+1],%eax
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	bf [E+1]		# movl   $[E+1],%edi
+	b8 [E+1]                # movl   $[E+1],%eax
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	bf [E+1]                # movl   $[E+1],%edi
 	/
 # AA - TAX
 AA,1:
-	89 c1			# movl   %eax,%ecx
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	0f be f9		# movsbl %cl,%edi
+	89 c1                   # movl   %eax,%ecx
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	0f be f9                # movsbl %cl,%edi
 	/
 # AB - (bad)
 # AC - LDY - Absolute
 AC,3:
-	8b 1d [X+1]		# movl   XMAP,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	0f be 93 [W+1] 00 00	# movsbl RAM(%ebx),%edx
-	89 d7			# movl   %edx,%edi
+	8b 1d [X+1]             # movl   XMAP,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	0f be 93 [W+1] 00 00    # movsbl RAM(%ebx),%edx
+	89 d7                   # movl   %edx,%edi
 	/
 # AD - LDA - Absolute
 AD,3:
-        8b 1d [X+1]		# movl   XMAP,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	0f be 83 [W+1] 00 00	# movsbl 0x0000AAAA(%ebx),%eax
-        89 c7			# movl   %eax,%edi
+	8b 1d [X+1]             # movl   XMAP,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	0f be 83 [W+1] 00 00    # movsbl 0x0000AAAA(%ebx),%eax
+	89 c7                   # movl   %eax,%edi
 	/
 # AE - LDX - Absolute
 AE,3:
-	8b 1d [X+1]		# movl   XMAP,%ebx
-	83 c6 04		# addl   $0x4,%esi
-	0f be 8b [W+1] 00 00	# movsbl 0x0000AAAA(%ebx),%ecx
-	89 cf			# movl   %ecx,%edi
+	8b 1d [X+1]             # movl   XMAP,%ebx
+	83 c6 04                # addl   $0x4,%esi
+	0f be 8b [W+1] 00 00    # movsbl 0x0000AAAA(%ebx),%ecx
+	89 cf                   # movl   %ecx,%edi
 	/
 # AF - (bad)
 # B0 - BCS
 B0,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	85 ed			# testl  %ebp,%ebp
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 85 [U]		# jne    U
-	83 ee [>+1] 01		# subl   $1+,%esi
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	85 ed                   # testl  %ebp,%ebp
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 85 [U]               # jne    U
+	83 ee [>+1] 01          # subl   $1+,%esi
 	/
 # B1 - LDA - (Indirect),Y
 B1,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   ZP,%bx
-	01 d3			# addl   %edx,%ebx
-	8d 76 05		# leal   0x5(%esi),%esi
-	89 df			# movl   %ebx,%edi
-	c1 ef 0c		# shrl   $0xc,%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   ZP,%bx
+	01 d3                   # addl   %edx,%ebx
+	8d 76 05                # leal   0x5(%esi),%esi
+	89 df                   # movl   %ebx,%edi
+	c1 ef 0c                # shrl   $0xc,%edi
 	8d 83 00 e0 ff ff       # leal   0xffffe000(%ebx),%eax
-	8b 3c bd [M]		# movl   MAPTABLE(,%edi,4),%edi
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
 	3d 00 40 00 00          # cmpl   $0x4000,%eax
 	73 07                   # jae    +7
 	e8 [I]                  # call   [I]
@@ -1336,304 +1336,304 @@ B1,2:
 # B3 - (bad)
 # B4 - LDY - Zero Page,X
 B4,2:
-	8d 59 [B+1]		# leal   [B+1](%ecx),%ebx
-	31 d2			# xorl   %edx,%edx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	8a 93 [L]		# movb   RAM(%ebx),%dl
-	0f be fa		# movsbl %dl,%edi
+	8d 59 [B+1]             # leal   [B+1](%ecx),%ebx
+	31 d2                   # xorl   %edx,%edx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	8a 93 [L]               # movb   RAM(%ebx),%dl
+	0f be fa                # movsbl %dl,%edi
 	/
 # B5 - LDA - Zero Page,X
 B5,2:
-	8d 41 [B+1]		# leal   operand(%ecx),%eax
-	25 ff 00 00 00		# andl   $0xff,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	0f be 80 [L]		# movsbl RAM(%eax),%eax
-	89 c7			# movl   %eax,%edi
+	8d 41 [B+1]             # leal   operand(%ecx),%eax
+	25 ff 00 00 00          # andl   $0xff,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	0f be 80 [L]            # movsbl RAM(%eax),%eax
+	89 c7                   # movl   %eax,%edi
 	/
 # B6 - LDX - Zero Page,Y
 B6,2:
-	8d 5a [B+1]		# leal   [B+1](%edx),%ebx
-	31 c9			# xorl   %ecx,%ecx
-	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	8a 8b [L]		# movb   RAM(%ebx),%cl
-	0f be f9		# movsbl %cl,%edi
+	8d 5a [B+1]             # leal   [B+1](%edx),%ebx
+	31 c9                   # xorl   %ecx,%ecx
+	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	8a 8b [L]               # movb   RAM(%ebx),%cl
+	0f be f9                # movsbl %cl,%edi
 	/
 # B7 - (bad)
 # B8 - CLV
 B8,1:
-	83 c6 02		# addl   $0x2,%esi
-	c7 05 [V] 00 00 00 00	# movl   $0x0,[V]
+	83 c6 02                # addl   $0x2,%esi
+	c7 05 [V] 00 00 00 00   # movl   $0x0,[V]
 	/
 # B9 - LDA - Absolute,Y
 B9,3:
 # FIXME - cycle count wrong
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	8d 82 [W+1] 00 00	# leal   ADDR(%edx),%eax
-	c1 e8 0c		# shrl   $0xc,%eax
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	8b 3c 85 [M]		# movl   MAPTABLE(,%eax,4),%edi
-	83 c6 04		# addl   $0x4,%esi
-	0f be 04 1f		# movsbl (%edi,%ebx,1),%eax
-	89 c7			# movl   %eax,%edi
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	8d 82 [W+1] 00 00       # leal   ADDR(%edx),%eax
+	c1 e8 0c                # shrl   $0xc,%eax
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	8b 3c 85 [M]            # movl   MAPTABLE(,%eax,4),%edi
+	83 c6 04                # addl   $0x4,%esi
+	0f be 04 1f             # movsbl (%edi,%ebx,1),%eax
+	89 c7                   # movl   %eax,%edi
 	/
 # BA - TSX
 BA,1:
-	31 c9			# xorl   %ecx,%ecx
-	83 c6 02		# addl   $0x2,%esi
-	8a 0d [S]		# movb   [S],%cl
-	0f be f9		# movsbl %cl,%edi
+	31 c9                   # xorl   %ecx,%ecx
+	83 c6 02                # addl   $0x2,%esi
+	8a 0d [S]               # movb   [S],%cl
+	0f be f9                # movsbl %cl,%edi
 	/
 # BB - (bad)
 # BC - LDY - Absolute,X
 BC,3:
 # FIXME - cycle count wrong
 	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	8d 91 [W+1] 00 00	# leal   ADDR(%ecx),%edx
-	c1 ea 0c		# shrl   $0xc,%edx
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	8b 3c 95 [M]		# movl   MAPTABLE(,%edx,4),%edi
-	83 c6 04		# addl   $0x4,%esi
-	0f be 14 1f		# movsbl (%edi,%ebx,1),%edx
-	89 d7			# movl   %edx,%edi
+	8d 91 [W+1] 00 00       # leal   ADDR(%ecx),%edx
+	c1 ea 0c                # shrl   $0xc,%edx
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	8b 3c 95 [M]            # movl   MAPTABLE(,%edx,4),%edi
+	83 c6 04                # addl   $0x4,%esi
+	0f be 14 1f             # movsbl (%edi,%ebx,1),%edx
+	89 d7                   # movl   %edx,%edi
 	/
 # BD - LDA - Absolute,X
 BD,3:
 # FIXME - cycle count wrong
-        81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	8d 81 [W+1] 00 00	# leal   ADDR(%ecx),%eax
-	c1 e8 0c		# shrl   $0xc,%eax
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	8b 3c 85 [M]		# movl   MAPTABLE(,%eax,4),%edi
-	83 c6 04		# addl   $0x4,%esi
-	0f be 04 1f		# movsbl (%edi,%ebx,1),%eax
-	89 c7			# movl   %eax,%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	8d 81 [W+1] 00 00       # leal   ADDR(%ecx),%eax
+	c1 e8 0c                # shrl   $0xc,%eax
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	8b 3c 85 [M]            # movl   MAPTABLE(,%eax,4),%edi
+	83 c6 04                # addl   $0x4,%esi
+	0f be 04 1f             # movsbl (%edi,%ebx,1),%eax
+	89 c7                   # movl   %eax,%edi
 	/
 # BE - LDX - Absolute,Y
 BE,3:
 # FIXME - cycle count wrong
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	8d 8a [W+1] 00 00	# leal   ADDR(%edx),%ecx
-	c1 e9 0c		# shrl   $0xc,%ecx
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	8b 3c 8d [M]		# movl   MAPTABLE(,%ecx,4),%edi
-	83 c6 04		# addl   $0x4,%esi
-	0f be 0c 1f		# movsbl (%edi,%ebx,1),%ecx
-	89 cf			# movl   %ecx,%edi
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	8d 8a [W+1] 00 00       # leal   ADDR(%edx),%ecx
+	c1 e9 0c                # shrl   $0xc,%ecx
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	8b 3c 8d [M]            # movl   MAPTABLE(,%ecx,4),%edi
+	83 c6 04                # addl   $0x4,%esi
+	0f be 0c 1f             # movsbl (%edi,%ebx,1),%ecx
+	89 cf                   # movl   %ecx,%edi
 	/
 # BF - (bad)
 # C0 - CPY - Immediate
 C0,2:
-	0f b6 da		# movzbl %dl,%ebx
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	81 eb [B+1] 00 00 00	# subl   $[B+1],%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	0f b6 da                # movzbl %dl,%ebx
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	81 eb [B+1] 00 00 00    # subl   $[B+1],%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	8d 76 02                # leal   0x2(%esi),%esi  # cycle count +2
 	/
 # C1 - CMP - (Indirect,X)
 C1,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	31 db			# xorl   %ebx,%ebx
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	25 ff 00 00 00		# andl   $0xff,%eax
-	66 8b 9f [L]		# movw   [L](%edi),%bx
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	25 ff 00 00 00          # andl   $0xff,%eax
+	66 8b 9f [L]            # movw   [L](%edi),%bx
 
 # FIXME - trap I/O
- 8d bb 00 e0 ff ff	# leal   0xffffe000(%ebx),%edi
- 81 ff 00 40 00 00	# cmpl   $0x4000,%edi
- 73 01			# jae    +1
- [^]			# int3
+	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
+	[^]                     # int3
 
-	89 df			# movl   %ebx,%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d 76 06		# leal   0x6(%esi),%esi
-	8b 2c 9d [M]		# movl   [M](,%ebx,4),%ebp
-	89 c3			# movl   %eax,%ebx
-	0f b6 3c 2f		# movzbl (%edi,%ebp,1),%edi
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	29 fb			# subl   %edi,%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d 76 06                # leal   0x6(%esi),%esi
+	8b 2c 9d [M]            # movl   [M](,%ebx,4),%ebp
+	89 c3                   # movl   %eax,%ebx
+	0f b6 3c 2f             # movzbl (%edi,%ebp,1),%edi
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	29 fb                   # subl   %edi,%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # C2 - (bad)
 # C3 - (bad)
 # C4 - CPY - Zero Page
 C4,2:
-	0f b6 da		# movzbl %dl,%ebx
-	0f b6 3d [Z+1]		# movzbl ZP,%edi
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	29 fb			# subl   %edi,%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
-	8d 76 03		# leal   0x3(%esi),%esi  # cycle count +3
+	0f b6 da                # movzbl %dl,%ebx
+	0f b6 3d [Z+1]          # movzbl ZP,%edi
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	29 fb                   # subl   %edi,%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
+	8d 76 03                # leal   0x3(%esi),%esi  # cycle count +3
 	/
 # C5 - CMP - Zero Page
 C5,2:
-	31 db			# xorl   %ebx,%ebx
-	0f b6 3d [Z+1]		# movzbl ZP,%edi
-	88 c3			# movb   %al,%bl
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	29 fb			# subl   %edi,%ebx
-	8d 76 03		# leal   0x3(%esi),%esi  # cycle count +3
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	31 db                   # xorl   %ebx,%ebx
+	0f b6 3d [Z+1]          # movzbl ZP,%edi
+	88 c3                   # movb   %al,%bl
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	29 fb                   # subl   %edi,%ebx
+	8d 76 03                # leal   0x3(%esi),%esi  # cycle count +3
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # C6 - DEC - Zero Page
 C6,2:
-	31 db			# xorl   %ebx,%ebx
-	8a 1d [Z+1]		# movb   ZP,%bl
-	80 eb 81		# subb   $0x81,%bl
-	83 c6 05		# addl   $0x5,%esi  # cycle count +5
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	89 df			# movl   %ebx,%edi
-	88 1d [Z+1]		# movb   %bl,ZP
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [Z+1]             # movb   ZP,%bl
+	80 eb 81                # subb   $0x81,%bl
+	83 c6 05                # addl   $0x5,%esi  # cycle count +5
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	89 df                   # movl   %ebx,%edi
+	88 1d [Z+1]             # movb   %bl,ZP
 	/
 # C7 - (bad)
 # C8 - INY
 C8,1:
-	42			# incl   %edx
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	0f be fa		# movsbl %dl,%edi
+	42                      # incl   %edx
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	0f be fa                # movsbl %dl,%edi
 	/
 # C9 - CMP - Immediate
 C9,2:
-	bd 01 00 00 00		# movl   $1,%ebp
-	0f b6 d8		# movzbl %al,%ebx
-	83 c6 02		# addl   $2,%esi  # cycle count +2
-	81 eb [B+1] 00 00 00	# subl   $[B+1],%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0,%ebp
+	bd 01 00 00 00          # movl   $1,%ebp
+	0f b6 d8                # movzbl %al,%ebx
+	83 c6 02                # addl   $2,%esi  # cycle count +2
+	81 eb [B+1] 00 00 00    # subl   $[B+1],%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0,%ebp
 	/
 # CA - DEX
 CA,1:
-	49			# decl   %ecx
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	0f be f9		# movsbl %cl,%edi
+	49                      # decl   %ecx
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	0f be f9                # movsbl %cl,%edi
 	/
 # CB - (bad)
 # CC - CPY - Absolute
 CC,3:
-	8b 3d [X+1]		# movl   X,%edi
-	31 db			# xorl   %ebx,%ebx
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	88 d3			# movb   %dl,%bl
-	0f b6 bf [W+1] 00 00	# movzbl ADDR(%edi),%edi
-	29 fb			# subl   %edi,%ebx
-	8d 76 04		# leal   4(%esi),%esi
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	8b 3d [X+1]             # movl   X,%edi
+	31 db                   # xorl   %ebx,%ebx
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	88 d3                   # movb   %dl,%bl
+	0f b6 bf [W+1] 00 00    # movzbl ADDR(%edi),%edi
+	29 fb                   # subl   %edi,%ebx
+	8d 76 04                # leal   4(%esi),%esi
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # CD - CMP - Absolute
 CD,3:
-	8b 3d [X+1]		# movl   X,%edi
-	31 db			# xorl   %ebx,%ebx
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	88 c3			# movb   %al,%bl
-	0f b6 bf [W+1] 00 00	# movzbl ADDR(%edi),%edi
-	29 fb			# subl   %edi,%ebx
-	8d 76 04		# leal   4(%esi),%esi
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	8b 3d [X+1]             # movl   X,%edi
+	31 db                   # xorl   %ebx,%ebx
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	88 c3                   # movb   %al,%bl
+	0f b6 bf [W+1] 00 00    # movzbl ADDR(%edi),%edi
+	29 fb                   # subl   %edi,%ebx
+	8d 76 04                # leal   4(%esi),%esi
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # CE - DEC - Absolute
 CE,3:
-	31 db			# xorl   %ebx,%ebx
-	8a 1d [A+1]		# movb   ADDR,%bl
-	80 eb 81		# subb   $0x81,%bl
-	83 c6 06		# addl   $0x6,%esi  # cycle count +6
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	89 df			# movl   %ebx,%edi
-	88 1d [A+1]		# movb   %bl,ADDR
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [A+1]             # movb   ADDR,%bl
+	80 eb 81                # subb   $0x81,%bl
+	83 c6 06                # addl   $0x6,%esi  # cycle count +6
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	89 df                   # movl   %ebx,%edi
+	88 1d [A+1]             # movb   %bl,ADDR
 	/
 # CF - (bad)
 # D0 - BNE
 D0,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	f7 c7 ff 00 00 00	# testl  $0xff,%edi
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 85 [U]		# jne    U
-	83 ee [>+1] 01		# subl   $1+,%esi
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	f7 c7 ff 00 00 00       # testl  $0xff,%edi
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 85 [U]               # jne    U
+	83 ee [>+1] 01          # subl   $1+,%esi
 	/
 # D1 - CMP   (Indirect),Y
 D1,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   [Z+1],%bx
-	25 ff 00 00 00		# andl   $0xff,%eax
-	01 d3			# addl   %edx,%ebx
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   [Z+1],%bx
+	25 ff 00 00 00          # andl   $0xff,%eax
+	01 d3                   # addl   %edx,%ebx
 
 # FIXME - trap I/O
- 8d bb 00 e0 ff ff	# leal   0xffffe000(%ebx),%edi
- 81 ff 00 40 00 00	# cmpl   $0x4000,%edi
- 73 01			# jae    +1
- [^]			# int3
+	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
+	[^]                     # int3
 
-	89 df			# movl   %ebx,%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8d 76 05		# leal   0x5(%esi),%esi
-	8b 2c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebp
-	89 c3			# movl   %eax,%ebx
-	0f b6 3c 2f		# movzbl (%edi,%ebp,1),%edi
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	29 fb			# subl   %edi,%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8d 76 05                # leal   0x5(%esi),%esi
+	8b 2c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebp
+	89 c3                   # movl   %eax,%ebx
+	0f b6 3c 2f             # movzbl (%edi,%ebp,1),%edi
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	29 fb                   # subl   %edi,%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # D2 - (bad)
 # D3 - (bad)
 # D4 - (bad)
 # D5 - CMP - Zero Page,X
 D5,2:
-	8d 69 [B+1]		# leal   [B+1](%ecx),%ebp
-	31 db			# xorl   %ebx,%ebx
-	81 e5 ff 00 00 00	# andl   $0xff,%ebp
-	88 c3			# movb   %al,%bl
-	8d 76 04		# leal   0x4(%esi),%esi
-	0f b6 bd [L]		# movzbl RAM(%ebp),%edi
-	29 fb			# subl   %edi,%ebx
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	8d 69 [B+1]             # leal   [B+1](%ecx),%ebp
+	31 db                   # xorl   %ebx,%ebx
+	81 e5 ff 00 00 00       # andl   $0xff,%ebp
+	88 c3                   # movb   %al,%bl
+	8d 76 04                # leal   0x4(%esi),%esi
+	0f b6 bd [L]            # movzbl RAM(%ebp),%edi
+	29 fb                   # subl   %edi,%ebx
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # D6 - DEC - Zero Page,X
 D6,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	31 db			# xorl   %ebx,%ebx
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	8a 9f [L]		# movb   RAM(%edi),%bl
-	80 eb 81		# subb   $0x81,%bl
-	83 c6 06		# addl   $0x6,%esi
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	88 9f [L]		# movb   %bl,RAM(%edi)
-	89 df			# movl   %ebx,%edi
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	31 db                   # xorl   %ebx,%ebx
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	8a 9f [L]               # movb   RAM(%edi),%bl
+	80 eb 81                # subb   $0x81,%bl
+	83 c6 06                # addl   $0x6,%esi
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	88 9f [L]               # movb   %bl,RAM(%edi)
+	89 df                   # movl   %ebx,%edi
 	/
 # D7 - (bad)
 # D8 - CLD
 D8,1:
-	83 c6 02		# addl   $0x2,%esi
-	80 25 [F] f7		# andb   $0xf7,[F]
+	83 c6 02                # addl   $0x2,%esi
+	80 25 [F] f7            # andb   $0xf7,[F]
 	/
 # D9 - CMP - Absolute,Y
 D9,3:
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	25 ff 00 00 00		# andl   $0xff,%eax
-	8d 9a [W+1] 00 00	# leal   [W+1](%edx),%ebx
-	89 df			# movl   %ebx,%edi
-	38 d3			# cmpb   %dl,%bl
-	83 d6 04		# adcl   $0x4,%esi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	8b 2c 9d [M]		# movl   [M](,%ebx,4),%ebp
-	89 c3			# movl   %eax,%ebx
-	0f b6 3c 2f		# movzbl (%edi,%ebp,1),%edi
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	29 fb			# subl   %edi,%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	25 ff 00 00 00          # andl   $0xff,%eax
+	8d 9a [W+1] 00 00       # leal   [W+1](%edx),%ebx
+	89 df                   # movl   %ebx,%edi
+	38 d3                   # cmpb   %dl,%bl
+	83 d6 04                # adcl   $0x4,%esi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	8b 2c 9d [M]            # movl   [M](,%ebx,4),%ebp
+	89 c3                   # movl   %eax,%ebx
+	0f b6 3c 2f             # movzbl (%edi,%ebp,1),%edi
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	29 fb                   # subl   %edi,%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # DA - (bad)
 # DB - (bad)
@@ -1641,92 +1641,92 @@ D9,3:
 # DD - CMP - Absolute,X
 DD,3:
 # FIXME - cycle count wrong
-	bd [W+1] 00 00		# movl   $ADDR,%ebp
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	01 cd			# addl   %ecx,%ebp
-	31 db			# xorl   %ebx,%ebx
-	c1 ed 0c		# shrl   $0xc,%ebp
-	88 c3			# movb   %al,%bl
-	8b 2c ad [M]		# movl   MAPTABLE(,%ebp,4),%ebp
-	8d 76 04		# leal   0x4(%esi),%esi
-	0f b6 bc 29 [W+1] 00 00	# movzbl ADDR(%ecx,%ebp,1),%edi
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	29 fb			# subl   %edi,%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	bd [W+1] 00 00          # movl   $ADDR,%ebp
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	01 cd                   # addl   %ecx,%ebp
+	31 db                   # xorl   %ebx,%ebx
+	c1 ed 0c                # shrl   $0xc,%ebp
+	88 c3                   # movb   %al,%bl
+	8b 2c ad [M]            # movl   MAPTABLE(,%ebp,4),%ebp
+	8d 76 04                # leal   0x4(%esi),%esi
+	0f b6 bc 29 [W+1] 00 00 # movzbl ADDR(%ecx,%ebp,1),%edi
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	29 fb                   # subl   %edi,%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # DE - DEC - Absolute,X
 DE,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	31 db			# xorl   %ebx,%ebx
-	8a 99 [A+1]		# movb   ADDR(%ecx),%bl
-	80 eb 81		# subb   $0x81,%bl
-	83 c6 07		# addl   $0x7,%esi  # cycle count +7
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	89 df			# movl   %ebx,%edi
-	88 99 [A+1]		# movb   %bl,ADDR(%ecx)
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	31 db                   # xorl   %ebx,%ebx
+	8a 99 [A+1]             # movb   ADDR(%ecx),%bl
+	80 eb 81                # subb   $0x81,%bl
+	83 c6 07                # addl   $0x7,%esi  # cycle count +7
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	89 df                   # movl   %ebx,%edi
+	88 99 [A+1]             # movb   %bl,ADDR(%ecx)
 	/
 # DF - (bad)
 # E0 - CPX - Immediate
 E0,2:
-	0f b6 d9		# movzbl %cl,%ebx
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	81 eb [B+1] 00 00 00	# subl   $[B+1],%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
-	8d 76 02		# leal   0x2(%esi),%esi  # cycle count +2
+	0f b6 d9                # movzbl %cl,%ebx
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	81 eb [B+1] 00 00 00    # subl   $[B+1],%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
+	8d 76 02                # leal   0x2(%esi),%esi  # cycle count +2
 	/
 # E1 - SBC - (Indirect,X)
 # E2 - (bad)
 # E3 - (bad)
 # E4 - CPX - Zero Page
 E4,2:
-	0f b6 d9		# movzbl %cl,%ebx
-	0f b6 3d [Z+1]		# movzbl [Z+1],%edi
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	29 fb			# subl   %edi,%ebx
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
-	8d 76 03		# leal   0x3(%esi),%esi  # cycle count +3
+	0f b6 d9                # movzbl %cl,%ebx
+	0f b6 3d [Z+1]          # movzbl [Z+1],%edi
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	29 fb                   # subl   %edi,%ebx
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
+	8d 76 03                # leal   0x3(%esi),%esi  # cycle count +3
 	/
 # E5 - SBC - Zero Page
 E5,2:
-	0f be 1d [Z+1]		# movsbl [Z+1],%ebx
-	0f be c0		# movsbl %al,%eax
-	83 f3 ff		# xorl   $0xffffffff,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	11 d8			# adcl   %ebx,%eax
-	8d 76 03		# leal   0x3(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	0f be 1d [Z+1]          # movsbl [Z+1],%ebx
+	0f be c0                # movsbl %al,%eax
+	83 f3 ff                # xorl   $0xffffffff,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 03                # leal   0x3(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # E6 - INC - Zero Page
 E6,2:
-	31 db			# xorl   %ebx,%ebx
-	8a 1d [Z+1]		# movb   ZP,%bl
-	80 c3 81		# addb   $0x81,%bl
-	83 c6 05		# addl   $0x5,%esi  # cycle count +5
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	89 df			# movl   %ebx,%edi
-	88 1d [Z+1]		# movb   %bl,ZP
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [Z+1]             # movb   ZP,%bl
+	80 c3 81                # addb   $0x81,%bl
+	83 c6 05                # addl   $0x5,%esi  # cycle count +5
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	89 df                   # movl   %ebx,%edi
+	88 1d [Z+1]             # movb   %bl,ZP
 	/
 # E7 - (bad)
 # E8 - INX
 E8,1:
-	41			# incl   %ecx
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
-	0f be f9		# movsbl %cl,%edi
+	41                      # incl   %ecx
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	0f be f9                # movsbl %cl,%edi
 	/
 # E9 - SBC - Immediate
 E9,2:
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	0f be c0		# movsbl %al,%eax
-	83 d0 [C+1]		# adcl   $[C+1],%eax
-	8d 76 02		# leal   0x2(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be c0                # movsbl %al,%eax
+	83 d0 [C+1]             # adcl   $[C+1],%eax
+	8d 76 02                # leal   0x2(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 #alternatively, could do: subl $0x1,%ebp
 #                         sbbl $imm,%eax
 # but then the carry flag must be inverted again before putting into ebp,
@@ -1734,144 +1734,144 @@ E9,2:
 	/
 # EA - NOP
 EA,1:
-	83 c6 02		# addl   $0x2,%esi  # cycle count +2
+	83 c6 02                # addl   $0x2,%esi  # cycle count +2
 	/
 # EB - (bad)
 # EC - CPX - Absolute
 EC,3:
-	8b 3d [X+1]		# movl   XLATADDR,%edi
-	31 db			# xorl   %ebx,%ebx
-	bd 01 00 00 00		# movl   $0x1,%ebp
-	88 cb			# movb   %cl,%bl
-	0f b6 bf [W+1] 00 00	# movzbl ADDR(%edi),%edi
-	29 fb			# subl   %edi,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	0f be fb		# movsbl %bl,%edi
-	83 dd 00		# sbbl   $0x0,%ebp
+	8b 3d [X+1]             # movl   XLATADDR,%edi
+	31 db                   # xorl   %ebx,%ebx
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	88 cb                   # movb   %cl,%bl
+	0f b6 bf [W+1] 00 00    # movzbl ADDR(%edi),%edi
+	29 fb                   # subl   %edi,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	0f be fb                # movsbl %bl,%edi
+	83 dd 00                # sbbl   $0x0,%ebp
 	/
 # ED - SBC - Absolute
 ED,3:
-	8b 3d [X+1]		# movl   XMAPADDR,%edi
-	25 ff 00 00 00		# andl   $0xff,%eax
-	31 db			# xorl   %ebx,%ebx
-	83 c0 80		# addl   $0xffffff80,%eax
-	8a 9f [W+1] 00 00	# movb   ADDR(%edi),%bl
-	83 f0 80		# xorl   $0xffffff80,%eax
-	83 c3 80		# addl   $0xffffff80,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	83 f3 7f		# xorl   $0x7f,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	11 d8			# adcl   %ebx,%eax
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	8b 3d [X+1]             # movl   XMAPADDR,%edi
+	25 ff 00 00 00          # andl   $0xff,%eax
+	31 db                   # xorl   %ebx,%ebx
+	83 c0 80                # addl   $0xffffff80,%eax
+	8a 9f [W+1] 00 00       # movb   ADDR(%edi),%bl
+	83 f0 80                # xorl   $0xffffff80,%eax
+	83 c3 80                # addl   $0xffffff80,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	83 f3 7f                # xorl   $0x7f,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	11 d8                   # adcl   %ebx,%eax
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # EE - INC - Absolute
 EE,3:
-	31 db			# xorl   %ebx,%ebx
-	8a 1d [A+1]		# movb   ADDR,%bl
-	80 c3 81		# addb   $0x81,%bl
-	83 c6 06		# addl   $0x6,%esi  # cycle count +6
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	89 df			# movl   %ebx,%edi
-	88 1d [A+1]		# movb   %bl,ADDR
+	31 db                   # xorl   %ebx,%ebx
+	8a 1d [A+1]             # movb   ADDR,%bl
+	80 c3 81                # addb   $0x81,%bl
+	83 c6 06                # addl   $0x6,%esi  # cycle count +6
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	89 df                   # movl   %ebx,%edi
+	88 1d [A+1]             # movb   %bl,ADDR
 	/
 # EF - (bad)
 # F0 - BEQ
 F0,2:
-	83 c6 [>+1] 03		# addl   $3+,%esi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	f7 c7 ff 00 00 00	# testl  $0xff,%edi
-	bb [R+1]		# movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 84 [U]		# je     U
-	83 ee [>+1] 01		# subl   $1+,%esi
+	83 c6 [>+1] 03          # addl   $3+,%esi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	f7 c7 ff 00 00 00       # testl  $0xff,%edi
+	bb [R+1]                # movl   $[R+1],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 84 [U]               # je     U
+	83 ee [>+1] 01          # subl   $1+,%esi
 	/
 # F1 - SBC - (Indirect),Y
 f1,2:
-	31 db			# xorl   %ebx,%ebx
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	66 8b 1d [Z+1]		# movw   ZP,%bx
-	01 d3			# addl   %edx,%ebx
+	31 db                   # xorl   %ebx,%ebx
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	66 8b 1d [Z+1]          # movw   ZP,%bx
+	01 d3                   # addl   %edx,%ebx
 
 # FIXME - trap I/O
- 8d bb 00 e0 ff ff	# leal   0xffffe000(%ebx),%edi
- 81 ff 00 40 00 00	# cmpl   $0x4000,%edi
- 73 01			# jae    +1
- [^]			# int3
+	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
+	[^]                     # int3
 
-	89 df			# movl   %ebx,%edi
-	c1 eb 0c		# shrl   $0xc,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	8b 1c 9d [M]		# movl   MAPTABLE(,%ebx,4),%ebx
-	0f be c0		# movsbl %al,%eax
-	0f be 1c 3b		# movsbl (%ebx,%edi,1),%ebx
-	f7 d3			# notl   %ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 05		# leal   0x5(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,V
-	0f be f8		# movsbl %al,%edi
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $0xc,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	0f be c0                # movsbl %al,%eax
+	0f be 1c 3b             # movsbl (%ebx,%edi,1),%ebx
+	f7 d3                   # notl   %ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 05                # leal   0x5(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,V
+	0f be f8                # movsbl %al,%edi
 	/
 # F2 - (bad)
 # F3 - (bad)
 # F4 - (bad)
 # F5 - SBC - Zero Page,X
 F5,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	25 ff 00 00 00		# andl   $0xff,%eax
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	31 db			# xorl   %ebx,%ebx
-	83 c0 80		# addl   $0xffffff80,%eax
-	8a 9f [L]		# movb   RAM(%edi),%bl
-	83 f0 80		# xorl   $0xffffff80,%eax
-	83 c3 80		# addl   $0xffffff80,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi
-	83 f3 7f		# xorl   $0x7f,%ebx
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	11 d8			# adcl   %ebx,%eax
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	25 ff 00 00 00          # andl   $0xff,%eax
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	31 db                   # xorl   %ebx,%ebx
+	83 c0 80                # addl   $0xffffff80,%eax
+	8a 9f [L]               # movb   RAM(%edi),%bl
+	83 f0 80                # xorl   $0xffffff80,%eax
+	83 c3 80                # addl   $0xffffff80,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	83 f3 7f                # xorl   $0x7f,%ebx
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	11 d8                   # adcl   %ebx,%eax
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # F6 - INC - Zero Page,X
 F6,2:
-	8d 79 [B+1]		# leal   [B+1](%ecx),%edi
-	81 e7 ff 00 00 00	# andl   $0xff,%edi
-	31 db			# xorl   %ebx,%ebx
-	8a 9f [L]		# movb   0x0(%edi),%bl
-	80 c3 81		# addb   $0x81,%bl
-	83 c6 06		# addl   $0x6,%esi
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	88 9f [L]		# movb   %bl,0x0(%edi)
-	89 df			# movl   %ebx,%edi
+	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
+	81 e7 ff 00 00 00       # andl   $0xff,%edi
+	31 db                   # xorl   %ebx,%ebx
+	8a 9f [L]               # movb   0x0(%edi),%bl
+	80 c3 81                # addb   $0x81,%bl
+	83 c6 06                # addl   $0x6,%esi
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	88 9f [L]               # movb   %bl,0x0(%edi)
+	89 df                   # movl   %ebx,%edi
 	/
 # F7 - (bad)
 # F8 - SED
 F8,1: #What happens on a real NES when the CPU is put into decimal mode?
-	83 c6 02		# addl   $0x2,%esi
-	83 0d [F] 08		# orb    $0x8,[F]
+	83 c6 02                # addl   $0x2,%esi
+	83 0d [F] 08            # orb    $0x8,[F]
 	/
 # F9 - SBC - Absolute,Y
 F9,3:
 # FIXME - cycle count wrong
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	25 ff 00 00 00		# andl   $0xff,%eax
-	8d ba [W+1] 00 00	# leal   ADDR(%edx),%edi
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	83 c0 80		# addl   $0xffffff80,%eax
-	8b 3c bd [M]		# movl   MAPTABLE(,%edi,4),%edi
-	83 f0 80		# xorl   $0xffffff80,%eax
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	0f be 1c 1f		# movsbl (%edi,%ebx,1),%ebx
-	f7 d3			# notl   %ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	25 ff 00 00 00          # andl   $0xff,%eax
+	8d ba [W+1] 00 00       # leal   ADDR(%edx),%edi
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	83 c0 80                # addl   $0xffffff80,%eax
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 f0 80                # xorl   $0xffffff80,%eax
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
+	f7 d3                   # notl   %ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # FA - (bad)
 # FB - (bad)
@@ -1879,33 +1879,33 @@ F9,3:
 # FD - SBC - Absolute,X
 FD,3:
 # FIXME - cycle count wrong
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	25 ff 00 00 00		# andl   $0xff,%eax
-	8d b9 [W+1] 00 00	# leal   ADDR(%ecx),%edi
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	83 c0 80		# addl   $0xffffff80,%eax
-	8b 3c bd [M]		# movl   MAPTABLE(,%edi,4),%edi
-	83 f0 80		# xorl   $0xffffff80,%eax
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	0f be 1c 1f		# movsbl (%edi,%ebx,1),%ebx
-	f7 d3			# notl   %ebx
-	11 d8			# adcl   %ebx,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	25 ff 00 00 00          # andl   $0xff,%eax
+	8d b9 [W+1] 00 00       # leal   ADDR(%ecx),%edi
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	83 c0 80                # addl   $0xffffff80,%eax
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 f0 80                # xorl   $0xffffff80,%eax
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
+	f7 d3                   # notl   %ebx
+	11 d8                   # adcl   %ebx,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # FE - INC - Absolute,X
 FE,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	31 db			# xorl   %ebx,%ebx
-	8a 99 [A+1]		# movb   [A+1](%ecx),%bl
-	80 c3 81		# addb   $0x81,%bl
-	83 c6 07		# addl   $0x7,%esi
-	81 eb 80 00 00 00	# subl   $0x80,%ebx
-	89 df			# movl   %ebx,%edi
-	88 99 [A+1]		# movb   %bl,[A+1](%ecx)
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	31 db                   # xorl   %ebx,%ebx
+	8a 99 [A+1]             # movb   [A+1](%ecx),%bl
+	80 c3 81                # addb   $0x81,%bl
+	83 c6 07                # addl   $0x7,%esi
+	81 eb 80 00 00 00       # subl   $0x80,%ebx
+	89 df                   # movl   %ebx,%edi
+	88 99 [A+1]             # movb   %bl,[A+1](%ecx)
 	/
 # FF - (bad)
 
@@ -1915,189 +1915,189 @@ FE,3:
 # movsx is slow (3 cycles on a Pentium) so we eliminate it whenever possible:
 
 09 80/80,2: # ORA with a negative is always negative (and nonzero)
-	0d [E+1]	# orl    $[E+1],%eax
-	83 c6 02	# addl   $2,%esi
-	bf ff ff ff ff  # movl   $0xffffffff,%edi
+	0d [E+1]                # orl    $[E+1],%eax
+	83 c6 02                # addl   $2,%esi
+	bf ff ff ff ff          # movl   $0xffffffff,%edi
 	/
 09/BF 00/FF,2: # ORA/EOR #$00  (set flags only)
-	83 c6 02	# addl   $2,%esi
-	0f be f8	# movsbl %al,%edi
+	83 c6 02                # addl   $2,%esi
+	0f be f8                # movsbl %al,%edi
 	/
 09 FF/FF,2: # ORA #$FF  (set all bits)
-	b8 ff ff ff ff  # movl   $0xffffffff,%eax
-	83 c6 02	# addl   $2,%esi
-	bf ff ff ff ff  # movl   $0xffffffff,%edi
+	b8 ff ff ff ff          # movl   $0xffffffff,%eax
+	83 c6 02                # addl   $2,%esi
+	bf ff ff ff ff          # movl   $0xffffffff,%edi
 	/
 29 00/80,2: # AND with a positive value is always positive (sign flag=0)
-	25 [E+1]	# andl   $imm,%eax
-	83 c6 02	# addl   $2,%esi
-	89 c7          	# movl   %eax,%edi
+	25 [E+1]                # andl   $imm,%eax
+	83 c6 02                # addl   $2,%esi
+	89 c7                   # movl   %eax,%edi
 	/
 29 00/FF,2: # AND #$00  (clear registers only)
-	31 c0          	# xorl   %eax,%eax
-	83 c6 02	# addl   $2,%esi
-	31 ff          	# xorl   %edi,%edi
+	31 c0                   # xorl   %eax,%eax
+	83 c6 02                # addl   $2,%esi
+	31 ff                   # xorl   %edi,%edi
 	/
 29 FF/FF,2: # AND #$FF  (set flags only)
-	83 c6 02	# addl   $2,%esi
-	0f be f8        # movsbl %al,%edi
+	83 c6 02                # addl   $2,%esi
+	0f be f8                # movsbl %al,%edi
 	/
 A9 00,2: # LDA #$00  (clear registers only, same as AND #0)
-	83 c6 02	# addl   $2,%esi
-	31 c0          	# xorl   %eax,%eax
-	31 ff          	# xorl   %edi,%edi
+	83 c6 02                # addl   $2,%esi
+	31 c0                   # xorl   %eax,%eax
+	31 ff                   # xorl   %edi,%edi
 	/
 A2 00,2: # LDX #$00  (clear registers)
-	83 c6 02	# addl   $2,%esi
-	31 c9           # xorl   %ecx,%ecx
-	31 ff           # xorl   %edi,%edi
+	83 c6 02                # addl   $2,%esi
+	31 c9                   # xorl   %ecx,%ecx
+	31 ff                   # xorl   %edi,%edi
 	/
 A0 00,2: # LDY #$00  (clear registers)
-	83 c6 02	# addl   $2,%esi
-	31 d2           # xorl   %edx,%edx
-	31 ff           # xorl   %edi,%edi
+	83 c6 02                # addl   $2,%esi
+	31 d2                   # xorl   %edx,%edx
+	31 ff                   # xorl   %edi,%edi
 	/
 
 # CLC followed by ADC -> ADD
 18 69,3:
-	0f be c0	# movsbl %al,%eax
-	83 c0 [B+2]     # addl   $[B+2],%eax
-	8d 76 04        # leal   0x4(%esi),%esi
-	19 ed		# sbbl   %ebp,%ebp
-	a3 [V]		# movl   %eax,VFLAG
-	0f be f8	# movsbl %al,%edi
+	0f be c0                # movsbl %al,%eax
+	83 c0 [B+2]             # addl   $[B+2],%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 # SEC followed by SBC -> SUB
 31 E9,3:
-	bd 01 00 00 00	# movl   $0x1,%ebp
-	0f be c0	# movsbl %al,%eax
-	83 e8 [B+2]	# subl   $[B+2],%eax
-	8d 76 04	# leal   0x4(%esi),%esi
-	83 dd 00        # sbbl   $0,%ebp
-	a3 [V]		# movl   %eax,VFLAG
-	0f be f8	# movsbl %al,%edi
+	bd 01 00 00 00          # movl   $0x1,%ebp
+	0f be c0                # movsbl %al,%eax
+	83 e8 [B+2]             # subl   $[B+2],%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	83 dd 00                # sbbl   $0,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 
 # Repeated NOP
 EA EA,2:
-	83 c6 04	# addl   $0x4,%esi  # cycle count +4
+	83 c6 04                # addl   $0x4,%esi  # cycle count +4
 	/
 EA EA EA,3:
-	83 c6 06	# addl   $0x6,%esi  # cycle count +6
+	83 c6 06                # addl   $0x6,%esi  # cycle count +6
 	/
 EA EA EA EA,4:
-	83 c6 08	# addl   $0x8,%esi  # cycle count +8
+	83 c6 08                # addl   $0x8,%esi  # cycle count +8
 	/
 
 # Repeated INX
 E8 E8,2:
-	83 c1 02        # addl   $0x2,%ecx
-	83 c6 04	# addl   $4,%esi  # cycle count +2x2
-	0f be f9	# movsbl %cl,%edi
+	83 c1 02                # addl   $0x2,%ecx
+	83 c6 04                # addl   $4,%esi  # cycle count +2x2
+	0f be f9                # movsbl %cl,%edi
 	/
 E8 E8 E8,3:
-	83 c1 03        # addl   $0x3,%ecx
-	83 c6 06	# addl   $6,%esi  # cycle count +2x3
-	0f be f9	# movsbl %cl,%edi
+	83 c1 03                # addl   $0x3,%ecx
+	83 c6 06                # addl   $6,%esi  # cycle count +2x3
+	0f be f9                # movsbl %cl,%edi
 	/
 E8 E8 E8 E8,4:
-	83 c1 04        # addl   $0x4,%ecx
-	83 c6 08	# addl   $8,%esi  # cycle count +2x4
-	0f be f9	# movsbl %cl,%edi
+	83 c1 04                # addl   $0x4,%ecx
+	83 c6 08                # addl   $8,%esi  # cycle count +2x4
+	0f be f9                # movsbl %cl,%edi
 	/
 
 # Repeated INY
 C8 C8,2:
-	83 c2 02        # addl   $0x2,%edx
-	83 c6 04        # addl   $4,%esi  # cycle count +2x2
-	0f be fa	# movsbl %dl,%edi
+	83 c2 02                # addl   $0x2,%edx
+	83 c6 04                # addl   $4,%esi  # cycle count +2x2
+	0f be fa                # movsbl %dl,%edi
 	/
 C8 C8 C8,3:
-	83 c2 03        # addl   $0x3,%edx
-	83 c6 06        # addl   $6,%esi  # cycle count +3x2
-	0f be fa	# movsbl %dl,%edi
+	83 c2 03                # addl   $0x3,%edx
+	83 c6 06                # addl   $6,%esi  # cycle count +3x2
+	0f be fa                # movsbl %dl,%edi
 	/
 C8 C8 C8 C8,4:
-	83 c2 04        # addl   $0x4,%edx
-	83 c6 08        # addl   $8,%esi  # cycle count +4x2
-	0f be fa	# movsbl %dl,%edi
+	83 c2 04                # addl   $0x4,%edx
+	83 c6 08                # addl   $8,%esi  # cycle count +4x2
+	0f be fa                # movsbl %dl,%edi
 	/
 
 # Repeated DEX
 CA CA,2:
-	83 e9 02	# subl   $0x2,%ecx
-	83 c6 04	# addl   $4,%esi  # cycle count +4
-	0f be f9	# movsbl %cl,%edi
+	83 e9 02                # subl   $0x2,%ecx
+	83 c6 04                # addl   $4,%esi  # cycle count +4
+	0f be f9                # movsbl %cl,%edi
 	/
 CA CA CA,3:
-	83 e9 03	# subl   $0x3,%ecx
-	83 c6 06	# addl   $6,%esi  # cycle count +6
-	0f be f9	# movsbl %cl,%edi
+	83 e9 03                # subl   $0x3,%ecx
+	83 c6 06                # addl   $6,%esi  # cycle count +6
+	0f be f9                # movsbl %cl,%edi
 	/
 CA CA CA CA,4:
-	83 e9 04	# subl   $0x4,%ecx
-	83 c6 08	# addl   $8,%esi  # cycle count +8
-	0f be f9	# movsbl %cl,%edi
+	83 e9 04                # subl   $0x4,%ecx
+	83 c6 08                # addl   $8,%esi  # cycle count +8
+	0f be f9                # movsbl %cl,%edi
 	/
 
 # Repeated DEY
 88 88,2:
-	83 ea 02        # subl   $0x2,%edx
-	83 c6 04	# addl   $4,%esi  # cycle count +4
-	0f be fa        # movsbl %dl,%edi
+	83 ea 02                # subl   $0x2,%edx
+	83 c6 04                # addl   $4,%esi  # cycle count +4
+	0f be fa                # movsbl %dl,%edi
 	/
 88 88 88,3:
-	83 ea 03        # subl   $0x3,%edx
-	83 c6 06	# addl   $6,%esi  # cycle count +6
-	0f be fa        # movsbl %dl,%edi
+	83 ea 03                # subl   $0x3,%edx
+	83 c6 06                # addl   $6,%esi  # cycle count +6
+	0f be fa                # movsbl %dl,%edi
 	/
 88 88 88 88,4:
-	83 ea 04        # subl   $0x4,%edx
-	83 c6 08	# addl   $8,%esi  # cycle count +8
-	0f be fa        # movsbl %dl,%edi
+	83 ea 04                # subl   $0x4,%edx
+	83 c6 08                # addl   $8,%esi  # cycle count +8
+	0f be fa                # movsbl %dl,%edi
 	/
 
 # Repeated ASL
 0A 0A,2:
-	c0 e0 02	# shlb   $0x2,%al
-	8d 76 04	# leal   0x4(%esi),%esi  # cycle count +4
-        19 ed		# sbbl   %ebp,%ebp
-	0f be f8	# movsbl %al,%edi
+	c0 e0 02                # shlb   $0x2,%al
+	8d 76 04                # leal   0x4(%esi),%esi  # cycle count +4
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be f8                # movsbl %al,%edi
 	/
 0A 0A 0A,3:
-	c0 e0 03	# shlb   $0x3,%al
-	8d 76 06	# leal   0x6(%esi),%esi  # cycle count +6
-        19 ed		# sbbl   %ebp,%ebp
-	0f be f8	# movsbl %al,%edi
+	c0 e0 03                # shlb   $0x3,%al
+	8d 76 06                # leal   0x6(%esi),%esi  # cycle count +6
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be f8                # movsbl %al,%edi
 	/
 0A 0A 0A 0A,4:
-	c0 e0 04	# shlb   $0x4,%al
-	8d 76 08	# leal   0x8(%esi),%esi  # cycle count +8
-        19 ed		# sbbl   %ebp,%ebp
-	0f be f8	# movsbl %al,%edi
+	c0 e0 04                # shlb   $0x4,%al
+	8d 76 08                # leal   0x8(%esi),%esi  # cycle count +8
+	19 ed                   # sbbl   %ebp,%ebp
+	0f be f8                # movsbl %al,%edi
 	/
 
 # Repeated LSR
 4A 4A,2:
-	25 ff 00 00 00	# andl   $0xff,%eax
-	c1 e8 02	# shrl   $0x2,%eax
-	8d 76 04	# leal   0x4(%esi),%esi
-	19 ed		# sbbl   %ebp,%ebp
-	89 c7		# movl   %eax,%edi
+	25 ff 00 00 00          # andl   $0xff,%eax
+	c1 e8 02                # shrl   $0x2,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	89 c7                   # movl   %eax,%edi
 	/
 4A 4A 4A,3:
-	25 ff 00 00 00	# andl   $0xff,%eax
-	c1 e8 03	# shrl   $0x3,%eax
-	8d 76 06	# leal   0x6(%esi),%esi
-	19 ed		# sbbl   %ebp,%ebp
-	89 c7		# movl   %eax,%edi
+	25 ff 00 00 00          # andl   $0xff,%eax
+	c1 e8 03                # shrl   $0x3,%eax
+	8d 76 06                # leal   0x6(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	89 c7                   # movl   %eax,%edi
 	/
 4A 4A 4A 4A,4:
-	25 ff 00 00 00	# andl   $0xff,%eax
-	c1 e8 04	# shrl   $0x4,%eax
-	8d 76 08	# leal   0x8(%esi),%esi
-	19 ed		# sbbl   %ebp,%ebp
-	89 c7		# movl   %eax,%edi
+	25 ff 00 00 00          # andl   $0xff,%eax
+	c1 e8 04                # shrl   $0x4,%eax
+	8d 76 08                # leal   0x8(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	89 c7                   # movl   %eax,%edi
 	/
 
 
@@ -2107,180 +2107,180 @@ CA CA CA CA,4:
 
 # LDA of non-zero followed by BNE is always taken
 A9 00/00 D0,4:
-	b8 [E+1]		# movl   $[E+1],%eax
-	83 c6 [>+3] 05		# addl   $5+,%esi # do timing count
-	bf [E+1]		# movl   $[E+1],%edi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	b8 [E+1]                # movl   $[E+1],%eax
+	83 c6 [>+3] 05          # addl   $5+,%esi # do timing count
+	bf [E+1]                # movl   $[E+1],%edi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	[!]
 	/
 # LDA #0 followed by BNE is never taken (overrides previous case for LDA #0)
 A9 00 D0,4:
-	31 c0			# xorl   %eax,%eax
-	31 ff			# xorl   %edi,%edi
-	8d 76 04		# leal   4(%esi),%esi # do timing count
+	31 c0                   # xorl   %eax,%eax
+	31 ff                   # xorl   %edi,%edi
+	8d 76 04                # leal   4(%esi),%esi # do timing count
 	/
 # LDX of non-zero followed by BNE is always taken
 A2 00/00 D0,4:
-	b9 [E+1]		# movl   $[E+1],%ecx
-	bf [E+1]		# movl   $[E+1],%edi
-	83 c6 [>+3] 05		# addl   $5+,%esi # do timing count
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	b9 [E+1]                # movl   $[E+1],%ecx
+	bf [E+1]                # movl   $[E+1],%edi
+	83 c6 [>+3] 05          # addl   $5+,%esi # do timing count
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	[!]
 	/
 # LDX #0 followed by BNE is never taken (overrides previous case for LDX #0)
 A2 00 D0,4:
-	31 c9			# xorl   %ecx,%ecx
-	31 ff			# xorl   %edi,%edi
-	8d 76 04		# leal   4(%esi),%esi # do timing count
+	31 c9                   # xorl   %ecx,%ecx
+	31 ff                   # xorl   %edi,%edi
+	8d 76 04                # leal   4(%esi),%esi # do timing count
 	/
 
 # LDY of non-zero followed by BNE is always taken
 A0 00/00 D0,4:
-	ba [E+1]		# movl   $[E+1],%edx
-	bf [E+1]		# movl   $[E+1],%edi
-	83 c6 [>+3] 05		# addl   $5+,%esi # do timing count
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	ba [E+1]                # movl   $[E+1],%edx
+	bf [E+1]                # movl   $[E+1],%edi
+	83 c6 [>+3] 05          # addl   $5+,%esi # do timing count
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	[!]
 	/
 # LDY #0 followed by BNE is never taken (overrides previous case for LDY #0)
 A0 00 D0,4:
-	31 d2			# xorl   %edx,%edx
-	31 ff			# xorl   %edi,%edi
-	8d 76 04		# leal   4(%esi),%esi # do timing count
+	31 d2                   # xorl   %edx,%edx
+	31 ff                   # xorl   %edi,%edi
+	8d 76 04                # leal   4(%esi),%esi # do timing count
 	/
 
 # LDA #0 followed by BEQ is always taken
 A9 00 F0,4:
-	31 c0			# xorl   %eax,%eax
-	31 ff			# xorl   %edi,%edi
-	8d 76 [>+3] 05		# leal   5+(%esi),%esi # do timing count
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    UPDATE/COMPILE
+	31 c0                   # xorl   %eax,%eax
+	31 ff                   # xorl   %edi,%edi
+	8d 76 [>+3] 05          # leal   5+(%esi),%esi # do timing count
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    UPDATE/COMPILE
 	[!]
 	/
 # LDX #0 followed by BEQ is always taken
 A2 00 F0,4:
-	31 c9			# xorl   %ecx,%ecx
-	31 ff			# xorl   %edi,%edi
-	8d 76 [>+3] 05		# leal   5+(%esi),%esi # do timing count
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    UPDATE/COMPILE
+	31 c9                   # xorl   %ecx,%ecx
+	31 ff                   # xorl   %edi,%edi
+	8d 76 [>+3] 05          # leal   5+(%esi),%esi # do timing count
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    UPDATE/COMPILE
 	[!]
 	/
 # LDY #0 followed by BEQ is always taken
 A0 00 F0,4:
-	31 d2			# xorl   %edx,%edx
-	31 ff			# xorl   %edi,%edi
-	8d 76 [>+3] 05		# leal   5+(%esi),%esi # do timing count
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    UPDATE/COMPILE
+	31 d2                   # xorl   %edx,%edx
+	31 ff                   # xorl   %edi,%edi
+	8d 76 [>+3] 05          # leal   5+(%esi),%esi # do timing count
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    UPDATE/COMPILE
 	[!]
 	/
 
 # This shows up quite a bit also... LDA #0 / STA / BEQ
 A9 00 85 00/00 F0,6:
-	31 c0			# xorl   %eax,%eax
-	31 ff			# xorl   %edi,%edi
-	8d 76 [>+5] 08		# leal   8+(%esi),%esi # do timing count
-	a2 [Z+3]		# movb   %al,[Z+3]
-	bb [R+5]		# movl   $[R+5],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    UPDATE/COMPILE
+	31 c0                   # xorl   %eax,%eax
+	31 ff                   # xorl   %edi,%edi
+	8d 76 [>+5] 08          # leal   8+(%esi),%esi # do timing count
+	a2 [Z+3]                # movb   %al,[Z+3]
+	bb [R+5]                # movl   $[R+5],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    UPDATE/COMPILE
 	[!]
 	/
 
 # Also A9..95..D0  LDA #xx / STA 00,X / BNE
 #A9 00/00 95 00/00 D0,6:
-#	b8 [E+1]		# movl   $[E+1],%eax
-#	8d 59 [B+3]		# leal   [B+3](%ecx),%ebx
-#	bf [E+1]		# movl   $[E+1],%edi
-#	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-#	8d 76 09		# leal   0x9(%esi),%esi
-#	88 83 [L]		# movb   %al,[L](%ebx)
-#	bb [R+5]		# movl   $[R+5],%ebx
-#	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-#	e9 [U]			# jmp    [U]
+#	b8 [E+1]                # movl   $[E+1],%eax
+#	8d 59 [B+3]             # leal   [B+3](%ecx),%ebx
+#	bf [E+1]                # movl   $[E+1],%edi
+#	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+#	8d 76 09                # leal   0x9(%esi),%esi
+#	88 83 [L]               # movb   %al,[L](%ebx)
+#	bb [R+5]                # movl   $[R+5],%ebx
+#	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+#	e9 [U]                  # jmp    [U]
 #	[!]
 #	/
-#A9 00 95 00/00 D0,6:	# For LDA #00 case...
-#	31 c0			# xorl   %eax,%eax
-#	8d 59 [B+3]		# leal   [B+3](%ecx),%ebx
-#	31 ff			# xorl   %edi,%edi
-#	81 e3 ff 00 00 00	# andl   $0xff,%ebx
-#	8d 76 08		# leal   0x8(%esi),%esi
-#	88 83 [L]		# movb   %al,[L](%ebx)
+#A9 00 95 00/00 D0,6:   # For LDA #00 case...
+#	31 c0                   # xorl   %eax,%eax
+#	8d 59 [B+3]             # leal   [B+3](%ecx),%ebx
+#	31 ff                   # xorl   %edi,%edi
+#	81 e3 ff 00 00 00       # andl   $0xff,%ebx
+#	8d 76 08                # leal   0x8(%esi),%esi
+#	88 83 [L]               # movb   %al,[L](%ebx)
 #	/
 
 # ORA of non-zero followed by BNE is always taken
 09 00/00 D0,4:
-	83 c8 [B+1]		# orl    $[B+1],%eax
-	83 c6 [>+3] 05		# addl   $5+,%esi # do timing count
-	0f be f8		# movsbl %al,%edi
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	83 c8 [B+1]             # orl    $[B+1],%eax
+	83 c6 [>+3] 05          # addl   $5+,%esi # do timing count
+	0f be f8                # movsbl %al,%edi
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	[!]
 	/
 09 00 D0,4: # ORA #$00 / BNE
-	0f be f8		# movsbl %al,%edi
-	83 c6 [>+3] 05		# addl   $5+,%esi # timing
-	bb [P]			# movl   $[P],%ebx
-	0f 89 [N]		# jns    NMI
-	f7 c7 ff 00 00 00	# testl  $0xff,%edi
-	bb [R+3]		# movl   $[R+3],%ebx
-	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-	0f 85 [U]		# jne    [U]
-	83 ee [>+3] 01		# subl   $1+,%esi
+	0f be f8                # movsbl %al,%edi
+	83 c6 [>+3] 05          # addl   $5+,%esi # timing
+	bb [P]                  # movl   $[P],%ebx
+	0f 89 [N]               # jns    NMI
+	f7 c7 ff 00 00 00       # testl  $0xff,%edi
+	bb [R+3]                # movl   $[R+3],%ebx
+	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+	0f 85 [U]               # jne    [U]
+	83 ee [>+3] 01          # subl   $1+,%esi
 	/
 
 # Branch pairs (one or the other is always taken)
 
 # BNE/BEQ
 #D0 00/00 F0,4:
-#	83 c6 03		# addl   $3,%esi
-#	bb [P]			# movl   $[P],%ebx
-#	0f 89 [N]		# jns    NMI
-#	f7 c7 ff 00 00 00	# testl  $0xff,%edi
-#	bb [R+1]		# movl   $[R+1],%ebx
-#	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-#	0f 85 [U]		# jne    U
-#	83 c6 02		# addl   $2,%esi
-#	bb [R+3]		# movl   $[R+3],%ebx
-#	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-#	e9 [U]			# jmp    U
-#	[!]			# STOP
+#	83 c6 03                # addl   $3,%esi
+#	bb [P]                  # movl   $[P],%ebx
+#	0f 89 [N]               # jns    NMI
+#	f7 c7 ff 00 00 00       # testl  $0xff,%edi
+#	bb [R+1]                # movl   $[R+1],%ebx
+#	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+#	0f 85 [U]               # jne    U
+#	83 c6 02                # addl   $2,%esi
+#	bb [R+3]                # movl   $[R+3],%ebx
+#	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+#	e9 [U]                  # jmp    U
+#	[!]                     # STOP
 #	/
 # BEQ/BNE
 #F0 00/00 D0,4:
-#	83 c6 03		# addl   $3,%esi
-#	bb [P]			# movl   $[P],%ebx
-#	0f 89 [N]		# jns    NMI
-#	f7 c7 ff 00 00 00	# testl  $0xff,%edi
-#	bb [R+1]		# movl   $[R+1],%ebx
-#	c7 44 24 fc [D+6]	# movl   $[D+6],0xfffffffc(%esp,1)
-#	0f 84 [U]		# je     U
-#	83 c6 02		# addl   $2,%esi
-#	bb [R+3]		# movl   $[R+3],%ebx
-#	c7 44 24 fc [D+5]	# movl   $[D+5],0xfffffffc(%esp,1)
-#	e9 [U]			# jmp    U
-#	[!]			# STOP
+#	83 c6 03                # addl   $3,%esi
+#	bb [P]                  # movl   $[P],%ebx
+#	0f 89 [N]               # jns    NMI
+#	f7 c7 ff 00 00 00       # testl  $0xff,%edi
+#	bb [R+1]                # movl   $[R+1],%ebx
+#	c7 44 24 fc [D+6]       # movl   $[D+6],0xfffffffc(%esp,1)
+#	0f 84 [U]               # je     U
+#	83 c6 02                # addl   $2,%esi
+#	bb [R+3]                # movl   $[R+3],%ebx
+#	c7 44 24 fc [D+5]       # movl   $[D+5],0xfffffffc(%esp,1)
+#	e9 [U]                  # jmp    U
+#	[!]                     # STOP
 #	/
 
 #-----------------------------------------------------------------------------
@@ -2288,160 +2288,160 @@ A9 00 85 00/00 F0,6:
 
 # STA $8000+  - write mapper regs
 8D 00/00 80/80,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [Y]		# call   MAPPER
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [Y]                  # call   MAPPER
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 # STX $8000+  - write mapper regs
 8E 00/00 80/80,3:
-	91              # xchgl  %eax,%ecx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $ADDR,%ebx
-	e8 [Y]		# call   MAPPER
-	91              # xchgl  %eax,%ecx
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	91                      # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [Y]                  # call   MAPPER
+	91                      # xchgl  %eax,%ecx
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 # STY $8000+  - write mapper regs
 8C 00/00 80/80,3:
-	92              # xchgl  %eax,%edx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $ADDR,%ebx
-	e8 [Y]		# call   MAPPER
-	92              # xchgl  %eax,%edx
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	92                      # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [Y]                  # call   MAPPER
+	92                      # xchgl  %eax,%edx
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 # STA $8xxx,X  - write to mapper
 9D 00/00 80/80,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c6 05		# addl   $0x5,%esi
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	e8 [Y]			# call   MAPPER
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c6 05                # addl   $0x5,%esi
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	e8 [Y]                  # call   MAPPER
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 # STA $8xxx,Y  - write to mapper
 99 00/00 80/80,3:
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	83 c6 05		# addl   $0x5,%esi
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	e8 [Y]			# call   MAPPER
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	83 c6 05                # addl   $0x5,%esi
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	e8 [Y]                  # call   MAPPER
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 # STA $7Fxx,X or $FFxx,X - possibly write to mapper
 9D 00/00 7F/7F,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c6 05		# addl   $0x5,%esi
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	f7 c3 00 80 00 00	# testl  $0x8000,%ebx
-	74 17			# je     +23
-	e8 [Y]			# call   MAPPER
- 	bb [P+3]		# movl   $[P+3],%ebx
- 	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
- 	e9 [U]			# jmp    [U]
-	81 e3 ff ff 00 00	# andl   $0xffff,%ebx
-	88 83 [L]		# movb   %al,[L](%ebx)
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c6 05                # addl   $0x5,%esi
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
+	74 17                   # je     +23
+	e8 [Y]                  # call   MAPPER
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
+	81 e3 ff ff 00 00       # andl   $0xffff,%ebx
+	88 83 [L]               # movb   %al,[L](%ebx)
 	/
 
 # STA $7Fxx,Y or $FFxx,Y - possibly write to mapper
 99 00/00 7F/7F,3:
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	83 c6 05		# addl   $0x5,%esi
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	f7 c3 00 80 00 00	# testl  $0x8000,%ebx
-	74 17			# je     +23
-	e8 [Y]			# call   MAPPER
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
-	81 e3 ff ff 00 00	# andl   $0xffff,%ebx
-	88 83 [L]		# movb   %al,[L](%ebx)
- 	/
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	83 c6 05                # addl   $0x5,%esi
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
+	74 17                   # je     +23
+	e8 [Y]                  # call   MAPPER
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
+	81 e3 ff ff 00 00       # andl   $0xffff,%ebx
+	88 83 [L]               # movb   %al,[L](%ebx)
+	/
 
 # INC $8000+  - write mapper regs
 #   Believe it or not, some games actually do this to write to the mapper.
 #   Why?  Although it doesn't save any clock cycles, it does save a byte
 #   of memory compared to the usual LDA/STA method.
 EE 00/00 80/80,3:
-	8b 1d [X+1]		# movl   [X+1],%ebx
-	83 c6 06		# addl   $0x6,%esi
-	50			# pushl  %eax
-	0f b6 83 [W+1] 00 00	# movzbl ADDR(%ebx),%eax
-	bb [W+1] 00 00		# movl   $ADDR,%ebx
-	40			# incl   %eax
-	0f be f8		# movsbl %al,%edi
-	e8 [Y]			# call   [Y]
-	58			# popl   %eax
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	8b 1d [X+1]             # movl   [X+1],%ebx
+	83 c6 06                # addl   $0x6,%esi
+	50                      # pushl  %eax
+	0f b6 83 [W+1] 00 00    # movzbl ADDR(%ebx),%eax
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	40                      # incl   %eax
+	0f be f8                # movsbl %al,%edi
+	e8 [Y]                  # call   [Y]
+	58                      # popl   %eax
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 # DEC $8000+  - write mapper regs
 CE 00/00 80/80,3:
-	8b 1d [X+1]		# movl   [X+1],%ebx
-	83 c6 06		# addl   $0x6,%esi
-	50			# pushl  %eax
-	0f b6 83 [W+1] 00 00	# movzbl ADDR(%ebx),%eax
-	bb [W+1] 00 00		# movl   $ADDR,%ebx
-	48			# decl   %eax
-	0f be f8		# movsbl %al,%edi
-	e8 [Y]			# call   [Y]
-	58			# popl   %eax
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	8b 1d [X+1]             # movl   [X+1],%ebx
+	83 c6 06                # addl   $0x6,%esi
+	50                      # pushl  %eax
+	0f b6 83 [W+1] 00 00    # movzbl ADDR(%ebx),%eax
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	48                      # decl   %eax
+	0f be f8                # movsbl %al,%edi
+	e8 [Y]                  # call   [Y]
+	58                      # popl   %eax
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 # INC $8000+,X to mapper
 FE 00/00 80/80,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c6 07		# addl   $0x7,%esi
-	8d b9 [W+1] 00 00	# leal   ADDR(%ecx),%edi
-	50			# pushl  %eax
-	89 fb			# movl   %edi,%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	8b 3c bd [M]		# movl   [M](,%edi,4),%edi
-	0f b6 04 1f		# movzbl (%edi,%ebx,1),%eax
-	40			# incl   %eax
-	0f be f8		# movsbl %al,%edi
-	e8 [Y]			# call   [Y]
-	58			# popl   %eax
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c6 07                # addl   $0x7,%esi
+	8d b9 [W+1] 00 00       # leal   ADDR(%ecx),%edi
+	50                      # pushl  %eax
+	89 fb                   # movl   %edi,%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	8b 3c bd [M]            # movl   [M](,%edi,4),%edi
+	0f b6 04 1f             # movzbl (%edi,%ebx,1),%eax
+	40                      # incl   %eax
+	0f be f8                # movsbl %al,%edi
+	e8 [Y]                  # call   [Y]
+	58                      # popl   %eax
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 # DEC $8000+,X to mapper
 DE 00/00 80/80,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c6 07		# addl   $0x7,%esi
-	8d b9 [W+1] 00 00	# leal   ADDR(%ecx),%edi
-	50			# pushl  %eax
-	89 fb			# movl   %edi,%ebx
-	c1 ef 0c		# shrl   $0xc,%edi
-	8b 3c bd [M]		# movl   [M](,%edi,4),%edi
-	0f b6 04 1f		# movzbl (%edi,%ebx,1),%eax
-	48			# decl   %eax
-	0f be f8		# movsbl %al,%edi
-	e8 [Y]			# call   [Y]
-	58			# popl   %eax
-	bb [P+3]		# movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00	# movl   $0,0xfffffffc(%esp,1)
-	e9 [U]			# jmp    [U]
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c6 07                # addl   $0x7,%esi
+	8d b9 [W+1] 00 00       # leal   ADDR(%ecx),%edi
+	50                      # pushl  %eax
+	89 fb                   # movl   %edi,%ebx
+	c1 ef 0c                # shrl   $0xc,%edi
+	8b 3c bd [M]            # movl   [M](,%edi,4),%edi
+	0f b6 04 1f             # movzbl (%edi,%ebx,1),%eax
+	48                      # decl   %eax
+	0f be f8                # movsbl %al,%edi
+	e8 [Y]                  # call   [Y]
+	58                      # popl   %eax
+	bb [P+3]                # movl   $[P+3],%ebx
+	c7 44 24 fc 00 00 00 00 # movl   $0,0xfffffffc(%esp,1)
+	e9 [U]                  # jmp    [U]
 	/
 
 
@@ -2450,104 +2450,104 @@ DE 00/00 80/80,3:
 
 # LDA $2002 - PPU Status Register [PPUSTAT]
 AD 02 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi # do timing count
-	bb 02 20 00 00	# movl   $0x2002,%ebx
-	e8 [I]		# call   INPUT
-	89 f8		# movl   %edi,%eax
+	8d 76 04                # leal   0x4(%esi),%esi # do timing count
+	bb 02 20 00 00          # movl   $0x2002,%ebx
+	e8 [I]                  # call   INPUT
+	89 f8                   # movl   %edi,%eax
 	/
 # LDX $2002 - PPU Status Register [PPUSTAT]
 AE 02 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi # do timing count
-	bb 02 20 00 00	# movl   $0x2002,%ebx
-	e8 [I]		# call   INPUT
-	89 f9		# movl   %edi,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi # do timing count
+	bb 02 20 00 00          # movl   $0x2002,%ebx
+	e8 [I]                  # call   INPUT
+	89 f9                   # movl   %edi,%ecx
 	/
 # LDY $2002 - PPU Status Register [PPUSTAT]
 AC 02 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi # do timing count
-	bb 02 20 00 00	# movl   $0x2002,%ebx
-	e8 [I]		# call   INPUT
-	89 fa		# movl   %edi,%edx
+	8d 76 04                # leal   0x4(%esi),%esi # do timing count
+	bb 02 20 00 00          # movl   $0x2002,%ebx
+	e8 [I]                  # call   INPUT
+	89 fa                   # movl   %edi,%edx
 	/
 # BIT $2002 (Test PPU status)
 2C 02 20,3:
-	0d 00 ff ff ff		# orl    $0xffffff00,%eax
-	bb 02 20 00 00		# movl   $0x2002,%ebx
-	e8 [I]			# call   INPUT
-	83 c6 04		# addl   $0x4,%esi
-	8d 1c fd 00 00 00 00	# leal   0x0(,%edi,8),%ebx
-	21 c7			# andl   %eax,%edi
-	81 e3 00 02 00 00	# andl   $0x200,%ebx
-	89 1d [V]		# movl   %ebx,VFLAG
+	0d 00 ff ff ff          # orl    $0xffffff00,%eax
+	bb 02 20 00 00          # movl   $0x2002,%ebx
+	e8 [I]                  # call   INPUT
+	83 c6 04                # addl   $0x4,%esi
+	8d 1c fd 00 00 00 00    # leal   0x0(,%edi,8),%ebx
+	21 c7                   # andl   %eax,%edi
+	81 e3 00 02 00 00       # andl   $0x200,%ebx
+	89 1d [V]               # movl   %ebx,VFLAG
 	/
 
 # LDA $2007 - Read VRAM
 AD 07 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb 07 20 00 00	# movl   $0x2007,%ebx
-	e8 [I]		# call   INPUT
-	89 f8		# movl   %edi,%eax
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb 07 20 00 00          # movl   $0x2007,%ebx
+	e8 [I]                  # call   INPUT
+	89 f8                   # movl   %edi,%eax
 	/
 # LDX $2007
 AE 07 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi # do timing count
-	bb 07 20 00 00	# movl   $0x2007,%ebx
-	e8 [I]		# call   INPUT
-	89 f9		# movl   %edi,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi # do timing count
+	bb 07 20 00 00          # movl   $0x2007,%ebx
+	e8 [I]                  # call   INPUT
+	89 f9                   # movl   %edi,%ecx
 	/
 # LDY $2007
 AC 07 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi # do timing count
-	bb 07 20 00 00	# movl   $0x2007,%ebx
-	e8 [I]		# call   INPUT
-	89 fa		# movl   %edi,%edx
+	8d 76 04                # leal   0x4(%esi),%esi # do timing count
+	bb 07 20 00 00          # movl   $0x2007,%ebx
+	e8 [I]                  # call   INPUT
+	89 fa                   # movl   %edi,%edx
 	/
 
 # ADC $2007
 6D 07 20,3:
-	0f be c0		# movsbl %al,%eax
-	bb 07 20 00 00		# movl   $0x2007,%ebx
-	e8 [I]			# call   INPUT
-	83 c5 ff		# addl   $0xffffffff,%ebp
-	11 f8			# adcl   %edi,%eax
-	8d 76 04		# leal   0x4(%esi),%esi
-	19 ed			# sbbl   %ebp,%ebp
-	a3 [V]			# movl   %eax,VFLAG
-	0f be f8		# movsbl %al,%edi
+	0f be c0                # movsbl %al,%eax
+	bb 07 20 00 00          # movl   $0x2007,%ebx
+	e8 [I]                  # call   INPUT
+	83 c5 ff                # addl   $0xffffffff,%ebp
+	11 f8                   # adcl   %edi,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	19 ed                   # sbbl   %ebp,%ebp
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
 	/
 
 # LDA $40xx - I/O read
 AD 00/00 40,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [I]		# call   INPUT
-	89 f8		# movl   %edi,%eax
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [I]                  # call   INPUT
+	89 f8                   # movl   %edi,%eax
 	/
 # AND $40xx - I/O read
 2D 00/00 40,3:
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	0f be c0	# movsbl %al,%eax
-	8d 76 04	# leal   0x4(%esi),%esi
-	e8 [I]		# call   INPUT
-	21 c7		# andl   %eax,%edi
-	89 f8		# movl   %edi,%eax
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	0f be c0                # movsbl %al,%eax
+	8d 76 04                # leal   0x4(%esi),%esi
+	e8 [I]                  # call   INPUT
+	21 c7                   # andl   %eax,%edi
+	89 f8                   # movl   %edi,%eax
 	/
 # LDA $40xx,x - I/O read
 BD 00/00 40,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	bb [W+1] 00 00		# movl   $ADDR,%ebx
-	8d 76 04		# leal   0x4(%esi),%esi #timing
-	01 cb			# addl   %ecx,%ebx
-	e8 [I]			# call   INPUT
-	89 f8			# movl   %edi,%eax
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	01 cb                   # addl   %ecx,%ebx
+	e8 [I]                  # call   INPUT
+	89 f8                   # movl   %edi,%eax
 	/
 # LDA $40xx,y - I/O read
 B9 00/00 40,3:
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	8d 76 04		# leal   0x4(%esi),%esi
-	8d 9a [W+1] 00 00	# leal   $ADDR(%edx),%ebx
-	e8 [I]			# call   INPUT
-	89 f8			# movl   %edi,%eax
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	8d 9a [W+1] 00 00       # leal   $ADDR(%edx),%ebx
+	e8 [I]                  # call   INPUT
+	89 f8                   # movl   %edi,%eax
 	/
 
 
@@ -2555,193 +2555,193 @@ B9 00/00 40,3:
 
 # STA $2000  - write to $2000
 8D 00 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $2000  - write to $2000
 8E 00 20,3:
-	91              # xchgl  %eax,%ecx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2000,%ebx
-	e8 [O]		# call   OUTPUT
-	91              # xchgl  %eax,%ecx
+	91                      # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2000,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $2000  - write to $2000
 8C 00 20,3:
-	92              # xchgl  %eax,%edx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2000,%ebx
-	e8 [O]		# call   OUTPUT
-	92              # xchgl  %eax,%edx
+	92                      # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2000,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 # STA $2001  - write to $2001
 8D 01 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $2001  - write to $2001
 8E 01 20,3:
-	91              # xchgl  %eax,%ecx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2001,%ebx
-	e8 [O]		# call   OUTPUT
-	91              # xchgl  %eax,%ecx
+	91                      # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2001,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $2001  - write to $2001
 8C 01 20,3:
-	92              # xchgl  %eax,%edx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2001,%ebx
-	e8 [O]		# call   OUTPUT
-	92              # xchgl  %eax,%edx
+	92                      # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2001,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 # STA $2002  - write to $2002?? should not happen
 8D 02 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-#	bb [W+1] 00 00	# movl   $ADDR,%ebx
-#	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+#	bb [W+1] 00 00          # movl   $ADDR,%ebx
+#	e8 [O]                  # call   OUTPUT
 	/
 
 # STA $2003  - write to $2003
 8D 03 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $2003  - write to $2003
 8E 03 20,3:
-	91              # xchgl  %eax,%ecx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2003,%ebx
-	e8 [O]		# call   OUTPUT
-	91              # xchgl  %eax,%ecx
+	91                      # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2003,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $2003  - write to $2003
 8C 03 20,3:
-	92              # xchgl  %eax,%edx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2003,%ebx
-	e8 [O]		# call   OUTPUT
-	92              # xchgl  %eax,%edx
+	92                      # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2003,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 # STA $2004  - write to $2004
 8D 04 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $2004  - write to $2004
 8E 04 20,3:
-	91              # xchgl  %eax,%ecx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2004,%ebx
-	e8 [O]		# call   OUTPUT
-	91              # xchgl  %eax,%ecx
+	91                      # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2004,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $2004  - write to $2004
 8C 04 20,3:
-	92              # xchgl  %eax,%edx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2004,%ebx
-	e8 [O]		# call   OUTPUT
-	92              # xchgl  %eax,%edx
+	92                      # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2004,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 # STA $2005  - write to $2005
 8D 05 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $2005  - write to $2005
 8E 05 20,3:
-	91              # xchgl  %eax,%ecx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2005,%ebx
-	e8 [O]		# call   OUTPUT
-	91              # xchgl  %eax,%ecx
+	91                      # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2005,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $2005  - write to $2005
 8C 05 20,3:
-	92              # xchgl  %eax,%edx
-	8d 76 04        # leal   0x4(%esi),%esi
-	bb [W+1] 00 00  # movl   $0x2005,%ebx
-	e8 [O]		# call   OUTPUT
-	92              # xchgl  %eax,%edx
+	92                      # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $0x2005,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 # STA $2006  - write to $2006
 8D 06 20,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $2006  - write to $2006
 8E 06 20,3:
-	8d 76 04        # leal   0x4(%esi),%esi
-	91              # xchgl  %eax,%ecx
-	bb 06 20 00 00  # movl   $0x2006,%ebx
-	e8 [O]		# call   OUTPUT
-	91              # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	91                      # xchgl  %eax,%ecx
+	bb 06 20 00 00          # movl   $0x2006,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $2006  - write to $2006
 8C 06 20,3:
-	8d 76 04        # leal   0x4(%esi),%esi
-	92              # xchgl  %eax,%edx
-	bb 06 20 00 00  # movl   $0x2006,%ebx
-	e8 [O]		# call   OUTPUT
-	92              # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	92                      # xchgl  %eax,%edx
+	bb 06 20 00 00          # movl   $0x2006,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 # STA $2007  - write to $2007
 8D 07 20,3:
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	8d 76 04        # leal   0x4(%esi),%esi
-	e8 [O]		# call   OUTPUT
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	8d 76 04                # leal   0x4(%esi),%esi
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $2007  - write to $2007
 8E 07 20,3:
-	8d 76 04        # leal   0x4(%esi),%esi
-	91              # xchgl  %eax,%ecx
-	bb 07 20 00 00  # movl   $0x2007,%ebx
-	e8 [O]		# call   OUTPUT
-	91              # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	91                      # xchgl  %eax,%ecx
+	bb 07 20 00 00          # movl   $0x2007,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $2007  - write to $2007
 8C 07 20,3:
-	8d 76 04        # leal   0x4(%esi),%esi
-	92              # xchgl  %eax,%edx
-	bb 07 20 00 00  # movl   $0x2007,%ebx
-	e8 [O]		# call   OUTPUT
-	92              # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	92                      # xchgl  %eax,%edx
+	bb 07 20 00 00          # movl   $0x2007,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 # STA $40xx - I/O write
 8D 00/00 40,3:
-	8d 76 04	# leal   0x4(%esi),%esi #timing
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
+	8d 76 04                # leal   0x4(%esi),%esi #timing
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STX $40xx - I/O write
 8E 00/00 40,3:
-	91		# xchgl  %eax,%ecx
-	8d 76 04	# leal   0x4(%esi),%esi
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
-	91		# xchgl  %eax,%ecx
+	91                      # xchgl  %eax,%ecx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
+	91                      # xchgl  %eax,%ecx
 	/
 # STY $40xx - I/O write
 8C 00/00 40,3:
-	92		# xchgl  %eax,%edx
-	8d 76 04	# leal   0x4(%esi),%esi
-	bb [W+1] 00 00	# movl   $ADDR,%ebx
-	e8 [O]		# call   OUTPUT
-	92		# xchgl  %eax,%edx
+	92                      # xchgl  %eax,%edx
+	8d 76 04                # leal   0x4(%esi),%esi
+	bb [W+1] 00 00          # movl   $ADDR,%ebx
+	e8 [O]                  # call   OUTPUT
+	92                      # xchgl  %eax,%edx
 	/
 
 
@@ -2749,15 +2749,15 @@ B9 00/00 40,3:
 
 # STA $40xx,X
 9D 00/00 40,3:
-	81 e1 ff 00 00 00	# andl   $0xff,%ecx
-	83 c6 05		# addl   $0x5,%esi
-	8d 99 [W+1] 00 00	# leal   ADDR(%ecx),%ebx
-	e8 [O]			# call   OUTPUT
+	81 e1 ff 00 00 00       # andl   $0xff,%ecx
+	83 c6 05                # addl   $0x5,%esi
+	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
+	e8 [O]                  # call   OUTPUT
 	/
 # STA $40xx,Y
 99 00/00 40,3:
-	81 e2 ff 00 00 00	# andl   $0xff,%edx
-	83 c6 05		# addl   $0x5,%esi
-	8d 9a [W+1] 00 00	# leal   ADDR(%edx),%ebx
-	e8 [O]			# call   OUTPUT
+	81 e2 ff 00 00 00       # andl   $0xff,%edx
+	83 c6 05                # addl   $0x5,%esi
+	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
+	e8 [O]                  # call   OUTPUT
 	/

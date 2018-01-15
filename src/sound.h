@@ -9,14 +9,14 @@
 
 /* exports */
 
-extern int		InitAudio(int argc, char **argv);
-extern void		SoundEvent(long addr, unsigned char value);
-extern char     	SoundGetLengthReg(void);
-extern void		UpdateAudio(void);
+extern int              InitAudio(int argc, char **argv);
+extern void             SoundEvent(long addr, unsigned char value);
+extern char             SoundGetLengthReg(void);
+extern void             UpdateAudio(void);
 
 struct SampleFormat {
-     const char *name, *fullname;
-     int number;
+	const char *name, *fullname;
+	int number;
 };
 
 /* the currently selected sample format */
@@ -30,9 +30,9 @@ extern unsigned char ulaw [0x4000];
 
 /* global sound parameters */
 extern struct SoundConfig {
-     const char	*audiofile;
-     int	audiorate;
-     int	audiostereo;
-     float	max_sound_delay;
-     int	reverb;
+	const char *audiofile;
+	int        audiorate;
+	int        audiostereo;
+	float      max_sound_delay;
+	int        reverb;
 } sound_config;
