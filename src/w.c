@@ -269,8 +269,8 @@ HandleKeyboardW(WEVENT *ev)
 			SaveScreenshotW();
 			break;
 /*		case WKEY_F8: */
-/*			memset(displaycachevalid, 0, sizeof(displaycachevalid)); */
-/*			memset(bitplanecachevalid, 0, sizeof(bitplanecachevalid)); */
+/*			memset(displaycachevalid, 0, sizeof displaycachevalid); */
+/*			memset(bitplanecachevalid, 0, sizeof bitplanecachevalid); */
 /*			break; */
 		case 8:
 			START();

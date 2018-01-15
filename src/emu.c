@@ -979,7 +979,7 @@ loadpal(char *palfile)
 	}
 
 	/* convert the palette */
-	if (!(NES_palette = malloc(64 * sizeof (*NES_palette)))) {
+	if (!(NES_palette = malloc(64 * sizeof *NES_palette))) {
 		perror("malloc");
 		free(palfile);
 		return;
@@ -1050,7 +1050,7 @@ main(int argc, char **argv)
 	/* Make sure there's a ~/.tuxnes directory */
 	if ((tuxnesdir = malloc(strlen(homedir) + strlen("/.tuxnes/") + 1)) == NULL) {
 		fprintf(stderr, "Out of memory\n");
-		return (EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 	sprintf(tuxnesdir, "%s%s", homedir, "/.tuxnes/");
 	dir = opendir(tuxnesdir);
@@ -1058,11 +1058,11 @@ main(int argc, char **argv)
 		mkdir(tuxnesdir, 0777);
 		if ((dir = opendir(tuxnesdir)) == NULL) {
 			fprintf(stderr, "Cannot open directory %s\n", tuxnesdir);
-			return (EXIT_FAILURE);
+			return EXIT_FAILURE;
 		}
 	} else if ((dir == NULL) && (errno == ENOENT)) {
 		fprintf(stderr, "Cannot open directory %s\n", tuxnesdir);
-		return (EXIT_FAILURE);
+		return EXIT_FAILURE;
 	} else {
 		closedir(dir);
 	}
@@ -1770,7 +1770,7 @@ main(int argc, char **argv)
 		unsigned int *new_palette;
 		int pen;
 
-		if (!(new_palette = malloc(64 * sizeof (*new_palette)))) {
+		if (!(new_palette = malloc(64 * sizeof *new_palette))) {
 			fprintf(stderr, "Can't remap palette: ");
 			fflush(stderr);
 			perror("malloc");
@@ -1783,7 +1783,7 @@ main(int argc, char **argv)
 				  : NES_palette[pen];
 			memcpy((void *)NES_palette,
 			       (void *)new_palette,
-			       64 * sizeof(*NES_palette));
+			       64 * sizeof *NES_palette);
 			free(new_palette);
 		}
 	}
@@ -1887,5 +1887,5 @@ main(int argc, char **argv)
 	START();                     /* execute translated code */
 
 	/* Not Reached, but return something anyway to get rid of warnings */
-	return(EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }

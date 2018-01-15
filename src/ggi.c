@@ -95,7 +95,7 @@ InitScreenshotGGI(void)
 		perror("ppm_allocarray");
 		fprintf(stderr, "GGI: screenshots are disabled\n");
 	} else {
-		if (!(cols = malloc(256 * magstep * sizeof (*cols)))) {
+		if (!(cols = malloc(256 * magstep * sizeof *cols))) {
 			perror("malloc");
 			pixels = 0;
 		}
@@ -405,8 +405,8 @@ HandleKeyboardGGI(ggi_event ev)
 			SaveScreenshotGGI();
 			break;
 /*		case GIIK_F8: */
-/*			memset(displaycachevalid, 0, sizeof(displaycachevalid)); */
-/*			memset(bitplanecachevalid, 0, sizeof(bitplanecachevalid)); */
+/*			memset(displaycachevalid, 0, sizeof displaycachevalid); */
+/*			memset(bitplanecachevalid, 0, sizeof bitplanecachevalid); */
 /*			break; */
 		case GIIUC_BackSpace:
 			START();

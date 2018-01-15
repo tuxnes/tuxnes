@@ -284,7 +284,7 @@ do_tree(int sbn, int *blockp)
 				do_tree(sbn + 1, nblockp);
 			}
 		}
-	return (0);
+	return 0;
 }
 
 static void

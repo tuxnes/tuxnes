@@ -53,7 +53,7 @@ ziploader(unzFile file, char *zipname)
 
 	if (!(file_marker == UNZ_END_OF_LIST_OF_FILE
 	  || file_marker == UNZ_OK) || fsize == 0)
-		return (0);
+		return 0;
 
 	ptr = ROM;
 	unzLocateFile(file, romname, 1);
@@ -61,13 +61,13 @@ ziploader(unzFile file, char *zipname)
 
 	if (unzOpenCurrentFile(file) != UNZ_OK) {
 		printf("Error in zip file\n");
-		return (0);
+		return 0;
 	}
 
 	res = unzReadCurrentFile(file, ptr, fsize);
 	if (unzCloseCurrentFile(file) == UNZ_CRCERROR) {
 		fprintf(stderr, "ZIP file has a CRC error.\n");
-		return (0);
+		return 0;
 	}
 
 	if (res <= 0 || res != fsize) {
@@ -85,8 +85,8 @@ ziploader(unzFile file, char *zipname)
 			fprintf(stderr, "Internal error\n");
 		if (res == UNZ_CRCERROR)
 			fprintf(stderr, "CRC error\n");
-		return (0);
+		return 0;
 	}
 
-	return (1);
+	return 1;
 }

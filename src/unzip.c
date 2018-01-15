@@ -213,7 +213,7 @@ strcmpcasenosensitive_internal(const char *fileName1, const char *fileName2)
 		if ((c2>='a') && (c2<='z'))
 			c2 -= 0x20;
 		if (c1=='\0')
-			return ((c2=='\0') ? 0 : -1);
+			return (c2=='\0') ? 0 : -1;
 		if (c2=='\0')
 			return 1;
 		if (c1<c2)
@@ -412,7 +412,7 @@ unzOpen(const char *path)
 	us.pfile_in_zip_read = NULL;
 
 
-	s=(unz_s*)ALLOC(sizeof(unz_s));
+	s=ALLOC(sizeof *s);
 	*s=us;
 	unzGoToFirstFile((unzFile)s);
 	return (unzFile)s;
@@ -748,7 +748,7 @@ unzLocateFile(unzFile file, const char *szFileName, int iCaseSensitivity)
 	while (err == UNZ_OK) {
 		char szCurrentFileName[UNZ_MAXFILENAMEINZIP+1];
 		unzGetCurrentFileInfo(file, NULL,
-		                        szCurrentFileName, sizeof(szCurrentFileName)-1,
+		                        szCurrentFileName, sizeof szCurrentFileName - 1,
 		                        NULL, 0, NULL, 0);
 		if (unzStringFileNameCompare(szCurrentFileName,
 		                                szFileName, iCaseSensitivity)==0)
@@ -885,8 +885,7 @@ unzOpenCurrentFile(unzFile file)
 	            &offset_local_extrafield, &size_local_extrafield)!=UNZ_OK)
 		return UNZ_BADZIPFILE;
 
-	pfile_in_zip_read_info = (file_in_zip_read_info_s*)
-	                                    ALLOC(sizeof(file_in_zip_read_info_s));
+	pfile_in_zip_read_info = ALLOC(sizeof *pfile_in_zip_read_info);
 	if (pfile_in_zip_read_info==NULL)
 		return UNZ_INTERNALERROR;
 

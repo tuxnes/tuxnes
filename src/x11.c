@@ -915,8 +915,8 @@ HandleKeyboardX11(XEvent ev)
 			SaveScreenshotX11();
 			break;
 		case XK_F8:
-			memset(displaycachevalid, 0, sizeof(displaycachevalid));
-			memset(bitplanecachevalid, 0, sizeof(bitplanecachevalid));
+			memset(displaycachevalid, 0, sizeof displaycachevalid);
+			memset(bitplanecachevalid, 0, sizeof bitplanecachevalid);
 			break;
 		case XK_BackSpace:
 			START();
@@ -1757,17 +1757,17 @@ UpdateTilesOldX11(void)
 			tilemask2_changed[nextcache] =
 			tilemask3_changed[nextcache] = 1;
 			memcpy(ntcache[nextcache], ntcache[currentcache],
-			       sizeof(ntcache[nextcache]));
+			       sizeof ntcache[nextcache]);
 			memcpy(vramcache[nextcache], vramcache[currentcache],
-			       sizeof(vramcache[nextcache]));
+			       sizeof vramcache[nextcache]);
 			memset(displaycachevalid[currentcache], 0,
-			       sizeof(displaycachevalid[currentcache]));
+			       sizeof displaycachevalid[currentcache]);
 			memset(bitplanecachevalid[currentcache], 0,
-			       sizeof(bitplanecachevalid[currentcache]));
+			       sizeof bitplanecachevalid[currentcache]);
 			memcpy(displaytilecache[nextcache], displaytilecache[currentcache],
-			       sizeof(displaytilecache[nextcache]));
+			       sizeof displaytilecache[nextcache]);
 			memcpy(displaycolorcache[nextcache], displaycolorcache[currentcache],
-			       sizeof(displaycolorcache[nextcache]));
+			       sizeof displaycolorcache[nextcache]);
 			/*memcpy(tiletransparent[nextcache], tiletransparent[currentcache], 512); */
 			/*memcpy(tileopaque[nextcache], tileopaque[currentcache], 512); */
 			XCopyArea(display, background[currentcache],

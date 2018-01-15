@@ -588,12 +588,12 @@ SoundEvent(long addr, unsigned char value)
 inline char
 SoundGetLengthReg(void)
 {
-	return (sq1_enabled && sq1_len_counter ? 0x01 : 0x00) |
-	       (sq2_enabled && sq2_len_counter ? 0x02 : 0x00) |
-	       (tri_enabled && tri_len_counter ? 0x04 : 0x00) |
-	       (noi_enabled && noi_len_counter ? 0x08 : 0x00) |
-	       (dmc_len_counter ? 0x10 : 0x00) |
-	        dmc_interrupt;
+	return (sq1_enabled && sq1_len_counter ? 0x01 : 0x00)
+	     | (sq2_enabled && sq2_len_counter ? 0x02 : 0x00)
+	     | (tri_enabled && tri_len_counter ? 0x04 : 0x00)
+	     | (noi_enabled && noi_len_counter ? 0x08 : 0x00)
+	     | (dmc_len_counter ? 0x10 : 0x00)
+	     |  dmc_interrupt;
 }
 
 
@@ -613,7 +613,7 @@ shift_register15(unsigned char xor_tap)
 	bit14 = (bit0 ^ tap);
 	sreg >>= 1;
 	sreg |= (bit14 << 14);
-	return (bit0 ^ 1);
+	return bit0 ^ 1;
 }
 
 void
@@ -629,7 +629,8 @@ UpdateAudio(void) /* called freq times a sec */
 	static   unsigned char dmc_shiftcnt = 0;
 	static   unsigned char skip_count = 0;
 
-	if (audiofd < 0) return;
+	if (audiofd < 0)
+		return;
 
 
 	while (sample < samples_per_vsync) {
