@@ -259,9 +259,8 @@ static int
 do_tree(int sbn, int *blockp)
 {
 	int                   *nblockp;
-	int                    x, y;
 
-	for (x = 0; x < 256; x++)
+	for (int x = 0; x < 256; x++)
 		if ((x & srcmask[sbn]) == srcseq[sbn]) {
 			if (blockp[x] == 0 || (srcseq[sbn + 1] != 0 && srcmask[sbn + 1] == 0))
 				blockp[x] = (unsigned int) datap | 1;         /* Leaf node */
@@ -272,7 +271,7 @@ do_tree(int sbn, int *blockp)
 					nblockp = (int *) (TBL_BASE + (blocksalloc++) * 1024);
 					if ((blocksalloc << 10) >= ALLOC_SIZE)
 						memory_error();
-					for (y = 0; y < 256; y++)
+					for (int y = 0; y < 256; y++)
 						nblockp[y] = blockp[x];
 					blockp[x] = (int) nblockp;
 				} else {

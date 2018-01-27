@@ -44,12 +44,8 @@ translate(int addr)
 {
 	int saddr;
 	u_char src;
-/*	unsigned int *ptr, *nptr; */
 	unsigned int *ptr;
-	unsigned char *sptr;
 	unsigned char *cptr, *bptr;
-	int slen, dlen;
-	u_char m, l, o;
 	u_char stop = 0;
 
 	XPC = cptr = next_code_alloc;
@@ -77,13 +73,14 @@ translate(int addr)
 			if (!ignorebadinstr)
 				*(cptr++) = BRK;
 		} else {
-			sptr = (u_char *) TRANS_TBL + ptr[src];
-			slen = sptr[-1];
-			dlen = *(sptr++);
+			unsigned char *sptr = (u_char *) TRANS_TBL + ptr[src];
+			int slen = sptr[-1];
+			int dlen = *(sptr++);
 			bptr = cptr;
 			while (dlen--)
 				*(cptr++) = *(sptr++);
 			while (*sptr) {
+				u_char m, l, o;
 				m = *(sptr++);
 				l = *(sptr++);
 				o = *(sptr++);

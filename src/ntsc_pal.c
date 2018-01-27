@@ -77,10 +77,8 @@ ntsc_palette(double hue, double tint)
 /* our palette.  Ok, in the code, X is the "brightness bits" of the colour, */
 /* and Z is our actual colour... i.e. XZh represents the NES colour value. */
 
-	int x, z;
-
-	for (x=0; x<4; x++) {
-		for (z=0; z<16; z++) {
+	for (int x=0; x<4; x++) {
+		for (int z=0; z<16; z++) {
 			double s, y, theta;
 			unsigned int r, g, b;
 

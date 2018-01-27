@@ -344,7 +344,6 @@ HandleKeyboardW(WEVENT *ev)
 int
 InitDisplayW(int argc, char **argv)
 {
-	int x;
 	rgb_t color;
 	struct timeval time;
 
@@ -485,7 +484,7 @@ InitDisplayW(int argc, char **argv)
 	color.red = color.green = color.blue = 0xFFU;
 	if (bitmapW->palette)
 		bitmapW->palette[whitepixel] = color;
-	for (x=0; x < 24; x++) {
+	for (int x=0; x < 24; x++) {
 		palette[x] = palette2[x] = whitepixel;
 	}
 	if (indexedcolor && (bpp > 1)) {
@@ -494,7 +493,7 @@ InitDisplayW(int argc, char **argv)
 		color.red = ((NES_palette[0] & 0xFF0000) >> 16);
 		color.green = ((NES_palette[0] & 0xFF00) >> 8);
 		color.blue = (NES_palette[0] & 0xFF);
-		for (x = 0; x <= 24; x++) {
+		for (int x = 0; x <= 24; x++) {
 			palette[x] =
 			  w_allocColor(winW, color.red, color.green, color.blue);
 			palette2[x] = blackpixel;
@@ -515,7 +514,7 @@ InitDisplayW(int argc, char **argv)
 		}
 	} else /* truecolor */ {
 		indexedcolor = 0;
-		for (x=0; x < 64; x++) {
+		for (int x=0; x < 64; x++) {
 			short pixel;
 			rgb_t desired;
 
@@ -552,7 +551,7 @@ InitDisplayW(int argc, char **argv)
 			palette2W[x] = blackpixel;
 		}
 		if (scanlines && (scanlines != 100))
-			for (x = 0; x < 64; x++) {
+			for (int x = 0; x < 64; x++) {
 				short pixel;
 				rgb_t desired;
 				unsigned long r, g, b;
@@ -654,14 +653,12 @@ InitDisplayW(int argc, char **argv)
 void
 UpdateColorsW(void)
 {
-/*	int x, y, t; */
-	int x, c;
 	rgb_t color;
 
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
 	if (indexedcolor) {
-		c = VRAM[0x3f00] & 63;
+		int c = VRAM[0x3f00] & 63;
 		currentbgcolor = NES_palette[c];
 		if (currentbgcolor != oldbgcolor) {
 			color.red = ((currentbgcolor & 0xFF0000) >> 16);
@@ -686,15 +683,12 @@ UpdateColorsW(void)
 
 	/* Tile colors */
 	if (indexedcolor) {
-		for (x = 0; x < 24; x++) {
-			c = VRAM[0x3f01 + x + (x / 3)] & 63;
+		for (int x = 0; x < 24; x++) {
+			int c = VRAM[0x3f01 + x + (x / 3)] & 63;
 			if (c != (palette_cache[0][1 + x + (x / 3)] & 63)) {
-				color.red = ((NES_palette[c] &
-				              0xFF0000) >> 16);
-				color.green = ((NES_palette[c] &
-				                0xFF00) >> 8);
-				color.blue = (NES_palette[c] &
-				              0xFF);
+				color.red = ((NES_palette[c] & 0xFF0000) >> 16);
+				color.green = ((NES_palette[c] & 0xFF00) >> 8);
+				color.blue = (NES_palette[c] & 0xFF);
 				if (w_changeColor(winW, palette[x],
 				                  color.red, color.green, color.blue) < 0) {
 					if (winW != WROOT)
@@ -716,7 +710,7 @@ UpdateColorsW(void)
 	if (indexedcolor) {
 		/* Already done in InitDisplayW */
 	} else /* truecolor */ {
-		for (x = 0; x < 24; x++) {
+		for (int x = 0; x < 24; x++) {
 			palette[x] = paletteW[VRAM[0x3f01 + x + (x / 3)] & 63];
 			if (scanlines && (scanlines != 100))
 				palette2[x] = palette2W[VRAM[0x3f01 + x + (x / 3)] & 63];

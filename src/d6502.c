@@ -101,10 +101,9 @@ void
 disas(int loc)
 {
 	unsigned char *ptr;
-	int x;
 	ptr = MAPTABLE[loc >> 12];
 	while (loc < 0x10000) {
-		x = ptr[loc];
+		int x = ptr[loc];
 		printf("%4x: %1x%1x-%s ", loc++, x >> 4, x & 15, Opcodes_6502[x]);
 		switch (Modes_6502[x]) {
 		case ZP:

@@ -161,8 +161,6 @@ static int chrmask;
 int
 MapRom(int page, unsigned loc, unsigned size)
 {
-	int x;
-
 	if ((page < 8) || (page > 15)) {
 		return -1;
 	}
@@ -175,7 +173,7 @@ MapRom(int page, unsigned loc, unsigned size)
 		return -1;
 	}
 
-	for (x = page; x < page + (size / 4096); x++) {
+	for (int x = page; x < page + (size / 4096); x++) {
 		MAPTABLE[x] = ROM_BASE + loc - (page * 4096);
 	}
 
@@ -551,8 +549,6 @@ static int prgmask32;
 static void
 init_mmc5(void)
 {
-	int i;
-
 	prgbanksize = 2;
 
 	/* figure out if the PRG bank should be masked */
@@ -566,7 +562,7 @@ init_mmc5(void)
 	prgmask32 = prgmask >> 2;
 
 	blankbank = malloc(4096);
-	for (i = 0; i < 4096; i++) {
+	for (int i = 0; i < 4096; i++) {
 		blankbank[i] = 0xFF;
 	}
 
@@ -1032,9 +1028,7 @@ m100in1(int addr, int val)
 			locA000 = locswap;
 		}
 */
-	}
-	else if (addr == 0x8001)
-	{
+	} else if (addr == 0x8001) {
 		MapRom(PAGE_C000, val & 0x1F, SIZE_16K);
 		locC000 = 16384 * (val & 0x1F);
 		locE000 = locE000 + 0x2000;
@@ -1047,16 +1041,12 @@ m100in1(int addr, int val)
 			locE000 = locswap;
 		}
 */
-	}
-	else if (addr == 0x8002)
-	{
+	} else if (addr == 0x8002) {
 		MapRom(PAGE_8000, (val & 0x3F) * 16384 + (val >> 7) * 8192, SIZE_8K);
 		MapRom(PAGE_A000, (val & 0x3F) * 16384 + (val >> 7) * 8192, SIZE_8K);
 		MapRom(PAGE_C000, (val & 0x3F) * 16384 + (val >> 7) * 8192, SIZE_8K);
 		MapRom(PAGE_E000, (val & 0x3F) * 16384 + (val >> 7) * 8192, SIZE_8K);
-	}
-	else if (addr == 0x8003)
-	{
+	} else if (addr == 0x8003) {
 		hvmirror = (~val & 0x40) >> 6;
 		MapRom(PAGE_C000, val & 0x1F, SIZE_16K);
 		locC000 = 16384 * (val & 0x1F);
@@ -1950,10 +1940,8 @@ void nina7(int addr, int val)
 void
 InitMapperSubsystem(void)
 {
-	int x;
-
 	/* clear them all to zero */
-	for (x = 0; x < MAXMAPPER; x++) {
+	for (int x = 0; x < MAXMAPPER; x++) {
 		MapperInit[x] = 0;
 		Mapper[x] = 0;
 		MapperName[x][0] = '\0';

@@ -481,7 +481,6 @@ HandleKeyboardGGI(ggi_event ev)
 int
 InitDisplayGGI(int argc, char **argv)
 {
-	int x;
 	ggi_color color;
 	struct timeval time;
 
@@ -560,7 +559,7 @@ InitDisplayGGI(int argc, char **argv)
 		color.r = ((NES_palette[0] & 0xFF0000) >> 8);
 		color.g = (NES_palette[0] & 0xFF00);
 		color.b = ((NES_palette[0] & 0xFF) << 8);
-		for (x = 0; x <= 24; x++) {
+		for (int x = 0; x <= 24; x++) {
 			palette[x] = x + basepixel + 2;
 			colormapGGI[x + 2] = color;
 			palette2[x] = blackpixel;
@@ -595,10 +594,10 @@ InitDisplayGGI(int argc, char **argv)
 		blackpixel = ggiMapColor(visualGGI, &color);
 		color.r = color.g = color.b = 0xFFFF;
 		whitepixel = ggiMapColor(visualGGI, &color);
-		for (x=0; x < 24; x++) {
+		for (int x=0; x < 24; x++) {
 			palette[x] = palette2[x] = blackpixel;
 		}
-		for (x=0; x < 64; x++) {
+		for (int x=0; x < 64; x++) {
 			color.r = ((NES_palette[x] & 0xFF0000) >> 8);
 			color.g = (NES_palette[x] & 0xFF00);
 			color.b = ((NES_palette[x] & 0xFF) << 8);
@@ -606,7 +605,7 @@ InitDisplayGGI(int argc, char **argv)
 			palette2GGI[x] = blackpixel;
 		}
 		if (scanlines && (scanlines != 100))
-			for (x = 0; x < 64; x++) {
+			for (int x = 0; x < 64; x++) {
 				unsigned long r, g, b;
 
 				r = ((NES_palette[x] & 0xFF0000) >> 8) * (scanlines / 100.0);
@@ -733,9 +732,6 @@ InitDisplayGGI(int argc, char **argv)
 void
 UpdateColorsGGI(void)
 {
-/*	int x, y, t; */
-	int x;
-
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
 	if (indexedcolor) {
@@ -762,7 +758,7 @@ UpdateColorsGGI(void)
 
 	/* Tile colors */
 	if (indexedcolor) {
-		for (x = 0; x < 24; x++) {
+		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
 				colormapGGI[x+2].r = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF0000) >> 8);
 				colormapGGI[x+2].g = (NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF00);
@@ -783,7 +779,7 @@ UpdateColorsGGI(void)
 	if (indexedcolor) {
 		/* Already done in InitDisplayGGI */
 	} else /* truecolor */ {
-		for (x = 0; x < 24; x++) {
+		for (int x = 0; x < 24; x++) {
 			palette[x] = paletteGGI[VRAM[0x3f01 + x + (x / 3)] & 63];
 			if (scanlines && (scanlines != 100))
 				palette2[x] = palette2GGI[VRAM[0x3f01 + x + (x / 3)] & 63];

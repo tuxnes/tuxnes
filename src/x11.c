@@ -254,15 +254,14 @@ SaveScreenshotX11(void)
 	screenshot_new();
 	if (renderer->_flags & RENDERER_OLD) {
 		if (depth == 1) {
-			int x, y;
 			XImage *im;
 
 			im = XGetImage(display, layout,
 			                0, 0,
 			                256 * magstep, 240 * magstep,
 			                ~0, ZPixmap);
-			for (y = 0; y < 240 * magstep; y++)
-				for (x = 0; x < 256 * magstep; x++)
+			for (int y = 0; y < 240 * magstep; y++)
+				for (int x = 0; x < 256 * magstep; x++)
 					XPutPixel(image, x, y, XGetPixel(im, x, y));
 			status = XpmWriteFileFromImage(display, screenshotfile, image, NULL, NULL);
 		} else {
@@ -347,10 +346,10 @@ InitDisplayX11(int argc, char **argv)
 	bitmap_pad = BitmapPad(display);
 	bpp = depth;
 	if (depth > 1) {
-		int i, formats = 0;
+		int formats = 0;
 		XPixmapFormatValues *xpfv = XListPixmapFormats(display, &formats);
 
-		for (i = 0; i < formats; i++)
+		for (int i = 0; i < formats; i++)
 			if (xpfv[i].depth == depth) {
 				bpp = xpfv[i].bits_per_pixel;
 				break;
@@ -676,9 +675,7 @@ InitDisplayX11(int argc, char **argv)
 			                     bpp, bytes_per_line);
 	}
 	if (renderer->_flags & RENDERER_DIFF) {
-		int f;
-
-		for (f = 0; f < ARRAY_LEN(xdfb); f++) {
+		for (int f = 0; f < ARRAY_LEN(xdfb); f++) {
 			if ((bpp == 8) && (f == 0) && (bytes_per_line == 256)) {
 				xdfb[f] = xfb;
 			} else {
@@ -1021,12 +1018,9 @@ UpdateDisplayX11(void)
 	if (!nodisplay) {
 		drawimage(PBL);
 		if (!frameskip) {
-			int r, r0;
-			int x, y, c;
+			int r = 0, r0 = 0;
+			int y = 0;
 
-			r = 0;
-			r0 = 0;
-			y = 0;
 			UpdateColorsX11();
 			/* differential X11 renderer "diff" */
 			if (renderer->_flags & RENDERER_DIFF) {
@@ -1042,15 +1036,13 @@ UpdateDisplayX11(void)
 					           (void *)xdfb[next_frame] + (y << 8),
 					           (size_t)256)) {
 						if ((bpp != 8) || (magstep > 1)) {
-							for (x = 0; x < 256; x++) {
-								int c1, c2;
-
-								c = fb[(y << 8) + x];
-								c1 =
+							for (int x = 0; x < 256; x++) {
+								int c = fb[(y << 8) + x];
+								int c1 =
 								  indexedcolor
 								  ? colortableX11[c]
 								  : paletteX11[c];
-								c2 =
+								int c2 =
 								  (scanlines == 0)
 								  ? black
 								  : (scanlines == 100)
@@ -1061,17 +1053,13 @@ UpdateDisplayX11(void)
 									          x * magstep, y * magstep,
 									          c1);
 								} else {
-									int xxx;
-
-									for (xxx = 0; xxx < magstep; xxx++) {
+									for (int xxx = 0; xxx < magstep; xxx++) {
 										XPutPixel(image,
 										          x * magstep + xxx,
 										          y * magstep,
 										          c1);
 										if (scanlines || virgin) {
-											int yyy;
-
-											for (yyy = 1; yyy < magstep; yyy++)
+											for (int yyy = 1; yyy < magstep; yyy++)
 												XPutPixel(image,
 												          x * magstep + xxx,
 												          y * magstep + yyy,
@@ -1658,9 +1646,7 @@ DoBackgroundOldX11(void)
 					           16 * magstep, 16 * magstep,
 					           x * 8 * magstep, v * 8 * magstep, 1);
 					if ((scanlines != 100) && (magstep > 1)) {
-						int y;
-
-						for (y = 0; y < 16; y++) {
+						for (int y = 0; y < 16; y++) {
 							XFillRectangle(display, background[currentcache],
 							               blackgc,
 							               x * 8 * magstep,
@@ -1835,16 +1821,15 @@ UpdateTilesOldX11(void)
 		for (v = vfirstchange; v <= vlastchange; v += 8) {
 			x = h | ((v >> 3) & 7);
 			for (l = 0; l < 8; l++) {
-				int xo, yo;
 				int c;
 
 				b1 = VRAM[baseaddr + ((x & 256) << 4) + ((x & 255) * 16) + l];
 				b2 = VRAM[baseaddr + ((x & 256) << 4) + ((x & 255) * 16) + l + 8];
 				for (n = 0, c = 0x80; n < 8; n++, c >>= 1)
-					for (yo = 0;
+					for (int yo = 0;
 					     yo < ((scanlines == 100) ? magstep : 1);
 					     yo++)
-						for (xo = 0; xo < magstep; xo++) {
+						for (int xo = 0; xo < magstep; xo++) {
 							XPutPixel(tilebitimage,
 							          (h + n) * magstep + xo,
 							          (v + l) * magstep + yo,
@@ -1940,8 +1925,7 @@ UpdateTilesOldX11(void)
 static void
 LayoutBackgroundOldX11(void)
 {
-	int y, z;
-	int x;
+	int z;
 	unsigned int last;
 	static int linecache[240];
 
@@ -1953,9 +1937,7 @@ LayoutBackgroundOldX11(void)
 		               0, 0,
 		               256 * magstep, 240 * magstep);
 		if ((scanlines != 100) && (magstep > 1)) {
-			int y;
-
-			for (y = 0; y < 240; y++) {
+			for (int y = 0; y < 240; y++) {
 				XFillRectangle(display, layout,
 				               blackgc,
 				               0, y * magstep + 1,
@@ -1975,7 +1957,7 @@ LayoutBackgroundOldX11(void)
 	}
 
 	last = linereg[0] & 0x10;
-	for (y = 0; y < 240; y++) {
+	for (int y = 0; y < 240; y++) {
 		z = y + 1;
 		while (hscroll[y] == hscroll[z]
 		    && vscroll[y] == vscroll[z]
@@ -1993,12 +1975,12 @@ LayoutBackgroundOldX11(void)
 			DoBackgroundOldX11();
 		}
 
-		for (x = y; x < z; x++)
+		for (int x = y; x < z; x++)
 			if (linecache[y] != currentcache)
 				redrawall = 1;
 
 		if (scanline_diff[y] || redrawall) {
-			for (x = y; x < z; x++)
+			for (int x = y; x < z; x++)
 				linecache[y] = currentcache;
 
 			if (!osmirror) {
@@ -2090,9 +2072,6 @@ LayoutBackgroundOldX11(void)
 void
 UpdateColorsX11(void)
 {
-/*	int x, y, t; */
-	int x;
-
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
 	if (indexedcolor) {
@@ -2124,7 +2103,7 @@ UpdateColorsX11(void)
 
 	/* Tile colors */
 	if (indexedcolor) {
-		for (x = 0; x < 24; x++) {
+		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
 				color.pixel = colortableX11[x];
 				color.red = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF0000) >> 8);
@@ -2142,7 +2121,7 @@ UpdateColorsX11(void)
 	if (indexedcolor) {
 		/* Already done in InitDisplayX11 */
 	} else /* truecolor */ {
-		for (x = 0; x < 24; x++) {
+		for (int x = 0; x < 24; x++) {
 			if ((renderer->_flags & RENDERER_DIFF) && ((bpp != 8) || (magstep > 1)))
 				palette[x] = VRAM[0x3f01 + x + (x / 3)] & 63;
 			else
@@ -2158,8 +2137,6 @@ UpdateColorsX11(void)
 static void
 UpdateTileColorsOldX11(void)
 {
-	int x, y, t;
-
 	/* Set Background color */
 
 	if (currentbgcolor != bgcolor[currentcache]) {
@@ -2175,9 +2152,7 @@ UpdateTileColorsOldX11(void)
 		               0, 0,
 		               512 * magstep, 480 * magstep);
 		if ((scanlines != 100) && (magstep > 1)) {
-			int y;
-
-			for (y = 0; y < 480; y++) {
+			for (int y = 0; y < 480; y++) {
 				XFillRectangle(display, background[currentcache],
 				               blackgc,
 				               0, y * magstep + 1,
@@ -2197,9 +2172,9 @@ UpdateTileColorsOldX11(void)
 	   best.  This only affects truecolor mode; for 8-bit mode, just change
 	   the palettes. */
 
-	for (y = 0; y < 30; y++) {
-		for (x = 0; x < 32; x++) {
-			t = displaycolorcache[currentcache][y * 64 + x];
+	for (int y = 0; y < 30; y++) {
+		for (int x = 0; x < 32; x++) {
+			int t = displaycolorcache[currentcache][y * 64 + x];
 			if (palette_cache[currentcache][t * 4 + 1] != VRAM[0x3f00 + t * 4 + 1]
 			 || palette_cache[currentcache][t * 4 + 2] != VRAM[0x3f00 + t * 4 + 2]
 			 || palette_cache[currentcache][t * 4 + 3] != VRAM[0x3f00 + t * 4 + 3]) {
@@ -2244,8 +2219,6 @@ InForegroundOldX11(unsigned int x, unsigned int y)
 static void
 DrawSpritesOldX11(void)
 {
-	int x, y;
-	int s;
 /*	int spritetile, spritecolor, pixelcolor, pixelcolor2; */
 	int spritetile;
 	int hflip, vflip, behind;
@@ -2275,7 +2248,7 @@ DrawSpritesOldX11(void)
 	}
 
 	/* If any sprite entries have changed since last time, redraw */
-	for (s = 0; s < 64; s++) {
+	for (int s = 0; s < 64; s++) {
 		if (spriteram[s * 4] < 240 || spritecache[s * 4] < 240) {
 			if (((int *)spriteram)[s] != ((int *)spritecache)[s]) {
 				redrawall = needsredraw = 1;
@@ -2285,11 +2258,11 @@ DrawSpritesOldX11(void)
 	}
 
 	if (redrawbackground || redrawall) {
-		for (y = 1; y < 240; y++) {
+		for (int y = 1; y < 240; y++) {
 			if (redrawall || scanline_diff[y]) {
 				memset(linebuffer, 0, 256);      /* Clear buffer for this scanline */
 				baseaddr = ((linereg[y] & 0x08) << 9);    /* 0 or 0x1000 */
-				for (s = 63; s >= 0; s--) {
+				for (int s = 63; s >= 0; s--) {
 					if (spriteram[s * 4] < y
 					 && spriteram[s * 4] < 240
 					 && spriteram[s * 4 + 3] < 249) {
@@ -2327,7 +2300,7 @@ DrawSpritesOldX11(void)
 									d2 = VRAM[baseaddr + ((spritetile & (~(spritesize >> 4))) << 4) + y + 15 - spriteram[s * 4]];
 								}
 							}
-							for (x = 7 * (!hflip); x < 8 && x >= 0; x += 1 - ((!hflip) << 1)) {
+							for (int x = 7 * (!hflip); x < 8 && x >= 0; x += 1 - ((!hflip) << 1)) {
 								if (d1 & d2 & 1)
 									linebuffer[spriteram[s * 4 + 3] + x] = 3 + ((spriteram[s * 4 + 2] & 3) << 2);
 								else if (d1 & 1)
@@ -2344,7 +2317,7 @@ DrawSpritesOldX11(void)
 					}
 				}
 
-				for (x = 0; x < 256; x++) {
+				for (int x = 0; x < 256; x++) {
 					if (linebuffer[x]) {
 						if (indexedcolor)
 							color1 = colortableX11[(linebuffer[x] >> 2) * 3 + 11 + (linebuffer[x] & 3)];
@@ -2355,12 +2328,10 @@ DrawSpritesOldX11(void)
 							               currentcolor1 = color1);
 
 						{
-							int xo, yo;
-
-							for (yo = 0;
+							for (int yo = 0;
 							     yo < ((scanlines == 100) ? magstep : 1);
 							     yo++)
-								for (xo = 0; xo < magstep; xo++)
+								for (int xo = 0; xo < magstep; xo++)
 									XDrawPoint(display, layout, spritecolor1gc,
 									           x * magstep + xo, y * magstep + yo);
 						}
@@ -2377,7 +2348,6 @@ DiffUpdateOldX11(void)
 	static int old_screen_on;
 	static int old_sprites_on;
 	static unsigned char oldlinereg[240];
-	unsigned int x, s;
 	int spritesize = 8 << ((RAM[0x2000] & 0x20) >> 5);    /* 8 or 16 */
 
 	if (old_screen_on != screen_on)
@@ -2391,11 +2361,11 @@ DiffUpdateOldX11(void)
 	}
 
 	/* Update scanline redraw info */
-	for (x = 0; x < 60; x++) {
+	for (unsigned int x = 0; x < 60; x++) {
 		tileline_begin[x] = 512;
 		tileline_end[x] = 256;
 	}
-	for (x = 0; x < 240; x++) {
+	for (unsigned int x = 0; x < 240; x++) {
 		scanline_diff[x] = 0;
 		if (oldhscroll[x] != hscroll[x])
 			redrawbackground = scanline_diff[x] = 1;
@@ -2425,11 +2395,11 @@ DiffUpdateOldX11(void)
 	/* those scanlines for redraw. */
 	if (debug_spritesoff || !sprites_on)
 		return;
-	for (s = 0; s < 64; s++) {
+	for (unsigned int s = 0; s < 64; s++) {
 		if (spritecache[s * 4] < 240) {
 			if (((int *)spriteram)[s] != ((int *)spritecache)[s]) {
 				redrawbackground = 1;
-				for (x = 1; x <= spritesize && x + spritecache[s * 4] < 240; x++)
+				for (unsigned int x = 1; x <= spritesize && x + spritecache[s * 4] < 240; x++)
 					scanline_diff[x + spritecache[s * 4]] = 1;
 			}
 		}

@@ -61,7 +61,6 @@ static int last_clock; /* For vblank bit */
 void
 input(int addr)
 {
-	int x;
 	static signed char vram_read;
 	unsigned char *ptr;
 	INRET = 0;
@@ -118,9 +117,9 @@ input(int addr)
 		if (CLOCK > VBL && !(RAM[0x2000] & 0x80)) {
 			/* This is totally wierd, but SMB and Zelda depend on it. */
 			RAM[0x2000] &= 0xFE;
-			for (x = 0; x < 240; x++)
+			for (int x = 0; x < 240; x++)
 				hscroll[x] = hscrollval & 255;
-			for (x = 0; x < 240; x++)
+			for (int x = 0; x < 240; x++)
 				linereg[x] = RAM[0x2000];
 			/*printf("Read: %4x=%2x (scan %d)\n", addr, INRET&0xff, CLOCK);*/
 		}
@@ -154,7 +153,7 @@ input(int addr)
 		 * address into horizontal/vertical offsets.
 		 */
 		if (CLOCK < VBL && (RAM[0x2001] & 8)) {
-			for (x = (CLOCK * 3 / HCYCLES) + 1; x < 240; x++) {
+			for (int x = (CLOCK * 3 / HCYCLES) + 1; x < 240; x++) {
 				hscroll[x] = (hscroll[x] & 0xff) | ((VRAMPTR & 0x400) >> 2);
 				vscroll[x] = (480 + 480 + (((VRAMPTR & 0x800) >> 11) * 240) + ((VRAMPTR & 0x3e0) >> 2) - ((CLOCK * 3 / HCYCLES) + 1)) % 480;
 			}
@@ -205,7 +204,6 @@ input(int addr)
 void
 output(int addr, int val)
 {
-	int x;
 	int scanline;
 	static int spriteaddr;
 
@@ -226,9 +224,9 @@ output(int addr, int val)
 		hscrollval = ((RAM[0x2000] & 1) << 8) | (hscrollval & 255);
 		vscrollval = (RAM[0x2000] & 2) * 120 + (vscrollval % 240);
 		/*printf("vrom base:0x%4x\n", 0x2000+((RAM[0x2000]&3)<<10)); */
-		for (x = scanline; x < 240; x++)
+		for (int x = scanline; x < 240; x++)
 			hscroll[x] = hscrollval;
-		for (x = scanline; x < 240; x++)
+		for (int x = scanline; x < 240; x++)
 			linereg[x] = RAM[0x2000];
 		/*printf("Write: %4x,%2x (scan %d)\n", addr, val, CLOCK); */
 	}
@@ -244,7 +242,7 @@ output(int addr, int val)
 			drawimage(CLOCK * 3);
 			hscrollreg = val;
 			hscrollval = ((RAM[0x2000] & 1) << 8) + val;
-			for (x = scanline; x < 240; x++)
+			for (int x = scanline; x < 240; x++)
 				hscroll[x] = hscrollval;
 			/*printf("hscroll: %d\n", hscrollval); */
 		} else {
@@ -256,7 +254,7 @@ output(int addr, int val)
 			   rest of the lines end up where they're supposed to be. */
 			vscrollval = ((RAM[0x2000] & 2) * 120 + ((val < 240) ? val : val + 224)) % 480;
 			if (scanline < 1)
-				for (x = scanline; x < 240; x++)
+				for (int x = scanline; x < 240; x++)
 					vscroll[x] = vscrollval;
 			/* Note: Unlike the h-scroll, the v-scroll register only gets read
 			   on the first scanline.  To create split-screen vertical scrolling,
@@ -303,7 +301,7 @@ output(int addr, int val)
 			vwrap = 0;
 		}
 		hscrollval = ((RAM[0x2000] & 1) << 8) + hscrollreg;
-		for (x = scanline; x < 240; x++)
+		for (int x = scanline; x < 240; x++)
 			hscroll[x] = hscrollval;
 
 		/*if(CLOCK<VBL)printf("hbl update: %4x %d\n", VRAMPTR, CLOCK); */
@@ -436,8 +434,6 @@ output(int addr, int val)
 int
 donmi(void)
 {
-	int x;
-
 	/*printf("donmi: at %d\n", CLOCK); */
 
 	CLOCK = VBL + 7;              /* 7 cycle interrupt latency */
@@ -453,7 +449,7 @@ donmi(void)
 
 	/* reset scroll registers */
 	/*hvscroll = 0;*/
-	for (x = 0; x < 240; x++) {
+	for (int x = 0; x < 240; x++) {
 		hscroll[x] = hscrollval;
 		vscroll[x] = vscrollval;
 		linereg[x] = RAM[0x2000];

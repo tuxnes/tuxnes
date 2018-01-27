@@ -423,18 +423,15 @@ traphandler(int signum)
 void
 quit(void)
 {
-	int                   fd;
-	int                   x;
-
 	/* Clean up char pointers */
 	free(tuxnesdir);
 	free(basefilename);
 
 	/* Save ram */
-	for (x = 0; ((long long *)(RAM + 0x6000))[x] == 0; x++)
+	for (int x = 0; ((long long *)(RAM + 0x6000))[x] == 0; x++)
 		if (x >= 1023)
 			exit(EXIT_SUCCESS);      /* Nothing to save */
-	fd = open(savefile, O_CREAT | O_RDWR, 0666);
+	int fd = open(savefile, O_CREAT | O_RDWR, 0666);
 	if (fd > 0) {
 		write(fd, RAM + 0x6000, 8192);
 		close(fd);
@@ -452,12 +449,11 @@ help(const char *progname, const char *topic)
 	void (*dfn)(int) = (void (*)(int))0;
 	const char *desc = 0;
 	int dfns = 0;
-	size_t len;
 	int terse = 0;
 
 	if (!topic)
 		topic = "";
-	len = strlen(topic);
+	size_t len = strlen(topic);
 	if ((!*topic)
 	 || ((*topic == '-') && !topic[1])) {
 		terse = 1;
@@ -755,7 +751,7 @@ help_controls(int terse)
 static void
 restoresavedgame(void)
 {
-	int fd, result, x;
+	int fd, result;
 	char buffer[1024];
 	struct stat statbuf;
 	*savefile = 0;
@@ -765,6 +761,7 @@ restoresavedgame(void)
 	strcat(buffer, "/.tuxnes");
 	result = stat(buffer, &statbuf);
 	if (result == 0) {
+		int x;
 		for (x = strlen(filename) - 1; x > 0 && filename[x - 1] != '/'; x--);
 		strcat(buffer, "/");
 		strncat(buffer, filename + x, 1019 - strlen(buffer));
@@ -774,7 +771,7 @@ restoresavedgame(void)
 	if (!*savefile) {
 		strncpy(buffer, filename, 1013);
 		savefile[1013] = 0;
-		for (x = strlen(buffer); x >= 0 && buffer[x] != '/'; x--)
+		for (int x = strlen(buffer); x >= 0 && buffer[x] != '/'; x--)
 			buffer[x] = 0;
 		strcat(buffer, "tuxnes.tmp");
 		result = open(buffer, O_CREAT | O_RDWR, 0666);
@@ -824,7 +821,7 @@ loadpal(char *palfile)
 {
 	/* for the raw palette data */
 	unsigned char palette[192];
-	int pen, pens;
+	int pens;
 	size_t len;
 	int fd = -1;
 
@@ -984,7 +981,7 @@ loadpal(char *palfile)
 		free(palfile);
 		return;
 	}
-	for (pen = 0; pen < 64; pen++) {
+	for (int pen = 0; pen < 64; pen++) {
 		if (pen < pens) {
 			NES_palette[pen] =
 			  (((unsigned long)palette[pen * 3]) << 16) |
@@ -1010,19 +1007,15 @@ loadpal(char *palfile)
 int
 main(int argc, char **argv)
 {
-	int x;
 	int r;
 	int audiofd;
 	int size;
-	int cmirror;
+	int cmirror = 0;
 	DIR *dir;             /* for checking if .tuxnes directory is present */
-	char *palfile = 0;    /* palette file */
+	char *palfile = NULL; /* palette file */
 
-	char *ggcode;
-	int ggret, parseret;
-
-	/* for the Game Genie */
-	int address, data, compare;
+	char *ggcode = NULL;
+	int parseret;
 
 #ifdef HAVE_LIBZ
 	gzFile rom_file_gz = NULL;
@@ -1031,8 +1024,6 @@ main(int argc, char **argv)
 #else
 	int romfd;
 #endif
-
-	ggcode = NULL;
 
 	/* set up the mapper arrays */
 	InitMapperSubsystem();
@@ -1069,7 +1060,6 @@ main(int argc, char **argv)
 
 	/* initialize variables */
 	verbose = 0;
-	cmirror = 0;
 	dolink = 0;
 	disassemble = 0;
 	gamegenie = 0;
@@ -1560,11 +1550,11 @@ main(int argc, char **argv)
 	if (showheader) {
 		fprintf(stderr,
 		        "iNES header bytes:\n  0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F\n  ");
-		for (x = 0; x < 16; x++) {
+		for (int x = 0; x < 16; x++) {
 			fprintf(stderr, "%02X  ", ROM[x]);
 		}
 		fprintf(stderr, "\n ");
-		for (x = 0; x < 16; x++) {
+		for (int x = 0; x < 16; x++) {
 			if ((ROM[x] >= 0x20) && (ROM[x] <= 0x7F))
 				fprintf(stderr, " %c  ", ROM[x]);
 			else
@@ -1807,7 +1797,8 @@ main(int argc, char **argv)
 
 	/* enter the Game Genie codes */
 	if (gamegenie) {
-		ggret = DecodeGameGenieCode(ggcode, &address, &data, &compare);
+		int address, data, compare;
+		int ggret = DecodeGameGenieCode(ggcode, &address, &data, &compare);
 		if (ggret == GAME_GENIE_BAD_CODE) {
 			fprintf(stderr, "invalid Game Genie code: %s\n", ggcode);
 		}
