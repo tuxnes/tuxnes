@@ -10,6 +10,7 @@ AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE
 
 # Checks for programs.
+PKG_PROG_PKG_CONFIG
 AC_PROG_CC
 AC_PROG_CC_C99
 AM_PROG_AS
@@ -89,7 +90,15 @@ AC_FUNC_STRTOD
 AC_CHECK_FUNCS([atexit ftruncate gettimeofday memmove memset strcasecmp strrchr strtoul])
 
 AC_CHECK_LIB([m],[sin])
-AC_CHECK_LIB([z],[gzgetc])
+
+PKG_CHECK_MODULES([DEFLATE], [zlib minizip],
+	[AS_VAR_SET([have_deflate], [yes])],
+	[AS_VAR_SET([have_deflate], [no])])
+AS_IF([test "x$have_deflate" = "xyes"],[
+	# Ugh, existing usage is conflated to mean both -lz and -lminizip
+	AC_DEFINE([HAVE_LIBZ], [1], [Define to 1 if you have the `z' library (-lz).])
+])
+AM_CONDITIONAL([DEFLATE], [test "x$have_deflate" = "xyes"])
 
 AC_CHECK_LIB([pbm],[pbm_writepbm])
 AC_CHECK_LIB([pgm],[pgm_writepgm])

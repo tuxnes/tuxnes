@@ -1,4 +1,5 @@
-AM_CFLAGS = $(WARNING_CFLAGS) $(PROFILING_CFLAGS) $(X_CFLAGS)
+AM_CFLAGS = $(WARNING_CFLAGS) $(PROFILING_CFLAGS)
+AM_CPPFLAGS = $(DEFLATE_CFLAGS) $(X_CFLAGS)
 
 bin_PROGRAMS = tuxnes
 bin_SCRIPTS = romfixer
@@ -24,11 +25,14 @@ tuxnes_SOURCES = \
 	screenshot.c screenshot.h \
 	ggi.c \
 	x11.c \
-	w.c \
-	unzip.c unzip.h \
-	ziploader.c ziploader.h
+	w.c
 
-tuxnes_LDADD = table.o $(W_LIBS) $(GGI_LIBS) $(X_LIBS)
+if DEFLATE
+tuxnes_SOURCES += \
+	ziploader.c ziploader.h
+endif
+
+tuxnes_LDADD = table.o $(DEFLATE_LIBS) $(W_LIBS) $(GGI_LIBS) $(X_LIBS)
 tuxnes_LDFLAGS = $(AM_LDFLAGS) -Wl,-z,noexecstack
 
 comptbl_SOURCES = comptbl.c
