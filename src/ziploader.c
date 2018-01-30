@@ -11,60 +11,44 @@
 #include "config.h"
 #endif
 
-#include <string.h>
-#include <ctype.h>
-
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <unzip.h>
+#include "ziploader.h"
 #include "mapper.h"
+
+#include <stdio.h>
+#include <string.h>
 
 
 int
 ziploader(unzFile file, char *zipname)
 {
-	char filename[1024];
-	int fsize = 0;
-	int file_marker;
-	unz_file_info fileinfo;
-	char *extension;
-	char *ptr;
 	int res;
-	char romname[1024];
-
-	file_marker = unzGoToFirstFile(file);
+	int fsize = 0;
 
 	/* Search .zip file and file the ROM file with extension .nes */
-	while (file_marker == UNZ_OK) {
-		unzGetCurrentFileInfo(file, &fileinfo, filename, 128, NULL, 0, NULL, 0);
+	for (res = unzGoToFirstFile(file);
+	     res == UNZ_OK;
+	     res = unzGoToNextFile(file)) {
+		unz_file_info fileinfo;
+		char filename[256 + 1];
+		const char *extension;
 
+		unzGetCurrentFileInfo(file, &fileinfo, filename, sizeof filename, NULL, 0, NULL, 0);
+		filename[sizeof filename - 1] = '\0';
 		extension = strrchr(filename, '.');
-
 		if (extension && !strcasecmp(extension, ".nes")) {
-			strcpy(romname, filename);
 			fsize = fileinfo.uncompressed_size;
 			break;
 		}
-		file_marker = unzGoToNextFile(file);
 	}
-
-	if (!(file_marker == UNZ_END_OF_LIST_OF_FILE
-	  || file_marker == UNZ_OK) || fsize == 0)
+	if (res != UNZ_OK || !fsize)
 		return 0;
-
-	ptr = ROM;
-	unzLocateFile(file, romname, 1);
-	unzGetCurrentFileInfo(file, &fileinfo, romname, 128, NULL, 0, NULL, 0);
 
 	if (unzOpenCurrentFile(file) != UNZ_OK) {
-		printf("Error in zip file\n");
+		fprintf(stderr, "Error in zip file\n");
 		return 0;
 	}
 
-	res = unzReadCurrentFile(file, ptr, fsize);
+	res = unzReadCurrentFile(file, ROM, fsize);
 	if (unzCloseCurrentFile(file) == UNZ_CRCERROR) {
 		fprintf(stderr, "ZIP file has a CRC error.\n");
 		return 0;
@@ -74,16 +58,16 @@ ziploader(unzFile file, char *zipname)
 		fprintf(stderr, "Error reading ZIP file.\n");
 
 		if (res == UNZ_ERRNO)
-			fprintf(stderr, "Unkown error\n");
-		if (res == UNZ_EOF)
+			fprintf(stderr, "Unknown error\n");
+		else if (res == UNZ_EOF)
 			fprintf(stderr, "Unexpected End of File\n");
-		if (res == UNZ_PARAMERROR)
+		else if (res == UNZ_PARAMERROR)
 			fprintf(stderr, "Parameter error\n");
-		if (res == UNZ_BADZIPFILE)
+		else if (res == UNZ_BADZIPFILE)
 			fprintf(stderr, "Corrupt ZIP file\n");
-		if (res == UNZ_INTERNALERROR)
+		else if (res == UNZ_INTERNALERROR)
 			fprintf(stderr, "Internal error\n");
-		if (res == UNZ_CRCERROR)
+		else if (res == UNZ_CRCERROR)
 			fprintf(stderr, "CRC error\n");
 		return 0;
 	}
