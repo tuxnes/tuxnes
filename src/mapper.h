@@ -34,17 +34,13 @@
 
 /* C type definitions */
 
-#ifndef u_char
-#define u_char unsigned char
-#endif
-
-#define RAM   ((u_char *)(_RAM))        /* NES internal 2k RAM */
-#define ZPMEM ((u_char *)(_ZPMEM))      /* Zero page */
-#define STACK ((u_char *)(_STACK))      /* stack page */
-#define NVRAM ((u_char *)(_NVRAM))      /* Battery RAM */
-#define REG1 _REG1
-#define REG2 _REG2
-#define ROM       ((u_char *)(_ROM))    /* ROM Image */
-#define CODE_BASE ((u_char *)(_CODE_BASE))      /* translated code */
-#define INT_MAP ((unsigned int *)_INT_MAP)      /* translation address map */
-#define VRAM vram               /* Video memory */
+#define RAM       ((unsigned char *)(_RAM))        /* NES internal 2k RAM */
+#define ZPMEM     ((unsigned char *)(_ZPMEM))      /* Zero page */
+#define STACK     ((unsigned char *)(_STACK))      /* stack page */
+#define NVRAM     ((unsigned char *)(_NVRAM))      /* Battery RAM */
+#define REG1      _REG1
+#define REG2      _REG2
+#define ROM       ((unsigned char *)(_ROM))        /* ROM Image */
+#define CODE_BASE ((unsigned char *)(_CODE_BASE))  /* translated code */
+#define INT_MAP   ((unsigned int *)(_INT_MAP))     /* translation address map */
+#define VRAM      vram                             /* Video memory */

@@ -18,7 +18,7 @@
 #include "mapper.h"
 #include "globals.h"
 
-u_char *next_code_alloc = CODE_BASE;
+unsigned char *next_code_alloc = CODE_BASE;
 
 /* Some declarataions for the asm code */
 unsigned int VFLAG;             /* Store overflow flag */
@@ -43,10 +43,10 @@ void
 translate(int addr)
 {
 	int saddr;
-	u_char src;
+	unsigned char src;
 	unsigned int *ptr;
 	unsigned char *cptr, *bptr;
-	u_char stop = 0;
+	unsigned char stop = 0;
 
 	XPC = cptr = next_code_alloc;
 	if (disassemble) {
@@ -73,14 +73,14 @@ translate(int addr)
 			if (!ignorebadinstr)
 				*(cptr++) = BRK;
 		} else {
-			unsigned char *sptr = (u_char *) TRANS_TBL + ptr[src];
+			unsigned char *sptr = (unsigned char *) TRANS_TBL + ptr[src];
 			int slen = sptr[-1];
 			int dlen = *(sptr++);
 			bptr = cptr;
 			while (dlen--)
 				*(cptr++) = *(sptr++);
 			while (*sptr) {
-				u_char m, l, o;
+				unsigned char m, l, o;
 				m = *(sptr++);
 				l = *(sptr++);
 				o = *(sptr++);

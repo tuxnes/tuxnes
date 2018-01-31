@@ -57,7 +57,7 @@ static void     init_none(void);
 static int      MapRom(int, unsigned, unsigned);
 
 /* ROM mapper table (pointers) */
-u_char *MAPTABLE[17];
+unsigned char *MAPTABLE[17];
 
 /* some globals */
 extern unsigned char    *VROM_BASE;

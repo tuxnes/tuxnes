@@ -53,8 +53,8 @@
 
 #define ARRAY_LEN(x) (sizeof (x) / sizeof *(x))
 
-u_char  *ROM_BASE;
-u_char  *VROM_BASE;
+unsigned char  *ROM_BASE;
+unsigned char  *VROM_BASE;
 char    *filename;
 const char      *homedir;
 char     savefile[1024];
