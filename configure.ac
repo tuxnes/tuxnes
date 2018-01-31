@@ -98,7 +98,6 @@ AS_IF([test "x$have_deflate" = "xyes"],[
 	# Ugh, existing usage is conflated to mean both -lz and -lminizip
 	AC_DEFINE([HAVE_LIBZ], [1], [Define to 1 if you have the `z' library (-lz).])
 ])
-AM_CONDITIONAL([DEFLATE], [test "x$have_deflate" = "xyes"])
 
 AC_CHECK_LIB([pbm],[pbm_writepbm])
 AC_CHECK_LIB([pgm],[pgm_writepgm])

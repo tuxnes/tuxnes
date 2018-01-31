@@ -18,6 +18,7 @@ tuxnes_SOURCES = \
 	gamegenie.c gamegenie.h \
 	controller.c controller.h \
 	joystick.c joystick.h \
+	loader.c loader.h \
 	mapper.c mapper.h \
 	ntsc_pal.c \
 	sound.c sound.h \
@@ -26,11 +27,6 @@ tuxnes_SOURCES = \
 	ggi.c \
 	x11.c \
 	w.c
-
-if DEFLATE
-tuxnes_SOURCES += \
-	ziploader.c ziploader.h
-endif
 
 tuxnes_LDADD = table.o $(DEFLATE_LIBS) $(W_LIBS) $(GGI_LIBS) $(X_LIBS)
 tuxnes_LDFLAGS = $(AM_LDFLAGS) -Wl,-z,noexecstack

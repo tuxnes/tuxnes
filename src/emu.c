@@ -31,17 +31,12 @@
 #include <sysexits.h>
 #include <unistd.h>
 
-#ifdef HAVE_LIBZ
-#include <zlib.h>
-#include <unzip.h>
-#include "ziploader.h"
-#endif
-
 #include "consts.h"
 #include "controller.h"
 #include "gamegenie.h"
 #include "globals.h"
 #include "joystick.h"
+#include "loader.h"
 #include "mapper.h"
 #include "renderer.h"
 #include "sound.h"
@@ -1017,14 +1012,6 @@ main(int argc, char **argv)
 	char *ggcode = NULL;
 	int parseret;
 
-#ifdef HAVE_LIBZ
-	gzFile rom_file_gz = NULL;
-	unzFile rom_file_zip = NULL;
-	char *extension = NULL;
-#else
-	int romfd;
-#endif
-
 	/* set up the mapper arrays */
 	InitMapperSubsystem();
 
@@ -1424,54 +1411,6 @@ main(int argc, char **argv)
 		}
 	}
 
-	/* Open ROM file */
-#ifdef HAVE_LIBZ
-	extension = strrchr(filename, '.');
-
-	if (extension && !strcasecmp(extension, ".zip")) {
-		/* If the extension is .zip open the file */
-		rom_file_zip = unzOpen(filename);
-		if (rom_file_zip == NULL) {
-			perror(filename);
-			exit(EXIT_FAILURE);
-		}
-	} else {
-		/* If its not a .zip file treat it as a .gz */
-		rom_file_gz = gzopen(filename, "rb");
-		if (rom_file_gz == NULL) {
-			perror(filename);
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	/* FIXME: Error */
-#else
-	romfd = open(filename, O_RDONLY);
-	if (romfd < 0) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-#endif
-
-#if HAVE_LIBZ
-	/*
-	 * FIXME: Do not calculate the size, instead read the complete file with
-	 * getc(), this looks wrong but working.
-	 */
-#else
-	size = lseek(romfd, 0, SEEK_END);
-	lseek(romfd, 0, SEEK_SET);   /* Get file size */
-
-	if (size < 0) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-	if (size == 0) {
-		fprintf(stderr, "Unable to read %s (empty file)\n", filename);
-		exit(EXIT_FAILURE);
-	}
-#endif
-
 	/* allocate space for the ROM */
 	if ((r = (int)mmap(ROM, 0x300000,
 	                   PROT_READ | PROT_WRITE | PROT_EXEC,
@@ -1480,38 +1419,6 @@ main(int argc, char **argv)
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-
-	/* load the ROM */
-#if HAVE_LIBZ
-
-
-	if (extension && !strcasecmp(extension, ".zip")) {
-		/* Treat as a .zip file */
-		ziploader(rom_file_zip, filename);
-		unzClose(rom_file_zip);
-	} else {
-		/* Treat as a .gz file */
-		int c;
-		int i = 0;
-		while ((c = gzgetc(rom_file_gz)) != -1) {
-			ROM[i++] = c;
-		}
-		size = i;
-
-		gzclose(rom_file_gz);
-	}
-
-#else
-	if (read(romfd, ROM, size) != size) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-
-	close(romfd);
-#endif
-
-	if (verbose)
-		fprintf(stderr, "Rom size: %d\n", size);
 
 	/* Allocate memory */
 	r = (int)mmap(RAM, 0x8000,
@@ -1538,6 +1445,10 @@ main(int argc, char **argv)
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
+
+	size = load_rom(filename);
+	if (verbose)
+		fprintf(stderr, "Rom size: %d\n", size);
 
 	/* Initialize sound playback */
 	if (InitAudio(argc, argv)) {
