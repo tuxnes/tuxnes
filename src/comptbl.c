@@ -45,7 +45,7 @@ int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 0,
   cip = 0, cln = 0, cdb = 0, omc = 0, omo = 0, oml = 0, ssl = 0, dsl = 0;
 unsigned char *datap;
 
-static int      do_tree(int, int*);
+static int      do_tree(int, int *);
 static void     memory_error(void);
 
 int
@@ -82,7 +82,7 @@ main(int argc, char *argv[])
 		for (cip = 0; (input[cip] != 0) && (input[cip] != '#') && (input[cip] != 10); cip++) {
 			i = input[cip];
 			/* Decode hex digits */
-			if ((!slf) && (!dmf)) {
+			if (!slf && !dmf) {
 				if ((i >= '0' && i <= '9')
 				 || ((i | 32) >= 'a' && (i | 32) <= 'f')) {
 					if (fbf)
@@ -206,14 +206,14 @@ main(int argc, char *argv[])
 
 					if ((datap - TBL_BASE2) + dsl + oml + 3 > ALLOC_SIZE)
 						memory_error();
-					*(datap++) = ssl;
-					*(datap++) = dsl;
+					*datap++ = ssl;
+					*datap++ = dsl;
 					for (x = 0; x < dsl; x++)
-						*(datap++) = objseq[x];
+						*datap++ = objseq[x];
 					for (x = 0; x < oml; x++)
-						*(datap++) = objmod[x];
-					*(datap++) = 0;
-					datap = (unsigned char *) (((unsigned int) datap + 7) & 0xfffffff8);
+						*datap++ = objmod[x];
+					*datap++ = 0;
+					datap = (unsigned char *)(((unsigned int)datap + 7) & 0xfffffff8);
 					sdf = 1;
 					sbn = 0;
 					dbn = 0;
@@ -227,11 +227,11 @@ main(int argc, char *argv[])
 		}
 	}
 	/* relocate pointers */
-	for (ptr = (int *) TBL_BASE, x = blocksalloc * 256; x--; ptr++) {
+	for (ptr = (int *)TBL_BASE, x = blocksalloc * 256; x--; ptr++) {
 		if (*ptr) {
 			if (*ptr & 1)
 				*ptr -= (TBL_BASE2 - TBL_BASE) - blocksalloc * 1024;
-			*ptr -= (int) TBL_BASE;
+			*ptr -= (int)TBL_BASE;
 		}
 	}
 	if (fsync(fd) != 0)
@@ -263,21 +263,21 @@ do_tree(int sbn, int *blockp)
 	for (int x = 0; x < 256; x++)
 		if ((x & srcmask[sbn]) == srcseq[sbn]) {
 			if (blockp[x] == 0 || (srcseq[sbn + 1] != 0 && srcmask[sbn + 1] == 0))
-				blockp[x] = (unsigned int) datap | 1;         /* Leaf node */
+				blockp[x] = (unsigned int)datap | 1;         /* Leaf node */
 			else {
 				if (blockp[x] & 1) {
 					/* grow tree and copy data to new node */
 					/*printf("allocated block %d\n", blocksalloc); */
-					nblockp = (int *) (TBL_BASE + (blocksalloc++) * 1024);
+					nblockp = (int *)(TBL_BASE + (blocksalloc++) * 1024);
 					if ((blocksalloc << 10) >= ALLOC_SIZE)
 						memory_error();
 					for (int y = 0; y < 256; y++)
 						nblockp[y] = blockp[x];
-					blockp[x] = (int) nblockp;
+					blockp[x] = (int)nblockp;
 				} else {
 					/* traverse existing branch */
 					/*printf("following ptr...%x %x %x\n", srcseq[sbn], srcseq[sbn+1], srcmask[sbn+1]); */
-					nblockp = (int *) blockp[x];
+					nblockp = (int *)blockp[x];
 				}
 
 				do_tree(sbn + 1, nblockp);

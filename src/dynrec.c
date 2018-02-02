@@ -71,75 +71,75 @@ translate(int addr)
 			addr = saddr + 1;
 			/*printf("!%2x-NULL!", src); */
 			if (!ignorebadinstr)
-				*(cptr++) = BRK;
+				*cptr++ = BRK;
 		} else {
-			unsigned char *sptr = (unsigned char *) TRANS_TBL + ptr[src];
+			unsigned char *sptr = (unsigned char *)TRANS_TBL + ptr[src];
 			int slen = sptr[-1];
-			int dlen = *(sptr++);
+			int dlen = *sptr++;
 			bptr = cptr;
 			while (dlen--)
-				*(cptr++) = *(sptr++);
+				*cptr++ = *sptr++;
 			while (*sptr) {
 				unsigned char m, l, o;
-				m = *(sptr++);
-				l = *(sptr++);
-				o = *(sptr++);
+				m = *sptr++;
+				l = *sptr++;
+				o = *sptr++;
 				/*printf("[%c%d %d]", m, o, l);fflush(stdout); */
 				if (m == '!')
 					stop = 1;
-				if (m == 'B')
+				else if (m == 'B')
 					bptr[l] = *(MAPTABLE[(saddr + o) >> 12] + (saddr + o));
-				if (m == 'C')
+				else if (m == 'C')
 					bptr[l] = ~*(MAPTABLE[(saddr + o) >> 12] + (saddr + o));
-				if (m == 'D')
-					*((unsigned int *)(bptr + l)) = (unsigned int)bptr + l + o;
-				if (m == 'E')
-					*((int *)(bptr + l)) = *((signed char *)(MAPTABLE[(saddr + o) >> 12] + (saddr + o)));
-				if (m == 'Z')
-					*((unsigned int *)(bptr + l)) = (unsigned int)ZPMEM + *(MAPTABLE[(saddr + o) >> 12] + saddr + o);
-				if (m == 'A')
-					*((unsigned int *)(bptr + l)) = (unsigned int)RAM + *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + ((*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1)) << 8);
-				if (m == 'L')
-					*((unsigned int *)(bptr + l)) = (unsigned int)RAM;
-				if (m == 'W')
-					*((unsigned short *)(bptr + l)) = *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + ((*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1)) << 8);
-				if (m == 'X')
-					*((unsigned int *)(bptr + l)) = (unsigned int)(MAPTABLE + ((*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1)) >> 4));
-				if (m == 'M')
-					*((unsigned int *)(bptr + l)) = (unsigned int)(MAPTABLE);
-				if (m == 'T')
-					*((unsigned int *)(bptr + l)) = (unsigned int)STACK;
-				if (m == 'P')
-					*((unsigned short *)(bptr + l)) = saddr + o;
-				if (m == 'R')
-					*((int *)(bptr + l)) = *((signed char *)(MAPTABLE[(saddr + o) >> 12] + saddr + o)) + saddr + o + 1;
-				if (m == 'J')
-					*((unsigned int *)(bptr + l)) = *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + ((*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1)) << 8);
-				if (m == 'S')
-					*((void **)(bptr + l)) = &STACKPTR;
-				if (m == 'V')
-					*((void **)(bptr + l)) = &VFLAG;
-				if (m == 'F')
-					*((void **)(bptr + l)) = &FLAGS;
-				if (m == 'I')
-					*((int *)(bptr + l)) = (int)(&INPUT) - (int)(bptr + l) - 4;
-				if (m == 'O')
-					*((int *)(bptr + l)) = (int)(&OUTPUT) - (int)(bptr + l) - 4;
-				if (m == 'U')
-					*((int *)(bptr + l)) = (int)(&U) - (int)(bptr + l) - 4;
-				if (m == 'N')
-					*((int *)(bptr + l)) = (int)(&NMI) - (int)(bptr + l) - 4;
-				if (m == 'Y')
-					*((int *)(bptr + l)) = (int)(Mapper[MAPPERNUMBER]) - (int)(bptr + l) - 4;
-				if (m == '>')
-					bptr[l] += (((*((signed char *)(MAPTABLE[(saddr + o) >> 12] + saddr + o)) + saddr + o + 1) & 0xFF00) != ((saddr + o + 1) & 0xFF00));
-				if (m == '^')
+				else if (m == 'D')
+					*(unsigned int *)(bptr + l) = (unsigned int)bptr + l + o;
+				else if (m == 'E')
+					*(int *)(bptr + l) = *(signed char *)(MAPTABLE[(saddr + o) >> 12] + (saddr + o));
+				else if (m == 'Z')
+					*(unsigned int *)(bptr + l) = (unsigned int)ZPMEM + *(MAPTABLE[(saddr + o) >> 12] + saddr + o);
+				else if (m == 'A')
+					*(unsigned int *)(bptr + l) = (unsigned int)RAM + *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) << 8);
+				else if (m == 'L')
+					*(unsigned int *)(bptr + l) = (unsigned int)RAM;
+				else if (m == 'W')
+					*(unsigned short *)(bptr + l) = *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) << 8);
+				else if (m == 'X')
+					*(unsigned int *)(bptr + l) = (unsigned int)(MAPTABLE + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) >> 4));
+				else if (m == 'M')
+					*(unsigned int *)(bptr + l) = (unsigned int)(MAPTABLE);
+				else if (m == 'T')
+					*(unsigned int *)(bptr + l) = (unsigned int)STACK;
+				else if (m == 'P')
+					*(unsigned short *)(bptr + l) = saddr + o;
+				else if (m == 'R')
+					*(int *)(bptr + l) = *(signed char *)(MAPTABLE[(saddr + o) >> 12] + saddr + o) + saddr + o + 1;
+				else if (m == 'J')
+					*(unsigned int *)(bptr + l) = *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) << 8);
+				else if (m == 'S')
+					*(void **)(bptr + l) = &STACKPTR;
+				else if (m == 'V')
+					*(void **)(bptr + l) = &VFLAG;
+				else if (m == 'F')
+					*(void **)(bptr + l) = &FLAGS;
+				else if (m == 'I')
+					*(int *)(bptr + l) = (int)&INPUT - (int)(bptr + l) - 4;
+				else if (m == 'O')
+					*(int *)(bptr + l) = (int)&OUTPUT - (int)(bptr + l) - 4;
+				else if (m == 'U')
+					*(int *)(bptr + l) = (int)&U - (int)(bptr + l) - 4;
+				else if (m == 'N')
+					*(int *)(bptr + l) = (int)&NMI - (int)(bptr + l) - 4;
+				else if (m == 'Y')
+					*(int *)(bptr + l) = (int)Mapper[MAPPERNUMBER] - (int)(bptr + l) - 4;
+				else if (m == '>')
+					bptr[l] += ((*(signed char *)(MAPTABLE[(saddr + o) >> 12] + saddr + o) + saddr + o + 1) & 0xFF00) != ((saddr + o + 1) & 0xFF00);
+				else if (m == '^')
 					bptr[l] = ignorebadinstr ? NOP : BRK;
 			}
 			addr = saddr + slen;
 		}
 	}
 	while ((int)cptr & 15)
-		*(cptr++) = NOP;
+		*cptr++ = NOP;
 	next_code_alloc = cptr;
 }
