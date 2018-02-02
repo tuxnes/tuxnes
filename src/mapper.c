@@ -21,35 +21,35 @@
 #include "globals.h"
 #include "mapper.h"
 
-extern void MAPPER_NONE;
-extern void MAPPER_MMC1;
-extern void MAPPER_UNROM;
-extern void MAPPER_CNROM;
-extern void MAPPER_MMC3;
-extern void MAPPER_MMC5;
-extern void MAPPER_MMC2;
-extern void MAPPER_MMC4;
-extern void MAPPER_CLRDRMS;
-extern void MAPPER_AOROM;
-extern void MAPPER_CPROM;
-extern void MAPPER_100IN1;
-extern void MAPPER_NAMCOT106;
-extern void MAPPER_VRC2_A;
-extern void MAPPER_VRC2_B;
-extern void MAPPER_G101;
-extern void MAPPER_TAITO_TC0190;
-extern void MAPPER_GNROM;
-extern void MAPPER_TENGEN_RAMBO1;
-extern void MAPPER_SUNSOFT4;
-extern void MAPPER_FME7;
-extern void MAPPER_CAMERICA;
-extern void MAPPER_IREM_74HC161_32;
-extern void MAPPER_VS;
-extern void MAPPER_SUPERVISION;
-extern void MAPPER_NINA7;
+extern void MAPPER_NONE(void);
+extern void MAPPER_MMC1(void);
+extern void MAPPER_UNROM(void);
+extern void MAPPER_CNROM(void);
+extern void MAPPER_MMC3(void);
+extern void MAPPER_MMC5(void);
+extern void MAPPER_MMC2(void);
+extern void MAPPER_MMC4(void);
+extern void MAPPER_CLRDRMS(void);
+extern void MAPPER_AOROM(void);
+extern void MAPPER_CPROM(void);
+extern void MAPPER_100IN1(void);
+extern void MAPPER_NAMCOT106(void);
+extern void MAPPER_VRC2_A(void);
+extern void MAPPER_VRC2_B(void);
+extern void MAPPER_G101(void);
+extern void MAPPER_TAITO_TC0190(void);
+extern void MAPPER_GNROM(void);
+extern void MAPPER_TENGEN_RAMBO1(void);
+extern void MAPPER_SUNSOFT4(void);
+extern void MAPPER_FME7(void);
+extern void MAPPER_CAMERICA(void);
+extern void MAPPER_IREM_74HC161_32(void);
+extern void MAPPER_VS(void);
+extern void MAPPER_SUPERVISION(void);
+extern void MAPPER_NINA7(void);
 
 void (*MapperInit[MAXMAPPER + 1])(void);
-void *Mapper[MAXMAPPER + 1];
+void (*Mapper[MAXMAPPER + 1])(void);
 char MapperName[MAXMAPPER + 1][30];
 
 static int      commandregister;

@@ -18,7 +18,7 @@ extern void     *INPUT;
 extern void     *OUTPUT;
 extern void     *U;
 extern void     *NMI;
-extern void     *Mapper[MAXMAPPER + 1];
+extern void     (*Mapper[MAXMAPPER + 1])(void);
 /* extern int    Mapper[]; */
 extern int       MAPPERNUMBER;
 extern unsigned char    *ROM_BASE;
