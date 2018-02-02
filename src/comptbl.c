@@ -64,15 +64,15 @@ main(int argc, char *argv[])
 	if (mmap(TBL_BASE, ALLOC_SIZE,
 	         PROT_READ | PROT_WRITE,
 	         MAP_FIXED | MAP_SHARED,
-	         fd, 0) != (void *)TBL_BASE) {
-		printf("Can't allocate memory!\n");
+	         fd, 0) == MAP_FAILED) {
+		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
 	if (mmap(TBL_BASE2, ALLOC_SIZE,
 	         PROT_READ | PROT_WRITE,
-	         MAP_FIXED | MAP_ANON | MAP_PRIVATE,
-	         -1, 0) != (void *)TBL_BASE2) {
-		printf("Can't allocate memory!\n");
+	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+	         -1, 0) == MAP_FAILED) {
+		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
 	memset(TBL_BASE, 0, 1024);

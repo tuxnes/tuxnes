@@ -1002,7 +1002,6 @@ loadpal(char *palfile)
 int
 main(int argc, char **argv)
 {
-	int r;
 	int audiofd;
 	int size;
 	int cmirror = 0;
@@ -1411,37 +1410,32 @@ main(int argc, char **argv)
 		}
 	}
 
-	/* allocate space for the ROM */
-	if ((r = (int)mmap(ROM, 0x300000,
-	                   PROT_READ | PROT_WRITE | PROT_EXEC,
-	                   MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	                   -1, 0)) < 0) {
-		perror("mmap");
-		exit(EXIT_FAILURE);
-	}
-
 	/* Allocate memory */
-	r = (int)mmap(RAM, 0x8000,
-	              PROT_READ | PROT_WRITE,
-	              MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	              -1, 0);
-	if (r <= 0) {
+	if (mmap(ROM, 0x300000,
+	         PROT_READ | PROT_WRITE | PROT_EXEC,
+	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+	         -1, 0) == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	r = (int)mmap(CODE_BASE, 0x800000,
-	              PROT_READ | PROT_WRITE | PROT_EXEC,
-	              MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	              -1, 0);
-	if (r <= 0) {
+	if (mmap(RAM, 0x8000,
+	         PROT_READ | PROT_WRITE,
+	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+	         -1, 0) == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	r = (int)mmap((void *)INT_MAP, 0x400000,
-	              PROT_READ | PROT_WRITE,
-	              MAP_FIXED | MAP_PRIVATE | MAP_ANON,
-	              -1, 0);
-	if (r <= 0) {
+	if (mmap(CODE_BASE, 0x800000,
+	         PROT_READ | PROT_WRITE | PROT_EXEC,
+	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+	         -1, 0) == MAP_FAILED) {
+		perror("mmap");
+		exit(EXIT_FAILURE);
+	}
+	if (mmap(INT_MAP, 0x400000,
+	         PROT_READ | PROT_WRITE,
+	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+	         -1, 0) == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
