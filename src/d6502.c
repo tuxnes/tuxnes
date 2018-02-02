@@ -103,59 +103,53 @@ disas(int loc)
 	ptr = MAPTABLE[loc >> 12];
 	while (loc < 0x10000) {
 		int x = ptr[loc];
-		printf("%4x: %1x%1x-%s ", loc++, x >> 4, x & 15, Opcodes_6502[x]);
+		printf("%04x: %02x-%s ", loc++, x, Opcodes_6502[x]);
 		switch (Modes_6502[x]) {
 		case ZP:
-			printf("%1x%1x\n", ptr[loc] >> 4, ptr[loc] & 15);
+			printf("%02x\n", ptr[loc]);
 			loc++;
 			break;
 		case ZPx:
-			printf("%1x%1x,X\n", ptr[loc] >> 4, ptr[loc] & 15);
+			printf("%02x,X\n", ptr[loc]);
 			loc++;
 			break;
 		case ZPy:
-			printf("%1x%1x,Y\n", ptr[loc] >> 4, ptr[loc] & 15);
+			printf("%02x,Y\n", ptr[loc]);
 			loc++;
 			break;
 		case ZPIx:
-			printf("(%1x%1x,X)\n", ptr[loc] >> 4, ptr[loc] & 15);
+			printf("(%02x,X)\n", ptr[loc]);
 			loc++;
 			break;
 		case ZPIy:
-			printf("(%1x%1x),Y\n", ptr[loc] >> 4, ptr[loc] & 15);
+			printf("(%02x),Y\n", ptr[loc]);
 			loc++;
 			break;
 		case ABS:
-			printf("%1x%1x%1x%1x\n", ptr[loc + 1] >> 4, ptr[loc + 1] & 15,
-			       ptr[loc] >> 4, ptr[loc] & 15);
+			printf("%04x\n", ptr[loc + 1] << 8 | ptr[loc]);
 			loc += 2;
 			break;
 		case ABSx:
-			printf("%1x%1x%1x%1x,X\n", ptr[loc + 1] >> 4, ptr[loc + 1] & 15,
-			       ptr[loc] >> 4, ptr[loc] & 15);
+			printf("%04x,X\n", ptr[loc + 1] << 8 | ptr[loc]);
 			loc += 2;
 			break;
 		case ABSy:
-			printf("%1x%1x%1x%1x,Y\n", ptr[loc + 1] >> 4, ptr[loc + 1] & 15,
-			       ptr[loc] >> 4, ptr[loc] & 15);
+			printf("%04x,Y\n", ptr[loc + 1] << 8 | ptr[loc]);
 			loc += 2;
 			break;
 		case IND:
-			printf("(%1x%1x%1x%1x)\n", ptr[loc + 1] >> 4, ptr[loc + 1] & 15,
-			       ptr[loc] >> 4, ptr[loc] & 15);
+			printf("(%04x)\n", ptr[loc + 1] << 8 | ptr[loc]);
 			loc += 2;
 			break;
 		case REL:
 			if (ptr[loc] < 128)
-				printf("%4x (+%1x%1x)\n", loc + ptr[loc] + 1, ptr[loc] >> 4,
-				       ptr[loc] & 15);
+				printf("%04x (+%02x)\n", loc + ptr[loc] + 1, ptr[loc]);
 			else
-				printf("%4x (-%1x%1x)\n", loc + ptr[loc] - 255, ((ptr[loc] - 1) >> 4) ^ 15,
-				       ((ptr[loc] - 1) & 15) ^ 15);
+				printf("%04x (-%02x)\n", loc + ptr[loc] - 255, (ptr[loc] - 1) ^ 255);
 			loc++;
 			break;
 		case IMM:
-			printf("#%1x%1x\n", ptr[loc] >> 4, ptr[loc] & 15);
+			printf("#%02x\n", ptr[loc]);
 			loc++;
 			break;
 		default:
