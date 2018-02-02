@@ -11,11 +11,10 @@
 #include "config.h"
 #endif
 
-#include <sys/types.h>
 #include <stdio.h>
 #include "globals.h"
 
-static char Opcodes_6502[256][4] = {
+static const char Opcodes_6502[256][4] = {
 	"BRK", "ORA", "BAD", "BAD", "BAD", "ORA", "ASL", "BAD",
 	"PHP", "ORA", "ASL", "BAD", "BAD", "ORA", "ASL", "BAD",
 	"BPL", "ORA", "BAD", "BAD", "BAD", "ORA", "ASL", "BAD",
@@ -47,54 +46,54 @@ static char Opcodes_6502[256][4] = {
 	"CPX", "SBC", "BAD", "BAD", "CPX", "SBC", "INC", "BAD",
 	"INX", "SBC", "NOP", "BAD", "CPX", "SBC", "INC", "BAD",
 	"BEQ", "SBC", "BAD", "BAD", "BAD", "SBC", "INC", "BAD",
-	"SED", "SBC", "BAD", "BAD", "BAD", "SBC", "INC", "BAD"
+	"SED", "SBC", "BAD", "BAD", "BAD", "SBC", "INC", "BAD",
 };
 
 /* Addressing modes */
-#define ZP 1
-#define ZPx 2
-#define ZPy 3
-#define ZPIx 4
-#define ZPIy 5
-#define ABS 6
-#define ABSx 7
-#define ABSy 8
-#define IND 9
-#define REL 10
-#define IMM 11
-static unsigned char Modes_6502[256] = {
-	0, ZPIx, 0, 0, 0, ZP, ZP, 0,
-	0, IMM, 0, 0, 0, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
-	0, ABSy, 0, 0, 0, ABSx, ABSx, 0,
-	ABS, ZPIx, 0, 0, ZP, ZP, ZP, 0,
-	0, IMM, 0, 0, ABS, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
-	0, ABSy, 0, 0, 0, ABSx, ABSx, 0,
-	0, ZPIx, 0, 0, 0, ZP, ZP, 0,
-	0, IMM, 0, 0, ABS, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
-	0, ABSy, 0, 0, 0, ABSx, ABSx, 0,
-	0, ZPIx, 0, 0, 0, ZP, ZP, 0,
-	0, IMM, 0, 0, IND, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
-	0, ABSy, 0, 0, 0, ABSx, ABSx, 0,
-	0, ZPIx, 0, 0, ZP, ZP, ZP, 0,
-	0, 0, 0, 0, ABS, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, ZPx, ZPx, ZPy, 0,
-	0, ABSy, 0, 0, 0, ABSx, 0, 0,
-	IMM, ZPIx, IMM, 0, ZP, ZP, ZP, 0,
-	0, IMM, 0, 0, ABS, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, ZPx, ZPx, ZPy, 0,
-	0, ABSy, 0, 0, ABSx, ABSx, ABSy, 0,
-	IMM, ZPIx, 0, 0, ZP, ZP, ZP, 0,
-	0, IMM, 0, 0, ABS, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
-	0, ABSy, 0, 0, 0, ABSx, ABSx, 0,
-	IMM, ZPIx, 0, 0, ZP, ZP, ZP, 0,
-	0, IMM, 0, 0, ABS, ABS, ABS, 0,
-	REL, ZPIy, 0, 0, 0, ZPx, ZPx, 0,
-	0, ABSy, 0, 0, 0, ABSx, ABSx, 0
+#define ZP    1
+#define ZPx   2
+#define ZPy   3
+#define ZPIx  4
+#define ZPIy  5
+#define ABS   6
+#define ABSx  7
+#define ABSy  8
+#define IND   9
+#define REL  10
+#define IMM  11
+static const unsigned char Modes_6502[256] = {
+	0,    ZPIx, 0,    0,    0,    ZP,   ZP,   0,
+	0,    IMM,  0,    0,    0,    ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    0,    ZPx,  ZPx,  0,
+	0,    ABSy, 0,    0,    0,    ABSx, ABSx, 0,
+	ABS,  ZPIx, 0,    0,    ZP,   ZP,   ZP,   0,
+	0,    IMM,  0,    0,    ABS,  ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    0,    ZPx,  ZPx,  0,
+	0,    ABSy, 0,    0,    0,    ABSx, ABSx, 0,
+	0,    ZPIx, 0,    0,    0,    ZP,   ZP,   0,
+	0,    IMM,  0,    0,    ABS,  ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    0,    ZPx,  ZPx,  0,
+	0,    ABSy, 0,    0,    0,    ABSx, ABSx, 0,
+	0,    ZPIx, 0,    0,    0,    ZP,   ZP,   0,
+	0,    IMM,  0,    0,    IND,  ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    0,    ZPx,  ZPx,  0,
+	0,    ABSy, 0,    0,    0,    ABSx, ABSx, 0,
+	0,    ZPIx, 0,    0,    ZP,   ZP,   ZP,   0,
+	0,    0,    0,    0,    ABS,  ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    ZPx,  ZPx,  ZPy,  0,
+	0,    ABSy, 0,    0,    0,    ABSx, 0,    0,
+	IMM,  ZPIx, IMM,  0,    ZP,   ZP,   ZP,   0,
+	0,    IMM,  0,    0,    ABS,  ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    ZPx,  ZPx,  ZPy,  0,
+	0,    ABSy, 0,    0,    ABSx, ABSx, ABSy, 0,
+	IMM,  ZPIx, 0,    0,    ZP,   ZP,   ZP,   0,
+	0,    IMM,  0,    0,    ABS,  ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    0,    ZPx,  ZPx,  0,
+	0,    ABSy, 0,    0,    0,    ABSx, ABSx, 0,
+	IMM,  ZPIx, 0,    0,    ZP,   ZP,   ZP,   0,
+	0,    IMM,  0,    0,    ABS,  ABS,  ABS,  0,
+	REL,  ZPIy, 0,    0,    0,    ZPx,  ZPx,  0,
+	0,    ABSy, 0,    0,    0,    ABSx, ABSx, 0,
 };
 
 void
