@@ -22,11 +22,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#if defined(__FreeBSD__)
+
+#ifdef HAVE_MACHINE_ENDIAN_H
 #include <machine/endian.h>
-#elif defined(__NetBSD__) || defined(__OpenBSD__)
+#endif
+#ifdef HAVE_SYS_ENDIAN_H
 #include <sys/endian.h>
-#else /* Linux */
+#endif
+#ifdef HAVE_ENDIAN_H
 #include <endian.h>
 #endif
 

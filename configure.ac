@@ -59,6 +59,7 @@ AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS([fcntl.h stddef.h stdlib.h string.h sys/ioctl.h sys/time.h unistd.h])
 AC_CHECK_HEADERS([features.h linux/joystick.h linux/soundcard.h sys/soundcard.h])
+AC_CHECK_HEADERS([machine/endian.h sys/endian.h endian.h],[break])
 AC_CHECK_HEADERS([getopt.h])
 AC_CHECK_HEADERS([ppm.h])
 
@@ -76,7 +77,6 @@ AS_IF([test "x$no_x" != "xyes"],[
 ])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_C_BIGENDIAN
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
