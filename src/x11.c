@@ -93,7 +93,7 @@
 #endif /* HAVE_SYS_IPC_H */
 #endif /* HAVE_XEXT */
 
-#if HAVE_SHM
+#ifdef HAVE_SHM
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
@@ -210,7 +210,7 @@ static int      currentcache = 0;
 static int      nextcache = 1 % tilecachedepth;
 static int width, height;
 
-#if HAVE_SHM
+#ifdef HAVE_SHM
 
 static Status shm_status = 0;
 static int shm_major, shm_minor;
@@ -287,7 +287,7 @@ SaveScreenshotX11(void)
 static int
 handler(Display *display, XErrorEvent *ev)
 {
-#if HAVE_SHM
+#ifdef HAVE_SHM
 	if (shm_attaching
 	 && (ev->error_code == BadAccess)
 	/* && (ev->request_code == Find_the_request_code_for_MIT_SHM) */
@@ -1075,7 +1075,7 @@ UpdateDisplayX11(void)
 						r++;
 					} else if (r) {
 						r0 += r;
-#if HAVE_SHM
+#ifdef HAVE_SHM
 						if (shm_attached) {
 							XShmPutImage(display, w, gc, image, 0, (y - r) * magstep,
 							             (256 * magstep - width) / -2,
@@ -1102,7 +1102,7 @@ UpdateDisplayX11(void)
 			}
 			if (r) {
 				r0 += r;
-#if HAVE_SHM
+#ifdef HAVE_SHM
 				if (shm_attached) {
 					XShmPutImage(display, w, gc, image, 0, (y - r) * magstep,
 					             (256 * magstep - width) / -2,
@@ -1118,7 +1118,7 @@ UpdateDisplayX11(void)
 					          256 * magstep, r * magstep);
 				}
 			} if (r0) {
-#if HAVE_SHM
+#ifdef HAVE_SHM
 				if (shm_attached) {
 					/* hang the event loop until we get a ShmCompletion */
 					ev.type = -1;
@@ -1191,7 +1191,7 @@ UpdateDisplayX11(void)
 				XExposeEvent *xev = (XExposeEvent *)&ev;
 
 				if (!xev->count) {
-#if HAVE_SHM
+#ifdef HAVE_SHM
 					if (shm_attached) {
 						XShmPutImage(display, w, gc, image, 0, 0,
 						             (256 * magstep - width) / -2,

@@ -80,7 +80,7 @@ static ggi_color colormapGGI[27];
 static void
 InitScreenshotGGI(void)
 {
-#if HAVE_PPM
+#ifdef HAVE_PPM
 	int                   ppm_argc = 1;
 	char                  *ppm_argv[] = {
 		PACKAGE_NAME

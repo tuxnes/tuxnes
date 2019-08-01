@@ -325,7 +325,7 @@ unrom(int addr, int val)
 {
 	val &= 0x0f;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -354,7 +354,7 @@ cnrom(int addr, int val)
 {
 	val &= 0xff;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -431,7 +431,7 @@ mmc3(int addr, int val)
 
 	val &= 0xff;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -578,7 +578,7 @@ mmc5(int addr, int val)
 {
 	val &= 0xff;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("address = %04X, value = %02X\n", addr, val);
 	}
@@ -949,7 +949,7 @@ clrdrms(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -999,7 +999,7 @@ m100in1(int addr, int val)
 /*	static int locswap; */
 
 	val &= 0xff;
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1087,7 +1087,7 @@ namcot106(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1177,7 +1177,7 @@ vrc2_a(int addr, int val)
 
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1212,7 +1212,7 @@ vrc2_a(int addr, int val)
 	case 0xB002:
 		reg0000 |= val << 4;
 		memcpy(VRAM + 0x0000, VROM_BASE + (reg0000 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x0000\n", reg0000 >> 1);
 #endif
 		break;
@@ -1223,7 +1223,7 @@ vrc2_a(int addr, int val)
 	case 0xB003:
 		reg0400 |= val << 4;
 		memcpy(VRAM + 0x0400, VROM_BASE + (reg0400 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x0400\n", reg0400 >> 1);
 #endif
 		break;
@@ -1234,7 +1234,7 @@ vrc2_a(int addr, int val)
 	case 0xC002:
 		reg0800 |= val << 4;
 		memcpy(VRAM + 0x0800, VROM_BASE + (reg0800 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x0800\n", reg0800 >> 1);
 #endif
 		break;
@@ -1245,7 +1245,7 @@ vrc2_a(int addr, int val)
 	case 0xC003:
 		reg0C00 |= val << 4;
 		memcpy(VRAM + 0x0C00, VROM_BASE + (reg0C00 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x0C00\n", reg0C00 >> 1);
 #endif
 		break;
@@ -1256,7 +1256,7 @@ vrc2_a(int addr, int val)
 	case 0xD002:
 		reg1000 |= val << 4;
 		memcpy(VRAM + 0x1000, VROM_BASE + (reg1000 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x1000\n", reg1000 >> 1);
 #endif
 		break;
@@ -1267,7 +1267,7 @@ vrc2_a(int addr, int val)
 	case 0xD003:
 		reg1400 |= val << 4;
 		memcpy(VRAM + 0x1400, VROM_BASE + (reg1400 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x1400\n", reg1400 >> 1);
 #endif
 		break;
@@ -1278,7 +1278,7 @@ vrc2_a(int addr, int val)
 	case 0xE002:
 		reg1800 |= val << 4;
 		memcpy(VRAM + 0x1800, VROM_BASE + (reg1800 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x1800\n", reg1800 >> 1);
 #endif
 		break;
@@ -1289,7 +1289,7 @@ vrc2_a(int addr, int val)
 	case 0xE003:
 		reg1C00 |= val << 4;
 		memcpy(VRAM + 0x1C00, VROM_BASE + (reg1C00 >> 1) * 1024, 1024);
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		printf("VROM page 0x%02X loaded at 0x1C00\n", reg1C00 >> 1);
 #endif
 		break;
@@ -1491,7 +1491,7 @@ taito_tc0190(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1555,7 +1555,7 @@ void tengen_rambo1(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1653,7 +1653,7 @@ sunsoft4(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1693,7 +1693,7 @@ sunsoft4(int addr, int val)
 		}
 		break;
 	case 0xF000:
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 		if (verbose) {
 			printf("addr = %04X, val = %02X\n", addr, val);
 		}
@@ -1785,7 +1785,7 @@ camerica(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1818,7 +1818,7 @@ void irem_74hc161_32(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
@@ -1873,7 +1873,7 @@ init_supervision(void)
 
 void supervision(int addr, int val)
 {
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 /*	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	} */
@@ -1912,7 +1912,7 @@ void nina7(int addr, int val)
 {
 	val &= 0xFF;
 
-#if DEBUG_MAPPER
+#ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
 	}
