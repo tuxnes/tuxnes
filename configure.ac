@@ -56,7 +56,6 @@ AC_ARG_WITH([w],
 AC_PATH_XTRA
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_HEADER_TIME
 AC_CHECK_HEADERS([fcntl.h stddef.h sys/ioctl.h sys/time.h unistd.h])
 AC_CHECK_HEADERS([features.h linux/joystick.h linux/soundcard.h sys/soundcard.h])
 AC_CHECK_HEADERS([machine/endian.h sys/endian.h endian.h],[break])
