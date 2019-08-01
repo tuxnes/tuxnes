@@ -804,9 +804,7 @@ UpdateDisplayGGI(void)
 	frame++;
 	if (halfspeed)
 		timeframe >>= 1;
-	if (doublespeed == 2)
-		timeframe <<= 1;
-	else if (doublespeed > 2)
+	else if (doublespeed)
 		timeframe *= doublespeed;
 	if (desync)
 		frame = timeframe;
@@ -934,9 +932,7 @@ UpdateDisplayGGI(void)
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
 	if (halfspeed)
 		timeframe >>= 1;
-	if (doublespeed == 2)
-		timeframe <<= 1;
-	else if (doublespeed > 2)
+	else if (doublespeed)
 		timeframe *= doublespeed;
 	if (frame >= timeframe || frame % 20 == 0)
 		frameskip = 0;
