@@ -87,20 +87,15 @@ struct Renderer renderers[] = {
 }, *renderer = 0;
 
 struct RendererConfig renderer_config = {
-	/* int     inroot */
-	0,
-	/* char    *geometry */
-	0,
-	/* char    *display_id */
-	0
+	.inroot = 0,
+	.geometry = NULL,
+	.display_id = NULL,
 };
 
 /* global renderer data */
 struct RendererData renderer_data = {
-	/* int     basetime */
-	0,
-	/* int     pause_display */
-	0
+	.basetime = 0,
+	.pause_display = 0,
 };
 
 int             indexedcolor = 1;

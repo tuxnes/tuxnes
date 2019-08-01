@@ -139,16 +139,11 @@ static char     shift_register15(unsigned char);
 
 /* global sound parameters */
 struct SoundConfig sound_config = {
-	/* char *audiofile */
-	0,
-	/* int        audiorate */
-	44100,
-	/* int        audiostereo */
-	0,
-	/* float        max_sound_delay */
-	0.33,
-	/* int        reverb */
-	0,
+	.audiofile = NULL,
+	.audiorate = 44100,
+	.audiostereo = 0,
+	.max_sound_delay = 0.33,
+	.reverb = 0,
 };
 
 /* the currently selected sample format */
