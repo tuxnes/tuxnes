@@ -958,8 +958,8 @@ loadpal(char *palfile)
 			}
 		} else {
 			/* handler for Nesticle-style raw palette files */
-			if (count) memcpy((char *)palette, buf, count);
-			if ((pens = read(fd, (char *)palette + count, 192 - count) / 3) < 0) {
+			if (count) memcpy(palette, buf, count);
+			if ((pens = read(fd, palette + count, 192 - count) / 3) < 0) {
 				perror(palfile);
 				free(palfile);
 				return;
@@ -1675,8 +1675,8 @@ main(int argc, char **argv)
 				new_palette[pen] = (palremap[pen] <= 64)
 				  ? NES_palette[palremap[pen]]
 				  : NES_palette[pen];
-			memcpy((void *)NES_palette,
-			       (void *)new_palette,
+			memcpy(NES_palette,
+			       new_palette,
 			       64 * sizeof *NES_palette);
 			free(new_palette);
 		}

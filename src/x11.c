@@ -679,11 +679,11 @@ InitDisplayX11(int argc, char **argv)
 			if ((bpp == 8) && (f == 0) && (bytes_per_line == 256)) {
 				xdfb[f] = xfb;
 			} else {
-				if (!(xdfb[f] = malloc((size_t)256 * 240))) {
+				if (!(xdfb[f] = malloc(256 * 240))) {
 					perror("malloc");
 					exit(EXIT_FAILURE);
 				}
-				memset((void *)xdfb[f], 64, (size_t)256 * 240);
+				memset(xdfb[f], 64, 256 * 240);
 			}
 		}
 		xdfb_frame = 0;
@@ -1032,9 +1032,9 @@ UpdateDisplayX11(void)
 				/* Obviously, that only works well for some programs... */
 				for (y = 0; y < 240; y++)
 					if (virgin
-					 || memcmp((void *)fb + (y << 8),
-					           (void *)xdfb[next_frame] + (y << 8),
-					           (size_t)256)) {
+					 || memcmp(fb + (y << 8),
+					           xdfb[next_frame] + (y << 8),
+					           256)) {
 						if ((bpp != 8) || (magstep > 1)) {
 							for (int x = 0; x < 256; x++) {
 								int c = fb[(y << 8) + x];
@@ -1070,9 +1070,9 @@ UpdateDisplayX11(void)
 							}
 						}
 						else if (xdfb_frame || (bytes_per_line != 256)) {
-							memcpy((void *)xfb + y * bytes_per_line,
-							       (void *)xdfb[xdfb_frame] + (y << 8),
-							       (size_t)256);
+							memcpy(xfb + y * bytes_per_line,
+							       xdfb[xdfb_frame] + (y << 8),
+							       256);
 						}
 						r++;
 					} else if (r) {

@@ -622,7 +622,7 @@ InitDisplayW(int argc, char **argv)
 	bpu = bitmapW->unitsize;
 	bytes_per_line = bpu * bitmapW->upl;
 
-	rfb = (fb = (char *) bitmapW->data);
+	rfb = fb = (char *)bitmapW->data;
 	InitScreenshotW();
 	fbinit();
 	w_setForegroundColor(winW, blackpixel);

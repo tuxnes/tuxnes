@@ -139,7 +139,7 @@ input(int addr)
 			vram_read = VRAM[VRAMPTR - 0x400];
 		else
 			vram_read = VRAM[VRAMPTR];
-		VRAMPTR += 1 << (((*((unsigned char *)REG1) & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
+		VRAMPTR += 1 << (((*(unsigned char *)REG1 & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
 		if (VRAMPTR > 0x3FFF)
 			VRAMPTR &= 0x3fff;
 		/*printf("VRAM Read: %4x=%2x (scan %d)\n", VRAMPTR, INRET, CLOCK); */
@@ -337,8 +337,8 @@ output(int addr, int val)
 		VRAMPTR &= 0x3fff;
 		/*mmc2_latch(VRAMPTR); */
 		/* For debugging */
-		/*if(CLOCK<VBL&&(RAM[0x2001]&8)) printf("vram write during refresh! "); */
-		/*printf("VRAM: %4x=%2x (+%d) scan %d\n", VRAMPTR, val, 1<<(((*((unsigned char *)REG1)&4)>>2)*5), CLOCK); */
+		/*if (CLOCK < VBL && (RAM[0x2001] & 8)) printf("vram write during refresh! "); */
+		/*printf("VRAM: %4x=%2x (+%d) scan %d\n", VRAMPTR, val, 1 << (((*(unsigned char *)REG1 & 4) >> 2) * 5), CLOCK); */
 		if ((VRAMPTR & 0x3f0f) == 0x3f00)
 			VRAM[0x3f00] =
 			VRAM[0x3f10] = (unsigned char)val;      /* Background color is mirrored between palettes */
@@ -378,7 +378,7 @@ output(int addr, int val)
 		} else
 			VRAM[VRAMPTR] = (unsigned char)val;
 
-		VRAMPTR += 1 << (((*((unsigned char *)REG1) & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
+		VRAMPTR += 1 << (((*(unsigned char *)REG1 & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
 		if (VRAMPTR > 0x3FFF) {
 			/* printf("help - vramptr >0x3fff!\n"); exit(EXIT_FAILURE); */
 			VRAMPTR &= 0x3fff;
@@ -456,7 +456,7 @@ donmi(void)
 	}
 
 	/* Is an NMI to be generated?  Return 1 if so. */
-	return ((*((unsigned char *)(REG1))) & 0x80) != 0;
+	return (*(unsigned char *)REG1 & 0x80) != 0;
 }
 
 /*
@@ -474,6 +474,6 @@ trace(int s)
 	 */
 	unsigned int x;
 	char hex[17] = "0123456789ABCDEF";
-	x = ((int *)(&s))[4];
+	x = ((int *)&s)[4];
 	printf("%c%c%c%c\n", hex[x >> 12], hex[(x & 0xf00) >> 8], hex[(x & 0xf0) >> 4], hex[x & 0xf]);
 }
