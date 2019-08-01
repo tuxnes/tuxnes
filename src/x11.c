@@ -1158,7 +1158,7 @@ UpdateDisplayX11(void)
 				sleep = desync = 1;
 #endif
 			if (ev.type == MapNotify) {
-				XExposeEvent *xev = (XExposeEvent *) &ev;
+				XExposeEvent *xev = (XExposeEvent *)&ev;
 
 				xev->type = Expose;
 				xev->count = 0;
@@ -1173,7 +1173,7 @@ UpdateDisplayX11(void)
 				HandleKeyboardX11(ev);
 			}
 			if (ev.type == KeymapNotify) {
-				memcpy(keystate, ((XKeymapEvent *) & ev)->key_vector, 32);
+				memcpy(keystate, ((XKeymapEvent *)&ev)->key_vector, 32);
 				controller[0] = controller[1] = 0;
 				controllerd[0] = controllerd[1] = 0;
 			}
@@ -1190,7 +1190,7 @@ UpdateDisplayX11(void)
 				}
 			}
 			if (ev.type == Expose) {
-				XExposeEvent *xev = (XExposeEvent *) &ev;
+				XExposeEvent *xev = (XExposeEvent *)&ev;
 
 				if (!xev->count) {
 #if HAVE_SHM
@@ -1341,7 +1341,7 @@ UpdateDisplayOldX11(void)
 				HandleKeyboardX11(ev);
 			}
 			if (ev.type == KeymapNotify) {
-				memcpy(keystate, ((XKeymapEvent *) & ev)->key_vector, 32);
+				memcpy(keystate, ((XKeymapEvent *)&ev)->key_vector, 32);
 				controller[0] = controller[1] = 0;
 				controllerd[0] = controllerd[1] = 0;
 			}

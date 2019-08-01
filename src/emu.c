@@ -630,8 +630,7 @@ help_version(int terse)
 	       "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
 	       "\n"
 	       "Written by  The TuxNES Team; see the AUTHORS file.\n"
-	       "Based on Nestra v0.66 by Quor\n"
-	       );
+	       "Based on Nestra v0.66 by Quor\n");
 }
 
 /****************************************************************************/
@@ -953,9 +952,9 @@ loadpal(char *palfile)
 						break;
 				}
 				sscanf(buf, "%x,%x,%x", &r, &g, &b);
-				palette [pens * 3] = r;
-				palette [pens * 3 + 1] = g;
-				palette [pens * 3 + 2] = b;
+				palette[pens * 3] = r;
+				palette[pens * 3 + 1] = g;
+				palette[pens * 3 + 2] = b;
 			}
 		} else {
 			/* handler for Nesticle-style raw palette files */

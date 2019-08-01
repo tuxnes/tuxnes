@@ -1124,7 +1124,7 @@ UpdateAudio(void) /* called freq times a sec */
 
 
 		if (bytes_per_sample == 2) {
-			*((short*)(audio_buffer + sample)) = (samp_temp / 5);
+			*((short *)(audio_buffer + sample)) = (samp_temp / 5);
 #if BYTE_ORDER == BIG_ENDIAN
 			/* swap order */
 			if (sample_format_number == AFMT_U16_BE

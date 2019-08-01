@@ -575,8 +575,7 @@ InitDisplayGGI(int argc, char **argv)
 			        "There is probably a bug in your GGI display driver.\n"
 			        "As a permanent solution, consider fixing libggi and\n"
 			        "submitting your fix back to the GGI maintainers.\n"
-			        "======================================================\n"
-			        );
+			        "======================================================\n");
 			indexedcolor = 0;
 		}
 		if (scanlines && (scanlines != 100)) {
