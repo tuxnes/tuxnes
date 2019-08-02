@@ -930,64 +930,53 @@ HandleKeyboardX11(XEvent ev)
 		case XK_P:
 		case XK_p:
 			renderer_data.pause_display = !renderer_data.pause_display;
-			desync = 1;
 			break;
 		case XK_grave:
-			desync = 1;
 			halfspeed = 1;
 			doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_1:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_2:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 2;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_3:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 3;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_4:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 4;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_5:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 5;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_6:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 6;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_7:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 7;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_8:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 8;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_0:
-			desync = 1;
 			renderer_data.pause_display = 1;
 			break;
 		}
@@ -1017,11 +1006,13 @@ UpdateDisplayX11(void)
 		timeframe >>= 1;
 	else if (doublespeed)
 		timeframe *= doublespeed;
-	if (desync)
+	if (desync) {
+		desync = 0;
 		frame = timeframe;
-	desync = 0;
-	if (frame < timeframe - 20 && frame % 20 == 0)
-		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
+	} else if (frame < timeframe - 20 && frame % 20 == 0) {
+		/* If we're more than 20 frames behind, might as well stop counting. */
+		desync = 1;
+	}
 
 	if (!nodisplay) {
 		drawimage(PBL);
@@ -1163,7 +1154,7 @@ UpdateDisplayX11(void)
 			if (ev.type == FocusIn)
 				renderer_data.pause_display = 0;
 			if (ev.type == FocusOut)
-				renderer_data.pause_display = desync = 1;
+				renderer_data.pause_display = 1;
 #endif
 			if (ev.type == MapNotify) {
 				XExposeEvent *xev = (XExposeEvent *)&ev;
@@ -1237,6 +1228,11 @@ UpdateDisplayX11(void)
 			XScreenSaverSuspend(display, 0);
 		}
 #endif
+
+		if (renderer_data.pause_display) {
+			usleep(16666);
+			desync = 1;
+		}
 	} while (renderer_data.pause_display);
 
 #ifdef HAVE_SCRNSAVER
@@ -1302,11 +1298,13 @@ UpdateDisplayOldX11(void)
 		timeframe >>= 1;
 	else if (doublespeed)
 		timeframe *= doublespeed;
-	if (desync)
+	if (desync) {
+		desync = 0;
 		frame = timeframe;
-	desync = 0;
-	if (frame < timeframe - 20 && frame % 20 == 0)
-		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
+	} else if (frame < timeframe - 20 && frame % 20 == 0) {
+		/* If we're more than 20 frames behind, might as well stop counting. */
+		desync = 1;
+	}
 
 	if (!nodisplay) {
 		if (frame >= timeframe || frame % 20 == 0) {
@@ -1346,7 +1344,7 @@ UpdateDisplayOldX11(void)
 			if (ev.type == FocusIn)
 				renderer_data.pause_display = 0;
 			if (ev.type == FocusOut)
-				renderer_data.pause_display = desync = 1;
+				renderer_data.pause_display = 1;
 #endif
 			if (ev.type == MapNotify) {
 				nodisplay = 0;
@@ -1394,6 +1392,11 @@ UpdateDisplayOldX11(void)
 			XScreenSaverSuspend(display, 0);
 		}
 #endif
+
+		if (renderer_data.pause_display) {
+			usleep(16666);
+			desync = 1;
+		}
 	} while (renderer_data.pause_display);
 
 #ifdef HAVE_SCRNSAVER
@@ -1951,7 +1954,7 @@ UpdateTilesOldX11(void)
 				}
 			}
 		}
-		/*desync=1; */
+		/*desync = 1;*/
 	}
 }
 

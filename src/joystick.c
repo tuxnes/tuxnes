@@ -244,7 +244,6 @@ stick_read(int stick)
 				if (nes_button == PAUSEDISPLAY) {
 					if (js.value) {
 						renderer_data.pause_display = !renderer_data.pause_display;
-						desync = 1;
 					}
 				} else {
 					ctl_button(stick, nes_button, js.value);

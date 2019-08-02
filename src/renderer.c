@@ -175,7 +175,11 @@ InitDisplayAuto(int argc, char **argv)
 int
 InitDisplayNone(int argc, char **argv)
 {
+	struct timeval time;
+
 	fbinit();
+	gettimeofday(&time, NULL);
+	renderer_data.basetime = time.tv_sec;
 	return 0;
 }
 
@@ -198,11 +202,13 @@ UpdateDisplayNone(void)
 		timeframe >>= 1;
 	else if (doublespeed)
 		timeframe *= doublespeed;
-	if (desync)
+	if (desync) {
+		desync = 0;
 		frame = timeframe;
-	desync = 0;
-	if (frame < timeframe - 20 && frame % 20 == 0)
-		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
+	} else if (frame < timeframe - 20 && frame % 20 == 0) {
+		/* If we're more than 20 frames behind, might as well stop counting. */
+		desync = 1;
+	}
 
 	/* Slow down if we're getting ahead */
 	if (frame > timeframe + 1 && frameskip == 0) {
@@ -213,6 +219,11 @@ UpdateDisplayNone(void)
 	do {
 		/* Handle joystick input */
 		js_handle_input();
+
+		if (renderer_data.pause_display) {
+			usleep(16666);
+			desync = 1;
+		}
 	} while (renderer_data.pause_display);
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */

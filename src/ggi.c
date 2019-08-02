@@ -415,64 +415,53 @@ HandleKeyboardGGI(ggi_event ev)
 		case GIIUC_P:
 		case GIIUC_p:
 			renderer_data.pause_display = !renderer_data.pause_display;
-			desync = 1;
 			break;
 		case GIIUC_Grave:
-			desync = 1;
 			halfspeed = 1;
 			doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_1:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_2:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 2;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_3:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 3;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_4:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 4;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_5:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 5;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_6:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 6;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_7:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 7;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_8:
-			desync = 1;
 			halfspeed = 0;
 			doublespeed = 8;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_0:
-			desync = 1;
 			renderer_data.pause_display = 1;
 			break;
 		}
@@ -806,11 +795,13 @@ UpdateDisplayGGI(void)
 		timeframe >>= 1;
 	else if (doublespeed)
 		timeframe *= doublespeed;
-	if (desync)
+	if (desync) {
+		desync = 0;
 		frame = timeframe;
-	desync = 0;
-	if (frame < timeframe - 20 && frame % 20 == 0)
-		desync = 1;                 /* If we're more than 20 frames behind, might as well stop counting. */
+	} else if (frame < timeframe - 20 && frame % 20 == 0) {
+		/* If we're more than 20 frames behind, might as well stop counting. */
+		desync = 1;
+	}
 
 	if (!nodisplay) {
 		drawimage(PBL);
@@ -924,6 +915,11 @@ UpdateDisplayGGI(void)
 
 			ggiEventRead(visualGGI, &ev, emKeyPress | emKeyRelease);
 			HandleKeyboardGGI(ev);
+		}
+
+		if (renderer_data.pause_display) {
+			usleep(16666);
+			desync = 1;
 		}
 	} while (renderer_data.pause_display);
 
