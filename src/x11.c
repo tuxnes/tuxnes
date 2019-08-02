@@ -995,7 +995,6 @@ UpdateDisplayX11(void)
 	struct timeval time;
 	static unsigned int frame;
 	unsigned int timeframe;
-	static int sleep = 0;         /* Initially we start with the emulation running.  If you want to wait until the window receives input focus, change this. */
 	static int nodisplay = 0;
 
 	/* do audio update */
@@ -1154,9 +1153,9 @@ UpdateDisplayX11(void)
 			/* if you'd like defocusing to pause emulation, define this */
 #ifdef PAUSE_ON_DEFOCUS
 			if (ev.type == FocusIn)
-				sleep = 0;
+				renderer_data.pause_display = 0;
 			if (ev.type == FocusOut)
-				sleep = desync = 1;
+				renderer_data.pause_display = desync = 1;
 #endif
 			if (ev.type == MapNotify) {
 				XExposeEvent *xev = (XExposeEvent *)&ev;
@@ -1214,7 +1213,7 @@ UpdateDisplayX11(void)
 					}
 				}
 			}
-			if ((sleep || renderer_data.pause_display) && needsredraw) {
+			if (renderer_data.pause_display && needsredraw) {
 				XCopyArea(display, layout, w, gc,
 				          0, 0,
 				          256 * magstep, 240 * magstep,
@@ -1223,7 +1222,7 @@ UpdateDisplayX11(void)
 				needsredraw = 0;
 			}
 		}
-	} while (sleep || renderer_data.pause_display);
+	} while (renderer_data.pause_display);
 
 	needsredraw = 0;
 	redrawbackground = 0;
@@ -1264,7 +1263,6 @@ UpdateDisplayOldX11(void)
 	struct timeval time;
 	static unsigned int frame;
 	unsigned int timeframe;
-	static int sleep = 0;         /* Initially we start with the emulation running.  If you want to wait until the window receives input focus, change this. */
 	static int nodisplay = 0;
 
 	/* do audio update */
@@ -1321,9 +1319,9 @@ UpdateDisplayOldX11(void)
 			/* if you'd like defocusing to pause emulation, enable this */
 #ifdef PAUSE_ON_DEFOCUS
 			if (ev.type == FocusIn)
-				sleep = 0;
+				renderer_data.pause_display = 0;
 			if (ev.type == FocusOut)
-				sleep = desync = 1;
+				renderer_data.pause_display = desync = 1;
 #endif
 			if (ev.type == MapNotify) {
 				nodisplay = 0;
@@ -1356,7 +1354,7 @@ UpdateDisplayOldX11(void)
 			}
 			if (ev.type == Expose)
 				needsredraw = 1;
-			if ((sleep || renderer_data.pause_display) && needsredraw) {
+			if (renderer_data.pause_display && needsredraw) {
 				XCopyArea(display, layout, w, gc,
 				          0, 0,
 				          256 * magstep, 240 * magstep,
@@ -1365,7 +1363,7 @@ UpdateDisplayOldX11(void)
 				needsredraw = 0;
 			}
 		}
-	} while (sleep || renderer_data.pause_display);
+	} while (renderer_data.pause_display);
 
 	if (needsredraw) {
 		XCopyArea(display, layout, w, gc,

@@ -95,7 +95,7 @@ struct RendererConfig renderer_config = {
 /* global renderer data */
 struct RendererData renderer_data = {
 	.basetime = 0,
-	.pause_display = 0,
+	.pause_display = 0,  /* Initially we start with the emulation running.  If you want to start paused, change this. */
 };
 
 int             indexedcolor = 1;
