@@ -106,6 +106,11 @@
 #endif
 #endif
 
+#ifdef HAVE_X11_EXTENSIONS_SCRNSAVER_H
+#include <X11/extensions/scrnsaver.h>
+#define HAVE_SCRNSAVER 1
+#endif
+
 #endif /* HAVE_X */
 
 #define ARRAY_LEN(x) (sizeof (x) / sizeof *(x))
@@ -996,6 +1001,9 @@ UpdateDisplayX11(void)
 	static unsigned int frame;
 	unsigned int timeframe;
 	static int nodisplay = 0;
+#ifdef HAVE_SCRNSAVER
+	static int sssuspend = 0;
+#endif
 
 	/* do audio update */
 	UpdateAudio();
@@ -1222,7 +1230,21 @@ UpdateDisplayX11(void)
 				needsredraw = 0;
 			}
 		}
+
+#ifdef HAVE_SCRNSAVER
+		if (renderer_data.pause_display && sssuspend) {
+			sssuspend = 0;
+			XScreenSaverSuspend(display, 0);
+		}
+#endif
 	} while (renderer_data.pause_display);
+
+#ifdef HAVE_SCRNSAVER
+	if (!sssuspend) {
+		sssuspend = 1;
+		XScreenSaverSuspend(display, 1);
+	}
+#endif
 
 	needsredraw = 0;
 	redrawbackground = 0;
@@ -1264,6 +1286,9 @@ UpdateDisplayOldX11(void)
 	static unsigned int frame;
 	unsigned int timeframe;
 	static int nodisplay = 0;
+#ifdef HAVE_SCRNSAVER
+	static int sssuspend = 0;
+#endif
 
 	/* do audio update */
 	UpdateAudio();
@@ -1363,7 +1388,20 @@ UpdateDisplayOldX11(void)
 				needsredraw = 0;
 			}
 		}
+#ifdef HAVE_SCRNSAVER
+		if (renderer_data.pause_display && sssuspend) {
+			sssuspend = 0;
+			XScreenSaverSuspend(display, 0);
+		}
+#endif
 	} while (renderer_data.pause_display);
+
+#ifdef HAVE_SCRNSAVER
+	if (!sssuspend) {
+		sssuspend = 1;
+		XScreenSaverSuspend(display, 1);
+	}
+#endif
 
 	if (needsredraw) {
 		XCopyArea(display, layout, w, gc,
