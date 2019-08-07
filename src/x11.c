@@ -1122,7 +1122,7 @@ UpdateDisplayX11(void)
 					XFlush(display);
 				}
 			}
-			redrawall = needsredraw = 0;
+			renderer_data.redrawall = renderer_data.needsredraw = 0;
 		}
 	}
 
@@ -1155,10 +1155,10 @@ UpdateDisplayX11(void)
 				xev->type = Expose;
 				xev->count = 0;
 				nodisplay = 0;
-				needsredraw = redrawall = 1;
+				renderer_data.needsredraw = renderer_data.redrawall = 1;
 			} else if (ev.type == UnmapNotify) {
 				nodisplay = 1;
-				needsredraw = redrawall = 0;
+				renderer_data.needsredraw = renderer_data.redrawall = 0;
 			}
 			/* Handle keyboard input */
 			if (ev.type == KeyPress || ev.type == KeyRelease) {
@@ -1205,13 +1205,13 @@ UpdateDisplayX11(void)
 					}
 				}
 			}
-			if (renderer_data.pause_display && needsredraw) {
+			if (renderer_data.pause_display && renderer_data.needsredraw) {
 				XCopyArea(display, layout, w, gc,
 				          0, 0,
 				          256 * magstep, 240 * magstep,
 				          (256 * magstep - width) / -2,
 				          (240 * magstep - height) / -2);
-				needsredraw = 0;
+				renderer_data.needsredraw = 0;
 			}
 		}
 
@@ -1235,9 +1235,9 @@ UpdateDisplayX11(void)
 	}
 #endif
 
-	needsredraw = 0;
-	redrawbackground = 0;
-	redrawall = 0;
+	renderer_data.needsredraw = 0;
+	renderer_data.redrawbackground = 0;
+	renderer_data.redrawall = 0;
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
@@ -1338,10 +1338,10 @@ UpdateDisplayOldX11(void)
 #endif
 			if (ev.type == MapNotify) {
 				nodisplay = 0;
-				needsredraw = redrawall = 1;
+				renderer_data.needsredraw = renderer_data.redrawall = 1;
 			} else if (ev.type == UnmapNotify) {
 				nodisplay = 1;
-				needsredraw = redrawall = 0;
+				renderer_data.needsredraw = renderer_data.redrawall = 0;
 			}
 
 			/* Handle keyboard input */
@@ -1366,14 +1366,14 @@ UpdateDisplayOldX11(void)
 				}
 			}
 			if (ev.type == Expose)
-				needsredraw = 1;
-			if (renderer_data.pause_display && needsredraw) {
+				renderer_data.needsredraw = 1;
+			if (renderer_data.pause_display && renderer_data.needsredraw) {
 				XCopyArea(display, layout, w, gc,
 				          0, 0,
 				          256 * magstep, 240 * magstep,
 				          (256 * magstep - width) / -2,
 				          (240 * magstep - height) / -2);
-				needsredraw = 0;
+				renderer_data.needsredraw = 0;
 			}
 		}
 #ifdef HAVE_SCRNSAVER
@@ -1396,7 +1396,7 @@ UpdateDisplayOldX11(void)
 	}
 #endif
 
-	if (needsredraw) {
+	if (renderer_data.needsredraw) {
 		XCopyArea(display, layout, w, gc,
 		          0, 0,
 		          256 * magstep, 240 * magstep,
@@ -1414,9 +1414,9 @@ UpdateDisplayOldX11(void)
 	}
 
 	XFlush(display);
-	needsredraw = 0;
-	redrawbackground = 0;
-	redrawall = 0;
+	renderer_data.needsredraw = 0;
+	renderer_data.redrawbackground = 0;
+	renderer_data.redrawall = 0;
 }
 
 /* Update the background as necessary */
@@ -1694,8 +1694,8 @@ DoBackgroundOldX11(void)
 				cachegroupptr[1] = vramgroupptr[1];
 				cachegroupptr[64] = vramgroupptr[32];
 				cachegroupptr[65] = vramgroupptr[33];
-				redrawbackground = 1;
-				redrawall = 1;
+				renderer_data.redrawbackground = 1;
+				renderer_data.redrawall = 1;
 				displaytilecache[currentcache][(v & ~1) * 32 + (x >> 1)] =
 				  ((cachegroupptr[0] << 24) |
 				   (cachegroupptr[1] << 16) |
@@ -1867,7 +1867,7 @@ UpdateTilesOldX11(void)
 						}
 			}
 			tiledirty[currentcache][x] = 0;
-			tilechanged[x] = redrawbackground = 1;
+			tilechanged[x] = renderer_data.redrawbackground = 1;
 		}
 	}
 
@@ -1956,7 +1956,7 @@ LayoutBackgroundOldX11(void)
 	static int linecache[240];
 
 	if ((!screen_on) || debug_bgoff) {
-		if (redrawbackground == 0)
+		if (!renderer_data.redrawbackground)
 			return;
 		XFillRectangle(display, layout,
 		               solidbggc,
@@ -1970,7 +1970,7 @@ LayoutBackgroundOldX11(void)
 				               256 * magstep, magstep - 1);
 			}
 		}
-		needsredraw = 1;
+		renderer_data.needsredraw = 1;
 		return;
 	} else {
 		currentline = 0;
@@ -1978,7 +1978,7 @@ LayoutBackgroundOldX11(void)
 		if (!renderer_config.indexedcolor)
 			UpdateTileColorsOldX11();
 		DoBackgroundOldX11();
-		if (redrawbackground == 0)
+		if (!renderer_data.redrawbackground)
 			return;
 	}
 
@@ -1989,7 +1989,7 @@ LayoutBackgroundOldX11(void)
 		    && vscroll[y] == vscroll[z]
 		    && z < 240
 		    && (linereg[y] & 0x10) == (linereg[z] & 0x10)
-		    && (redrawall || scanline_diff[y] == scanline_diff[z]))
+		    && (renderer_data.redrawall || scanline_diff[y] == scanline_diff[z]))
 			z++;
 
 		if (y && (linereg[y] & 0x10) != last) {
@@ -2003,9 +2003,9 @@ LayoutBackgroundOldX11(void)
 
 		for (int x = y; x < z; x++)
 			if (linecache[y] != currentcache)
-				redrawall = 1;
+				renderer_data.redrawall = 1;
 
-		if (scanline_diff[y] || redrawall) {
+		if (scanline_diff[y] || renderer_data.redrawall) {
 			for (int x = y; x < z; x++)
 				linecache[y] = currentcache;
 
@@ -2091,7 +2091,7 @@ LayoutBackgroundOldX11(void)
 		}
 		y = z - 1;
 	}
-	needsredraw = 1;
+	renderer_data.needsredraw = 1;
 }
 
 /* Update the colors on the screen if the palette changed */
@@ -2122,8 +2122,8 @@ UpdateColorsX11(void)
 			XSetForeground(display, solidbggc, currentbgcolor);
 			XSetForeground(display, bgcolorgc, currentbgcolor);
 			XSetForeground(display, backgroundgc, currentbgcolor);
-			redrawbackground = 1;
-			needsredraw = 1;
+			renderer_data.redrawbackground = 1;
+			renderer_data.needsredraw = 1;
 		}
 	}
 
@@ -2167,8 +2167,8 @@ UpdateTileColorsOldX11(void)
 
 	if (currentbgcolor != bgcolor[currentcache]) {
 		bgcolor[currentcache] = currentbgcolor;
-		redrawbackground = 1;
-		needsredraw = 1;
+		renderer_data.redrawbackground = 1;
+		renderer_data.needsredraw = 1;
 		if (bgmask_changed[currentcache] || currentcache != current_bgmask) {
 			XSetClipMask(display, backgroundgc, bgmask[currentcache]);
 			bgmask_changed[current_bgmask = currentcache] = 0;
@@ -2185,7 +2185,7 @@ UpdateTileColorsOldX11(void)
 				               512 * magstep, magstep - 1);
 			}
 		}
-		redrawall = 1;
+		renderer_data.redrawall = 1;
 	}
 
 	/* Tile colors */
@@ -2270,22 +2270,22 @@ DrawSpritesOldX11(void)
 	 && (*((long long *)(VRAM + 0x3f10)) != sprite_palette_cache[0]
 	  || *((long long *)(VRAM + 0x3f18)) != sprite_palette_cache[1])) {
 		memcpy(sprite_palette_cache, VRAM + 0x3f10, 16);
-		redrawall = needsredraw = 1;
+		renderer_data.redrawall = renderer_data.needsredraw = 1;
 	}
 
 	/* If any sprite entries have changed since last time, redraw */
 	for (int s = 0; s < 64; s++) {
 		if (spriteram[s * 4] < 240 || spritecache[s * 4] < 240) {
 			if (((int *)spriteram)[s] != ((int *)spritecache)[s]) {
-				redrawall = needsredraw = 1;
+				renderer_data.redrawall = renderer_data.needsredraw = 1;
 				((int *)spritecache)[s] = ((int *)spriteram)[s];
 			}
 		}
 	}
 
-	if (redrawbackground || redrawall) {
+	if (renderer_data.redrawbackground || renderer_data.redrawall) {
 		for (int y = 1; y < 240; y++) {
-			if (redrawall || scanline_diff[y]) {
+			if (renderer_data.redrawall || scanline_diff[y]) {
 				memset(linebuffer, 0, 256);      /* Clear buffer for this scanline */
 				baseaddr = ((linereg[y] & 0x08) << 9);    /* 0 or 0x1000 */
 				for (int s = 63; s >= 0; s--) {
@@ -2377,12 +2377,12 @@ DiffUpdateOldX11(void)
 	int spritesize = 8 << ((RAM[0x2000] & 0x20) >> 5);    /* 8 or 16 */
 
 	if (old_screen_on != screen_on)
-		redrawall = redrawbackground = 1;
+		renderer_data.redrawall = renderer_data.redrawbackground = 1;
 	old_screen_on = screen_on;
 
 	if (screen_on) {
 		if (old_sprites_on != sprites_on)
-			redrawall = needsredraw = 1;
+			renderer_data.redrawall = renderer_data.needsredraw = 1;
 		old_sprites_on = sprites_on;
 	}
 
@@ -2394,10 +2394,10 @@ DiffUpdateOldX11(void)
 	for (unsigned int x = 0; x < 240; x++) {
 		scanline_diff[x] = 0;
 		if (oldhscroll[x] != hscroll[x])
-			redrawbackground = scanline_diff[x] = 1;
+			renderer_data.redrawbackground = scanline_diff[x] = 1;
 		oldhscroll[x] = hscroll[x];
 		if (oldvscroll[x] != vscroll[x])
-			redrawbackground = scanline_diff[x] = 1;
+			renderer_data.redrawbackground = scanline_diff[x] = 1;
 		oldvscroll[x] = vscroll[x];
 		if (osmirror) {
 			tileline_begin[((vscroll[x] + x) % 240) >> 3] = 0;
@@ -2413,7 +2413,7 @@ DiffUpdateOldX11(void)
 				tileline_end[(((vscroll[x] + x) % 480) >> 3) & 62] = hscroll[x] + 256;
 		}
 		if (oldlinereg[x] != linereg[x])
-			redrawbackground = scanline_diff[x] = 1;
+			renderer_data.redrawbackground = scanline_diff[x] = 1;
 		oldlinereg[x] = linereg[x];
 	}
 
@@ -2424,7 +2424,7 @@ DiffUpdateOldX11(void)
 	for (unsigned int s = 0; s < 64; s++) {
 		if (spritecache[s * 4] < 240) {
 			if (((int *)spriteram)[s] != ((int *)spritecache)[s]) {
-				redrawbackground = 1;
+				renderer_data.redrawbackground = 1;
 				for (unsigned int x = 1; x <= spritesize && x + spritecache[s * 4] < 240; x++)
 					scanline_diff[x + spritecache[s * 4]] = 1;
 			}

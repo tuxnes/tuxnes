@@ -65,9 +65,12 @@ extern struct RendererConfig {
 extern struct RendererData {
 	int        basetime;
 	int        pause_display;
-	int        desync;
 	int        halfspeed;
 	int        doublespeed;
+	int        desync;
+	int        needsredraw;            /* Refresh screen display */
+	int        redrawbackground;       /* Redraw tile background */
+	int        redrawall;              /* Redraw all scanlines */
 } renderer_data;
 
 /* only 1x1 or 2x2 integer scaling is permitted for now */
@@ -77,9 +80,6 @@ extern struct RendererData {
 
 extern int              magstep;
 extern unsigned int     currentbgcolor, oldbgcolor;
-extern unsigned char    needsredraw;            /* Refresh screen display */
-extern unsigned char    redrawbackground;       /* Redraw tile background */
-extern unsigned char    redrawall;              /* Redraw all scanlines */
 extern unsigned char    palette_cache[tilecachedepth][32];
 
 #endif

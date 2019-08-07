@@ -96,16 +96,16 @@ struct RendererConfig renderer_config = {
 struct RendererData renderer_data = {
 	.basetime = 0,
 	.pause_display = 0,  /* Initially we start with the emulation running.  If you want to start paused, change this. */
-	.desync = 1,
 	.halfspeed = 0,
 	.doublespeed = 0,
+	.desync = 1,
+	.needsredraw = 1,        /* Refresh screen display */
+	.redrawbackground = 1,   /* Redraw tile background */
+	.redrawall = 1,          /* Redraw all scanlines */
 };
 
 int             magstep = 0;
 unsigned int    currentbgcolor, oldbgcolor;
-unsigned char   needsredraw = 1;        /* Refresh screen display */
-unsigned char   redrawbackground = 1;   /* Redraw tile background */
-unsigned char   redrawall = 1;          /* Redraw all scanlines */
 unsigned char   palette_cache[tilecachedepth][32];
 
 int

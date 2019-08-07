@@ -735,8 +735,8 @@ UpdateColorsGGI(void)
 		if (scanlines && (scanlines != 100))
 			palette2[24] = palette2GGI[VRAM[0x3f00] & 63];
 		if (oldbgcolor != currentbgcolor /*||currentbgcolor!=bgcolor[currentcache] */) {
-			redrawbackground = 1;
-			needsredraw = 1;
+			renderer_data.redrawbackground = 1;
+			renderer_data.needsredraw = 1;
 		}
 	}
 
@@ -882,13 +882,13 @@ UpdateDisplayGGI(void)
 					frameno = (frameno + 1) % modeGGI.frames;
 				}
 			}
-			redrawall = needsredraw = 0;
+			renderer_data.redrawall = renderer_data.needsredraw = 0;
 		}
 	}
 
-	needsredraw = 0;
-	redrawbackground = 0;
-	redrawall = 0;
+	renderer_data.needsredraw = 0;
+	renderer_data.redrawbackground = 0;
+	renderer_data.redrawall = 0;
 
 	/* Slow down if we're getting ahead */
 	if (frame > timeframe + 1 && frameskip == 0) {

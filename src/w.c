@@ -664,8 +664,8 @@ UpdateColorsW(void)
 		if (scanlines && (scanlines != 100))
 			palette2[24] = palette2W[VRAM[0x3f00] & 63];
 		if (oldbgcolor != currentbgcolor) {
-			redrawbackground = 1;
-			needsredraw = 1;
+			renderer_data.redrawbackground = 1;
+			renderer_data.needsredraw = 1;
 		}
 	}
 
@@ -739,13 +739,13 @@ UpdateDisplayW(void)
 			           (256 * magstep - width) / -2,
 			           (240 * magstep - height) / -2);
 			w_flush();
-			redrawall = needsredraw = 0;
+			renderer_data.redrawall = renderer_data.needsredraw = 0;
 		}
 	}
 
-	needsredraw = 0;
-	redrawbackground = 0;
-	redrawall = 0;
+	renderer_data.needsredraw = 0;
+	renderer_data.redrawbackground = 0;
+	renderer_data.redrawall = 0;
 
 	/* Slow down if we're getting ahead */
 	if (frame > timeframe + 1 && frameskip == 0) {
@@ -767,7 +767,7 @@ UpdateDisplayW(void)
 				height = ev->w;
 				w_resize(winW, width, height);
 				w_pbox(winW, 0, 0, width, height);
-				needsredraw = redrawall = 1;
+				renderer_data.needsredraw = renderer_data.redrawall = 1;
 				break;
 			case EVENT_KEY:
 			case EVENT_KRELEASE:
@@ -788,7 +788,7 @@ UpdateDisplayW(void)
 						w_close(winW);
 						w_open(iconW, x0, y0);
 						nodisplay = 1;
-						needsredraw = redrawall = 0;
+						renderer_data.needsredraw = renderer_data.redrawall = 0;
 						break;
 					}
 					break;
@@ -800,7 +800,7 @@ UpdateDisplayW(void)
 					w_close(iconW);
 					w_open(winW, x0, y0);
 					nodisplay = 0;
-					needsredraw = redrawall = 1;
+					renderer_data.needsredraw = renderer_data.redrawall = 1;
 				}
 				break;
 			}
