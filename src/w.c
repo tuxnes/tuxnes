@@ -338,9 +338,6 @@ InitDisplayW(int argc, char **argv)
 	rgb_t color;
 	struct timeval time;
 
-	if (magstep < 1) {
-		magstep = 1;
-	}
 	if (magstep > maxsize) {
 		fprintf(stderr, "Warning: Enlargement factor %d is too large!\n",
 		        magstep);

@@ -1331,6 +1331,9 @@ main(int argc, char **argv)
 	if ((scanlines != 100) && !magstep) {
 		magstep = 2;
 	}
+	if (magstep < 1) {
+		magstep = 1;
+	}
 
 	if ((argc - optind) != 1) {
 		fprintf(stderr, "%s: too %s arguments\n", *argv, (argc > optind) ? "many" : "few");

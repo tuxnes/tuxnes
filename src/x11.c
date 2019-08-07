@@ -322,6 +322,12 @@ InitDisplayX11(int argc, char **argv)
 	};
 	XTextProperty name[2];
 
+	if ((magstep > maxsize) && !(renderer->_flags & RENDERER_DIFF)) {
+		fprintf(stderr,
+		        "[%s] Enlargement factor %d is too large!\n",
+		        renderer->name, magstep);
+		magstep = maxsize;
+	}
 	display = XOpenDisplay(renderer_config.display_id);
 	oldhandler = XSetErrorHandler(handler);
 	if (display == NULL) {
@@ -450,15 +456,6 @@ InitDisplayX11(int argc, char **argv)
 				}
 				palette2X11[x] = color.pixel;
 			}
-	}
-	if (magstep < 1) {
-		magstep = 1;
-	}
-	if ((magstep > maxsize) && !(renderer->_flags & RENDERER_DIFF)) {
-		fprintf(stderr,
-		        "[%s] Enlargement factor %d is too large!\n",
-		        renderer->name, magstep);
-		magstep = maxsize;
 	}
 	width = 256 * magstep;
 	height = 240 * magstep;

@@ -472,9 +472,6 @@ InitDisplayGGI(int argc, char **argv)
 	ggi_color color;
 	struct timeval time;
 
-	if (magstep < 1) {
-		magstep = 1;
-	}
 	if (magstep > maxsize) {
 		fprintf(stderr, "Warning: Enlargement factor %d is too large!\n",
 		        magstep);
