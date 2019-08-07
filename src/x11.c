@@ -382,7 +382,7 @@ InitDisplayX11(int argc, char **argv)
 		        renderer->name);
 		scanlines = 0;
 	}
-	if ((visual->class & 1) && indexedcolor) {
+	if ((visual->class & 1) && renderer_config.indexedcolor) {
 		if (XAllocColorCells(display, colormap, 0, 0, 0, colortableX11, 25) == 0) {
 			fprintf(stderr, "%s: [%s] Can't allocate colors!\n",
 			        *argv, renderer->name);
@@ -409,7 +409,7 @@ InitDisplayX11(int argc, char **argv)
 			scanlines = 0;
 		}
 	} else {
-		indexedcolor = 0;
+		renderer_config.indexedcolor = 0;
 		/* convert palette to local color format */
 		for (x = 0; x < 64; x++) {
 			color.pixel = x;
@@ -662,7 +662,7 @@ InitDisplayX11(int argc, char **argv)
 		        (visual->class == DirectColor) ? "DirectColor" :
 		        "Unknown",
 		        depth, bpp,
-		        indexedcolor ? "dynamic" : "static",
+		        renderer_config.indexedcolor ? "dynamic" : "static",
 		        image ? "shared-memory" : "plain",
 		        (renderer->_flags & RENDERER_OLD) ? "Pixmap" : "XImage");
 	}
@@ -931,48 +931,48 @@ HandleKeyboardX11(XEvent ev)
 			renderer_data.pause_display = !renderer_data.pause_display;
 			break;
 		case XK_grave:
-			halfspeed = 1;
-			doublespeed = 0;
+			renderer_data.halfspeed = 1;
+			renderer_data.doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_1:
-			halfspeed = 0;
-			doublespeed = 0;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_2:
-			halfspeed = 0;
-			doublespeed = 2;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 2;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_3:
-			halfspeed = 0;
-			doublespeed = 3;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 3;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_4:
-			halfspeed = 0;
-			doublespeed = 4;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 4;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_5:
-			halfspeed = 0;
-			doublespeed = 5;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 5;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_6:
-			halfspeed = 0;
-			doublespeed = 6;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 6;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_7:
-			halfspeed = 0;
-			doublespeed = 7;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 7;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_8:
-			halfspeed = 0;
-			doublespeed = 8;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 8;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_0:
@@ -998,16 +998,16 @@ UpdateDisplayX11(void)
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
 	frame++;
-	if (halfspeed)
+	if (renderer_data.halfspeed)
 		timeframe >>= 1;
-	else if (doublespeed)
-		timeframe *= doublespeed;
-	if (desync) {
-		desync = 0;
+	else if (renderer_data.doublespeed)
+		timeframe *= renderer_data.doublespeed;
+	if (renderer_data.desync) {
+		renderer_data.desync = 0;
 		frame = timeframe;
 	} else if (frame < timeframe - 20 && frame % 20 == 0) {
 		/* If we're more than 20 frames behind, might as well stop counting. */
-		desync = 1;
+		renderer_data.desync = 1;
 	}
 
 	if (!nodisplay) {
@@ -1034,7 +1034,7 @@ UpdateDisplayX11(void)
 							for (int x = 0; x < 256; x++) {
 								int c = fb[(y << 8) + x];
 								int c1 =
-								  indexedcolor
+								  renderer_config.indexedcolor
 								  ? colortableX11[c]
 								  : paletteX11[c];
 								int c2 =
@@ -1227,7 +1227,7 @@ UpdateDisplayX11(void)
 
 		if (renderer_data.pause_display) {
 			usleep(16666);
-			desync = 1;
+			renderer_data.desync = 1;
 		}
 	} while (renderer_data.pause_display);
 
@@ -1245,10 +1245,10 @@ UpdateDisplayX11(void)
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
-	if (halfspeed)
+	if (renderer_data.halfspeed)
 		timeframe >>= 1;
-	else if (doublespeed)
-		timeframe *= doublespeed;
+	else if (renderer_data.doublespeed)
+		timeframe *= renderer_data.doublespeed;
 	if (frame >= timeframe || frame % 20 == 0)
 		frameskip = 0;
 	else
@@ -1287,16 +1287,16 @@ UpdateDisplayOldX11(void)
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
 	frame++;
-	if (halfspeed)
+	if (renderer_data.halfspeed)
 		timeframe >>= 1;
-	else if (doublespeed)
-		timeframe *= doublespeed;
-	if (desync) {
-		desync = 0;
+	else if (renderer_data.doublespeed)
+		timeframe *= renderer_data.doublespeed;
+	if (renderer_data.desync) {
+		renderer_data.desync = 0;
 		frame = timeframe;
 	} else if (frame < timeframe - 20 && frame % 20 == 0) {
 		/* If we're more than 20 frames behind, might as well stop counting. */
-		desync = 1;
+		renderer_data.desync = 1;
 	}
 
 	if (!nodisplay) {
@@ -1388,7 +1388,7 @@ UpdateDisplayOldX11(void)
 
 		if (renderer_data.pause_display) {
 			usleep(16666);
-			desync = 1;
+			renderer_data.desync = 1;
 		}
 	} while (renderer_data.pause_display);
 
@@ -1633,7 +1633,7 @@ DoBackgroundOldX11(void)
 					          8 * magstep, 8 * magstep, (x + 1) * 8 * magstep, (v + 1) * 8 * magstep);
 
 					bgmask_changed[currentcache] = 1;
-					if (indexedcolor) {
+					if (renderer_config.indexedcolor) {
 						color1 = colortableX11[tilecolor * 3];
 						color2 = colortableX11[tilecolor * 3 + 1];
 						color3 = colortableX11[tilecolor * 3 + 2];
@@ -1947,7 +1947,7 @@ UpdateTilesOldX11(void)
 				}
 			}
 		}
-		/*desync = 1;*/
+		/*renderer_data.desync = 1;*/
 	}
 }
 
@@ -1978,7 +1978,7 @@ LayoutBackgroundOldX11(void)
 	} else {
 		currentline = 0;
 		UpdateTilesOldX11();
-		if (!indexedcolor)
+		if (!renderer_config.indexedcolor)
 			UpdateTileColorsOldX11();
 		DoBackgroundOldX11();
 		if (redrawbackground == 0)
@@ -1999,7 +1999,7 @@ LayoutBackgroundOldX11(void)
 			currentline = y;
 			last = linereg[y] & 0x10;
 			UpdateTilesOldX11();
-			if (!indexedcolor)
+			if (!renderer_config.indexedcolor)
 				UpdateTileColorsOldX11();
 			DoBackgroundOldX11();
 		}
@@ -2103,7 +2103,7 @@ UpdateColorsX11(void)
 {
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
-	if (indexedcolor) {
+	if (renderer_config.indexedcolor) {
 		color.pixel = currentbgcolor = colortableX11[24];
 		color.red = ((NES_palette[VRAM[0x3f00] & 63] & 0xFF0000) >> 8);
 		color.green = (NES_palette[VRAM[0x3f00] & 63] & 0xFF00);
@@ -2131,7 +2131,7 @@ UpdateColorsX11(void)
 	}
 
 	/* Tile colors */
-	if (indexedcolor) {
+	if (renderer_config.indexedcolor) {
 		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
 				color.pixel = colortableX11[x];
@@ -2147,7 +2147,7 @@ UpdateColorsX11(void)
 	}
 
 	/* Set palette tables */
-	if (indexedcolor) {
+	if (renderer_config.indexedcolor) {
 		/* Already done in InitDisplayX11 */
 	} else /* truecolor */ {
 		for (int x = 0; x < 24; x++) {
@@ -2269,7 +2269,7 @@ DrawSpritesOldX11(void)
 
 	/* If the sprite palette changed, we must redraw the sprites in
 	   static color mode.  This isn't necessary for indexed color mode */
-	if (!indexedcolor
+	if (!renderer_config.indexedcolor
 	 && (*((long long *)(VRAM + 0x3f10)) != sprite_palette_cache[0]
 	  || *((long long *)(VRAM + 0x3f18)) != sprite_palette_cache[1])) {
 		memcpy(sprite_palette_cache, VRAM + 0x3f10, 16);
@@ -2348,7 +2348,7 @@ DrawSpritesOldX11(void)
 
 				for (int x = 0; x < 256; x++) {
 					if (linebuffer[x]) {
-						if (indexedcolor)
+						if (renderer_config.indexedcolor)
 							color1 = colortableX11[(linebuffer[x] >> 2) * 3 + 11 + (linebuffer[x] & 3)];
 						else
 							color1 = paletteX11[VRAM[0x3f10 + (linebuffer[x] & 15)] & 63];

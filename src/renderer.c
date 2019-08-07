@@ -86,21 +86,22 @@ struct Renderer renderers[] = {
 }, *renderer = 0;
 
 struct RendererConfig renderer_config = {
-	.inroot = 0,
 	.geometry = NULL,
 	.display_id = NULL,
+	.inroot = 0,
+	.indexedcolor = 1,
 };
 
 /* global renderer data */
 struct RendererData renderer_data = {
 	.basetime = 0,
 	.pause_display = 0,  /* Initially we start with the emulation running.  If you want to start paused, change this. */
+	.desync = 1,
+	.halfspeed = 0,
+	.doublespeed = 0,
 };
 
-int             indexedcolor = 1;
 int             magstep = 0;
-int             halfspeed = 0, doublespeed = 0;
-int             desync = 1;
 unsigned int    currentbgcolor, oldbgcolor;
 unsigned char   needsredraw = 1;        /* Refresh screen display */
 unsigned char   redrawbackground = 1;   /* Redraw tile background */
@@ -194,16 +195,16 @@ UpdateDisplayNone(void)
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
 	frame++;
-	if (halfspeed)
+	if (renderer_data.halfspeed)
 		timeframe >>= 1;
-	else if (doublespeed)
-		timeframe *= doublespeed;
-	if (desync) {
-		desync = 0;
+	else if (renderer_data.doublespeed)
+		timeframe *= renderer_data.doublespeed;
+	if (renderer_data.desync) {
+		renderer_data.desync = 0;
 		frame = timeframe;
 	} else if (frame < timeframe - 20 && frame % 20 == 0) {
 		/* If we're more than 20 frames behind, might as well stop counting. */
-		desync = 1;
+		renderer_data.desync = 1;
 	}
 
 	/* Slow down if we're getting ahead */
@@ -218,17 +219,17 @@ UpdateDisplayNone(void)
 
 		if (renderer_data.pause_display) {
 			usleep(16666);
-			desync = 1;
+			renderer_data.desync = 1;
 		}
 	} while (renderer_data.pause_display);
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
-	if (halfspeed)
+	if (renderer_data.halfspeed)
 		timeframe >>= 1;
-	else if (doublespeed)
-		timeframe *= doublespeed;
+	else if (renderer_data.doublespeed)
+		timeframe *= renderer_data.doublespeed;
 	if (frame >= timeframe || frame % 20 == 0)
 		frameskip = 0;
 	else

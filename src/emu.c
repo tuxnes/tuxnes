@@ -1206,7 +1206,7 @@ main(int argc, char **argv)
 				sound_config.audiofile = optarg ? optarg : DSP;
 			break;
 		case 'S':
-			indexedcolor = 0;
+			renderer_config.indexedcolor = 0;
 			break;
 		case 'F':
 			sample_format_name = optarg;

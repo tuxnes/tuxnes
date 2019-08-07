@@ -416,48 +416,48 @@ HandleKeyboardGGI(ggi_event ev)
 			renderer_data.pause_display = !renderer_data.pause_display;
 			break;
 		case GIIUC_Grave:
-			halfspeed = 1;
-			doublespeed = 0;
+			renderer_data.halfspeed = 1;
+			renderer_data.doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_1:
-			halfspeed = 0;
-			doublespeed = 0;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_2:
-			halfspeed = 0;
-			doublespeed = 2;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 2;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_3:
-			halfspeed = 0;
-			doublespeed = 3;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 3;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_4:
-			halfspeed = 0;
-			doublespeed = 4;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 4;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_5:
-			halfspeed = 0;
-			doublespeed = 5;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 5;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_6:
-			halfspeed = 0;
-			doublespeed = 6;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 6;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_7:
-			halfspeed = 0;
-			doublespeed = 7;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 7;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_8:
-			halfspeed = 0;
-			doublespeed = 8;
+			renderer_data.halfspeed = 0;
+			renderer_data.doublespeed = 8;
 			renderer_data.pause_display = 0;
 			break;
 		case GIIUC_0:
@@ -530,7 +530,7 @@ InitDisplayGGI(int argc, char **argv)
 		ggiFPrintMode(stderr, &modeGGI);
 		fprintf(stderr, "\"\n");
 	}
-	if ((GT_SCHEME(modeGGI.graphtype) == GT_PALETTE) && indexedcolor) {
+	if ((GT_SCHEME(modeGGI.graphtype) == GT_PALETTE) && renderer_config.indexedcolor) {
 		colormapGGI[0].r = colormapGGI[0].g = colormapGGI[0].b = 0x0000;
 		colormapGGI[1].r = colormapGGI[1].g = colormapGGI[1].b = 0xFFFF;
 		if ((basepixel = ggiSetPalette(visualGGI, GGI_PALETTE_DONTCARE, 27,
@@ -564,15 +564,15 @@ InitDisplayGGI(int argc, char **argv)
 			        "As a permanent solution, consider fixing libggi and\n"
 			        "submitting your fix back to the GGI maintainers.\n"
 			        "======================================================\n");
-			indexedcolor = 0;
+			renderer_config.indexedcolor = 0;
 		}
 		if (scanlines && (scanlines != 100)) {
 			fprintf(stderr, "Warning: Scanline intensity is ignored in indexed-color modes!\n");
 			scanlines = 0;
 		}
 	}
-	if ((GT_SCHEME(modeGGI.graphtype) != GT_PALETTE) || !indexedcolor) {
-		indexedcolor = 0;
+	if ((GT_SCHEME(modeGGI.graphtype) != GT_PALETTE) || !renderer_config.indexedcolor) {
+		renderer_config.indexedcolor = 0;
 		if (GT_SCHEME(modeGGI.graphtype) == GT_PALETTE) {
 			/* setup GGI palette -- should handle indexed-color visuals */
 			ggiSetColorfulPalette(visualGGI);
@@ -680,7 +680,7 @@ InitDisplayGGI(int argc, char **argv)
 		        "Static Palette" : "Unknown",
 		        depth,
 		        bpp,
-		        indexedcolor ? "dynamic" : "static",
+		        renderer_config.indexedcolor ? "dynamic" : "static",
 		        directGGI ? numbuffersGGI : modeGGI.frames,
 		        directGGI ? "direct buffer" : "frame",
 		        ((directGGI ? numbuffersGGI : modeGGI.frames) == 1) ? "" : "s");
@@ -721,7 +721,7 @@ UpdateColorsGGI(void)
 {
 	/* Set Background color */
 	oldbgcolor = currentbgcolor;
-	if (indexedcolor) {
+	if (renderer_config.indexedcolor) {
 		currentbgcolor = NES_palette[VRAM[0x3f00] & 63];
 		if (currentbgcolor != oldbgcolor) {
 			colormapGGI[24 + 2].r = ((currentbgcolor & 0xFF0000) >> 8);
@@ -744,7 +744,7 @@ UpdateColorsGGI(void)
 	}
 
 	/* Tile colors */
-	if (indexedcolor) {
+	if (renderer_config.indexedcolor) {
 		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
 				colormapGGI[x+2].r = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF0000) >> 8);
@@ -763,7 +763,7 @@ UpdateColorsGGI(void)
 	}
 
 	/* Set palette tables */
-	if (indexedcolor) {
+	if (renderer_config.indexedcolor) {
 		/* Already done in InitDisplayGGI */
 	} else /* truecolor */ {
 		for (int x = 0; x < 24; x++) {
@@ -787,16 +787,16 @@ UpdateDisplayGGI(void)
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
 	frame++;
-	if (halfspeed)
+	if (renderer_data.halfspeed)
 		timeframe >>= 1;
-	else if (doublespeed)
-		timeframe *= doublespeed;
-	if (desync) {
-		desync = 0;
+	else if (renderer_data.doublespeed)
+		timeframe *= renderer_data.doublespeed;
+	if (renderer_data.desync) {
+		renderer_data.desync = 0;
 		frame = timeframe;
 	} else if (frame < timeframe - 20 && frame % 20 == 0) {
 		/* If we're more than 20 frames behind, might as well stop counting. */
-		desync = 1;
+		renderer_data.desync = 1;
 	}
 
 	if (!nodisplay) {
@@ -915,17 +915,17 @@ UpdateDisplayGGI(void)
 
 		if (renderer_data.pause_display) {
 			usleep(16666);
-			desync = 1;
+			renderer_data.desync = 1;
 		}
 	} while (renderer_data.pause_display);
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
-	if (halfspeed)
+	if (renderer_data.halfspeed)
 		timeframe >>= 1;
-	else if (doublespeed)
-		timeframe *= doublespeed;
+	else if (renderer_data.doublespeed)
+		timeframe *= renderer_data.doublespeed;
 	if (frame >= timeframe || frame % 20 == 0)
 		frameskip = 0;
 	else

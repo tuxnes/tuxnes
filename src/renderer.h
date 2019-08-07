@@ -55,15 +55,19 @@ extern struct Renderer renderers[];
 
 /* global renderer parameters */
 extern struct RendererConfig {
-	int        inroot;
 	char       *geometry;
 	char       *display_id;
+	int        inroot;
+	int        indexedcolor;
 } renderer_config;
 
 /* global renderer data */
 extern struct RendererData {
 	int        basetime;
 	int        pause_display;
+	int        desync;
+	int        halfspeed;
+	int        doublespeed;
 } renderer_data;
 
 /* only 1x1 or 2x2 integer scaling is permitted for now */
@@ -71,10 +75,7 @@ extern struct RendererData {
 
 #define tilecachedepth 25
 
-extern int              indexedcolor;
 extern int              magstep;
-extern int              halfspeed, doublespeed;
-extern int              desync;
 extern unsigned int     currentbgcolor, oldbgcolor;
 extern unsigned char    needsredraw;            /* Refresh screen display */
 extern unsigned char    redrawbackground;       /* Redraw tile background */
