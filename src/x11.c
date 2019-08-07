@@ -42,7 +42,6 @@
 #include "mapper.h"
 #include "renderer.h"
 #include "screenshot.h"
-#include "sound.h"
 
 #ifdef HAVE_X
 
@@ -994,9 +993,6 @@ UpdateDisplayX11(void)
 	static int sssuspend = 0;
 #endif
 
-	/* do audio update */
-	UpdateAudio();
-
 	/* Check the time.  If we're getting behind, skip a frame to stay in sync. */
 	gettimeofday(&time, NULL);
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
@@ -1285,9 +1281,6 @@ UpdateDisplayOldX11(void)
 #ifdef HAVE_SCRNSAVER
 	static int sssuspend = 0;
 #endif
-
-	/* do audio update */
-	UpdateAudio();
 
 	/* Check the time.  If we're getting behind, skip a frame to stay in sync. */
 	gettimeofday(&time, NULL);

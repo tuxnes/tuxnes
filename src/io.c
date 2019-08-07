@@ -443,6 +443,7 @@ donmi(void)
 		vbl=1;
 	last_clock = CLOCK;
 
+	UpdateAudio();
 	renderer->UpdateDisplay();
 
 	/*printf("donmi: stack at %x\n", STACKPTR); */

@@ -29,7 +29,6 @@
 #include "mapper.h"
 #include "renderer.h"
 #include "screenshot.h"
-#include "sound.h"
 
 /* imports */
 void    quit(void);
@@ -782,9 +781,6 @@ UpdateDisplayGGI(void)
 	static unsigned int frame;
 	unsigned int timeframe;
 	static int nodisplay = 0;
-
-	/* do audio update */
-	UpdateAudio();
 
 	/* Check the time.  If we're getting behind, skip a frame to stay in sync. */
 	gettimeofday(&time, NULL);

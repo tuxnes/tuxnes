@@ -24,7 +24,6 @@
 #include "joystick.h"
 #include "mapper.h"
 #include "renderer.h"
-#include "sound.h"
 
 #ifdef HAVE_X
 extern int      InitDisplayX11(int argc, char **argv);
@@ -189,9 +188,6 @@ UpdateDisplayNone(void)
 	struct timeval time;
 	static unsigned int frame;
 	unsigned int timeframe;
-
-	/* do audio update */
-	UpdateAudio();
 
 	/* Check the time.  If we're getting behind, skip a frame to stay in sync. */
 	gettimeofday(&time, NULL);
