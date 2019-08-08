@@ -1692,12 +1692,12 @@ main(int argc, char **argv)
 		for (pen = 0; pen < 64; pen++) {
 			unsigned long red, blue, green, gray;
 
-			red = (NES_palette[pen] & 0xFF0000) >> 16;
-			green = (NES_palette[pen] & 0xFF00) >> 8;
-			blue = NES_palette[pen] & 0xFF;
+			red   = NES_palette[pen] >> 16 & 0xff;
+			green = NES_palette[pen] >>  8 & 0xff;
+			blue  = NES_palette[pen]       & 0xff;
 			gray = 0.299 * red + 0.587 * green + 0.114 * blue;
-			if (gray > 0xFFU)
-				gray = 0xFFU;
+			if (gray > 0xffU)
+				gray = 0xffU;
 			NES_palette[pen] = (gray << 16) | (gray << 8) | gray;
 		}
 	}

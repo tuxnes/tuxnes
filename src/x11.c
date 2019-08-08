@@ -395,9 +395,9 @@ InitDisplayX11(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 		/* Pre-initialize the colormap to known values */
-		color.red = ((NES_palette[0] & 0xFF0000) >> 8);
-		color.green = (NES_palette[0] & 0xFF00);
-		color.blue = ((NES_palette[0] & 0xFF) << 8);
+		color.red   = NES_palette[0] >> 8 & 0xff00;
+		color.green = NES_palette[0]      & 0xff00;
+		color.blue  = NES_palette[0] << 8 & 0xff00;
 		color.flags = DoRed | DoGreen | DoBlue;
 		for (x = 0; x <= 24; x++) {
 			color.pixel = colortableX11[x];
@@ -419,9 +419,9 @@ InitDisplayX11(int argc, char **argv)
 		/* convert palette to local color format */
 		for (x = 0; x < 64; x++) {
 			color.pixel = x;
-			color.red = ((NES_palette[x] & 0xFF0000) >> 8);
-			color.green = (NES_palette[x] & 0xFF00);
-			color.blue = ((NES_palette[x] & 0xFF) << 8);
+			color.red   = NES_palette[x] >> 8 & 0xff00;
+			color.green = NES_palette[x]      & 0xff00;
+			color.blue  = NES_palette[x] << 8 & 0xff00;
 			color.flags = DoRed | DoGreen | DoBlue;
 			if (XAllocColor(display, colormap, &color) == 0) {
 				fprintf(stderr, "%s: [%s] Can't allocate colors!\n",
@@ -436,17 +436,17 @@ InitDisplayX11(int argc, char **argv)
 				unsigned long r, g, b;
 
 				color.pixel = x;
-				r = ((NES_palette[x] & 0xFF0000) >> 8) * (scanlines / 100.0);
-				if (r > 0xFFFF)
-					r = 0xFFFF;
+				r = (NES_palette[x] >> 8 & 0xff00) * (scanlines / 100.0);
+				if (r > 0xffff)
+					r = 0xffff;
 				color.red = r;
-				g = (NES_palette[x] & 0xFF00) * (scanlines / 100.0);
-				if (g > 0xFFFF)
-					g = 0xFFFF;
+				g = (NES_palette[x]      & 0xff00) * (scanlines / 100.0);
+				if (g > 0xffff)
+					g = 0xffff;
 				color.green = g;
-				b = ((NES_palette[x] & 0xFF) << 8) * (scanlines / 100.0);
-				if (b > 0xFFFF)
-					b = 0xFFFF;
+				b = (NES_palette[x] << 8 & 0xff00) * (scanlines / 100.0);
+				if (b > 0xffff)
+					b = 0xffff;
 				color.blue = b;
 				color.flags = DoRed | DoGreen | DoBlue;
 				if (XAllocColor(display, colormap, &color) == 0) {
@@ -2102,9 +2102,9 @@ UpdateColorsX11(void)
 	oldbgcolor = currentbgcolor;
 	if (renderer_config.indexedcolor) {
 		color.pixel = currentbgcolor = colortableX11[24];
-		color.red = ((NES_palette[VRAM[0x3f00] & 63] & 0xFF0000) >> 8);
-		color.green = (NES_palette[VRAM[0x3f00] & 63] & 0xFF00);
-		color.blue = ((NES_palette[VRAM[0x3f00] & 63] & 0xFF) << 8);
+		color.red   = NES_palette[VRAM[0x3f00] & 63] >> 8 & 0xff00;
+		color.green = NES_palette[VRAM[0x3f00] & 63]      & 0xff00;
+		color.blue  = NES_palette[VRAM[0x3f00] & 63] << 8 & 0xff00;
 		color.flags = DoRed | DoGreen | DoBlue;
 		XStoreColor(display, colormap, &color);
 		XSetForeground(display, solidbggc, currentbgcolor);
@@ -2132,9 +2132,9 @@ UpdateColorsX11(void)
 		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
 				color.pixel = colortableX11[x];
-				color.red = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF0000) >> 8);
-				color.green = (NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF00);
-				color.blue = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF) << 8);
+				color.red   = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] >> 8 & 0xff00;
+				color.green = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63]      & 0xff00;
+				color.blue  = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] << 8 & 0xff00;
 				color.flags = DoRed | DoGreen | DoBlue;
 				XStoreColor (display, colormap, &color);
 				/*printf("color %d (%d) = %6x\n", x, colortableX11[x], paletteX11[VRAM[0x3f01+x+(x/3)]&63]); */

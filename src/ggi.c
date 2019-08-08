@@ -172,7 +172,7 @@ SaveScreenshotGGI(void)
 					for (x = 0; (x < w0) && ((x + x0) < w); x++) {
 						ggi_pixel pix;
 
-						cols[x + x0].r = cols[x + x0].b = 0xFFFF;
+						cols[x + x0].r = cols[x + x0].b = 0xffff;
 						cols[x + x0].g = 0x0000;
 						if (ggiGetPixel(visualGGI, x + x1, y + y1, &pix)) {
 							if (verbose)
@@ -529,7 +529,7 @@ InitDisplayGGI(int argc, char **argv)
 	}
 	if ((GT_SCHEME(modeGGI.graphtype) == GT_PALETTE) && renderer_config.indexedcolor) {
 		colormapGGI[0].r = colormapGGI[0].g = colormapGGI[0].b = 0x0000;
-		colormapGGI[1].r = colormapGGI[1].g = colormapGGI[1].b = 0xFFFF;
+		colormapGGI[1].r = colormapGGI[1].g = colormapGGI[1].b = 0xffff;
 		if ((basepixel = ggiSetPalette(visualGGI, GGI_PALETTE_DONTCARE, 27,
 		                               colormapGGI)) < 0) {
 			ggiClose(visualGGI);
@@ -541,9 +541,9 @@ InitDisplayGGI(int argc, char **argv)
 		blackpixel = basepixel;
 		whitepixel = basepixel + 1;
 		oldbgcolor = currentbgcolor = NES_palette[0];
-		color.r = ((NES_palette[0] & 0xFF0000) >> 8);
-		color.g = (NES_palette[0] & 0xFF00);
-		color.b = ((NES_palette[0] & 0xFF) << 8);
+		color.r = NES_palette[0] >> 8 & 0xff00;
+		color.g = NES_palette[0]      & 0xff00;
+		color.b = NES_palette[0] << 8 & 0xff00;
 		for (int x = 0; x <= 24; x++) {
 			palette[x] = x + basepixel + 2;
 			colormapGGI[x + 2] = color;
@@ -576,15 +576,15 @@ InitDisplayGGI(int argc, char **argv)
 		}
 		color.r = color.g = color.b = 0x0000;
 		blackpixel = ggiMapColor(visualGGI, &color);
-		color.r = color.g = color.b = 0xFFFF;
+		color.r = color.g = color.b = 0xffff;
 		whitepixel = ggiMapColor(visualGGI, &color);
 		for (int x=0; x < 24; x++) {
 			palette[x] = palette2[x] = blackpixel;
 		}
 		for (int x=0; x < 64; x++) {
-			color.r = ((NES_palette[x] & 0xFF0000) >> 8);
-			color.g = (NES_palette[x] & 0xFF00);
-			color.b = ((NES_palette[x] & 0xFF) << 8);
+			color.r = NES_palette[x] >> 8 & 0xff00;
+			color.g = NES_palette[x]      & 0xff00;
+			color.b = NES_palette[x] << 8 & 0xff00;
 			paletteGGI[x] = ggiMapColor(visualGGI, &color);
 			palette2GGI[x] = blackpixel;
 		}
@@ -592,17 +592,17 @@ InitDisplayGGI(int argc, char **argv)
 			for (int x = 0; x < 64; x++) {
 				unsigned long r, g, b;
 
-				r = ((NES_palette[x] & 0xFF0000) >> 8) * (scanlines / 100.0);
-				if (r > 0xFFFF)
-					r = 0xFFFF;
+				r = (NES_palette[x] >> 8 & 0xff00) * (scanlines / 100.0);
+				if (r > 0xffff)
+					r = 0xffff;
 				color.r = r;
-				g = (NES_palette[x] & 0xFF00) * (scanlines / 100.0);
-				if (g > 0xFFFF)
-					g = 0xFFFF;
+				g = (NES_palette[x]      & 0xff00) * (scanlines / 100.0);
+				if (g > 0xffff)
+					g = 0xffff;
 				color.g = g;
-				b = ((NES_palette[x] & 0xFF) << 8) * (scanlines / 100.0);
-				if (b > 0xFFFF)
-					b = 0xFFFF;
+				b = (NES_palette[x] << 8 & 0xff00) * (scanlines / 100.0);
+				if (b > 0xffff)
+					b = 0xffff;
 				color.b = b;
 				palette2GGI[x] = ggiMapColor(visualGGI, &color);
 			}
@@ -721,9 +721,9 @@ UpdateColorsGGI(void)
 	if (renderer_config.indexedcolor) {
 		currentbgcolor = NES_palette[VRAM[0x3f00] & 63];
 		if (currentbgcolor != oldbgcolor) {
-			colormapGGI[24 + 2].r = ((currentbgcolor & 0xFF0000) >> 8);
-			colormapGGI[24 + 2].g = (currentbgcolor & 0xFF00);
-			colormapGGI[24 + 2].b = ((currentbgcolor & 0xFF) << 8);
+			colormapGGI[24 + 2].r = currentbgcolor >> 8 & 0xff00;
+			colormapGGI[24 + 2].g = currentbgcolor      & 0xff00;
+			colormapGGI[24 + 2].b = currentbgcolor << 8 & 0xff00;
 			if (ggiSetPalette(visualGGI, 24 + basepixel + 2, 1,
 			                  colormapGGI + 24 + 2) < 0) {
 				fprintf(stderr,
@@ -744,9 +744,9 @@ UpdateColorsGGI(void)
 	if (renderer_config.indexedcolor) {
 		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
-				colormapGGI[x+2].r = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF0000) >> 8);
-				colormapGGI[x+2].g = (NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF00);
-				colormapGGI[x+2].b = ((NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] & 0xFF) << 8);
+				colormapGGI[x+2].r = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] >> 8 & 0xff00;
+				colormapGGI[x+2].g = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63]      & 0xff00;
+				colormapGGI[x+2].b = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] << 8 & 0xff00;
 				if (ggiSetPalette(visualGGI, x + basepixel + 2, 1, colormapGGI + x + 2) < 0) {
 					ggiClose(visualGGI);
 					ggiExit();

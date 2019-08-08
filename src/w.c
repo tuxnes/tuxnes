@@ -462,14 +462,14 @@ InitDisplayW(int argc, char **argv)
 				break;
 		}
 	if (whitepixel == serverW->sharedcolors)
-		whitepixel = w_allocColor(winW, 0xFFU, 0xFFU, 0xFFU);
+		whitepixel = w_allocColor(winW, 0xffU, 0xffU, 0xffU);
 	if (whitepixel < 0) {
 		if (bpp > 1)
 			fprintf(stderr,
 			        "W: can't allocate white pixel -- using index 0\n");
 		whitepixel = 0;
 	}
-	color.red = color.green = color.blue = 0xFFU;
+	color.red = color.green = color.blue = 0xffU;
 	if (bitmapW->palette)
 		bitmapW->palette[whitepixel] = color;
 	for (int x=0; x < 24; x++) {
@@ -478,9 +478,9 @@ InitDisplayW(int argc, char **argv)
 	if (renderer_config.indexedcolor && (bpp > 1)) {
 		/* Pre-initialize the colormap to known values */
 		oldbgcolor = currentbgcolor = NES_palette[0];
-		color.red = ((NES_palette[0] & 0xFF0000) >> 16);
-		color.green = ((NES_palette[0] & 0xFF00) >> 8);
-		color.blue = (NES_palette[0] & 0xFF);
+		color.red   = NES_palette[0] >> 16 & 0xff;
+		color.green = NES_palette[0] >>  8 & 0xff;
+		color.blue  = NES_palette[0]       & 0xff;
 		for (int x = 0; x <= 24; x++) {
 			palette[x] =
 			  w_allocColor(winW, color.red, color.green, color.blue);
@@ -506,9 +506,9 @@ InitDisplayW(int argc, char **argv)
 			short pixel;
 			rgb_t desired;
 
-			desired.red = ((NES_palette[x] & 0xFF0000) >> 16);
-			desired.green = ((NES_palette[x] & 0xFF00) >> 8);
-			desired.blue = (NES_palette[x] & 0xFF);
+			desired.red   = NES_palette[x] >> 16 & 0xff;
+			desired.green = NES_palette[x] >>  8 & 0xff;
+			desired.blue  = NES_palette[x]       & 0xff;
 			for (pixel = 0; pixel < serverW->sharedcolors; pixel++)
 				if (!w_getColor(winW, pixel,
 				                &(color.red), &(color.green), &(color.blue))) {
@@ -544,18 +544,18 @@ InitDisplayW(int argc, char **argv)
 				rgb_t desired;
 				unsigned long r, g, b;
 
-				r = ((NES_palette[x] & 0xFF0000) >> 8) * (scanlines / 100.0);
-				if (r > 0xFFFF)
-					r = 0xFFFF;
-				desired.red = (r + 0x7F) >> 8;
-				g = (NES_palette[x] & 0xFF00) * (scanlines / 100.0);
-				if (g > 0xFFFF)
-					g = 0xFFFF;
-				desired.green = (g + 0x7F) >> 8;
-				b = ((NES_palette[x] & 0xFF) << 8) * (scanlines / 100.0);
-				if (b > 0xFFFF)
-					b = 0xFFFF;
-				desired.blue = (b + 0x7F) >> 8;
+				r = (NES_palette[x] >> 8 & 0xff00) * (scanlines / 100.0);
+				if (r > 0xffff)
+					r = 0xffff;
+				desired.red = (r + 0x7f) >> 8;
+				g = (NES_palette[x]      & 0xff00) * (scanlines / 100.0);
+				if (g > 0xffff)
+					g = 0xffff;
+				desired.green = (g + 0x7f) >> 8;
+				b = (NES_palette[x] << 8 & 0xff00) * (scanlines / 100.0);
+				if (b > 0xffff)
+					b = 0xffff;
+				desired.blue = (b + 0x7f) >> 8;
 				for (pixel = 0; pixel < serverW->sharedcolors; pixel++)
 					if (!w_getColor(winW, pixel,
 					                &(color.red), &(color.green), &(color.blue))) {
@@ -649,9 +649,9 @@ UpdateColorsW(void)
 		int c = VRAM[0x3f00] & 63;
 		currentbgcolor = NES_palette[c];
 		if (currentbgcolor != oldbgcolor) {
-			color.red = ((currentbgcolor & 0xFF0000) >> 16);
-			color.green = ((currentbgcolor & 0xFF00) >> 8);
-			color.blue = (currentbgcolor & 0xFF);
+			color.red   = currentbgcolor >> 16 & 0xff;
+			color.green = currentbgcolor >>  8 & 0xff;
+			color.blue  = currentbgcolor       & 0xff;
 			if (w_changeColor(winW, palette[24],
 			                  color.red, color.green, color.blue) < 0) {
 				fprintf(stderr,
@@ -674,9 +674,9 @@ UpdateColorsW(void)
 		for (int x = 0; x < 24; x++) {
 			int c = VRAM[0x3f01 + x + (x / 3)] & 63;
 			if (c != (palette_cache[0][1 + x + (x / 3)] & 63)) {
-				color.red = ((NES_palette[c] & 0xFF0000) >> 16);
-				color.green = ((NES_palette[c] & 0xFF00) >> 8);
-				color.blue = (NES_palette[c] & 0xFF);
+				color.red   = NES_palette[c] >> 16 & 0xff;
+				color.green = NES_palette[c] >>  8 & 0xff;
+				color.blue  = NES_palette[c]       & 0xff;
 				if (w_changeColor(winW, palette[x],
 				                  color.red, color.green, color.blue) < 0) {
 					if (winW != WROOT)
