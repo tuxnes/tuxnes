@@ -545,17 +545,20 @@ InitDisplayW(int argc, char **argv)
 				unsigned long r, g, b;
 
 				r = (NES_palette[x] >> 8 & 0xff00) * (scanlines / 100.0);
-				if (r > 0xffff)
-					r = 0xffff;
-				desired.red = (r + 0x7f) >> 8;
+				r = (r + 0x80) >> 8;
+				if (r > 0xff)
+					r = 0xff;
+				desired.red = r;
 				g = (NES_palette[x]      & 0xff00) * (scanlines / 100.0);
-				if (g > 0xffff)
-					g = 0xffff;
-				desired.green = (g + 0x7f) >> 8;
+				g = (g + 0x80) >> 8;
+				if (g > 0xff)
+					g = 0xff;
+				desired.green = g;
 				b = (NES_palette[x] << 8 & 0xff00) * (scanlines / 100.0);
-				if (b > 0xffff)
-					b = 0xffff;
-				desired.blue = (b + 0x7f) >> 8;
+				b = (b + 0x80) >> 8;
+				if (b > 0xff)
+					b = 0xff;
+				desired.blue = b;
 				for (pixel = 0; pixel < serverW->sharedcolors; pixel++)
 					if (!w_getColor(winW, pixel,
 					                &(color.red), &(color.green), &(color.blue))) {
