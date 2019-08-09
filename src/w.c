@@ -435,11 +435,10 @@ InitDisplayW(int argc, char **argv)
 	}
 	/* Allocate black and white pixels */
 	for (blackpixel = 0; blackpixel < serverW->sharedcolors; blackpixel++)
-		if (!w_getColor(winW, blackpixel,
-		                &(color.red), &(color.green), &(color.blue))) {
-			if ((color.red <= 0x0FU)
-			 && (color.green <= 0x0FU)
-			 && (color.blue <= 0x0FU))
+		if (!w_getColor(winW, blackpixel, &color.red, &color.green, &color.blue)) {
+			if (color.red   <= 0x0fU
+			 && color.green <= 0x0fU
+			 && color.blue  <= 0x0fU)
 				break;
 		}
 	if (blackpixel == serverW->sharedcolors)
@@ -454,11 +453,10 @@ InitDisplayW(int argc, char **argv)
 	if (bitmapW->palette)
 		bitmapW->palette[blackpixel] = color;
 	for (whitepixel = 0; whitepixel < serverW->sharedcolors; whitepixel++)
-		if (!w_getColor(winW, whitepixel,
-		                &(color.red), &(color.green), &(color.blue))) {
-			if ((color.red >= 0xF0U)
-			 && (color.green >= 0xF0U)
-			 && (color.blue >= 0xF0U))
+		if (!w_getColor(winW, whitepixel, &color.red, &color.green, &color.blue)) {
+			if (color.red   >= 0xf0U
+			 && color.green >= 0xf0U
+			 && color.blue  >= 0xf0U)
 				break;
 		}
 	if (whitepixel == serverW->sharedcolors)
@@ -482,8 +480,7 @@ InitDisplayW(int argc, char **argv)
 		color.green = NES_palette[0] >>  8 & 0xff;
 		color.blue  = NES_palette[0]       & 0xff;
 		for (int x = 0; x <= 24; x++) {
-			palette[x] =
-			  w_allocColor(winW, color.red, color.green, color.blue);
+			palette[x] = w_allocColor(winW, color.red, color.green, color.blue);
 			palette2[x] = blackpixel;
 			if (palette[x] < 0) {
 				if (winW != WROOT)
@@ -510,22 +507,19 @@ InitDisplayW(int argc, char **argv)
 			desired.green = NES_palette[x] >>  8 & 0xff;
 			desired.blue  = NES_palette[x]       & 0xff;
 			for (pixel = 0; pixel < serverW->sharedcolors; pixel++)
-				if (!w_getColor(winW, pixel,
-				                &(color.red), &(color.green), &(color.blue))) {
-					if ((color.red == desired.red)
-					 && (color.green == desired.green)
-					 && (color.blue == desired.blue))
+				if (!w_getColor(winW, pixel, &color.red, &color.green, &color.blue)) {
+					if (color.red   == desired.red
+					 && color.green == desired.green
+					 && color.blue  == desired.blue)
 						break;
 				}
 			if (pixel == serverW->sharedcolors) {
-				pixel =
-				     w_allocColor(winW,
-				                  desired.red, desired.green, desired.blue);
+				pixel = w_allocColor(winW, desired.red, desired.green, desired.blue);
 			}
 			if (pixel < 0) {
-				if ((0.299 * desired.red +
-				     0.587 * desired.green +
-				     0.114 * desired.blue) >= 0x80U)
+				if ((0.299 * desired.red
+				   + 0.587 * desired.green
+				   + 0.114 * desired.blue) >= 0x80U)
 					pixel = whitepixel;
 				else
 					pixel = blackpixel;
@@ -560,22 +554,19 @@ InitDisplayW(int argc, char **argv)
 					b = 0xff;
 				desired.blue = b;
 				for (pixel = 0; pixel < serverW->sharedcolors; pixel++)
-					if (!w_getColor(winW, pixel,
-					                &(color.red), &(color.green), &(color.blue))) {
-						if ((color.red == desired.red)
-						 && (color.green == desired.green)
-						 && (color.blue == desired.blue))
+					if (!w_getColor(winW, pixel, &color.red, &color.green, &color.blue)) {
+						if (color.red   == desired.red
+						 && color.green == desired.green
+						 && color.blue  == desired.blue)
 							break;
 					}
 				if (pixel == serverW->sharedcolors) {
-					pixel =
-					     w_allocColor(winW,
-					                  desired.red, desired.green, desired.blue);
+					pixel = w_allocColor(winW, desired.red, desired.green, desired.blue);
 				}
 				if (pixel < 0) {
-					if ((0.299 * desired.red +
-					     0.587 * desired.green +
-					     0.114 * desired.blue) >= 0x80U)
+					if ((0.299 * desired.red
+					   + 0.587 * desired.green
+					   + 0.114 * desired.blue) >= 0x80U)
 						pixel = whitepixel;
 					else
 						pixel = blackpixel;
@@ -655,8 +646,7 @@ UpdateColorsW(void)
 			color.red   = currentbgcolor >> 16 & 0xff;
 			color.green = currentbgcolor >>  8 & 0xff;
 			color.blue  = currentbgcolor       & 0xff;
-			if (w_changeColor(winW, palette[24],
-			                  color.red, color.green, color.blue) < 0) {
+			if (w_changeColor(winW, palette[24], color.red, color.green, color.blue) < 0) {
 				fprintf(stderr,
 				        "W: w_changeColor failed for background color!\n");
 			} else if (bitmapW->palette)
@@ -680,8 +670,7 @@ UpdateColorsW(void)
 				color.red   = NES_palette[c] >> 16 & 0xff;
 				color.green = NES_palette[c] >>  8 & 0xff;
 				color.blue  = NES_palette[c]       & 0xff;
-				if (w_changeColor(winW, palette[x],
-				                  color.red, color.green, color.blue) < 0) {
+				if (w_changeColor(winW, palette[x], color.red, color.green, color.blue) < 0) {
 					if (winW != WROOT)
 						w_delete(winW);
 					if (iconW)
