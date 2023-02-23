@@ -140,7 +140,7 @@ static void     restoresavedgame(void);
 static void     traphandler(int);
 
 void    InitMapperSubsystem(void);
-char    MapperName[MAXMAPPER + 1][30];
+extern char MapperName[MAXMAPPER + 1][30];
 void    quit(void);
 void    START(void);
 void    translate(int);

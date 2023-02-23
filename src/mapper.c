@@ -76,7 +76,7 @@ void    camerica(int, int);
 void    clrdrms(int, int);
 void    cnrom(int, int);
 void    cprom(int, int);
-void    (*drawimage)(int);
+extern void (*drawimage)(int);
 void    fme7(int, int);
 void    g101(int, int);
 void    gnrom(int, int);
