@@ -24,11 +24,9 @@ tuxnes_SOURCES = \
 	sound.c sound.h \
 	renderer.c renderer.h \
 	screenshot.c screenshot.h \
-	ggi.c \
-	x11.c \
-	w.c
+	x11.c
 
-tuxnes_LDADD = table.o $(DEFLATE_LIBS) $(W_LIBS) $(GGI_LIBS) $(X_LIBS)
+tuxnes_LDADD = table.o $(DEFLATE_LIBS) $(X_LIBS)
 tuxnes_LDFLAGS = $(AM_LDFLAGS) -Wl,-z,noexecstack
 
 comptbl_SOURCES = comptbl.c

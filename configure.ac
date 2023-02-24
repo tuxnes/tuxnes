@@ -41,17 +41,6 @@ AS_IF([test "x$enable_profiling" = "xno"],[PROFILING_CFLAGS=""])
 AC_SUBST([PROFILING_CFLAGS])
 
 # Checks for libraries.
-AC_ARG_WITH([ggi],
-	[AS_HELP_STRING([--without-ggi],
-		[disable check for GGI (General Graphics Interface)])],
-	[],
-	[with_ggi="yes"])
-
-AC_ARG_WITH([w],
-	[AS_HELP_STRING([--without-w],
-		[disable check for the W Window System])],
-	[],
-	[with_w="yes"])
 
 # Checks for header files.
 AC_PATH_XTRA
@@ -62,14 +51,6 @@ AC_CHECK_HEADERS([features.h linux/joystick.h linux/soundcard.h sys/soundcard.h]
 AC_CHECK_HEADERS([machine/endian.h sys/endian.h endian.h],[break])
 AC_CHECK_HEADERS([getopt.h])
 AC_CHECK_HEADERS([ppm.h])
-
-AS_IF([test "x$with_ggi" = "xyes"],[
-	AC_CHECK_HEADERS([ggi/gii.h ggi/ggi.h])
-])
-
-AS_IF([test "x$with_w" = "xyes"],[
-	AC_CHECK_HEADERS([Wlib.h])
-])
 
 AS_IF([test "x$no_x" != "xyes"],[
 	AC_CHECK_HEADERS([X11/xpm.h X11/vroot.h sys/ipc.h sys/shm.h])
@@ -102,27 +83,6 @@ AS_IF([test "x$have_deflate" = "xyes"],[
 AC_CHECK_LIB([pbm],[pbm_writepbm])
 AC_CHECK_LIB([pgm],[pgm_writepgm])
 AC_CHECK_LIB([ppm],[ppm_writeppm])
-
-GGI_LIBS=""
-AS_IF([test "x$with_ggi" = "xyes"],[
-	save_LIBS="$LIBS"
-	LIBS=""
-	AC_CHECK_LIB([ggi],[ggiInit])
-	AC_CHECK_LIB([gii],[giiInit])
-	GGI_LIBS="$LIBS"
-	LIBS="$save_LIBS"
-])
-AC_SUBST([GGI_LIBS])
-
-W_LIBS=""
-AS_IF([test "x$with_w" = "xyes"],[
-	save_LIBS="$LIBS"
-	LIBS=""
-	AC_CHECK_LIB([W],[w_init])
-	W_LIBS="$LIBS"
-	LIBS="$save_LIBS"
-])
-AC_SUBST([W_LIBS])
 
 AS_IF([test "x$no_x" != "xyes"],[
 	save_CFLAGS="$CFLAGS"

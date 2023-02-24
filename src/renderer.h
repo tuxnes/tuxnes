@@ -14,22 +14,6 @@
 #define HAVE_X 1
 #endif /* !defined(X_DISPLAY_MISSING) */
 
-#ifdef HAVE_LIBGII
-#ifdef HAVE_GGI_GII_H
-#ifdef HAVE_LIBGGI
-#ifdef HAVE_GGI_GGI_H
-#define HAVE_GGI 1
-#endif
-#endif
-#endif
-#endif
-
-#ifdef HAVE_LIBW
-#ifdef HAVE_WLIB_H
-#define HAVE_W 1
-#endif
-#endif
-
 /* only the no-op renderer `none' is universally known */
 extern int      InitDisplayNone(int argc, char **argv);
 extern void     UpdateColorsNone(void);

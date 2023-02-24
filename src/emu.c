@@ -675,12 +675,6 @@ help_controls(int terse)
 #ifdef HAVE_X
 	       "                  Under X11, save to ~/.tuxnes/snap????.xpm\n"
 #endif /* HAVE_X */
-#ifdef HAVE_GGI
-	       "                  Under GGI, save to ~/.tuxnes/snap????.ppm\n"
-#endif /* HAVE_GGI */
-#ifdef HAVE_W
-	       "                  Under W, save to ~/.tuxnes/snap????.p8m\n"
-#endif /* HAVE_W */
 	       "                  (Note: XPM/PPM support must be installed and compiled\n"
 	       "                   for this to work; see the README file for more info.)\n");
 	printf("\n"

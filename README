@@ -25,7 +25,7 @@ Platforms:
 	NetBSD
 	OpenBSD [needs to be verified!]
 
-    TuxNES can render using the X Window System, the W Window System, or GGI.
+    TuxNES can render using the X Window System.
 
 Installing:
 =---------=
@@ -40,8 +40,6 @@ Extra --enable and --with options understood by ./configure:
 
   --enable-warnings       enable more compilation warning checks [default=no]
   --enable-profiling      enable profiling of functions [default=no]
-  --without-ggi           disable check for GGI (General Graphics Interface)
-  --without-w             disable check for the W Window System
 
 For more information, see the INSTALL file.
 
@@ -53,7 +51,7 @@ Features:
     The current features in TuxNES include:
 - open source
 - runs under Linux, FreeBSD, and NetBSD on x86 platforms
-- uses an X11 server, W server or GGI for display and input handling
+- uses an X11 server for display and input handling
 - dynamic recompilation from 6502 opcodes -> x86 native opcodes
 - mappers: 0, 1, 2, 3, 4, 7, 9, 11, 32, 66, 99
 - experimental mappers: 15, 22, 23, and 71
@@ -309,8 +307,6 @@ the -r, --renderer=...  command-line option. Available renderers:
       x11  = X11 renderer
       diff = differential X11 renderer
       old  = old X11 renderer (tile-based)
-      ggi  = GGI renderer
-      w    = W renderer
       none = Don't draw anything
 
     X11 renderer: (-r x11, --renderer=x11)
@@ -338,22 +334,6 @@ the -r, --renderer=...  command-line option. Available renderers:
     - no shared-memory rendering
     - doesn't support mid-screen PPU/VRAM updates
 
-    GGI renderer: (-r ggi, --renderer=ggi) [requires libgii and libggi]
-    + allows mid-screen PPU/VRAM updates
-    + supports screenshots [requires libppm]
-    + uses direct buffer rendering [when available]
-    - fairly slow (especially at high bpp)
-    - supports only 1bpp, 4bpp, 8bpp, 16bpp, 24bpp and 32bpp
-    - no graphics debugging/ripping support
-
-    W renderer: (-r w, --renderer=w)
-    + allows mid-screen PPU/VRAM updates
-    + supports screenshots
-    - supports only 1bpp and 8bpp
-    - fairly slow
-    - no shared-memory rendering
-    - no graphics debugging/ripping support
-
     Don't draw anything: (-r none, --renderer=none)
     + very, very fast!
     - no display (sound still works)
@@ -375,49 +355,14 @@ Other X Window System servers are listed on:
 
   http://www.x.org/
 
-GGI (including libgii and libggi) is available from:
-
-  http://www.ggi-project.org/
-
 libppm is part of the netpbm package, available from web and ftp
 servers world-wide.
-
-The W Window System is available from:
-
-  http://www.students.tut.fi/~t150315/
 
 NOTE 1: libXpm (at least some versions) is badly broken for 1bpp X11
 visuals. A workaround is present in TuxNES, but XPM screenshots are
 very slow on 1bpp visuals as a result of this.
 
-NOTE 2: GGI's ggiUnpackPixels fails or is broken on some targets. As a
-result of this, TuxNES uses a workaround to capture screenshots on
-these targets. This workaround can cause flickering while the
-screenshot is saved, and under at least the "xlib" target, iconifying
-TuxNES during a screenshot will cause "missing" regions in the
-resulting image. The workaround is also very slow, but at least proper
-PPM screenshots are saved.
-
-NOTE 3: GGI is badly broken for some 1bpp targets (notably "x", but
-not "xlib",) and for DirectColor X11 visuals -- sorry! If this affects
-you, you should fix GGI and submit patches to the GGI maintainers. The
-typical symptom is a core dump on startup... although it seems to work
-fine using a direct buffer (in libggi-2.0b2.1, at least.) Also note
-that TuxNES treats all 1bpp targets as having broken ggiUnpackPixels
-implementations, and so uses the workaround described above -- but
-screenshots are broken under the "xlib" target at 1bpp anyhow.
-
-NOTE 4: Some GII input sources can't sense key release events, so they
-simulate key releases immediately following key presses. These input
-sources don't work right with TuxNES unless you use the --sticky-keys
-option.
-
-NOTE 5: Be sure to read the GGI and GII documentation if you use the
-"ggi" target. It includes numerous examples of target specifications
-and other library options, which are generally set using environment
-variables.
-
-NOTE 6: Note that some NES games change the palette in the middle of a
+NOTE 2: Note that some NES games change the palette in the middle of a
 screen refresh.  If you're using a palettized display and you notice
 color flickering or unusual delays, you can force static color
 allocation using the --static-color option.  This increases the number
@@ -425,7 +370,7 @@ of colors allocated, but as a nice side-effect multiple TuxNES
 invocations will be able to share palette entries (provided they're
 using the same palette data.)
 
-NOTE 7: The code for 4bpp rendering is untested, but it might work.
+NOTE 3: The code for 4bpp rendering is untested, but it might work.
 
 Joystick:
 =-------=

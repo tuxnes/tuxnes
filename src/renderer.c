@@ -32,18 +32,6 @@ extern void     UpdateDisplayX11(void);
 extern void     UpdateDisplayOldX11(void);
 #endif
 
-#ifdef HAVE_GGI
-extern int      InitDisplayGGI(int argc, char **argv);
-extern void     UpdateColorsGGI(void);
-extern void     UpdateDisplayGGI(void);
-#endif
-
-#ifdef HAVE_W
-extern int      InitDisplayW(int argc, char **argv);
-extern void     UpdateColorsW(void);
-extern void     UpdateDisplayW(void);
-#endif
-
 /* exports */
 int     InitDisplayAuto(int argc, char **argv);
 int     InitDisplayNone(int argc, char **argv);
@@ -66,16 +54,6 @@ struct Renderer renderers[] = {
 	  RENDERER_OLD,
 	  InitDisplayX11, UpdateDisplayOldX11, UpdateColorsX11 },
 #endif /* HAVE_X */
-#ifdef HAVE_GGI
-	{ "ggi", "GGI renderer",
-	  0,
-	  InitDisplayGGI, UpdateDisplayGGI, UpdateColorsGGI },
-#endif /* HAVE_GGI */
-#ifdef HAVE_W
-	{ "w", "W renderer",
-	  0,
-	  InitDisplayW, UpdateDisplayW, UpdateColorsW },
-#endif /* HAVE_W */
 	{ "auto", "Choose one automatically",
 	  0,
 	  InitDisplayAuto, 0, 0 },
@@ -113,36 +91,9 @@ InitDisplayAuto(int argc, char **argv)
 {
 	const char *rendname = 0;
 
-#ifdef HAVE_W
-	{
-		struct stat statbuf;
-		if (getenv("WDISPLAY")
-		 || (!access("/tmp/wserver", F_OK | W_OK)
-		  && (!stat("/tmp/wserver", &statbuf))
-		  && S_ISSOCK(statbuf.st_mode))) {
-			rendname = "w";
-		}
-	}
-#endif
 	if (getenv("DISPLAY")) {
 #ifdef HAVE_X
 		rendname = "x11";
-#endif
-#ifdef HAVE_GGI
-		if (!rendname)
-			rendname = "ggi";
-#endif
-#ifdef HAVE_W
-		if (!rendname)
-			rendname = "w";
-#endif
-	} else if (!rendname) {
-#ifdef HAVE_GGI
-		rendname = "ggi";
-#endif
-#ifdef HAVE_W
-		if (!rendname)
-			rendname = "w";
 #endif
 	}
 	if (!rendname) {
