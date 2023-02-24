@@ -29,7 +29,6 @@
 extern int      InitDisplayX11(int argc, char **argv);
 extern void     UpdateColorsX11(void);
 extern void     UpdateDisplayX11(void);
-extern void     UpdateDisplayOldX11(void);
 #endif
 
 /* exports */
@@ -45,22 +44,13 @@ extern void     fbinit(void);
 struct Renderer renderers[] = {
 #ifdef HAVE_X
 	{ "x11", "X11 renderer",
-	  0,
 	  InitDisplayX11, UpdateDisplayX11, UpdateColorsX11 },
-	{ "diff", "differential X11 renderer",
-	  RENDERER_DIFF,
-	  InitDisplayX11, UpdateDisplayX11, UpdateColorsX11 },
-	{ "old", "old X11 renderer (tile-based)",
-	  RENDERER_OLD,
-	  InitDisplayX11, UpdateDisplayOldX11, UpdateColorsX11 },
 #endif /* HAVE_X */
 	{ "auto", "Choose one automatically",
-	  0,
 	  InitDisplayAuto, 0, 0 },
 	{ "none", "Don't draw anything",
-	  0,
 	  InitDisplayNone, UpdateDisplayNone, UpdateColorsNone },
-	{ 0, 0, 0, 0, 0, 0 }     /* terminator */
+	{ 0, 0, 0, 0, 0 }     /* terminator */
 }, *renderer = 0;
 
 struct RendererConfig renderer_config = {

@@ -19,13 +19,8 @@ extern int      InitDisplayNone(int argc, char **argv);
 extern void     UpdateColorsNone(void);
 extern void     UpdateDisplayNone(void);
 
-/* renderer flags */
-#define RENDERER_OLD            1
-#define RENDERER_DIFF           2
-
 struct Renderer {
 	const char *name, *fullname;
-	int _flags;
 	int (*InitDisplay)(int argc, char **argv);
 	void (*UpdateDisplay)(void);
 	void (*UpdateColors)(void);

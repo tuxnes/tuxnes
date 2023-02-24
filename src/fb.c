@@ -170,16 +170,9 @@ fbinit(void)
 {
 	/* this is the default inter-line skip */
 	nextline = bytes_per_line;
-	if ((renderer->_flags & RENDERER_OLD)
-	 || (renderer->InitDisplay == InitDisplayNone)) {
+	if (renderer->InitDisplay == InitDisplayNone) {
 		/* Point drawimage to the no-op version */
 		drawimage = drawimage_old;
-	} else if (renderer->_flags & RENDERER_DIFF) {
-		/* Current: Point drawimage to the 8bpp version */
-		/* Ideal: for !indexedcolor, should be drawimage6 with nextline=192 */
-		/*        for indexedcolor, should be drawimage5 with nextline=160 */
-		nextline = 256;
-		drawimage = drawimage8;
 	} else {
 		/* Point drawimage to the correct version for the bpp used: */
 		if (bpp == 1) {
@@ -190,9 +183,6 @@ fbinit(void)
 			        "Warning: Using untested 4bpp rendering code\n"
 			        "\n"
 			        "This display code may be buggy or non-functional.\n"
-			        "\n"
-			        "In case of difficulty, switch to --renderer=diff\n"
-			        "                              or --renderer=old\n"
 			        "\n"
 			        "Please send a status report to <" PACKAGE_BUGREPORT ">.\n"
 			        "Describe the appearance of TuxNES, and whether it is correct.\n"
@@ -221,18 +211,12 @@ fbinit(void)
 			nextline = bytes_per_line / 4;
 		} else {
 			fprintf(stderr, "Don't know how to handle %dbpp\n", bpp);
-			fprintf(stderr,
-			        "As a temporary workaround, try --renderer=diff\n"
-			        "                            or --renderer=old\n");
 			exit(EXIT_FAILURE);
 		}
 		if ((bpp == 1) && (bpu > 8) && pix_swab) {
 			fprintf(stderr,
 			        "Don't know how to handle pix_swabbed %dbpp/%dbpu\n",
 			        bpp, bpu);
-			fprintf(stderr,
-			        "As a temporary workaround, try --renderer=diff\n"
-			        "                            or --renderer=old\n");
 			exit(EXIT_FAILURE);
 		}
 	}

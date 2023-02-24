@@ -602,7 +602,6 @@ help_synonyms(int terse)
 	printf("                      otherwise equivalent to --help=-%s\n",
 	       topics[ARRAY_LEN(topics) - 1].name);
 	printf("  -j, --joystick=FILE Equivalent to --js1=FILE\n");
-	printf("  -o, --old           Equivalent to --renderer=old\n");
 	printf("  -V, --version       Same information as --help=version\n");
 }
 
@@ -708,17 +707,6 @@ help_controls(int terse)
 	       "    Button 6         - Select button\n"
 	       "    Button 7         - Start button\n"
 	       "    Button 8         - Pause or resume emulation\n");
-#ifdef HAVE_X
-	printf("\n"
-	       "  Extra keys for old X11 renderer (--renderer=old)\n"
-	       "    F1          - Disable background\n"
-	       "    F2          - Re-enable background\n"
-	       "    F3          - Disable sprites\n"
-	       "    F4          - Re-enable sprites\n"
-	       "    F5          - Alternate tiles\n"
-	       "    F6          - Default tiles\n"
-	       "    F8          - Flush tile cache\n");
-#endif /* HAVE_X */
 	printf("\n"
 	       "  Extra Keys for VS UniSystem games:\n"
 	       "    [/{         - Insert Coin (Left)\n"
