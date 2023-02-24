@@ -1,22 +1,21 @@
-TuxNES version 0.75
-  http://tmmm.simplenet.com/tuxnes/index.html
+TuxNES
 
 About:
 =----=
     TuxNES is an emulator for the 8-bit Nintendo Entertainment System.
 
-    TuxNES is based on Nestra, a great public-domain NES emulator by
-Quor.  TuxNES adds many features not found in Nestra, and uses a more
-collaborative development model. Enhancements to Nestra often find
-their way into TuxNES.  Enhancements to TuxNES don't generally find
-their way into Nestra due to licensing restrictions (since pieces of
-TuxNES are generally copyrighted by their authors, and covered by the
-GNU General Public License,) although similar changes by the same
-authors sometimes find their way back into Nestra.
+    Development apparently started in 1999, with the project becoming
+apparently abandoned after version 0.75 in 2001.
+
+    TuxNES was based on Nestra by Quor.
+
+    Pieces of TuxNES are generally copyrighted by their authors, and
+covered by the GNU General Public License.
 
 Platforms:
 =--------=
-    TuxNES requires an x86-family processor.
+    TuxNES runs only on i386.  There is no amd64 support; on amd64
+it needs to be cross-compiled as i386.
 
     TuxNES should work with these operating systems:
 
