@@ -115,8 +115,6 @@ Major command-line options:
   -S, --static-color  Force static color allocation (prevents flicker)
   -r, --renderer=...  Select a rendering engine (default: auto)
       x11        X11 renderer
-      diff       differential X11 renderer
-      old        old X11 renderer (tile-based)
       auto       Choose one automatically
       none       Don't draw anything
   -I, --in-root       Display in root window
@@ -165,7 +163,6 @@ Alternate option names:
   -h, --help          Equivalent to --help=-help if stdout is a tty,
                       otherwise equivalent to --help=-all
   -j, --joystick=FILE Equivalent to --js1=FILE
-  -o, --old           Equivalent to --renderer=old
   -V, --version       Same information as --help=version
 
 Keyboard and joystick options and bindings:
@@ -238,15 +235,6 @@ Keyboard and joystick options and bindings:
     Button 7         - Start button
     Button 8         - Pause or resume emulation
 
-  Extra keys for old X11 renderer (--renderer=old)
-    F1          - Disable background
-    F2          - Re-enable background
-    F3          - Disable sprites
-    F4          - Re-enable sprites
-    F5          - Alternate tiles
-    F6          - Default tiles
-    F8          - Flush tile cache
-
   Extra Keys for VS UniSystem games:
     [/{         - Insert Coin (Left)
     ]/}         - Insert Coin (Right)
@@ -300,13 +288,11 @@ your computer. Try this:
 
 Graphics:
 =-------=
-    TuxNES has three different rendering engines, with different
-capabilities and limitations. Different renderers can be selected using
-the -r, --renderer=...  command-line option. Available renderers:
+    TuxNES has different rendering engines, with different capabilities
+and limitations. Different renderers can be selected using the -r,
+--renderer=...  command-line option. Available renderers:
 
       x11  = X11 renderer
-      diff = differential X11 renderer
-      old  = old X11 renderer (tile-based)
       none = Don't draw anything
 
     X11 renderer: (-r x11, --renderer=x11)
@@ -317,23 +303,6 @@ the -r, --renderer=...  command-line option. Available renderers:
     - supports only 1bpp, 4bpp, 8bpp, 16bpp, 24bpp and 32bpp
     - no graphics debugging/ripping support
 
-    differential X11 renderer: (-r diff, --renderer=diff)
-    + optimized differential display (ideal for >8bpp)
-    + allows mid-screen PPU/VRAM updates
-    + supports all bpps
-    + supports screenshots [requires libXpm]
-    + uses shared-memory XImages [when available]
-    - fairly slow (especially at 8bpp and lower)
-    - no graphics debugging/ripping support
-
-    old X11 renderer: (-r old, --renderer=old)
-    + very fast (provided the game doesn't change too many tiles at once)
-    + supports all bpps
-    + supports screenshots [requires libXpm]
-    + allows graphics debugging/ripping (F1-F6, F8)
-    - no shared-memory rendering
-    - doesn't support mid-screen PPU/VRAM updates
-
     Don't draw anything: (-r none, --renderer=none)
     + very, very fast!
     - no display (sound still works)
@@ -343,20 +312,6 @@ the -r, --renderer=...  command-line option. Available renderers:
 
 Renderer speed depends on many things. If performance is unacceptable,
 try another renderer.
-
-The X Window System is available many places. My favorite
-implementation, XFree86, is available from:
-
-  http://www.xfree86.org/
-
-libXpm is included in recent distributions of XFree86.
-
-Other X Window System servers are listed on:
-
-  http://www.x.org/
-
-libppm is part of the netpbm package, available from web and ftp
-servers world-wide.
 
 NOTE 1: libXpm (at least some versions) is badly broken for 1bpp X11
 visuals. A workaround is present in TuxNES, but XPM screenshots are
