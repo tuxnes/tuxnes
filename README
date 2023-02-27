@@ -4,10 +4,12 @@ About:
 =----=
     TuxNES is an emulator for the 8-bit Nintendo Entertainment System.
 
-    Development apparently started in 1999, with the project becoming
-apparently abandoned after version 0.75 in 2001.
+    TuxNES was initially based on Nestra by Quor, adopting a more collaborative
+development process than that project.  Development started in 1999, with the
+project apparently becoming abandoned after version 0.75 in 2001.
 
-    TuxNES was based on Nestra by Quor.
+    This fork by @asveikau on github attempts to simplify and improve image
+scaling.
 
     Pieces of TuxNES are generally copyrighted by their authors, and
 covered by the GNU General Public License.
@@ -35,6 +37,12 @@ the archive, uncompress it and type
     make
     make install
 
+    TuxNES JIT has not been ported to amd64 and will need to be built as an
+i386 binary.  eg. On Debian, after installing the cross-compilation tools, this
+can be accomplished via:
+
+    ./configure CC=i686-linux-gnu-gcc LD=i686-linux-gnu-ld
+
 Extra --enable and --with options understood by ./configure:
 
   --enable-warnings       enable more compilation warning checks [default=no]
@@ -58,7 +66,7 @@ Features:
 - game saving
 - built-in disassembler
 - joystick support (2- & 4-button)
-- experimental sound support
+- sound support
 - capture screenshots in X pixmap (xpm) or portable pixmap (ppm) format
 - Game Genie code support
 - trainer support
