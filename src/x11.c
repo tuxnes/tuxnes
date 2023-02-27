@@ -142,7 +142,6 @@ static int       screen;
 static Colormap colormap;
 
 static unsigned int paletteX11[64];
-static unsigned int palette2X11[64];
 
 static unsigned char    *keystate[32];
 static GC       gc, blackgc;
@@ -349,7 +348,6 @@ InitDisplayX11(int argc, char **argv)
 			color.pixel = colortableX11[x];
 			palette[x] = color.pixel;
 			XStoreColor(display, colormap, &color);
-			palette2[x] = BlackPixel(display, screen);
 		}
 	} else {
 		renderer_config.indexedcolor = 0;
@@ -366,7 +364,6 @@ InitDisplayX11(int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 			paletteX11[x] = color.pixel;
-			palette2X11[x] = BlackPixel(display, screen);
 		}
 	}
 	width = 256 * magstep;

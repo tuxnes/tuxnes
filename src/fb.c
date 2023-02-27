@@ -44,8 +44,6 @@ char    *fb = 0;
 char    *rfb = 0;
 int      palette_alloc[25];
 int     *palette = palette_alloc;
-int      palette_alloc2[25];
-int     *palette2 = palette_alloc2;
 
 void    (*drawimage)(int);
 void    fbinit(void);

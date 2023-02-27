@@ -54,7 +54,7 @@ extern unsigned char     vscrollreg;
 extern unsigned char     hscrollreg;
 extern char     *rfb;
 extern char     *fb;
-extern int      *palette, *palette2;
+extern int      *palette;
 extern char     *tuxnesdir;
 extern char *basefilename;  /* filename without extension */
 
