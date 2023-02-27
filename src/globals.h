@@ -50,7 +50,6 @@ extern unsigned int      vline;
 extern unsigned int      vscan;
 extern unsigned int      vwrap;
 extern unsigned int      scanpage;
-extern unsigned int      scanlines;
 extern unsigned char     vscrollreg;
 extern unsigned char     hscrollreg;
 extern char     *rfb;

@@ -54,7 +54,7 @@ AC_CHECK_HEADERS([ppm.h])
 
 AS_IF([test "x$no_x" != "xyes"],[
 	AC_CHECK_HEADERS([X11/xpm.h X11/vroot.h sys/ipc.h sys/shm.h])
-	AC_CHECK_HEADERS([X11/extensions/XShm.h X11/extensions/Xext.h X11/extensions/scrnsaver.h],[],[],[[#include <X11/Xlib.h>]])
+	AC_CHECK_HEADERS([X11/extensions/XShm.h X11/extensions/Xext.h X11/extensions/scrnsaver.h X11/extensions/Xrender.h],[],[],[[#include <X11/Xlib.h>]])
 ])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -92,6 +92,7 @@ AS_IF([test "x$no_x" != "xyes"],[
 	AC_CHECK_LIB([Xpm],[XpmWriteFileFromImage])
 	AC_CHECK_LIB([Xext],[XMissingExtension])
 	AC_CHECK_LIB([Xss],[XScreenSaverSuspend])
+	AC_CHECK_LIB([Xrender],[XRenderCreatePicture])
 	X_LIBS="$LIBS"
 	CFLAGS="$save_CFLAGS"
 	LIBS="$save_LIBS"

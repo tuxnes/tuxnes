@@ -20,6 +20,7 @@
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -110,6 +111,14 @@
 #define HAVE_SCRNSAVER 1
 #endif
 
+#if defined(HAVE_LIBXRENDER) && defined(HAVE_X11_EXTENSIONS_XRENDER_H)
+#define HAVE_XRENDER
+#endif
+
+#ifdef HAVE_XRENDER
+#include <X11/extensions/Xrender.h>
+#endif
+
 #endif /* HAVE_X */
 
 #define ARRAY_LEN(x) (sizeof (x) / sizeof *(x))
@@ -148,6 +157,7 @@ static unsigned long    colortableX11[25];
 static XColor   color;
 
 static Pixmap layout;                  /* To assemble the final image to be displayed */
+static Pixmap scalePix;
 static XImage   *image = 0;
 
 /* X11 virtual framebuffer */
@@ -239,6 +249,22 @@ handler(Display *display, XErrorEvent *ev)
 	return 0;
 }
 
+static bool XRenderSupported()
+{
+#ifdef HAVE_XRENDER
+	static bool checked = false, enabled = false;
+	int eventBase, errorBase;
+	if (!checked) {
+		if (XRenderQueryExtension(display, &eventBase, &errorBase))
+			enabled = true;
+		checked = true;
+	}
+	return enabled;
+#else
+	return false;
+#endif
+}
+
 int
 InitDisplayX11(int argc, char **argv)
 {
@@ -325,12 +351,6 @@ InitDisplayX11(int argc, char **argv)
 			XStoreColor(display, colormap, &color);
 			palette2[x] = BlackPixel(display, screen);
 		}
-		if (scanlines && (scanlines != 100)) {
-			fprintf(stderr,
-			        "[%s] Scanline intensity is ignored in indexed-color modes!\n",
-			        renderer->name);
-			scanlines = 0;
-		}
 	} else {
 		renderer_config.indexedcolor = 0;
 		/* convert palette to local color format */
@@ -348,31 +368,6 @@ InitDisplayX11(int argc, char **argv)
 			paletteX11[x] = color.pixel;
 			palette2X11[x] = BlackPixel(display, screen);
 		}
-		if (scanlines && (scanlines != 100))
-			for (x = 0; x < 64; x++) {
-				unsigned long r, g, b;
-
-				color.pixel = x;
-				r = (NES_palette[x] >> 8 & 0xff00) * (scanlines / 100.0);
-				if (r > 0xffff)
-					r = 0xffff;
-				color.red = r;
-				g = (NES_palette[x]      & 0xff00) * (scanlines / 100.0);
-				if (g > 0xffff)
-					g = 0xffff;
-				color.green = g;
-				b = (NES_palette[x] << 8 & 0xff00) * (scanlines / 100.0);
-				if (b > 0xffff)
-					b = 0xffff;
-				color.blue = b;
-				color.flags = DoRed | DoGreen | DoBlue;
-				if (XAllocColor(display, colormap, &color) == 0) {
-					fprintf(stderr, "[%s] Can't allocate extra colors!\n",
-					        renderer->name);
-					break;
-				}
-				palette2X11[x] = color.pixel;
-			}
 	}
 	width = 256 * magstep;
 	height = 240 * magstep;
@@ -467,16 +462,24 @@ InitDisplayX11(int argc, char **argv)
 	gettimeofday(&time, NULL);
 	renderer_data.basetime = time.tv_sec;
 	layout = XCreatePixmap(display, w, 256 * magstep, 240 * magstep, depth);
+	if (magstep != 1) {
+		if (!XRenderSupported()) {
+			fprintf(stderr, "x11: scaling requires XRENDER support\n");
+			exit(1);
+		}
+
+		scalePix = XCreatePixmap(display, w, 256, 240, depth);
+	}
 #ifdef HAVE_SHM
 	if ((shm_status == True)) {
 		if (depth == 1)
 			shm_image = XShmCreateImage(display, visual, depth,
 			                         XYBitmap, NULL, &shminfo,
-			                         256 * magstep, 240 * magstep);
+			                         256, 240);
 		else
 			shm_image = XShmCreateImage(display, visual, depth,
 			                         ZPixmap, NULL, &shminfo,
-			                         256 * magstep, 240 * magstep);
+			                         256, 240);
 		if (shm_image) {
 			bytes_per_line = shm_image->bytes_per_line;
 			shminfo.shmid = -1;
@@ -538,18 +541,18 @@ InitDisplayX11(int argc, char **argv)
 		        "XImage");
 	}
 	if (!image) {
-		bytes_per_line = 256 / 8 * magstep * bpp;
-		if (!(xfb = malloc(bytes_per_line * 240 * magstep))) {
+		bytes_per_line = 256 / 8 * bpp;
+		if (!(xfb = malloc(bytes_per_line * 240))) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
 		if (depth == 1)
 			image = XCreateImage(display, visual, depth,
-			                     XYBitmap, 0, xfb, 256 * magstep, 240 * magstep,
+			                     XYBitmap, 0, xfb, 256, 240,
 			                     8, bytes_per_line);
 		else
 			image = XCreateImage(display, visual, depth,
-			                     ZPixmap, 0, xfb, 256 * magstep, 240 * magstep,
+			                     ZPixmap, 0, xfb, 256, 240,
 			                     bpp, bytes_per_line);
 	}
 	rfb = fb = xfb;
@@ -814,6 +817,65 @@ HandleKeyboardX11(XEvent ev)
 		}
 }
 
+static void
+RenderImage(XEvent *ev)
+{
+	Drawable target = w;
+	int sx = 0, sy = 0;
+	int w_ = 256, h = 240;
+	int dx = (width - w_ * magstep) / 2;
+	int dy = (height - h * magstep) / 2;
+	int old_dx = dx;
+	int old_dy = dy;
+
+	if (magstep != 1) {
+		target = scalePix;
+		dx = 0;
+		dy = 0;
+	}
+
+#ifdef HAVE_SHM
+	if (shm_attached) {
+		XShmPutImage(display, target, gc, image,
+				sx, sy,
+				dx, dy,
+				w_, h,
+				True);
+		/* hang the event loop until we get a ShmCompletion */
+		ev->type = -1;
+	} else
+#endif
+	{
+		XPutImage(display, target, gc, image,
+				sx, sy,
+				dx, dy,
+				w_, h);
+		XFlush(display);
+	}
+
+	if (magstep != 1) {
+#ifdef HAVE_XRENDER
+		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, DefaultVisual(display, DefaultScreen(display)));
+		XRenderPictureAttributes attrs = {0};
+		Picture window = XRenderCreatePicture(display, w, fmt, 0, &attrs);
+		Picture frame = XRenderCreatePicture(display, scalePix, fmt, 0, &attrs);
+		double xscale = magstep, yscale = magstep;
+		XTransform transform =
+		{
+			{
+				{ XDoubleToFixed(1.0/xscale), XDoubleToFixed(0), XDoubleToFixed(0) },
+				{ XDoubleToFixed(0), XDoubleToFixed(1.0/yscale), XDoubleToFixed(0) },
+				{ XDoubleToFixed(0), XDoubleToFixed(0), XDoubleToFixed(1.0) }
+			}
+		};
+		XRenderSetPictureTransform(display, frame, &transform);
+		XRenderComposite(display, PictOpSrc, frame, None, window, 0,0, 0,0, old_dx, old_dy, w_*magstep, h*magstep);
+		XRenderFreePicture(display, window);
+		XRenderFreePicture(display, frame);
+#endif
+	}
+}
+
 void
 UpdateDisplayX11(void)
 {
@@ -846,42 +908,8 @@ UpdateDisplayX11(void)
 	if (!nodisplay) {
 		drawimage(PBL);
 		if (!frameskip) {
-			int r = 0, r0 = 0;
-			int y = 0;
-
 			UpdateColorsX11();
-
-			r = 240;
-			y += r;
-
-			if (r) {
-				r0 += r;
-#ifdef HAVE_SHM
-				if (shm_attached) {
-					XShmPutImage(display, w, gc, image, 0, (y - r) * magstep,
-					             (256 * magstep - width) / -2,
-					             ((240 - 2 * (y - r)) * magstep - height) / -2,
-					             256 * magstep, r * magstep,
-					             True);
-				} else
-#endif
-				{
-					XPutImage(display, w, gc, image, 0, (y - r) * magstep,
-					          (256 * magstep - width) / -2,
-					          ((240 - 2 * (y - r)) * magstep - height) / -2,
-					          256 * magstep, r * magstep);
-				}
-			} if (r0) {
-#ifdef HAVE_SHM
-				if (shm_attached) {
-					/* hang the event loop until we get a ShmCompletion */
-					ev.type = -1;
-				} else
-#endif
-				{
-					XFlush(display);
-				}
-			}
+			RenderImage(&ev);
 			renderer_data.redrawall = renderer_data.needsredraw = 0;
 		}
 	}
@@ -942,27 +970,11 @@ UpdateDisplayX11(void)
 				}
 			}
 			if (ev.type == Expose) {
+
 				XExposeEvent *xev = (XExposeEvent *)&ev;
 
 				if (!xev->count) {
-#ifdef HAVE_SHM
-					if (shm_attached) {
-						XShmPutImage(display, w, gc, image, 0, 0,
-						             (256 * magstep - width) / -2,
-						             (240 * magstep - height) / -2,
-						             256 * magstep, 240 * magstep,
-						             True);
-						/* hang the event loop until we get a ShmCompletion */
-						ev.type = -1;
-					} else
-#endif
-					{
-						XPutImage(display, w, gc, image, 0, 0,
-						          (256 * magstep - width) / -2,
-						          (240 * magstep - height) / -2,
-						          256 * magstep, 240 * magstep);
-						XFlush(display);
-					}
+					RenderImage(&ev);
 				}
 			}
 			if (renderer_data.pause_display && renderer_data.needsredraw) {
@@ -1031,8 +1043,6 @@ UpdateColorsX11(void)
 	} else /* truecolor */ {
 		currentbgcolor = paletteX11[VRAM[0x3f00] & 63];
 		palette[24] = currentbgcolor;
-		if (scanlines && (scanlines != 100))
-			palette2[24] = palette2X11[VRAM[0x3f00] & 63];
 		if (oldbgcolor != currentbgcolor) {
 			XSetForeground(display, solidbggc, currentbgcolor);
 			XSetForeground(display, bgcolorgc, currentbgcolor);
@@ -1064,8 +1074,6 @@ UpdateColorsX11(void)
 	} else /* truecolor */ {
 		for (int x = 0; x < 24; x++) {
 			palette[x] = paletteX11[VRAM[0x3f01 + x + (x / 3)] & 63];
-			if (scanlines && (scanlines != 100))
-				palette2[x] = palette2X11[VRAM[0x3f01 + x + (x / 3)] & 63];
 		}
 	}
 }

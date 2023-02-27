@@ -17,43 +17,19 @@
 #if (BPP==1)
 #define endian_fix(x) (x)
 #define pixel_t unsigned char
-#if DOUBLE
-#if SCANLINES
-void    drawimage1s(int);
-#else
-void    drawimage1d(int);
-#endif
-#else
-void    drawimage1(int);
-#endif
+#define DRAW_IMAGE drawimage1
 #endif
 
 #if (BPP==4)
 #define endian_fix(x) ((x) | ((x) << 4))
 #define pixel_t unsigned char
-#if DOUBLE
-#if SCANLINES
-void    drawimage4s(int);
-#else
-void    drawimage4d(int);
-#endif
-#else
-void    drawimage4(int);
-#endif
+#define DRAW_IMAGE drawimage4
 #endif
 
 #if (BPP==8)
 #define endian_fix(x) (x)
 #define pixel_t unsigned char
-#if DOUBLE
-#if SCANLINES
-void    drawimage8s(int);
-#else
-void    drawimage8d(int);
-#endif
-#else
-void    drawimage8(int);
-#endif
+#define DRAW_IMAGE drawimage8
 #endif
 
 #if (BPP==16)
@@ -62,15 +38,7 @@ void    drawimage8(int);
          ? ((((x) & 0xFF) << 8) | ((x) >> 8)) \
          : (x))
 #define pixel_t unsigned short int
-#if DOUBLE
-#if SCANLINES
-void    drawimage16s(int);
-#else
-void    drawimage16d(int);
-#endif
-#else
-void    drawimage16(int);
-#endif
+#define DRAW_IMAGE drawimage16
 #endif
 
 #if (BPP==24)
@@ -79,15 +47,7 @@ void    drawimage16(int);
          ? ((((x) & 0xFF) << 16) | ((x) & 0xFF00) | ((x) >> 16)) \
          : (x))
 #define pixel_t unsigned char
-#if DOUBLE
-#if SCANLINES
-void    drawimage24s(int);
-#else
-void    drawimage24d(int);
-#endif
-#else
-void    drawimage24(int);
-#endif
+#define DRAW_IMAGE drawimage24
 #endif
 
 #if (BPP==32)
@@ -99,15 +59,7 @@ void    drawimage24(int);
             | ((x) >> 24)) \
          : (x))
 #define pixel_t unsigned int
-#if DOUBLE
-#if SCANLINES
-void    drawimage32s(int);
-#else
-void    drawimage32d(int);
-#endif
-#else
-void    drawimage32(int);
-#endif
+#define DRAW_IMAGE drawimage32
 #endif
 
 #undef rpixmap
@@ -116,84 +68,8 @@ void    drawimage32(int);
 #undef pixmap
 #define pixmap ((pixel_t *)fb)
 
-#if DOUBLE
-#if SCANLINES
-#if (BPP==1)
 void
-drawimage1s(int endclock)
-#endif
-#if (BPP==4)
-void
-drawimage4s(int endclock)
-#endif
-#if (BPP==8)
-void
-drawimage8s(int endclock)
-#endif
-#if (BPP==16)
-void
-drawimage16s(int endclock)
-#endif
-#if (BPP==24)
-void
-drawimage24s(int endclock)
-#endif
-#if (BPP==32)
-void
-drawimage32s(int endclock)
-#endif
-#else
-#if (BPP==1)
-void
-drawimage1d(int endclock)
-#endif
-#if (BPP==4)
-void
-drawimage4d(int endclock)
-#endif
-#if (BPP==8)
-void
-drawimage8d(int endclock)
-#endif
-#if (BPP==16)
-void
-drawimage16d(int endclock)
-#endif
-#if (BPP==24)
-void
-drawimage24d(int endclock)
-#endif
-#if (BPP==32)
-void
-drawimage32d(int endclock)
-#endif
-#endif
-#else
-#if (BPP==1)
-void
-drawimage1(int endclock)
-#endif
-#if (BPP==4)
-void
-drawimage4(int endclock)
-#endif
-#if (BPP==8)
-void
-drawimage8(int endclock)
-#endif
-#if (BPP==16)
-void
-drawimage16(int endclock)
-#endif
-#if (BPP==24)
-void
-drawimage24(int endclock)
-#endif
-#if (BPP==32)
-void
-drawimage32(int endclock)
-#endif
-#endif
+DRAW_IMAGE(int endclock)
 {
 	static unsigned int lastclock = 0;
 	static unsigned int curhscroll = 0;
@@ -215,14 +91,8 @@ drawimage32(int endclock)
 	static unsigned char byte1, byte2;
 #if (BPP==24)
 	static unsigned int curpal[4];
-#if DOUBLE && SCANLINES
-	static unsigned int curpal2[4];
-#endif
 #else
 	static pixel_t curpal[4];
-#if DOUBLE && SCANLINES
-	static pixel_t curpal2[4];
-#endif
 #endif
 	static unsigned char tilecolor;
 	static pixel_t *rptr, *rptr0;
@@ -262,9 +132,6 @@ drawimage32(int endclock)
 		else if (hvmirror == 1)
 			scanpage = 0x2000 + ((RAM[0x2000] & 2) << 9);   /* h-mirror, v-layout */
 		curpal[0] = endian_fix(palette[24]);
-#if DOUBLE && SCANLINES
-		curpal2[0] = endian_fix(palette2[24]);
-#endif
 		rptr0 = rptr = rpixmap;
 		ptr0 = ptr = pixmap;
 #if (BPP==1)
@@ -316,11 +183,6 @@ drawimage32(int endclock)
 		curpal[1] = endian_fix(palette[3 * (tilecolor & 3)]);
 		curpal[2] = endian_fix(palette[3 * (tilecolor & 3) + 1]);
 		curpal[3] = endian_fix(palette[3 * (tilecolor & 3) + 2]);
-#if DOUBLE && SCANLINES
-		curpal2[1] = endian_fix(palette2[3 * (tilecolor & 3)]);
-		curpal2[2] = endian_fix(palette2[3 * (tilecolor & 3) + 1]);
-		curpal2[3] = endian_fix(palette2[3 * (tilecolor & 3) + 2]);
-#endif
 	}
 
 	while (curclock < endclock) {
@@ -328,126 +190,40 @@ drawimage32(int endclock)
 			if (RAM[0x2001] & 8) {
 				bit--;
 #if (BPP==1)
-#if (DOUBLE && !SCANLINES)
-				ptr[nextline] =
-#endif
 				*ptr = (*rptr & ~pix_mask)
 				     | ((curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >> 7) | ((byte2 & 0x80) >> 6))]) ? pix_mask : 0);
-#if (DOUBLE && SCANLINES)
-				ptr[nextline] = (rptr[nextline] & ~pix_mask)
-				              | ((curpal2[bgmask[hposition - 85]]) ? pix_mask : 0);
-#endif
 #elif (BPP==4)
-#if (DOUBLE && !SCANLINES)
-				ptr[nextline] =
-#endif
 				*ptr = (*rptr & ~pix_mask)
 				     | ((curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >> 7) | ((byte2 & 0x80) >> 6))]) & pix_mask);
-#if (DOUBLE && SCANLINES)
-				ptr[nextline] = (rptr[nextline] & ~pix_mask)
-				              | ((curpal2[bgmask[hposition - 85]]) & pix_mask);
-#endif
 #elif (BPP == 24)
 				bgmask[hposition - 85] = (((byte1 & 0x80) >> 7)
 				                       |  ((byte2 & 0x80) >> 6));
 				for (pix_byte = 0; pix_byte < 3; pix_byte++) {
-#if DOUBLE
-#if !SCANLINES
-					ptr[nextline + 3 + pix_byte] =
-					ptr[nextline + pix_byte] =
-#endif
-					ptr[3 + pix_byte] =
-#endif
 					ptr[pix_byte] = (curpal[bgmask[hposition - 85]]) >> (8 * pix_byte);
-#if DOUBLE && SCANLINES
-					ptr[nextline + 3 + pix_byte] =
-					ptr[nextline + pix_byte] = (curpal2[bgmask[hposition - 85]]) >> (8 * pix_byte);
-#endif
 				}
 #else /* (BPP != 1) && (BPP != 24) */
-#if DOUBLE
-#if !SCANLINES
-				ptr[nextline + 1] =
-				ptr[nextline] =
-#endif
 				ptr[1] =
 #endif
 				*ptr = curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >> 7) | ((byte2 & 0x80) >> 6))];
-#if DOUBLE && SCANLINES
-				ptr[nextline + 1] =
-				ptr[nextline] = curpal2[bgmask[hposition - 85]];
-#endif
-#endif
 				byte1 <<= 1;
 				byte2 <<= 1;
 			} else {
 				/* Blank screen / Background color */
 #if (BPP==1)
-#if DOUBLE && !SCANLINES
-				ptr[nextline] =
-#endif
 				*ptr = (*rptr & ~pix_mask)
 				     | (*curpal ? pix_mask : 0);
-#if DOUBLE && SCANLINES
-				ptr[nextline] = (rptr[nextline] & ~pix_mask)
-				              | (*curpal2 ? pix_mask : 0);
-#endif
 #elif (BPP==4)
-#if DOUBLE && !SCANLINES
-				ptr[nextline] =
-#endif
 				*ptr = (*rptr & ~pix_mask)
 				     | (*curpal & pix_mask);
-#if DOUBLE && SCANLINES
-				ptr[nextline] = (rptr[nextline] & ~pix_mask)
-				              | (*curpal2 & pix_mask);
-#endif
 #elif (BPP==24)
 				for (pix_byte = 0; pix_byte < 3; pix_byte++) {
-#if DOUBLE
-#if !SCANLINES
-					ptr[nextline + 3 + pix_byte] =
-					ptr[nextline + pix_byte] =
-#endif
-					ptr[3 + pix_byte] =
-#endif
 					ptr[pix_byte] = (*curpal) >> (8 * pix_byte);
-#if DOUBLE && SCANLINES
-					ptr[nextline + 3 + pix_byte] =
-					ptr[nextline + pix_byte] = (*curpal2) >> (8 * pix_byte);
-#endif
 				}
 #else /* (BPP != 1) && (BPP != 24) */
-#if DOUBLE
-#if !SCANLINES
-				ptr[nextline + 1] =
-				ptr[nextline] =
-#endif
-				ptr[1] =
-#endif
 				*ptr = *curpal;
-#if DOUBLE && SCANLINES
-				ptr[nextline + 1] =
-				ptr[nextline] = *curpal2;
-#endif
 #endif
 			}
 #if (BPP==1)
-#if DOUBLE
-			if (lsb_first) {
-				if (!(pix_mask <<= 2)) {
-					pix_mask = 3;
-					rptr++;
-					ptr++;
-				}
-			} else {
-				if (!(pix_mask >>= 2)) {
-					pix_mask = 0xc0;
-					rptr++;
-					ptr++;
-				}
-			}
-#else
 			if (lsb_first) {
 				if (!(pix_mask <<= 1)) {
 					pix_mask = 1;
@@ -461,12 +237,7 @@ drawimage32(int endclock)
 					ptr++;
 				}
 			}
-#endif
 #elif (BPP==4)
-#if DOUBLE
-			rptr++;
-			ptr++;
-#else
 			if (lsb_first) {
 				if (!(pix_mask <<= 4)) {
 					pix_mask = 0x0f;
@@ -480,19 +251,10 @@ drawimage32(int endclock)
 					ptr++;
 				}
 			}
-#endif
 #elif (BPP==24)
-#if DOUBLE
-			rptr+=3;
-			ptr+=3;
-#endif
 			rptr+=3;
 			ptr+=3;
 #else
-#if DOUBLE
-			rptr++;
-			ptr++;
-#endif
 			rptr++;
 			ptr++;
 #endif
@@ -517,11 +279,6 @@ drawimage32(int endclock)
 					curpal[1] = endian_fix(palette[3 * (tilecolor & 3)]);
 					curpal[2] = endian_fix(palette[3 * (tilecolor & 3) + 1]);
 					curpal[3] = endian_fix(palette[3 * (tilecolor & 3) + 2]);
-#if DOUBLE && SCANLINES
-					curpal2[1] = endian_fix(palette2[3 * (tilecolor & 3)]);
-					curpal2[2] = endian_fix(palette2[3 * (tilecolor & 3) + 1]);
-					curpal2[3] = endian_fix(palette2[3 * (tilecolor & 3) + 2]);
-#endif
 				}
 			}
 		}
@@ -596,25 +353,6 @@ drawimage32(int endclock)
 				for (x = 0; x < 256; x++) {
 					if (linebuffer[x]) {
 #if (BPP==1)
-#if DOUBLE
-						unsigned int offset = spriteram[s * 4 + 3] + x;
-						unsigned char mask;
-
-						if (lsb_first)
-							mask = 3 << ((offset & 3) << 1);
-						else
-							mask = 0xc0 >> ((offset & 3) << 1);
-						offset = (offset >> 2);
-#if !SCANLINES
-						ptr0[offset + nextline] =
-#endif
-						ptr0[offset] = (rptr0[offset] & ~mask)
-						             | endian_fix(palette[linebuffer[x]] ? mask : 0);
-#if SCANLINES
-						ptr0[offset + nextline] = (rptr0[offset + nextline] & ~mask)
-						                        | endian_fix(palette2[linebuffer[x]] ? mask : 0);
-#endif
-#else
 						unsigned int offset = spriteram[s * 4 + 3] + x;
 						unsigned char mask;
 
@@ -625,17 +363,7 @@ drawimage32(int endclock)
 						offset = (offset >> 3);
 						ptr0[offset] = (rptr0[offset] & ~mask)
 						             | endian_fix(palette[linebuffer[x]] ? mask : 0);
-#endif
 #elif (BPP==4)
-#if DOUBLE
-#if !SCANLINES
-						ptr0[spriteram[s * 4 + 3] + x + nextline] =
-#endif
-						ptr0[spriteram[s * 4 + 3] + x] = endian_fix(palette[linebuffer[x]]);
-#if SCANLINES
-						ptr0[spriteram[s * 4 + 3] + x + nextline] = endian_fix(palette2[linebuffer[x]]);
-#endif
-#else
 						unsigned int offset = spriteram[s * 4 + 3] + x;
 						unsigned char mask;
 
@@ -646,39 +374,12 @@ drawimage32(int endclock)
 						offset = (offset >> 1);
 						ptr0[offset] = (rptr0[offset] & ~mask)
 						             | endian_fix(palette[linebuffer[x]] & mask);
-#endif
 #elif (BPP==24)
 						for (pix_byte = 0; pix_byte < 3; pix_byte++) {
-#if DOUBLE
-#if !SCANLINES
-							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3 + nextline + pix_byte] =
-							ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3 + nextline + pix_byte] =
-#endif
-							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3 + pix_byte] =
-							ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3 + pix_byte] = endian_fix(palette[linebuffer[x]]) >> (8 * pix_byte);
-#if SCANLINES
-							ptr0[((spriteram[s * 4 + 3] + x) * 2 + 1) * 3 + nextline + pix_byte] =
-							ptr0[((spriteram[s * 4 + 3] + x) * 2) * 3 + nextline + pix_byte] = endian_fix(palette2[linebuffer[x]]) >> (8 * pix_byte);
-#endif
-#else
 							ptr0[(spriteram[s * 4 + 3] + x) * 3 + pix_byte] = endian_fix(palette[linebuffer[x]]) >> (8 * pix_byte);
-#endif
 						}
 #else /* (BPP != 1) && (BPP != 24) */
-#if DOUBLE
-#if !SCANLINES
-						ptr0[(spriteram[s * 4 + 3] + x) * 2 + 1 + nextline] =
-						ptr0[(spriteram[s * 4 + 3] + x) * 2 + nextline] =
-#endif
-						ptr0[(spriteram[s * 4 + 3] + x) * 2 + 1] =
-						ptr0[(spriteram[s * 4 + 3] + x) * 2] = endian_fix(palette[linebuffer[x]]);
-#if SCANLINES
-						ptr0[(spriteram[s * 4 + 3] + x) * 2 + 1 + nextline] =
-						ptr0[(spriteram[s * 4 + 3] + x) * 2 + nextline] = endian_fix(palette2[linebuffer[x]]);
-#endif
-#else
 						ptr0[spriteram[s * 4 + 3] + x] = endian_fix(palette[linebuffer[x]]);
-#endif
 #endif
 					}
 				}
@@ -687,10 +388,6 @@ drawimage32(int endclock)
 			/* Next line */
 			rptr = rptr0 + nextline;
 			ptr = ptr0 + nextline;
-#if DOUBLE
-			rptr += nextline;
-			ptr += nextline;
-#endif
 			rptr0 = rptr;
 			ptr0 = ptr;
 			currentline++;
@@ -726,11 +423,6 @@ drawimage32(int endclock)
 			curpal[1] = endian_fix(palette[3 * (tilecolor & 3)]);
 			curpal[2] = endian_fix(palette[3 * (tilecolor & 3) + 1]);
 			curpal[3] = endian_fix(palette[3 * (tilecolor & 3) + 2]);
-#if DOUBLE && SCANLINES
-			curpal2[1] = endian_fix(palette2[3 * (tilecolor & 3)]);
-			curpal2[2] = endian_fix(palette2[3 * (tilecolor & 3) + 1]);
-			curpal2[3] = endian_fix(palette2[3 * (tilecolor & 3) + 2]);
-#endif
 			hposition = 85;
 			curclock += 85;
 		}
@@ -739,3 +431,5 @@ drawimage32(int endclock)
 	if ((lastclock = endclock) >= PBL)
 		lastclock = 0;
 }
+
+#undef DRAW_IMAGE

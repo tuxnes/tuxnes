@@ -40,7 +40,6 @@ unsigned int    vscan = 0;
 unsigned int    frameskip = 0;
 unsigned int    vwrap = 0;
 unsigned int    scanpage = 0;
-unsigned int    scanlines = 100;
 char    *fb = 0;
 char    *rfb = 0;
 int      palette_alloc[25];
@@ -53,81 +52,6 @@ void    fbinit(void);
 
 void    mmc2_4_latch(int);
 void    mmc2_4_latchspr(int);
-
-#undef DOUBLE
-#define DOUBLE 0
-
-#undef SCANLINES
-#define SCANLINES 0
-
-#define BPP 1
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 4
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 8
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 16
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 24
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 32
-#include "pixels.h"
-
-#undef BPP
-
-#undef DOUBLE
-#define DOUBLE 1
-
-#undef SCANLINES
-#define SCANLINES 0
-
-#define BPP 1
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 4
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 8
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 16
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 24
-#include "pixels.h"
-
-#undef BPP
-
-#define BPP 32
-#include "pixels.h"
-
-#undef BPP
-
-#undef SCANLINES
-#define SCANLINES 1
 
 #define BPP 1
 #include "pixels.h"
@@ -176,7 +100,7 @@ fbinit(void)
 	} else {
 		/* Point drawimage to the correct version for the bpp used: */
 		if (bpp == 1) {
-			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage1s : &drawimage1d : &drawimage1;
+			drawimage = drawimage1;
 		} else if (bpp == 4) {
 			fprintf(stderr,
 			        "======================================================\n"
@@ -198,16 +122,16 @@ fbinit(void)
 			system("uname -a >&2");
 			fprintf(stderr, "======================================================\n");
 			fflush(stderr);
-			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage4s : &drawimage4d : &drawimage4;
+			drawimage = drawimage4;
 		} else if (bpp == 8) {
-			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage8s : &drawimage8d : &drawimage8;
+			drawimage = drawimage8;
 		} else if (bpp == 16) {
-			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage16s : &drawimage16d : &drawimage16;
+			drawimage = drawimage16;
 			nextline = bytes_per_line / 2;
 		} else if (bpp == 24) {
-			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage24s : &drawimage24d : &drawimage24;
+			drawimage = drawimage24;
 		} else if (bpp == 32) {
-			drawimage = (magstep == 2) ? (scanlines != 100) ? &drawimage32s : &drawimage32d : &drawimage32;
+			drawimage = drawimage32;
 			nextline = bytes_per_line / 4;
 		} else {
 			fprintf(stderr, "Don't know how to handle %dbpp\n", bpp);

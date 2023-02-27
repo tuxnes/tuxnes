@@ -536,7 +536,6 @@ help_options(int terse)
 	printf("  -G, --geometry=WxH  Specify window/screen geometry\n");
 	printf("      --display=ID    Specify display/driver ID\n");
 	printf("  -E, --enlarge[=NUM] Enlarge by a factor of NUM (default: 2)\n");
-	printf("  -L, --scanlines[=%%] Set alternate scanline intensity (default: 0%%)\n");
 	printf("  -S, --static-color  Force static color allocation (prevents flicker)\n");
 	printf("  -r, --renderer=...  Select a rendering engine (default: auto)\n");
 	for (renderer = renderers; renderer->name; renderer++)
@@ -1076,7 +1075,6 @@ main(int argc, char **argv)
 			{"enlarge", 2, 0, 'E'},
 			{"geometry", 1, 0, 'G'},
 			{"display", 1, 0, 0},
-			{"scanlines", 2, 0, 'L'},
 			{"renderer", 1, 0, 'r'},
 			{"echo", 0, 0, 'e'},
 			{"swap-inputs", 0, 0, 'X'},
@@ -1259,12 +1257,6 @@ main(int argc, char **argv)
 			else
 				magstep = 2;
 			break;
-		case 'L':
-			if (optarg && *optarg)
-				scanlines = atoi(optarg);
-			else
-				scanlines = 0;
-			break;
 		case 'r':
 			rendname = optarg;
 			break;
@@ -1310,9 +1302,6 @@ main(int argc, char **argv)
 		}
 	}
 
-	if ((scanlines != 100) && !magstep) {
-		magstep = 2;
-	}
 	if (magstep < 1) {
 		magstep = 1;
 	}
