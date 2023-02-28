@@ -202,9 +202,8 @@ DRAW_IMAGE(int endclock)
 					ptr[pix_byte] = (curpal[bgmask[hposition - 85]]) >> (8 * pix_byte);
 				}
 #else /* (BPP != 1) && (BPP != 24) */
-				ptr[1] =
-#endif
 				*ptr = curpal[bgmask[hposition - 85] = (((byte1 & 0x80) >> 7) | ((byte2 & 0x80) >> 6))];
+#endif
 				byte1 <<= 1;
 				byte2 <<= 1;
 			} else {
