@@ -144,7 +144,6 @@ static XGCValues        GCValues;
 static unsigned long    colortableX11[25];
 static XColor   color;
 
-static Pixmap layout;                  /* To assemble the final image to be displayed */
 #ifdef HAVE_XRENDER
 static Pixmap scalePixmap;
 static Picture scalePicture, windowPicture;
@@ -450,7 +449,6 @@ InitDisplayX11(int argc, char **argv)
 	XFlush(display);
 	gettimeofday(&time, NULL);
 	renderer_data.basetime = time.tv_sec;
-	layout = XCreatePixmap(display, w, 256 * magstep, 240 * magstep, depth);
 	if (magstep != 1) {
 		if (!XRenderSupported()) {
 			fprintf(stderr, "x11: scaling requires XRENDER support\n");
@@ -972,11 +970,7 @@ UpdateDisplayX11(void)
 				}
 			}
 			if (renderer_data.pause_display && renderer_data.needsredraw) {
-				XCopyArea(display, layout, w, gc,
-				          0, 0,
-				          256 * magstep, 240 * magstep,
-				          (256 * magstep - width) / -2,
-				          (240 * magstep - height) / -2);
+				RenderImage(&ev);
 				renderer_data.needsredraw = 0;
 			}
 		}
