@@ -64,37 +64,26 @@
 #endif /* HAVE_X11_VROOT_H */
 
 /* check for XPM support */
-#ifdef HAVE_LIBXPM
-#ifdef HAVE_X11_XPM_H
+#if defined(HAVE_LIBXPM) && defined(HAVE_X11_XPM_H)
 
 #include <X11/xpm.h>
 
 #define HAVE_XPM 1
-
-#endif /* HAVE_X11_XPM_H */
-#endif /* HAVE_LIBXPM */
+#endif
 
 /* check for X Extension support */
-#ifdef HAVE_LIBXEXT
-#ifdef HAVE_X11_EXTENSIONS_XEXT_H
+#if defined(HAVE_LIBXEXT) && defined(HAVE_X11_EXTENSIONS_XEXT_H)
 
 #include <X11/extensions/Xext.h>
 
 #define HAVE_XEXT 1
-
-#endif /* HAVE_X11_EXTENSIONS_XEXT_H */
-#endif /* HAVE_LIBXEXT */
+#endif
 
 /* check for X Shared Memory extension */
-#ifdef HAVE_XEXT
-#ifdef HAVE_SYS_IPC_H
-#ifdef HAVE_SYS_SHM_H
-#ifdef HAVE_X11_EXTENSIONS_XSHM_H
+#if defined(HAVE_XEXT) && defined(HAVE_SYS_IPC_H) && \
+    defined(HAVE_SYS_SHM_H) && defined(HAVE_X11_EXTENSIONS_XSHM_H)
 #define HAVE_SHM 1
-#endif /* HAVE_X11_EXTENSIONS_XSHM_H */
-#endif /* HAVE_SYS_SHM_H */
-#endif /* HAVE_SYS_IPC_H */
-#endif /* HAVE_XEXT */
+#endif
 
 #ifdef HAVE_SHM
 #include <sys/ipc.h>
