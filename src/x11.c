@@ -156,7 +156,10 @@ static unsigned long    colortableX11[25];
 static XColor   color;
 
 static Pixmap layout;                  /* To assemble the final image to be displayed */
-static Pixmap scalePix;
+#ifdef HAVE_XRENDER
+static Pixmap scalePixmap;
+static Picture scalePicture, windowPicture;
+#endif
 static XImage   *image = 0;
 
 /* X11 virtual framebuffer */
@@ -465,7 +468,15 @@ InitDisplayX11(int argc, char **argv)
 			exit(1);
 		}
 
-		scalePix = XCreatePixmap(display, w, 256, 240, depth);
+#ifdef HAVE_XRENDER
+		scalePixmap = XCreatePixmap(display, w, 256, 240, depth);
+
+		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, DefaultVisual(display, DefaultScreen(display)));
+		XRenderPictureAttributes attrs = {0};
+
+		windowPicture = XRenderCreatePicture(display, w, fmt, 0, &attrs);
+		scalePicture = XRenderCreatePicture(display, scalePixmap, fmt, 0, &attrs);
+#endif
 	}
 #ifdef HAVE_SHM
 	if ((shm_status == True)) {
@@ -822,14 +833,17 @@ RenderImage(XEvent *ev)
 	int w_ = 256, h = 240;
 	int dx = (width - w_ * magstep) / 2;
 	int dy = (height - h * magstep) / 2;
+
+#ifdef HAVE_XRENDER
 	int old_dx = dx;
 	int old_dy = dy;
 
 	if (magstep != 1) {
-		target = scalePix;
+		target = scalePixmap;
 		dx = 0;
 		dy = 0;
 	}
+#endif
 
 #ifdef HAVE_SHM
 	if (shm_attached) {
@@ -850,12 +864,8 @@ RenderImage(XEvent *ev)
 		XFlush(display);
 	}
 
-	if (magstep != 1) {
 #ifdef HAVE_XRENDER
-		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, DefaultVisual(display, DefaultScreen(display)));
-		XRenderPictureAttributes attrs = {0};
-		Picture window = XRenderCreatePicture(display, w, fmt, 0, &attrs);
-		Picture frame = XRenderCreatePicture(display, scalePix, fmt, 0, &attrs);
+	if (magstep != 1) {
 		double xscale = magstep, yscale = magstep;
 		XTransform transform =
 		{
@@ -865,12 +875,10 @@ RenderImage(XEvent *ev)
 				{ XDoubleToFixed(0), XDoubleToFixed(0), XDoubleToFixed(1.0) }
 			}
 		};
-		XRenderSetPictureTransform(display, frame, &transform);
-		XRenderComposite(display, PictOpSrc, frame, None, window, 0,0, 0,0, old_dx, old_dy, w_*magstep, h*magstep);
-		XRenderFreePicture(display, window);
-		XRenderFreePicture(display, frame);
-#endif
+		XRenderSetPictureTransform(display, scalePicture, &transform);
+		XRenderComposite(display, PictOpSrc, scalePicture, None, windowPicture, 0,0, 0,0, old_dx, old_dy, w_*magstep, h*magstep);
 	}
+#endif
 }
 
 void
