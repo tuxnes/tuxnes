@@ -1329,7 +1329,7 @@ main(int argc, char **argv)
 				basename = &filename[i + 1];
 				baselen = namelen - i - 1;
 			} else if (filename[i] == '.') {
-				baselen -= namelen - i;
+				baselen = namelen - i;
 			}
 		}
 
