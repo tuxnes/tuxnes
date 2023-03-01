@@ -98,5 +98,10 @@ AS_IF([test "x$no_x" != "xyes"],[
 	LIBS="$save_LIBS"
 ])
 
+# HQX especially needs -O3 for vectorization
+AS_IF([test "x$enable_debug" = "xyes"],
+  [CFLAGS="-Wall -g -O0"],
+  [CFLAGS="-O3"])
+
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

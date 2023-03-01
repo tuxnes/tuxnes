@@ -30,8 +30,12 @@ it needs to be cross-compiled as i386.
 
 Installing:
 =---------=
-    TuxNES follows the standard GNU process for installing tarballs. Download
-the archive, uncompress it and type
+    Note that the github project has the HQX scaler as a submodule.  You'll
+need to fetch it via:
+
+    git submodule update --init
+
+    From there we follow the normal autoconf process:
 
     ./configure
     make

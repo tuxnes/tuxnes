@@ -52,12 +52,11 @@ extern struct RendererData {
 	int        redrawall;              /* Redraw all scanlines */
 } renderer_data;
 
-/* only 1x1 or 2x2 integer scaling is permitted for now */
-#define maxsize 2
+#define maxsize 4
 
 #define tilecachedepth 25
 
-extern int              magstep;
+extern int              magstep, scaler_magstep;
 extern unsigned int     currentbgcolor, oldbgcolor;
 extern unsigned char    palette_cache[tilecachedepth][32];
 

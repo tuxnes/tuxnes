@@ -12,6 +12,8 @@
 #include "config.h"
 #endif
 
+#include <hqx.h>
+
 #ifdef HAVE_FEATURES_H
 #include <features.h>
 #endif /* HAVE_FEATRES_H */
@@ -150,8 +152,32 @@ static Picture scalePicture, windowPicture;
 #endif
 static XImage   *image = 0;
 
-/* X11 virtual framebuffer */
+// X11 virtual framebuffer
+// This buffer will be passed into an XImage.
+//
+// If we are not applying any filters, it may be the same memory as fb.c's
+// framebuffer, which represents the unaltered image of the console.
+//
+// Otherwise, it will be the output buffer of hqx.
+//
 static char     *xfb = 0;
+static int      xfb_width, xfb_height;
+static int      xfb_bytes_per_line = 0;
+
+// This represents the window dimensions.
+// Default is NES screen resolution, multiplied by scale factor.  However
+// it may be resized by the WM or the user.
+//
+static int width, height;
+
+// If set to a value other than 1, we will allocate a separate fb/rfb buffer
+// for fb.c and invoke hqx with that factor.
+//
+// Note that magstep (which represents the XRender scale factor) can be set
+// to a different value, eg. pehaps we HQX scale into xfb with one factor,
+// then XRender scale into another.
+//
+int scaler_magstep = 1;
 
 /* externel and forward declarations */
 void    fbinit(void);
@@ -161,8 +187,6 @@ static void     InitScreenshotX11(void);
 static void     SaveScreenshotX11(void);
 static void     HandleKeyboardX11(XEvent ev);
 
-/* Misc globals */
-static int width, height;
 
 #ifdef HAVE_SHM
 
@@ -268,6 +292,18 @@ InitDisplayX11(int argc, char **argv)
 	};
 	XTextProperty name[2];
 
+	switch (scaler_magstep) {
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		break;
+	default:
+		fprintf(stderr,
+			"[%s] Scale factor %d is not valid for HQX\n",
+			renderer->name, scaler_magstep);
+		scaler_magstep = scaler_magstep > 1 ? 2 : 1;
+	}
 	if (magstep > maxsize) {
 		fprintf(stderr,
 		        "[%s] Enlargement factor %d is too large!\n",
@@ -313,6 +349,18 @@ InitDisplayX11(int argc, char **argv)
 				break;
 			}
 	}
+	if (scaler_magstep != 1 & depth != 32) {
+		fprintf(stderr,
+			"[%s] HQX will only work at higher bitdepths; disabling\n",
+			renderer->name);
+		scaler_magstep = 1;
+	}
+	if (scaler_magstep != 1) {
+		hqxInit();
+	}
+	if (scaler_magstep > magstep) {
+		magstep = scaler_magstep;
+	}
 	if ((BYTE_ORDER != BIG_ENDIAN) && (BYTE_ORDER != LITTLE_ENDIAN)
 	 && (bpp == 32)) {
 		fprintf(stderr,
@@ -357,6 +405,8 @@ InitDisplayX11(int argc, char **argv)
 			paletteX11[x] = color.pixel;
 		}
 	}
+	xfb_width = 256 * scaler_magstep;
+	xfb_height = 240 * scaler_magstep;
 	width = 256 * magstep;
 	height = 240 * magstep;
 	x = 0;
@@ -449,14 +499,14 @@ InitDisplayX11(int argc, char **argv)
 	XFlush(display);
 	gettimeofday(&time, NULL);
 	renderer_data.basetime = time.tv_sec;
-	if (magstep != 1) {
+	if (magstep != scaler_magstep) {
 		if (!XRenderSupported()) {
 			fprintf(stderr, "x11: scaling requires XRENDER support\n");
 			exit(1);
 		}
 
 #ifdef HAVE_XRENDER
-		scalePixmap = XCreatePixmap(display, w, 256, 240, depth);
+		scalePixmap = XCreatePixmap(display, w, xfb_width, xfb_height, depth);
 
 		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, DefaultVisual(display, DefaultScreen(display)));
 		XRenderPictureAttributes attrs = {0};
@@ -470,13 +520,13 @@ InitDisplayX11(int argc, char **argv)
 		if (depth == 1)
 			shm_image = XShmCreateImage(display, visual, depth,
 			                         XYBitmap, NULL, &shminfo,
-			                         256, 240);
+			                         xfb_width, xfb_height);
 		else
 			shm_image = XShmCreateImage(display, visual, depth,
 			                         ZPixmap, NULL, &shminfo,
-			                         256, 240);
+			                         xfb_width, xfb_height);
 		if (shm_image) {
-			bytes_per_line = shm_image->bytes_per_line;
+			xfb_bytes_per_line = shm_image->bytes_per_line;
 			shminfo.shmid = -1;
 			shminfo.shmid = shmget(IPC_PRIVATE, bytes_per_line * shm_image->height,
 			                       IPC_CREAT|0777);
@@ -536,21 +586,34 @@ InitDisplayX11(int argc, char **argv)
 		        "XImage");
 	}
 	if (!image) {
-		bytes_per_line = 256 / 8 * bpp;
-		if (!(xfb = malloc(bytes_per_line * 240))) {
+		xfb_bytes_per_line = xfb_width * bpp / 8;
+		if (!(xfb = malloc(xfb_bytes_per_line * xfb_height))) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
 		if (depth == 1)
 			image = XCreateImage(display, visual, depth,
-			                     XYBitmap, 0, xfb, 256, 240,
+			                     XYBitmap, 0, xfb, xfb_width, xfb_height,
 			                     8, bytes_per_line);
 		else
 			image = XCreateImage(display, visual, depth,
-			                     ZPixmap, 0, xfb, 256, 240,
+			                     ZPixmap, 0, xfb, xfb_width, xfb_height,
 			                     bpp, bytes_per_line);
 	}
-	rfb = fb = xfb;
+	if (scaler_magstep != 1) {
+		// Allocate unscaled image buffer
+		bytes_per_line = 256 * bpp / 8;
+		fb = rfb = malloc(bytes_per_line * 240 / 8);
+		if (!fb) {
+			perror("malloc");
+			exit(EXIT_FAILURE);
+		}
+	} else {
+		// No framebuffer scaling (though we might use XRender to upscale)
+		// This means fb.c and the XImage share the same buffer.
+		rfb = fb = xfb;
+		bytes_per_line = xfb_bytes_per_line;
+	}
 	XFillRectangle(display, w,
 	               blackgc, 0, 0,
 	               width, height);
@@ -817,7 +880,7 @@ RenderImage(XEvent *ev)
 {
 	Drawable target = w;
 	int sx = 0, sy = 0;
-	int w_ = 256, h = 240;
+	int w_ = xfb_width, h = xfb_height;
 	int dx = (width - w_ * magstep) / 2;
 	int dy = (height - h * magstep) / 2;
 
@@ -825,12 +888,24 @@ RenderImage(XEvent *ev)
 	int old_dx = dx;
 	int old_dy = dy;
 
-	if (magstep != 1) {
+	if (magstep != scaler_magstep) {
 		target = scalePixmap;
 		dx = 0;
 		dy = 0;
 	}
 #endif
+
+	switch (scaler_magstep) {
+	case 2:
+		hq2x_32_rb((uint32_t*)fb, bytes_per_line, (uint32_t*)xfb, xfb_bytes_per_line, 256, 240);
+		break;
+	case 3:
+		hq3x_32_rb((uint32_t*)fb, bytes_per_line, (uint32_t*)xfb, xfb_bytes_per_line, 256, 240);
+		break;
+	case 4:
+		hq4x_32_rb((uint32_t*)fb, bytes_per_line, (uint32_t*)xfb, xfb_bytes_per_line, 256, 240);
+		break;
+	}
 
 #ifdef HAVE_SHM
 	if (shm_attached) {
@@ -852,8 +927,8 @@ RenderImage(XEvent *ev)
 	}
 
 #ifdef HAVE_XRENDER
-	if (magstep != 1) {
-		double xscale = magstep, yscale = magstep;
+	if (magstep != scaler_magstep) {
+		double xscale = (magstep + 0.0) / scaler_magstep, yscale = xscale;
 		XTransform transform =
 		{
 			{

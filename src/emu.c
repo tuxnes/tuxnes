@@ -536,6 +536,7 @@ help_options(int terse)
 	printf("  -G, --geometry=WxH  Specify window/screen geometry\n");
 	printf("      --display=ID    Specify display/driver ID\n");
 	printf("  -E, --enlarge[=NUM] Enlarge by a factor of NUM (default: 2)\n");
+	printf("  -Q, --hqx[=<2|3|4>] Apply HQX scaling algorithm for 2x, 3x, or 4x (default: 2)\n");
 	printf("  -S, --static-color  Force static color allocation (prevents flicker)\n");
 	printf("  -r, --renderer=...  Select a rendering engine (default: auto)\n");
 	for (renderer = renderers; renderer->name; renderer++)
@@ -1073,6 +1074,7 @@ main(int argc, char **argv)
 			{"palette", 1, 0, 'P'},
 			{"version", 0, 0, 'V'},
 			{"enlarge", 2, 0, 'E'},
+			{"hqx", 2, 0, 'Q'},
 			{"geometry", 1, 0, 'G'},
 			{"display", 1, 0, 0},
 			{"renderer", 1, 0, 'r'},
@@ -1091,7 +1093,7 @@ main(int argc, char **argv)
 #ifdef HAVE_LIBM
 		                       "N::"
 #endif
-		                       "bcdfhHg:j:J:lom:M:F:R:p:P:vV1::2::s::SL::r:E::D:ieUG:XKI",
+		                       "bcdfhHg:j:J:lom:M:F:R:p:P:vV1::2::s::SL::r:E::Q::D:ieUG:XKI",
 		                       long_options,
 		                       &option_index);
 		if (parseret == -1)
@@ -1256,6 +1258,12 @@ main(int argc, char **argv)
 				magstep = atoi(optarg);
 			else
 				magstep = 2;
+			break;
+		case 'Q':
+			if (optarg && *optarg)
+				scaler_magstep = atoi(optarg);
+			else
+				scaler_magstep = 2;
 			break;
 		case 'r':
 			rendname = optarg;
