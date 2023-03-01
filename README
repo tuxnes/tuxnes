@@ -126,6 +126,7 @@ Major command-line options:
   -G, --geometry=WxH  Specify window/screen geometry
       --display=ID    Specify display/driver ID
   -E, --enlarge[=NUM] Enlarge by a factor of NUM (default: 2)
+  -Q, --hqx=[<2|3|4>] Apply HQX scaling algorithm for 2x, 3x, or 4x (default: 2)
   -S, --static-color  Force static color allocation (prevents flicker)
   -r, --renderer=...  Select a rendering engine (default: auto)
       x11        X11 renderer
