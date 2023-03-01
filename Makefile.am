@@ -1,4 +1,4 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src
-EXTRA_DIST = THANKS tuxnes.xpm tuxnes2.xpm BUGS CHANGES INSTALL.BSD
+EXTRA_DIST = THANKS tuxnes.xpm tuxnes2.xpm BUGS CHANGES
