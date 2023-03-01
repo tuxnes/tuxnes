@@ -33,19 +33,23 @@ Installing:
     Note that the github project has the HQX scaler as a submodule.  You'll
 need to fetch it via:
 
-    git submodule update --init
+    $ git submodule update --init
+
+    Next we may want to regenerate autoconf files:
+
+    $ sh autogen.sh
 
     From there we follow the normal autoconf process:
 
-    ./configure
-    make
-    make install
+    $ ./configure
+    $ make
+    $ sudo make install
 
     TuxNES JIT has not been ported to amd64 and will need to be built as an
 i386 binary.  eg. On Debian, after installing the cross-compilation tools, this
 can be accomplished via:
 
-    ./configure CC=i686-linux-gnu-gcc LD=i686-linux-gnu-ld
+    $ ./configure CC=i686-linux-gnu-gcc LD=i686-linux-gnu-ld
 
 Extra --enable and --with options understood by ./configure:
 
