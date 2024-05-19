@@ -37,7 +37,7 @@ need to fetch it via:
 
     Next we may want to regenerate autoconf files:
 
-    $ sh autogen.sh
+    $ autoreconf -if
 
     From there we follow the normal autoconf process:
 
