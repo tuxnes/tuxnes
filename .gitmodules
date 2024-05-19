@@ -1,3 +1,3 @@
 [submodule "submodules/hqx"]
 	path = submodules/hqx
-	url = git@github.com:grom358/hqx
+	url = https://github.com/grom358/hqx
