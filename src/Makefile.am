@@ -1,8 +1,4 @@
-AUTOMAKE_OPTIONS = subdir-objects
-
 AM_CFLAGS = $(WARNING_CFLAGS) $(PROFILING_CFLAGS)
-AM_CFLAGS += -I../submodules/hqx/src
-AM_CPPFLAGS = $(DEFLATE_CFLAGS) $(X_CFLAGS)
 
 bin_PROGRAMS = tuxnes
 bin_SCRIPTS = romfixer
@@ -27,13 +23,10 @@ tuxnes_SOURCES = \
 	sound.c sound.h \
 	renderer.c renderer.h \
 	screenshot.c screenshot.h \
-	x11.c \
-	../submodules/hqx/src/init.c \
-	../submodules/hqx/src/hq2x.c \
-	../submodules/hqx/src/hq3x.c \
-	../submodules/hqx/src/hq4x.c
+	x11.c
 
-tuxnes_LDADD = table.o $(DEFLATE_LIBS) $(X_LIBS)
+tuxnes_CPPFLAGS = $(AM_CPPFLAGS) $(DEFLATE_CFLAGS) $(HQX_CFLAGS) $(X_CFLAGS)
+tuxnes_LDADD = table.o $(DEFLATE_LIBS) $(HQX_LIBS) $(X_LIBS)
 tuxnes_LDFLAGS = $(AM_LDFLAGS) -Wl,-z,noexecstack
 
 comptbl_SOURCES = comptbl.c

@@ -6,8 +6,8 @@ AC_INIT([TuxNES],[0.75],[https://github.com/tuxnes/tuxnes/issues])
 AC_CONFIG_SRCDIR([src/consts.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADERS([src/config.h])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign subdir-objects])
+AM_SILENT_RULES([yes])
 
 # Checks for programs.
 PKG_PROG_PKG_CONFIG
@@ -15,6 +15,7 @@ AC_PROG_CC
 AC_CHECK_TOOL([LD], [ld])
 AC_PROG_CC_C99
 AM_PROG_AS
+AC_PROG_RANLIB
 AC_PROG_INSTALL
 
 ## Check whether user wants simple warnings or advanced warnings
@@ -80,6 +81,15 @@ AS_IF([test "x$have_deflate" = "xyes"],[
 	AC_DEFINE([HAVE_LIBZ], [1], [Define to 1 if you have the `z' library (-lz).])
 ])
 
+PKG_CHECK_MODULES([HQX], [hqx],
+	[AS_VAR_SET([have_hqx], [yes])],
+	[AS_VAR_SET([have_hqx], [no])])
+AM_CONDITIONAL([BUILD_HQX], [test "x$have_hqx" = "xno"])
+AS_IF([test "x$have_hqx" = "xno"],[
+	AC_SUBST([HQX_CFLAGS], ['-I$(top_srcdir)/submodules/hqx/src'])
+	AC_SUBST([HQX_LIBS], ['$(top_builddir)/libhqx.a'])
+])
+
 AC_CHECK_LIB([pbm],[pbm_writepbm])
 AC_CHECK_LIB([pgm],[pgm_writepgm])
 AC_CHECK_LIB([ppm],[ppm_writeppm])
@@ -98,10 +108,6 @@ AS_IF([test "x$no_x" != "xyes"],[
 	LIBS="$save_LIBS"
 ])
 
-# HQX especially needs -O3 for vectorization
-AS_IF([test "x$enable_debug" = "xyes"],
-  [CFLAGS="-Wall -g -O0"],
-  [CFLAGS="-O3"])
-
 AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_HEADERS([src/config.h])
 AC_OUTPUT
