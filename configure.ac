@@ -51,7 +51,6 @@ AC_CHECK_HEADERS([fcntl.h stddef.h sys/ioctl.h sys/time.h unistd.h])
 AC_CHECK_HEADERS([features.h linux/joystick.h linux/soundcard.h sys/soundcard.h])
 AC_CHECK_HEADERS([machine/endian.h sys/endian.h endian.h],[break])
 AC_CHECK_HEADERS([getopt.h])
-AC_CHECK_HEADERS([ppm.h])
 
 AS_IF([test "x$no_x" != "xyes"],[
 	AC_CHECK_HEADERS([X11/xpm.h X11/vroot.h sys/ipc.h sys/shm.h])
@@ -89,10 +88,6 @@ AS_IF([test "x$have_hqx" = "xno"],[
 	AC_SUBST([HQX_CFLAGS], ['-I$(top_srcdir)/submodules/hqx/src'])
 	AC_SUBST([HQX_LIBS], ['$(top_builddir)/libhqx.a'])
 ])
-
-AC_CHECK_LIB([pbm],[pbm_writepbm])
-AC_CHECK_LIB([pgm],[pgm_writepgm])
-AC_CHECK_LIB([ppm],[ppm_writeppm])
 
 AS_IF([test "x$no_x" != "xyes"],[
 	save_CFLAGS="$CFLAGS"

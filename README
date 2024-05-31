@@ -75,7 +75,7 @@ Features:
 - built-in disassembler
 - joystick support (2- & 4-button)
 - sound support
-- capture screenshots in X pixmap (xpm) or portable pixmap (ppm) format
+- capture screenshots in X pixmap (xpm) format
 - Game Genie code support
 - trainer support
 - alternate palette support
@@ -216,7 +216,7 @@ Keyboard and joystick options and bindings:
     S, F7, PrintScreen
                 - Capture screenshot
                   Under X11, save to ~/.tuxnes/snap????.xpm
-                  (Note: XPM/PPM support must be installed and compiled
+                  (Note: XPM support must be installed and compiled
                    for this to work; see the README file for more info.)
 
   Keypad:

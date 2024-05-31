@@ -674,7 +674,7 @@ help_controls(int terse)
 #ifdef HAVE_X
 	       "                  Under X11, save to ~/.tuxnes/snap????.xpm\n"
 #endif /* HAVE_X */
-	       "                  (Note: XPM/PPM support must be installed and compiled\n"
+	       "                  (Note: XPM support must be installed and compiled\n"
 	       "                   for this to work; see the README file for more info.)\n");
 	printf("\n"
 	       "  Keypad:\n"
