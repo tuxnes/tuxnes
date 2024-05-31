@@ -1055,7 +1055,6 @@ main(int argc, char **argv)
 			{"js2", 2, 0, '2'},
 			{"joystick-map", 1, 0, 'J'},
 			{"verbose", 0, 0, 'v'},
-			{"old", 0, 0, 'o'},
 			{"ignore-unhandled", 0, 0, 'i'},
 			{"link", 0, 0, 'l'},
 			{"disassemble", 0, 0, 'd'},
@@ -1093,7 +1092,7 @@ main(int argc, char **argv)
 #ifdef HAVE_LIBM
 		                       "N::"
 #endif
-		                       "bcdfhHg:j:J:lom:M:F:R:p:P:vV1::2::s::SL::r:E::Q::D:ieUG:XKI",
+		                       "bcdfhHg:j:J:lm:M:F:R:p:P:vV1::2::s::Sr:E::Q::D:ieG:XKI",
 		                       long_options,
 		                       &option_index);
 		if (parseret == -1)
@@ -1145,9 +1144,6 @@ main(int argc, char **argv)
 			break;
 		case 'l':
 			dolink = 1;
-			break;
-		case 'o':
-			rendname = "old";
 			break;
 		case 'i':
 			ignorebadinstr = 1;
@@ -1303,6 +1299,7 @@ main(int argc, char **argv)
 				renderer_config.display_id = optarg;
 				break;
 			}
+			/* fall through */
 		default:
 			fprintf(stderr, USAGE, *argv);
 			exit(EX_USAGE);
