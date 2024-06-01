@@ -79,6 +79,9 @@ const char      *rendname = "auto";
 
 #define USAGE "Usage: %s [--help] [options] filename\n"
 
+/* Long options with no short equivalents */
+#define OPTVAL_DISPLAY 256
+
 static void     help_help(int);
 static void     help_version(int);
 static void     help_options(int);
@@ -1046,8 +1049,7 @@ main(int argc, char **argv)
 	 * for equivalent long and short options can only lead to inconsistency
 	 */
 	while (1) {
-		int option_index = 0;
-		static struct option long_options[] = {
+		static const struct option long_options[] = {
 			{"help", 2, 0, 'h'},
 			{"controls", 0, 0, 'c'},
 			{"joystick", 1, 0, 'j'},
@@ -1075,7 +1077,7 @@ main(int argc, char **argv)
 			{"enlarge", 2, 0, 'E'},
 			{"hqx", 2, 0, 'Q'},
 			{"geometry", 1, 0, 'G'},
-			{"display", 1, 0, 0},
+			{"display", 1, 0, OPTVAL_DISPLAY},
 			{"renderer", 1, 0, 'r'},
 			{"echo", 0, 0, 'e'},
 			{"swap-inputs", 0, 0, 'X'},
@@ -1094,7 +1096,7 @@ main(int argc, char **argv)
 #endif
 		                       "bcdfhHg:j:J:lm:M:F:R:p:P:vV1::2::s::Sr:E::Q::D:ieG:XKI",
 		                       long_options,
-		                       &option_index);
+		                       NULL);
 		if (parseret == -1)
 			break;
 
@@ -1294,12 +1296,9 @@ main(int argc, char **argv)
 			NES_palette = ntsc_palette(hue, tint);
 			break;
 #endif
-		case 0: /* long options with no short equivalents */
-			if (!strcmp(long_options[option_index].name, "display")) {
-				renderer_config.display_id = optarg;
-				break;
-			}
-			/* fall through */
+		case OPTVAL_DISPLAY:
+			renderer_config.display_id = optarg;
+			break;
 		default:
 			fprintf(stderr, USAGE, *argv);
 			exit(EX_USAGE);
