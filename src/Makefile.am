@@ -38,4 +38,4 @@ compdata: comptbl $(srcdir)/table.x86
 	./comptbl < $(srcdir)/table.x86
 
 table.o: compdata
-	$(LD) -r -b binary -r -defsym TRANS_TBL=_binary_compdata_start $< -o $@
+	$(LD) -r -b binary -defsym TRANS_TBL=_binary_compdata_start $< -o $@
