@@ -1319,30 +1319,37 @@ main(int argc, char **argv)
 
 	/*
 	  This initializes the base filename by taking the filename of the ROM and
-	  parsing of leading directory information as well as the trailing extension
-	  (.nes, .gz, .Z).
+	  removing leading directory information as well as the trailing extension
+	  (.nes, .gz, .Z).  Trailing extension removal starts at the last '.' that
+	  is preceded by at least one non-'.' character.
 	*/
 	{
-		char *basename;
-		size_t baselen, namelen;
+		char *p, *basestart, *baseend;
+		size_t len;
 
-		basename = filename;
-		baselen = namelen = strlen(filename);
-		for (size_t i = 0; i < namelen; i++) {
-			if (filename[i] == '/') {
-				basename = &filename[i + 1];
-				baselen = namelen - i - 1;
-			} else if (filename[i] == '.') {
-				baselen = namelen - i;
+		basestart = p = filename;
+		baseend = NULL;
+		while (*p == '.') p++;
+		while (*p) {
+			if (*p == '/') {
+				basestart = ++p;
+				baseend = NULL;
+				while (*p == '.') p++;
+			} else if (*p == '.') {
+				baseend = p++;
+			} else {
+				p++;
 			}
 		}
+		if (!baseend) baseend = p;
 
-		if (!(basefilename = malloc(baselen + 1))) {
+		len = baseend - basestart;
+		if (!(basefilename = malloc(len + 1))) {
 			perror("main: malloc");
 			exit(EXIT_FAILURE);
 		}
-		strncpy(basefilename, basename, baselen);
-		basefilename[baselen] = '\0';
+		strncpy(basefilename, basestart, len);
+		basefilename[len] = '\0';
 	}
 
 	/* initialize joysticks */
