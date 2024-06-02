@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Authors of TuxNES
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = . src

@@ -1,9 +1,7 @@
+// SPDX-FileCopyrightText: Authors of TuxNES
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 /*
- * This file is part of the TuxNES project codebase.
- *
- * Please see the README and COPYING files for more information regarding
- * this project.
- *
  * Description: This file consists of functions which are called by the
  * dynamically recompiled code to do I/O operations. Whenever the 6502 code
  * reads from or writes to a memory location known to be a NES register,

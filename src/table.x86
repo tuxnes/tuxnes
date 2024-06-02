@@ -1,10 +1,6 @@
-#
-# This file is part of the TuxNES project codebase.
-#
-# Please see the README and COPYING files for more information regarding
-# this project.
-#
-#
+# SPDX-FileCopyrightText: Authors of TuxNES
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Description: Translation tables for 6502 to x86 dynamic recompiler
 
 # This is the translation table for converting 6502 code into native code

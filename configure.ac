@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Authors of TuxNES
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 

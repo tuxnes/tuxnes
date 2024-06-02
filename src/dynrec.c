@@ -1,9 +1,7 @@
+// SPDX-FileCopyrightText: Authors of TuxNES
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 /*
- * This file is part of the TuxNES project codebase.
- *
- * Please see the README and COPYING files for more information regarding
- * this project.
- *
  * Description: This is the dynamic recompiler.  This takes 6502 code as
  * input, looks up the opcodes in the translation dictionary, evaluates
  * any expressions found therein, and writes the translated code to

@@ -1,9 +1,7 @@
+// SPDX-FileCopyrightText: Authors of TuxNES
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 /*
- * This file is part of the TuxNES project codebase.
- *
- * Please see the README and COPYING files for more information regarding
- * this project.
- *
  * Description: comptbl.c is a separate support program used in the TuxNES
  * build process. When run, the comptbl executable builds file 'compdata'
  * out of table.x86 which is later turned into table.o.

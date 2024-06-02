@@ -1,9 +1,7 @@
+// SPDX-FileCopyrightText: Authors of TuxNES
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 /*
- * This file is part of the TuxNES project codebase.
- *
- * Please see the README and COPYING files for more information regarding
- * this project.
- *
  * Description: This file controls the mapper subsystem for the emulator.
  * See the HACKING file (and examine existing mapper code) for information
  * on how to add new mappers.

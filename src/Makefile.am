@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Authors of TuxNES
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 AM_CFLAGS = $(WARNING_CFLAGS) $(PROFILING_CFLAGS)
 
 bin_PROGRAMS = tuxnes
