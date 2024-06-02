@@ -1,3 +1,7 @@
+This file is no longer maintained.
+See the git history for detailed changes since v0.75.
+
+
 2001-04-11  Mike Melanson <melanson@pcisys.net>
 
 	* final modifications for v0.75 release
@@ -166,54 +170,54 @@
 2000-07-07  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
 
 	* sound.h (SoundData): moved some global data from sound_config to
- 	sound_data
+	sound_data
 
 	* renderer.h (RendererData): moved some global data from
- 	renderer_config to renderer_data
+	renderer_config to renderer_data
 
 	* sound.c: sound sample formats have more reasonable names, and
- 	they're in synch with soundcard.h AFMT_* symbols again
+	they're in synch with soundcard.h AFMT_* symbols again
 
 	* renderer.h (RendererConfig): cleaned up the renderer interface
- 	somewhat
+	somewhat
 
 	* sound.h (SoundConfig): cleaned up the sound interface somewhat
 
 2000-07-06  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
 
 	* emu.c (loadpal): Added support for iNES-style hexadecimal
- 	palette files.
+	palette files.
 
 	* README (Palettes): Added a pointer to rvu's NES Palette Zoo,
- 	which includes many iNES-style hexadecimal palette files.
+	which includes many iNES-style hexadecimal palette files.
 
 2000-07-05  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
 
 	* README (ROMs): Added a pointer to Chris Covell's website, and
- 	mentioned Solar Wars.
+	mentioned Solar Wars.
 
 	* renderer.c (InitDisplayAuto): X11 renderers now take precedence
- 	over the W renderer
+	over the W renderer
 
 	* emu.c (palettes): Added a new NES palette as "chris", thanks to
- 	Chris Covell <ccovell@direct.ca>
+	Chris Covell <ccovell@direct.ca>
 	(palettes): Added the excellent NTSC palette generator by Kevin
- 	Horton <khorton@iquest.net>
+	Horton <khorton@iquest.net>
 
 2000-07-02  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
 
 	* w.c (InitDisplayW): cleared up endianness issues -- W Window
- 	System bitmaps are big-endian by definition
+	System bitmaps are big-endian by definition
 
 2000-07-01  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
 
 	* w.c (InitDisplayW): fixed scanline color problem in static-color
- 	mode, removed workarounds for old W server bugs
+	mode, removed workarounds for old W server bugs
 
 2000-06-06  Benjamin C. W. Sittler  <bsittler@kragen.dnaco.net>
 
 	* x11.c (InitDisplayX11): pixmaps and GCs for the old renderer are
- 	now optional
+	now optional
 
 2000-04-01  Benjamin C. W. Sittler  <bsittler@nmt.edu>
 
@@ -250,9 +254,9 @@
 2000-02-23  Benjamin C. W. Sittler  <bsittler@nmt.edu>
 
 	* ggi.c (SaveScreenshotGGI): screenshots now work in 1bpp under
- 	  the DirectBuffered "x" target, but still break in 1bpp under the
- 	  "xlib" target. Normal-buffered "x" still dumps core (it's not my
- 	  fault!)
+	  the DirectBuffered "x" target, but still break in 1bpp under the
+	  "xlib" target. Normal-buffered "x" still dumps core (it's not my
+	  fault!)
 
 2000-02-22  Benjamin C. W. Sittler  <bsittler@nmt.edu>
 
@@ -339,10 +343,10 @@
 	(dobackground): Added scanline support to the old X11 code
 
 	* x11.c (HandleJoystick): Added support for joysticks with 6 axes
- 	and 9 buttons [old news]
+	and 9 buttons [old news]
 
 	* sound.c (UpdateAudio): Added an option to resync. audio after a
- 	specified delay has been reached [old news]
+	specified delay has been reached [old news]
 
 1999-12-15  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
 
@@ -390,10 +394,10 @@
 	 DOUBLE defined true)
 
 	* x11.c (maxsize): 2:1 integer scaling is now permitted, use your
- 	 window manager's "maximize" feature to activate it (it is disabled
- 	 with the old renderer at the moment)
+	 window manager's "maximize" feature to activate it (it is disabled
+	 with the old renderer at the moment)
 	 (SaveSnapshot): there's now rudimentary support for saving
- 	 snapshots from two simultaneous TuxNES processes
+	 snapshots from two simultaneous TuxNES processes
 
 	* README: re-labeled sections so 'C-x 4 a' can find them
 	 (Graphics): added a section comparing the two renderers' features
@@ -500,7 +504,7 @@
 
 1999-10-30  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
 
-        * Removed spurious comment characters from x86.S
+	* Removed spurious comment characters from x86.S
 
 	* Added INSTALL.BSD to help BSD users with installing
 
@@ -516,17 +520,17 @@
 
 1999-10-23  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
 
-        * changed the configure.in script a lot in preparation for
-          the FreeBSD support
+	* changed the configure.in script a lot in preparation for
+	  the FreeBSD support
 
-        * added FreeBSD's libgnugetopt support
+	* added FreeBSD's libgnugetopt support
 
 1999-10-21  Jeroen Ruigrok van der Werven  <asmodai@wxs.nl>
 
-        * added FreeBSD check for sys/soundcard.h
+	* added FreeBSD check for sys/soundcard.h
 
-        * messed around with getopt.h, which is a Linux/GNU only thing
-          and thus needs either external support or reworked sources
+	* messed around with getopt.h, which is a Linux/GNU only thing
+	  and thus needs either external support or reworked sources
 
 1999-09-23  Benjamin C. W. Sittler  <bsittler@underdog.nmt.edu>
 

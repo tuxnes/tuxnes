@@ -1,3 +1,20 @@
+Changes since latest release
+- miscellaneous error/warning fixes and general cleanup/refactoring
+- standardized exit codes from the tuxnes process
+- modernized the autotools build system
+- link against system minizip for .zip support and remove our copy of it
+- fixed ROM size calculation when reading from a .zip file
+- fixed invalid malloc calls when used with some odd file paths or file names
+- fixed mmap error handling
+- stack memory is marked as not executable
+- fixed trying to create the audio device (/dev/dsp) if missing
+- fixed using 100% CPU while paused
+- screensaver is disabled while running
+- removed GGI, W, "old X11" and "diff X11" renderers
+- removed scanlines mode (-L)
+- made -E scaling use XRender extension
+- added HQX scaling algorithm (-Q)
+
 Version 0.75, released April 15, 2001
 - complete sound support
 - complete MMC2 support (Mike Tyson's Punch-Out!!)
