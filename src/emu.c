@@ -1759,8 +1759,7 @@ main(int argc, char **argv)
 		}
 
 	/* start the show */
-	STACKPTR = (int)STACK + 0xFF;
-	START();                     /* execute translated code */
+	START();
 
 	/* Not Reached, but return something anyway to get rid of warnings */
 	return EXIT_SUCCESS;

@@ -16,6 +16,8 @@ START:
 	mov %esi,CLOCK
 	sub %ebx,%esi
 	mov %esi,_CTNI
+	mov $_STACK+0xff,%ebx
+	mov %ebx,_STACKPTR
 	xor %eax,%eax
 	xor %ecx,%ecx
 	xor %edx,%edx
