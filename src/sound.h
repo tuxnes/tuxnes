@@ -7,7 +7,7 @@
 
 /* exports */
 
-extern int              InitAudio(int argc, char **argv);
+extern int              InitAudio(void);
 extern void             SoundEvent(long addr, unsigned char value);
 extern char             SoundGetLengthReg(void);
 extern void             UpdateAudio(void);

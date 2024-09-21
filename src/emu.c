@@ -1418,10 +1418,8 @@ main(int argc, char **argv)
 		fprintf(stderr, "Rom size: %d\n", size);
 
 	/* Initialize sound playback */
-	if (InitAudio(argc, argv)) {
-		fprintf(stderr,
-		        "%s: warning: failed to initialize sound playback\n",
-		        *argv);
+	if (InitAudio()) {
+		fprintf(stderr, "%s: warning: failed to initialize sound playback\n", *argv);
 	}
 
 	/* if the user requested header bytes, show them */

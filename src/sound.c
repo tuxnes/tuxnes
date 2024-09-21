@@ -392,7 +392,7 @@ static unsigned long freq_buffer_dmc[16];
 #define MAGIC_noi ((unsigned long long)0xFFFFFFF)
 
 int
-InitAudio(int argc, char **argv)
+InitAudio(void)
 {
 	/* Open an audio stream */
 	if (sound_config.audiofile) {
@@ -513,20 +513,16 @@ InitAudio(int argc, char **argv)
 	memset(audio_buffer, 0, samples_per_vsync);
 
 	/* set up the triangle precalc
-	 * using argc and hz_60_set as a temp
-	 * 0 stays 0, don't change it
+	 * triangle_50[0] stays 0, don't change it
 	 * */
-	for (argc = 1; argc < 32; ++argc) {
-		if (argc < 16) {
-			triangle_50[argc] = (volume_adjust) * argc;
+	for (int i = 1; i < 32; ++i) {
+		if (i < 16) {
+			triangle_50[i] = (volume_adjust) * i;
 		} else {
-#if 0
-			triangle_50[argc] = triangle_50[(15 - (argc % 16))] + hz_60_set;
-#endif
-			triangle_50[argc] = triangle_50[31 - argc];
+			triangle_50[i] = triangle_50[31 - i];
 		}
 #if 0
-		fprintf(stderr, "Test(0x%X): 0x%X\n", argc, triangle_50[argc]);
+		fprintf(stderr, "Test(0x%X): 0x%X\n", i, triangle_50[i]);
 #endif
 	}
 
@@ -535,8 +531,8 @@ InitAudio(int argc, char **argv)
 		volume_max    |= (volume_max << 8);
 		volume_adjust |= (volume_adjust << 8);
 		/* adjust the triangle */
-		for (argc = 1; argc < 32; ++argc) {
-			triangle_50[argc] |= (triangle_50[argc] << 8);
+		for (int i = 1; i < 32; ++i) {
+			triangle_50[i] |= (triangle_50[i] << 8);
 		}
 	}
 	/* set up initial values */
@@ -555,14 +551,9 @@ InitAudio(int argc, char **argv)
 	hz_240_set = hz_60_set / 4 + hz_60_set % 4;
 
 	/* precalculate square wave steps */
-	for (argc = 1; argc < 2048; ++argc) {
-		freq_buffer_squ[argc] =
-		        (MAGIC_squ* CYCLES_PER_SAMPLE * magic_adjust) /
-		        (argc);
-
-		freq_buffer_tri[argc] =
-		        (MAGIC_tri * CYCLES_PER_SAMPLE * magic_adjust) /
-		        (argc);
+	for (int i = 1; i < 2048; ++i) {
+		freq_buffer_squ[i] = (MAGIC_squ * CYCLES_PER_SAMPLE * magic_adjust) / i;
+		freq_buffer_tri[i] = (MAGIC_tri * CYCLES_PER_SAMPLE * magic_adjust) / i;
 	}
 
 	/* set up triangle stuff */
