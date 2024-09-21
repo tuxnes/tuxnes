@@ -136,8 +136,7 @@ static void     loadpal(char *);
 static void     restoresavedgame(void);
 static void     traphandler(int);
 
-void    InitMapperSubsystem(void);
-extern char MapperName[MAXMAPPER + 1][30];
+extern const char *const MapperName[];
 void    quit(void);
 void    START(void);
 
@@ -988,9 +987,6 @@ main(int argc, char **argv)
 	char *ggcode = NULL;
 	int parseret;
 
-	/* set up the mapper arrays */
-	InitMapperSubsystem();
-
 	/* Find the user's home directory */
 	if (!(homedir = getenv("HOME"))) {
 		struct passwd *pwent = getpwuid(getuid());
@@ -1550,7 +1546,7 @@ main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (MAPPERNUMBER > MAXMAPPER || ((int *)MapperInit)[MAPPERNUMBER] == 0) {
+	if (MAPPERNUMBER > MAXMAPPER || !MapperInit[MAPPERNUMBER]) {
 		fprintf(stderr, "Unknown Mapper: %d (0x%02X)\n", MAPPERNUMBER,
 		        MAPPERNUMBER);
 		exit(EXIT_FAILURE);
@@ -1594,7 +1590,7 @@ main(int argc, char **argv)
 	/* VROM mask for 1k-sized pages */
 	VROM_MASK_1k = (VROM_MASK << 3) | 7;
 
-	((void (*)(void))(MapperInit[MAPPERNUMBER]))();
+	MapperInit[MAPPERNUMBER]();
 
 	if (cmirror == 1 && mapmirror == 0) {
 		if (verbose && !hvmirror)

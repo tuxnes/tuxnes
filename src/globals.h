@@ -15,12 +15,10 @@ extern void     *INPUT;
 extern void     *OUTPUT;
 extern void     *U;
 extern void     *NMI;
-extern void     (*Mapper[MAXMAPPER + 1])(void);
-/* extern int    Mapper[]; */
 extern int       MAPPERNUMBER;
 extern unsigned char    *ROM_BASE;
-/* extern void     *MapperInit[MAXMAPPER + 1]; */
-extern void     (*MapperInit[])(void);
+extern void     (*const MapperInit[])(void);
+extern void     (*const Mapper[])(void);
 extern void     (*drawimage)(int);
 
 /* Global Variables */

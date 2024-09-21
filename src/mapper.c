@@ -19,44 +19,6 @@
 #include "globals.h"
 #include "mapper.h"
 
-extern void MAPPER_NONE(void);
-extern void MAPPER_MMC1(void);
-extern void MAPPER_UNROM(void);
-extern void MAPPER_CNROM(void);
-extern void MAPPER_MMC3(void);
-extern void MAPPER_MMC5(void);
-extern void MAPPER_MMC2(void);
-extern void MAPPER_MMC4(void);
-extern void MAPPER_CLRDRMS(void);
-extern void MAPPER_AOROM(void);
-extern void MAPPER_CPROM(void);
-extern void MAPPER_100IN1(void);
-extern void MAPPER_NAMCOT106(void);
-extern void MAPPER_VRC2_A(void);
-extern void MAPPER_VRC2_B(void);
-extern void MAPPER_G101(void);
-extern void MAPPER_TAITO_TC0190(void);
-extern void MAPPER_GNROM(void);
-extern void MAPPER_TENGEN_RAMBO1(void);
-extern void MAPPER_SUNSOFT4(void);
-extern void MAPPER_FME7(void);
-extern void MAPPER_CAMERICA(void);
-extern void MAPPER_IREM_74HC161_32(void);
-extern void MAPPER_VS(void);
-extern void MAPPER_SUPERVISION(void);
-extern void MAPPER_NINA7(void);
-
-void (*MapperInit[MAXMAPPER + 1])(void);
-void (*Mapper[MAXMAPPER + 1])(void);
-char MapperName[MAXMAPPER + 1][30];
-
-static int      commandregister;
-static void     init_none(void);
-static int      MapRom(int, unsigned, unsigned);
-
-/* ROM mapper table (pointers) */
-unsigned char *MAPTABLE[17];
-
 /* some globals */
 extern unsigned char    *VROM_BASE;
 extern unsigned int      ROM_PAGES;
@@ -67,65 +29,73 @@ extern unsigned int      VROM_MASK_1k;
 extern unsigned int      mapmirror;
 extern unsigned int      irqflag;
 
-void    InitMapperSubsystem(void);
-void    m100in1(int, int);
-void    aorom(int, int);
-void    camerica(int, int);
-void    clrdrms(int, int);
-void    cnrom(int, int);
-void    cprom(int, int);
 extern void (*drawimage)(int);
-void    fme7(int, int);
-void    g101(int, int);
-void    gnrom(int, int);
-void    irem_74hc161_32(int, int);
-void    mmc1(int, int);
-void    mmc2(int, int);
-void    mmc3(int, int);
-void    mmc5(int, int);
-void    namcot106(int, int);
-void    nina7(int, int);
-void    sunsoft4(int, int);
-void    supervision(int, int);
-void    taito_tc0190(int, int);
-void    tengen_rambo1(int, int);
-void    unrom(int, int);
-void    vrc2_a(int, int);
-void    vrc2_b(int, int);
-void    vs(int, int);
 
-static void     init_100in1(void);
-static void     init_aorom(void);
-static void     init_camerica(void);
-static void     init_clrdrms(void);
-static void     init_cnrom(void);
-static void     init_cprom(void);
-static void     init_fme7(void);
-static void     init_g101(void);
-static void     init_gnrom(void);
-static void     init_irem_74hc161_32(void);
-static void     init_mmc1(void);
-static void     init_mmc2(void);
-static void     init_mmc3(void);
-static void     init_mmc5(void);
-static void     init_namcot106(void);
-static void     init_nina7(void);
-static void     init_sunsoft4(void);
-static void     init_supervision(void);
-static void     init_taito_tc0190(void);
-static void     init_tengen_rambo1(void);
-static void     init_unrom(void);
-static void     init_vrc2_a(void);
-static void     init_vrc2_b(void);
-static void     init_vs(void);
-void    mmc2_4_latch(int);
-void    mmc2_4_latchspr(int);
+extern void MAPPER_NONE(void);
+extern void MAPPER_MMC1(void);
+extern void MAPPER_UNROM(void);
+extern void MAPPER_CNROM(void);
+extern void MAPPER_MMC3(void);
+extern void MAPPER_MMC5(void);
+extern void MAPPER_AOROM(void);
+extern void MAPPER_MMC2(void);
+extern void MAPPER_MMC4(void);
+extern void MAPPER_CLRDRMS(void);
+extern void MAPPER_CPROM(void);
+extern void MAPPER_100IN1(void);
+extern void MAPPER_NAMCOT106(void);
+extern void MAPPER_VRC2_A(void);
+extern void MAPPER_VRC2_B(void);
+extern void MAPPER_G101(void);
+extern void MAPPER_TAITO_TC0190(void);
+extern void MAPPER_TENGEN_RAMBO1(void);
+extern void MAPPER_GNROM(void);
+extern void MAPPER_SUNSOFT4(void);
+extern void MAPPER_FME7(void);
+extern void MAPPER_CAMERICA(void);
+extern void MAPPER_IREM_74HC161_32(void);
+extern void MAPPER_VS(void);
+extern void MAPPER_SUPERVISION(void);
+extern void MAPPER_NINA7(void);
+
+void mmc1(int, int);
+void unrom(int, int);
+void cnrom(int, int);
+void mmc3(int, int);
+void mmc5(int, int);
+void aorom(int, int);
+void mmc2(int, int);
+void mmc4(int, int);
+void clrdrms(int, int);
+void cprom(int, int);
+void m100in1(int, int);
+void namcot106(int, int);
+void vrc2_a(int, int);
+void vrc2_b(int, int);
+void g101(int, int);
+void taito_tc0190(int, int);
+void tengen_rambo1(int, int);
+void gnrom(int, int);
+void sunsoft4(int, int);
+void fme7(int, int);
+void camerica(int, int);
+void irem_74hc161_32(int, int);
+void vs(int, int);
+void supervision(int, int);
+void nina7(int, int);
+
+void mmc2_4_latch(int);
+void mmc2_4_latchspr(int);
 
 #define LAST_PAGE (ROM_PAGES-1)
 #define LAST_HALF_PAGE ((ROM_PAGES<<1)-1)
 
+/* ROM mapper table (pointers) */
+unsigned char *MAPTABLE[17];
+
 static int prgmask;
 static int chrmask;
+static int commandregister;
 
 /* #define DEBUG_MAPPER 1 */
 
@@ -156,7 +126,7 @@ static int chrmask;
 #define PAGE_E000 0xE
 #define PAGE_F000 0xF
 
-int
+static int
 MapRom(int page, unsigned loc, unsigned size)
 {
 	if ((page < 8) || (page > 15)) {
@@ -1295,6 +1265,7 @@ vrc2_a(int addr, int val)
 }
 
 /****************************************************************************/
+
 /* Konami VRC2 type B */
 static void
 init_vrc2_b(void)
@@ -1549,7 +1520,8 @@ init_tengen_rambo1(void)
 	mapmirror = 0;
 }
 
-void tengen_rambo1(int addr, int val)
+void
+tengen_rambo1(int addr, int val)
 {
 	val &= 0xFF;
 
@@ -1812,7 +1784,8 @@ init_irem_74hc161_32(void)
 	mapmirror = 0;
 }
 
-void irem_74hc161_32(int addr, int val)
+void
+irem_74hc161_32(int addr, int val)
 {
 	val &= 0xFF;
 
@@ -1869,7 +1842,8 @@ init_supervision(void)
 	mapmirror = 0;
 }
 
-void supervision(int addr, int val)
+void
+supervision(int addr, int val)
 {
 #ifdef DEBUG_MAPPER
 /*	if (verbose) {
@@ -1906,7 +1880,8 @@ init_nina7(void)
 	mapmirror = 0;
 }
 
-void nina7(int addr, int val)
+void
+nina7(int addr, int val)
 {
 	val &= 0xFF;
 
@@ -1925,127 +1900,90 @@ void nina7(int addr, int val)
 }
 
 /****************************************************************************/
-/*
-	if (verbose) {
-		printf("addr = %04X, val = %02X\n", addr, val);
-	}
-*/
 
-/*
-   This procedure initializes the MapperInit[], Mapper[], and
-   MapperName[] arrays.
- */
-void
-InitMapperSubsystem(void)
-{
-	/* clear them all to zero */
-	for (int x = 0; x < MAXMAPPER; x++) {
-		MapperInit[x] = 0;
-		Mapper[x] = 0;
-		MapperName[x][0] = '\0';
-	}
+void (*const MapperInit[MAXMAPPER + 1])(void) = {
+	[0]   = &init_none,
+	[1]   = &init_mmc1,
+	[2]   = &init_unrom,
+	[3]   = &init_cnrom,
+	[4]   = &init_mmc3,
+	[5]   = &init_mmc5,
+	[7]   = &init_aorom,
+	[9]   = &init_mmc2,
+	[10]  = &init_mmc4,
+	[11]  = &init_clrdrms,
+	[13]  = &init_cprom,
+	[15]  = &init_100in1,
+	[19]  = &init_namcot106,
+	[22]  = &init_vrc2_a,
+	[23]  = &init_vrc2_b,
+	[32]  = &init_g101,
+	[33]  = &init_taito_tc0190,
+	[64]  = &init_tengen_rambo1,
+	[66]  = &init_gnrom,
+	[68]  = &init_sunsoft4,
+	[69]  = &init_fme7,
+	[71]  = &init_camerica,
+	[78]  = &init_irem_74hc161_32,
+	[99]  = &init_vs,
+	[225] = &init_supervision,
+	[231] = &init_nina7,
+};
 
-	MapperInit[0] = &init_none;
-	Mapper[0] = &MAPPER_NONE;
-	strcpy(MapperName[0], "No mapper");
+void (*const Mapper[MAXMAPPER + 1])(void) = {
+	[0]   = &MAPPER_NONE,
+	[1]   = &MAPPER_MMC1,
+	[2]   = &MAPPER_UNROM,
+	[3]   = &MAPPER_CNROM,
+	[4]   = &MAPPER_MMC3,
+	[5]   = &MAPPER_MMC5,
+	[7]   = &MAPPER_AOROM,
+	[9]   = &MAPPER_MMC2,
+	[10]  = &MAPPER_MMC4,
+	[11]  = &MAPPER_CLRDRMS,
+	[13]  = &MAPPER_CPROM,
+	[15]  = &MAPPER_100IN1,
+	[19]  = &MAPPER_NAMCOT106,
+	[22]  = &MAPPER_VRC2_A,
+	[23]  = &MAPPER_VRC2_B,
+	[32]  = &MAPPER_G101,
+	[33]  = &MAPPER_TAITO_TC0190,
+	[64]  = &MAPPER_TENGEN_RAMBO1,
+	[66]  = &MAPPER_GNROM,
+	[68]  = &MAPPER_SUNSOFT4,
+	[69]  = &MAPPER_FME7,
+	[71]  = &MAPPER_CAMERICA,
+	[78]  = &MAPPER_IREM_74HC161_32,
+	[99]  = &MAPPER_VS,
+	[225] = &MAPPER_SUPERVISION,
+	[231] = &MAPPER_NINA7,
+};
 
-	MapperInit[1] = &init_mmc1;
-	Mapper[1] = &MAPPER_MMC1;
-	strcpy(MapperName[1], "MMC1");
-
-	MapperInit[2] = &init_unrom;
-	Mapper[2] = &MAPPER_UNROM;
-	strcpy(MapperName[2], "UNROM");
-
-	MapperInit[3] = &init_cnrom;
-	Mapper[3] = &MAPPER_CNROM;
-	strcpy(MapperName[3], "CNROM");
-
-	MapperInit[4] = &init_mmc3;
-	Mapper[4] = &MAPPER_MMC3;
-	strcpy(MapperName[4], "MMC3");
-
-	MapperInit[5] = &init_mmc5;
-	Mapper[5] = &MAPPER_MMC5;
-	strcpy(MapperName[5], "MMC5");
-
-	MapperInit[7] = &init_aorom;
-	Mapper[7] = &MAPPER_AOROM;
-	strcpy(MapperName[7], "AOROM");
-
-	MapperInit[9] = &init_mmc2;
-	Mapper[9] = &MAPPER_MMC2;
-	strcpy(MapperName[9], "MMC2");
-
-	MapperInit[10] = &init_mmc4;
-	Mapper[10] = &MAPPER_MMC4;
-	strcpy(MapperName[10], "MMC4");
-
-	MapperInit[11] = &init_clrdrms;
-	Mapper[11] = &MAPPER_CLRDRMS;
-	strcpy(MapperName[11], "Color Dreams");
-
-	MapperInit[13] = &init_cprom;
-	Mapper[13] = &MAPPER_CPROM;
-	strcpy(MapperName[13], "CPROM");
-
-	MapperInit[15] = &init_100in1;
-	Mapper[15] = &MAPPER_100IN1;
-	strcpy(MapperName[15], "100-in-1");
-
-	MapperInit[19] = &init_namcot106;
-	Mapper[19] = &MAPPER_NAMCOT106;
-	strcpy(MapperName[19], "Namcot 106");
-
-	MapperInit[22] = &init_vrc2_a;
-	Mapper[22] = &MAPPER_VRC2_A;
-	strcpy(MapperName[22], "Konami VRC2 type A");
-
-	MapperInit[23] = &init_vrc2_b;
-	Mapper[23] = &MAPPER_VRC2_B;
-	strcpy(MapperName[23], "Konami VRC2 type B");
-
-	MapperInit[32] = &init_g101;
-	Mapper[32] = &MAPPER_G101;
-	strcpy(MapperName[32], "Irem G-101");
-
-	MapperInit[33] = &init_taito_tc0190;
-	Mapper[33] = &MAPPER_TAITO_TC0190;
-	strcpy(MapperName[33], "Taito TC0190");
-
-	MapperInit[64] = &init_tengen_rambo1;
-	Mapper[64] = &MAPPER_TENGEN_RAMBO1;
-	strcpy(MapperName[64], "Tengen RAMBO-1");
-
-	MapperInit[66] = &init_gnrom;
-	Mapper[66] = &MAPPER_GNROM;
-	strcpy(MapperName[66], "GNROM");
-
-	MapperInit[68] = &init_sunsoft4;
-	Mapper[68] = &MAPPER_SUNSOFT4;
-	strcpy(MapperName[68], "Sunsoft Mapper #4");
-
-	MapperInit[69] = &init_fme7;
-	Mapper[69] = &MAPPER_FME7;
-	strcpy(MapperName[69], "Sunsoft FME-7");
-
-	MapperInit[71] = &init_camerica;
-	Mapper[71] = &MAPPER_CAMERICA;
-	strcpy(MapperName[71], "Camerica");
-
-	MapperInit[78] = &init_irem_74hc161_32;
-	Mapper[78] = &MAPPER_IREM_74HC161_32;
-	strcpy(MapperName[78], "Irem 74HC161/32");
-
-	MapperInit[99] = &init_vs;
-	Mapper[99] = &MAPPER_VS;
-	strcpy(MapperName[99], "VS UniSystem");
-
-	MapperInit[225] = &init_supervision;
-	Mapper[225] = &MAPPER_SUPERVISION;
-	strcpy(MapperName[225], "SuperVision");
-
-	MapperInit[231] = &init_nina7;
-	Mapper[231] = &MAPPER_NINA7;
-	strcpy(MapperName[231], "NINA-07");
-}
+const char *const MapperName[MAXMAPPER + 1] = {
+	[0]   = "No mapper",
+	[1]   = "MMC1",
+	[2]   = "UNROM",
+	[3]   = "CNROM",
+	[4]   = "MMC3",
+	[5]   = "MMC5",
+	[7]   = "AOROM",
+	[9]   = "MMC2",
+	[10]  = "MMC4",
+	[11]  = "Color Dreams",
+	[13]  = "CPROM",
+	[15]  = "100-in-1",
+	[19]  = "Namcot 106",
+	[22]  = "Konami VRC2 type A",
+	[23]  = "Konami VRC2 type B",
+	[32]  = "Irem G-101",
+	[33]  = "Taito TC0190",
+	[64]  = "Tengen RAMBO-1",
+	[66]  = "GNROM",
+	[68]  = "Sunsoft Mapper #4",
+	[69]  = "Sunsoft FME-7",
+	[71]  = "Camerica",
+	[78]  = "Irem 74HC161/32",
+	[99]  = "VS UniSystem",
+	[225] = "SuperVision",
+	[231] = "NINA-07",
+};
