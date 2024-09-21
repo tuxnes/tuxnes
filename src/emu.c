@@ -144,7 +144,6 @@ void    InitMapperSubsystem(void);
 extern char MapperName[MAXMAPPER + 1][30];
 void    quit(void);
 void    START(void);
-void    translate(int);
 
 /* color palettes */
 struct {
@@ -1761,7 +1760,6 @@ main(int argc, char **argv)
 
 	/* start the show */
 	STACKPTR = (int)STACK + 0xFF;
-	translate(*((unsigned short *)(MAPTABLE[15] + 0xFFFC)));
 	START();                     /* execute translated code */
 
 	/* Not Reached, but return something anyway to get rid of warnings */

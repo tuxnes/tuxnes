@@ -15,14 +15,16 @@ START:
 	mov $VBL,%ebx
 	mov %esi,CLOCK
 	sub %ebx,%esi
-	mov $_CODE_BASE,%ebx
 	mov %esi,_CTNI
 	xor %eax,%eax
 	xor %ecx,%ecx
 	xor %edx,%edx
 	xor %ebp,%ebp
 	xor %edi,%edi
-	jmp *%ebx
+	movl $0,-4(%esp)
+	movl MAPTABLE+60,%ebx
+	movzwl 0xFFFC(%ebx),%ebx
+	jmp U
 
 .globl U
 U:
