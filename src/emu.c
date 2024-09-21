@@ -60,7 +60,6 @@ int     disassemble = 0;
 int     dolink = 0;
 unsigned int    MAPPERNUMBER = 0;
 int     SRAM_ENABLED;
-int     gamegenie = 0;
 int     irqflag = 0;
 int     mapmirror = 0;
 int     mapperoverride = 0;
@@ -1021,7 +1020,6 @@ main(int argc, char **argv)
 	verbose = 0;
 	dolink = 0;
 	disassemble = 0;
-	gamegenie = 0;
 
 	/* check for the default output device */
 	if ((audiofd = open(DSP, O_WRONLY | O_APPEND)) < 0)
@@ -1120,7 +1118,6 @@ main(int argc, char **argv)
 			showheader = 1;
 			break;
 		case 'g':
-			gamegenie = 1;
 			ggcode = optarg;
 			break;
 		case 'j':
@@ -1672,13 +1669,10 @@ main(int argc, char **argv)
 	}
 
 	/* enter the Game Genie codes */
-	if (gamegenie) {
+	if (ggcode) {
 		int address, data, compare;
 		int ggret = DecodeGameGenieCode(ggcode, &address, &data, &compare);
-		if (ggret == GAME_GENIE_BAD_CODE) {
-			fprintf(stderr, "invalid Game Genie code: %s\n", ggcode);
-		}
-		else if (ggret == GAME_GENIE_8_CHAR) {
+		if (ggret == GAME_GENIE_8_CHAR) {
 			if (verbose) {
 				fprintf(stderr, "Game Genie: address = %04X, data = %02X\n",
 				        address, data);
@@ -1694,7 +1688,7 @@ main(int argc, char **argv)
 					        address, MAPTABLE[address >> 12][address]);
 				}
 			}
-		} else {
+		} else if (ggret == GAME_GENIE_6_CHAR) {
 			if (verbose) {
 				fprintf(stderr, "Game Genie: address = %04X, data = %02X\n",
 				        address, data);
@@ -1704,6 +1698,8 @@ main(int argc, char **argv)
 			if (verbose)
 				fprintf(stderr, "Game Genie: value at %04X = %02X\n", address,
 				        MAPTABLE[address >> 12][address]);
+		} else {
+			fprintf(stderr, "invalid Game Genie code: %s\n", ggcode);
 		}
 	}
 
