@@ -9,6 +9,16 @@
 #include "consts.h"
 #include "mapper.h"
 
+.section .rodata
+.balign 8
+.globl TRANS_TBL
+TRANS_TBL:
+.incbin "compdata"
+.type TRANS_TBL,@object
+.size TRANS_TBL,.-TRANS_TBL
+
+
+.section .text
 .globl START
 START:
 	xor %esi,%esi

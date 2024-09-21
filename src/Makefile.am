@@ -29,7 +29,7 @@ tuxnes_SOURCES = \
 	x11.c
 
 tuxnes_CPPFLAGS = $(AM_CPPFLAGS) $(DEFLATE_CFLAGS) $(HQX_CFLAGS) $(X_CFLAGS)
-tuxnes_LDADD = table.o $(DEFLATE_LIBS) $(HQX_LIBS) $(X_LIBS)
+tuxnes_LDADD = $(DEFLATE_LIBS) $(HQX_LIBS) $(X_LIBS)
 tuxnes_LDFLAGS = $(AM_LDFLAGS) -Wl,-z,noexecstack
 
 comptbl_SOURCES = comptbl.c
@@ -37,8 +37,6 @@ comptbl_SOURCES = comptbl.c
 EXTRA_DIST = table.x86 romfixer
 CLEANFILES = compdata
 
+tuxnes-x86.$(OBJEXT): compdata
 compdata: comptbl $(srcdir)/table.x86
-	./comptbl < $(srcdir)/table.x86
-
-table.o: compdata
-	$(LD) -r -b binary -defsym TRANS_TBL=_binary_compdata_start $< -o $@
+	$(AM_V_GEN)./comptbl < $(srcdir)/table.x86
