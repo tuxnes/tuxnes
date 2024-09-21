@@ -9,6 +9,9 @@
 #include "consts.h"
 #include "mapper.h"
 
+.section .note.GNU-stack,"",@progbits
+
+
 .section .rodata
 .balign 8
 .globl TRANS_TBL

@@ -30,7 +30,6 @@ tuxnes_SOURCES = \
 
 tuxnes_CPPFLAGS = $(AM_CPPFLAGS) $(DEFLATE_CFLAGS) $(HQX_CFLAGS) $(X_CFLAGS)
 tuxnes_LDADD = $(DEFLATE_LIBS) $(HQX_LIBS) $(X_LIBS)
-tuxnes_LDFLAGS = $(AM_LDFLAGS) -Wl,-z,noexecstack
 
 comptbl_SOURCES = comptbl.c
 
