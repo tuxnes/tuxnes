@@ -68,7 +68,7 @@ recompile_always:
 	mov _XPC,%ebx
 0:
 	push %ecx
-	cmp $0,dolink
+	cmpl $0,dolink
 	jz 1f  /* to disable linking (for debugging) */
 	mov _PCR,%ecx
 	and $0xFFFFF000,%ecx
