@@ -1393,7 +1393,7 @@ main(int argc, char **argv)
 
 	/* Allocate memory */
 	if (mmap(ROM, 0x300000,
-	         PROT_READ | PROT_WRITE | PROT_EXEC,
+	         PROT_READ | PROT_WRITE,
 	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
 	         -1, 0) == MAP_FAILED) {
 		perror("mmap");

@@ -6,7 +6,7 @@ Changes since latest release
 - fixed ROM size calculation when reading from a .zip file
 - fixed invalid malloc calls when used with some odd file paths or file names
 - fixed mmap error handling
-- stack memory is marked as not executable
+- stack and ROM memory is no longer executable
 - fixed trying to create the audio device (/dev/dsp) if missing
 - fixed using 100% CPU while paused
 - screensaver is disabled while running
