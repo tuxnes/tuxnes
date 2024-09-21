@@ -148,9 +148,6 @@ struct SoundConfig sound_config = {
 	.reverb = 0,
 };
 
-/* the currently selected sample format */
-struct SampleFormat *sample_format = 0;
-
 /* sample format numbers */
 #ifndef AFMT_MU_LAW
 #  define AFMT_MU_LAW 1
@@ -174,8 +171,11 @@ struct SampleFormat *sample_format = 0;
 #  define AFMT_U16_BE 256
 #endif
 
-/* table of sample formats, terminated by { 0, 0, 0, 0 } */
-struct SampleFormat sample_formats[] = {
+/* the currently selected sample format */
+const struct SampleFormat *sample_format = NULL;
+
+/* table of sample formats, terminated by { 0, 0, 0 } */
+const struct SampleFormat sample_formats[] = {
 	{ "mu8",    "8-bit Mu-Law encoded *tested, imperfect",
 	  AFMT_MU_LAW },
 	{ "8",      "8-bit unsigned",
@@ -224,7 +224,7 @@ struct SampleFormat sample_formats[] = {
 
 /* dmc values - this is in actual cpu time
  * */
-static unsigned short dmc_samples_wait[0x10] = {
+static const unsigned short dmc_samples_wait[0x10] = {
 	0x0D60, 0x0BE0, 0x0AA0, 0x0A00,
 	0x08F0, 0x07F0, 0x0710, 0x06B0,
 	0x05F0, 0x0500, 0x0470, 0x0400,
@@ -232,7 +232,7 @@ static unsigned short dmc_samples_wait[0x10] = {
 };
 
 /* when the sound should be played, when step <= the value */
-static unsigned long squ_duty[0x04] = {
+static const unsigned long squ_duty[0x04] = {
 	0x04000000, 0x08000000, 0x10000000, 0x18000000,
 };
 
@@ -241,7 +241,7 @@ static short triangle_50[0x20] = {
 };
 
 /* as in NESSOUND.txt */
-static unsigned char length_precalc[0x20] = {
+static const unsigned char length_precalc[0x20] = {
 	0x05, 0x7F, 0x0A, 0x01, 0x14, 0x02, 0x28, 0x03,
 	0x50, 0x04, 0x1E, 0x05, 0x07, 0x06, 0x0E, 0x07,
 	0x06, 0x08, 0x0C, 0x09, 0x18, 0x0A, 0x30, 0x0B,
@@ -249,7 +249,7 @@ static unsigned char length_precalc[0x20] = {
 };
 
 /* as in NESSOUND.txt */
-static unsigned short noi_wavelen[0x10] = {
+static const unsigned short noi_wavelen[0x10] = {
 	0x002, 0x004, 0x008, 0x010,
 	0x020, 0x030, 0x040, 0x050,
 	0x065, 0x07F, 0x0BE, 0x0FE,
@@ -405,7 +405,7 @@ InitAudio(int argc, char **argv)
 			if (!ioctl(audiofd, SNDCTL_DSP_RESET)) {
 				int desired_audiorate;
 				int desired_audiostereo;
-				struct SampleFormat *desired_sample_format = sample_format;
+				const struct SampleFormat *desired_sample_format = sample_format;
 
 				desired_audiorate = sound_config.audiorate;
 				if (ioctl(audiofd, SNDCTL_DSP_SPEED, &sound_config.audiorate))

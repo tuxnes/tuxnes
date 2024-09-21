@@ -18,13 +18,10 @@ struct SampleFormat {
 };
 
 /* the currently selected sample format */
-extern struct SampleFormat *sample_format;
+extern const struct SampleFormat *sample_format;
 
-/* table of sample formats, terminated by { 0, 0, 0, 0 } */
-extern struct SampleFormat sample_formats[];
-
-/* lookup table for 12bit->Mu-Law sample conversion */
-extern unsigned char ulaw [0x4000];
+/* table of sample formats, terminated by { 0, 0, 0 } */
+extern const struct SampleFormat sample_formats[];
 
 /* global sound parameters */
 extern struct SoundConfig {

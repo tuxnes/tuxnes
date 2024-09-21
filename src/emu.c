@@ -1346,7 +1346,7 @@ main(int argc, char **argv)
 
 	/* Select a sound sample format */
 	{
-		struct SampleFormat *match = 0;
+		const struct SampleFormat *match = 0;
 		int partials = 0;
 		size_t len;
 
