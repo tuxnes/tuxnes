@@ -12,10 +12,6 @@
 
 #include <hqx.h>
 
-#ifdef HAVE_FEATURES_H
-#include <features.h>
-#endif /* HAVE_FEATRES_H */
-
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/wait.h>

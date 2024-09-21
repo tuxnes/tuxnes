@@ -9,10 +9,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_FEATURES_H
-#include <features.h>
-#endif /* HAVE_FEATRES_H */
-
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/mman.h>

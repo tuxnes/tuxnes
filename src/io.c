@@ -12,10 +12,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_FEATURES_H
-#include <features.h>
-#endif /* HAVE_FEATURES_H */
-
 #include <stdio.h>
 #include <string.h>
 

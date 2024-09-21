@@ -14,9 +14,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef HAVE_FEATURES_H
-#include <features.h>
-#endif
 
 #include "globals.h"
 #include "mapper.h"
