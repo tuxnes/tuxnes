@@ -11,7 +11,6 @@
 #include "consts.h"
 
 /* Asm linkage */
-extern int       TRANS_TBL[];
 extern void     *INPUT;
 extern void     *OUTPUT;
 extern void     *U;

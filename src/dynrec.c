@@ -16,6 +16,8 @@
 #include "mapper.h"
 #include "globals.h"
 
+extern const unsigned int TRANS_TBL[];
+
 unsigned char *next_code_alloc = CODE_BASE;
 
 /* Some declarataions for the asm code */
@@ -42,7 +44,6 @@ translate(int addr)
 {
 	int saddr;
 	unsigned char src;
-	unsigned int *ptr;
 	unsigned char *cptr, *bptr;
 	unsigned char stop = 0;
 
@@ -51,10 +52,10 @@ translate(int addr)
 		printf("\n[%4x] (%8x) -> %8x\n", addr, (int)(MAPTABLE[addr >> 12] + addr), (int)cptr);
 		disas(addr);             /* This will output a disassembly of the 6502 code */
 	}
-	while (!stop) {
+	do {
 		saddr = addr;
 		INT_MAP[(MAPTABLE[addr >> 12] + addr) - RAM] = (unsigned int)cptr;
-		ptr = (int *)TRANS_TBL;
+		const unsigned int *ptr = TRANS_TBL;
 		while (1) {
 			src = *(MAPTABLE[addr >> 12] + addr);
 			addr++;
@@ -63,7 +64,7 @@ translate(int addr)
 				break;
 			if (ptr[src] & 1)
 				break;
-			ptr = (int *)(ptr[src] + (int)TRANS_TBL);
+			ptr = (const unsigned int *)((const char *)TRANS_TBL + ptr[src]);
 		}
 		if (ptr[src] == 0) {
 			addr = saddr + 1;
@@ -71,7 +72,7 @@ translate(int addr)
 			if (!ignorebadinstr)
 				*cptr++ = BRK;
 		} else {
-			unsigned char *sptr = (unsigned char *)TRANS_TBL + ptr[src];
+			const unsigned char *sptr = (const unsigned char *)((const char *)TRANS_TBL + ptr[src]);
 			int slen = sptr[-1];
 			int dlen = *sptr++;
 			bptr = cptr;
@@ -136,7 +137,7 @@ translate(int addr)
 			}
 			addr = saddr + slen;
 		}
-	}
+	} while (!stop);
 	while ((int)cptr & 15)
 		*cptr++ = NOP;
 	next_code_alloc = cptr;
