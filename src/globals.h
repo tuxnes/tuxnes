@@ -15,7 +15,7 @@ extern void     *INPUT;
 extern void     *OUTPUT;
 extern void     *U;
 extern void     *NMI;
-extern int       MAPPERNUMBER;
+extern unsigned int      MAPPERNUMBER;
 extern unsigned char    *ROM_BASE;
 extern void     (*const MapperInit[])(void);
 extern void     (*const Mapper[])(void);

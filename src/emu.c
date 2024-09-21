@@ -58,7 +58,7 @@ const char *sample_format_name = "8";
 int     dirtyheader = 0;
 int     disassemble = 0;
 int     dolink = 0;
-int     MAPPERNUMBER = -1;
+unsigned int    MAPPERNUMBER = 0;
 int     SRAM_ENABLED;
 int     gamegenie = 0;
 int     irqflag = 0;
