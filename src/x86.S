@@ -27,6 +27,9 @@ START:
 	movl MAPTABLE+60,%ebx
 	movzwl 0xFFFC(%ebx),%ebx
 	jmp U
+.type START,@function
+.size START,.-START
+
 
 .globl U
 U:
@@ -93,6 +96,8 @@ recompile_always:
 1:
 	pop %ecx
 	jmp *%ebx
+.type U,@function
+.size U,.-U
 
 
 .globl NMI
@@ -220,6 +225,9 @@ irq:
 	orl    $0x04,_FLAGS
 	movzwl 0xFFFE(%ebx),%ebx
 	jmp U
+.type NMI,@function
+.size NMI,.-NMI
+
 
 .globl INPUT
 INPUT:
@@ -240,6 +248,9 @@ INPUT:
 	movl _CTNI,%esi
 	movsbl _INRET,%edi
 	ret
+.type INPUT,@function
+.size INPUT,.-INPUT
+
 
 .globl OUTPUT
 OUTPUT:
@@ -261,6 +272,8 @@ OUTPUT:
 	popa
 	movl _CTNI,%esi
 	ret
+.type OUTPUT,@function
+.size OUTPUT,.-OUTPUT
 
 
 /* Mapper Linkage */
@@ -268,6 +281,9 @@ OUTPUT:
 .globl MAPPER_NONE
 MAPPER_NONE:
 	ret
+.type MAPPER_NONE,@function
+.size MAPPER_NONE,.-MAPPER_NONE
+
 
 .globl MAPPER_MMC1
 MAPPER_MMC1:
@@ -289,6 +305,9 @@ MAPPER_MMC1:
 	popa
 	movl _CTNI,%esi
 	ret
+.type MAPPER_MMC1,@function
+.size MAPPER_MMC1,.-MAPPER_MMC1
+
 
 .globl MAPPER_UNROM
 MAPPER_UNROM:
@@ -300,6 +319,9 @@ MAPPER_UNROM:
 	pop %eax
 	popa
 	ret
+.type MAPPER_UNROM,@function
+.size MAPPER_UNROM,.-MAPPER_UNROM
+
 
 .globl MAPPER_CNROM
 MAPPER_CNROM:
@@ -311,6 +333,9 @@ MAPPER_CNROM:
 	pop %eax
 	popa
 	ret
+.type MAPPER_CNROM,@function
+.size MAPPER_CNROM,.-MAPPER_CNROM
+
 
 .globl MAPPER_MMC3
 MAPPER_MMC3:
@@ -332,6 +357,9 @@ MAPPER_MMC3:
 	popa
 	movl _CTNI,%esi
 	ret
+.type MAPPER_MMC3,@function
+.size MAPPER_MMC3,.-MAPPER_MMC3
+
 
 .globl MAPPER_MMC5
 MAPPER_MMC5:
@@ -343,6 +371,9 @@ MAPPER_MMC5:
 	pop %eax
 	popa
 	ret
+.type MAPPER_MMC5,@function
+.size MAPPER_MMC5,.-MAPPER_MMC5
+
 
 .globl MAPPER_AOROM
 MAPPER_AOROM:
@@ -364,6 +395,9 @@ MAPPER_AOROM:
 	popa
 	movl _CTNI,%esi
 	ret
+.type MAPPER_AOROM,@function
+.size MAPPER_AOROM,.-MAPPER_AOROM
+
 
 .globl MAPPER_MMC2
 MAPPER_MMC2:
@@ -375,6 +409,9 @@ MAPPER_MMC2:
 	pop %eax
 	popa
 	ret
+.type MAPPER_MMC2,@function
+.size MAPPER_MMC2,.-MAPPER_MMC2
+
 
 .globl MAPPER_MMC4
 MAPPER_MMC4:
@@ -386,6 +423,9 @@ MAPPER_MMC4:
 	pop %eax
 	popa
 	ret
+.type MAPPER_MMC4,@function
+.size MAPPER_MMC4,.-MAPPER_MMC4
+
 
 .globl MAPPER_CLRDRMS
 MAPPER_CLRDRMS:
@@ -397,6 +437,9 @@ MAPPER_CLRDRMS:
 	pop %eax
 	popa
 	ret
+.type MAPPER_CLRDRMS,@function
+.size MAPPER_CLRDRMS,.-MAPPER_CLRDRMS
+
 
 .globl MAPPER_CPROM
 MAPPER_CPROM:
@@ -408,6 +451,9 @@ MAPPER_CPROM:
 	pop %eax
 	popa
 	ret
+.type MAPPER_CPROM,@function
+.size MAPPER_CPROM,.-MAPPER_CPROM
+
 
 .globl MAPPER_100IN1
 MAPPER_100IN1:
@@ -419,6 +465,9 @@ MAPPER_100IN1:
 	pop %eax
 	popa
 	ret
+.type MAPPER_100IN1,@function
+.size MAPPER_100IN1,.-MAPPER_100IN1
+
 
 .globl MAPPER_NAMCOT106
 MAPPER_NAMCOT106:
@@ -430,6 +479,9 @@ MAPPER_NAMCOT106:
 	pop %eax
 	popa
 	ret
+.type MAPPER_NAMCOT106,@function
+.size MAPPER_NAMCOT106,.-MAPPER_NAMCOT106
+
 
 .globl MAPPER_VRC2_A
 MAPPER_VRC2_A:
@@ -441,6 +493,9 @@ MAPPER_VRC2_A:
 	pop %eax
 	popa
 	ret
+.type MAPPER_VRC2_A,@function
+.size MAPPER_VRC2_A,.-MAPPER_VRC2_A
+
 
 .globl MAPPER_VRC2_B
 MAPPER_VRC2_B:
@@ -452,6 +507,9 @@ MAPPER_VRC2_B:
 	pop %eax
 	popa
 	ret
+.type MAPPER_VRC2_B,@function
+.size MAPPER_VRC2_B,.-MAPPER_VRC2_B
+
 
 .globl MAPPER_G101
 MAPPER_G101:
@@ -463,6 +521,9 @@ MAPPER_G101:
 	pop %eax
 	popa
 	ret
+.type MAPPER_G101,@function
+.size MAPPER_G101,.-MAPPER_G101
+
 
 .globl MAPPER_TAITO_TC0190
 MAPPER_TAITO_TC0190:
@@ -474,6 +535,9 @@ MAPPER_TAITO_TC0190:
 	pop %eax
 	popa
 	ret
+.type MAPPER_TAITO_TC0190,@function
+.size MAPPER_TAITO_TC0190,.-MAPPER_TAITO_TC0190
+
 
 .globl MAPPER_TENGEN_RAMBO1
 MAPPER_TENGEN_RAMBO1:
@@ -485,6 +549,8 @@ MAPPER_TENGEN_RAMBO1:
 	pop %eax
 	popa
 	ret
+.type MAPPER_TENGEN_RAMBO1,@function
+.size MAPPER_TENGEN_RAMBO1,.-MAPPER_TENGEN_RAMBO1
 
 
 .globl MAPPER_GNROM
@@ -497,6 +563,9 @@ MAPPER_GNROM:
 	pop %eax
 	popa
 	ret
+.type MAPPER_GNROM,@function
+.size MAPPER_GNROM,.-MAPPER_GNROM
+
 
 .globl MAPPER_SUNSOFT4
 MAPPER_SUNSOFT4:
@@ -508,6 +577,9 @@ MAPPER_SUNSOFT4:
 	pop %eax
 	popa
 	ret
+.type MAPPER_SUNSOFT4,@function
+.size MAPPER_SUNSOFT4,.-MAPPER_SUNSOFT4
+
 
 .globl MAPPER_FME7
 MAPPER_FME7:
@@ -519,6 +591,9 @@ MAPPER_FME7:
 	pop %eax
 	popa
 	ret
+.type MAPPER_FME7,@function
+.size MAPPER_FME7,.-MAPPER_FME7
+
 
 .globl MAPPER_CAMERICA
 MAPPER_CAMERICA:
@@ -530,6 +605,9 @@ MAPPER_CAMERICA:
 	pop %eax
 	popa
 	ret
+.type MAPPER_CAMERICA,@function
+.size MAPPER_CAMERICA,.-MAPPER_CAMERICA
+
 
 .globl MAPPER_IREM_74HC161_32
 MAPPER_IREM_74HC161_32:
@@ -541,6 +619,9 @@ MAPPER_IREM_74HC161_32:
 	pop %eax
 	popa
 	ret
+.type MAPPER_IREM_74HC161_32,@function
+.size MAPPER_IREM_74HC161_32,.-MAPPER_IREM_74HC161_32
+
 
 .globl MAPPER_VS
 MAPPER_VS:
@@ -552,6 +633,9 @@ MAPPER_VS:
 	pop %eax
 	popa
 	ret
+.type MAPPER_VS,@function
+.size MAPPER_VS,.-MAPPER_VS
+
 
 .globl MAPPER_SUPERVISION
 MAPPER_SUPERVISION:
@@ -563,6 +647,9 @@ MAPPER_SUPERVISION:
 	pop %eax
 	popa
 	ret
+.type MAPPER_SUPERVISION,@function
+.size MAPPER_SUPERVISION,.-MAPPER_SUPERVISION
+
 
 .globl MAPPER_NINA7
 MAPPER_NINA7:
@@ -574,6 +661,9 @@ MAPPER_NINA7:
 	pop %eax
 	popa
 	ret
+.type MAPPER_NINA7,@function
+.size MAPPER_NINA7,.-MAPPER_NINA7
+
 
 /*
  * This is an interpreter to handle self-modifying code.
