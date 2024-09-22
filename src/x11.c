@@ -128,14 +128,11 @@ void    quit(void);
 void    START(void);
 
 #ifdef HAVE_SHM
-
-static Status shm_status = 0;
-static int shm_major, shm_minor;
-static Bool shm_pixmaps;
 static XShmSegmentInfo shminfo;
 static Status shm_attached = 0;
 static int shm_attaching = 0;
 static XImage *shm_image = 0;
+static int shm_major_opcode, shm_first_event, shm_first_error;
 
 static void
 cleanup_shm(void)
@@ -153,7 +150,6 @@ cleanup_shm(void)
 		shminfo.shmid = -1;
 	}
 }
-
 #endif
 
 static void
@@ -186,8 +182,7 @@ handler(Display *display, XErrorEvent *ev)
 {
 #ifdef HAVE_SHM
 	if (shm_attaching
-	 && (ev->error_code == BadAccess)
-	/* && (ev->request_code == Find_the_request_code_for_MIT_SHM) */
+	 && (ev->request_code == shm_major_opcode)
 	 && (ev->minor_code == X_ShmAttach)) {
 		shm_attached = False;
 		return 0;
@@ -248,9 +243,6 @@ InitDisplayX11(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	int screen = XDefaultScreen(display);
-#ifdef HAVE_SHM
-	shm_status = XShmQueryVersion(display, &shm_major, &shm_minor, &shm_pixmaps);
-#endif /* HAVE_SHM */
 	unsigned int depth = DefaultDepth(display, screen);
 	Visual *visual = XDefaultVisual(display, screen);
 	colormap = DefaultColormap(display, screen);
@@ -447,7 +439,7 @@ InitDisplayX11(int argc, char **argv)
 #endif
 	}
 #ifdef HAVE_SHM
-	if (shm_status == True) {
+	if (XQueryExtension(display, "MIT-SHM", &shm_major_opcode, &shm_first_event, &shm_first_error)) {
 		shm_image = XShmCreateImage(display, visual, depth,
 		                            depth == 1 ? XYBitmap : ZPixmap, NULL, &shminfo,
 		                            w, h);
