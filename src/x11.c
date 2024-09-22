@@ -452,6 +452,16 @@ InitDisplayX11(int argc, char **argv)
 
 		windowPicture = XRenderCreatePicture(display, window, fmt, 0, &attrs);
 		scalePicture = XRenderCreatePicture(display, scalePixmap, fmt, 0, &attrs);
+
+		double inv_xscale = (double)renderer_config.scaler_magstep / (double)renderer_config.magstep, inv_yscale = inv_xscale;
+		XTransform transform = {
+			{
+				{ XDoubleToFixed(inv_xscale), XDoubleToFixed(0), XDoubleToFixed(0) },
+				{ XDoubleToFixed(0), XDoubleToFixed(inv_yscale), XDoubleToFixed(0) },
+				{ XDoubleToFixed(0), XDoubleToFixed(0), XDoubleToFixed(1.0) }
+			}
+		};
+		XRenderSetPictureTransform(display, scalePicture, &transform);
 #endif
 	}
 #ifdef HAVE_SHM
@@ -851,17 +861,6 @@ RenderImage(XEvent *ev)
 		h = 240 * renderer_config.magstep;
 		dx = (window_w - w) / 2;
 		dy = (window_h - h) / 2;
-
-		double xscale = (renderer_config.magstep + 0.0) / renderer_config.scaler_magstep, yscale = xscale;
-		XTransform transform =
-		{
-			{
-				{ XDoubleToFixed(1.0/xscale), XDoubleToFixed(0), XDoubleToFixed(0) },
-				{ XDoubleToFixed(0), XDoubleToFixed(1.0/yscale), XDoubleToFixed(0) },
-				{ XDoubleToFixed(0), XDoubleToFixed(0), XDoubleToFixed(1.0) }
-			}
-		};
-		XRenderSetPictureTransform(display, scalePicture, &transform);
 		XRenderComposite(display, PictOpSrc, scalePicture, None, windowPicture, 0,0, 0,0, dx, dy, w, h);
 	}
 #endif
