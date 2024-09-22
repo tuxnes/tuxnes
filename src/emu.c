@@ -1234,15 +1234,15 @@ main(int argc, char **argv)
 			break;
 		case 'E':
 			if (optarg && *optarg)
-				magstep = atoi(optarg);
+				renderer_config.magstep = atoi(optarg);
 			else
-				magstep = 2;
+				renderer_config.magstep = 2;
 			break;
 		case 'Q':
 			if (optarg && *optarg)
-				scaler_magstep = atoi(optarg);
+				renderer_config.scaler_magstep = atoi(optarg);
 			else
-				scaler_magstep = 2;
+				renderer_config.scaler_magstep = 2;
 			break;
 		case 'r':
 			rendname = optarg;
@@ -1285,8 +1285,8 @@ main(int argc, char **argv)
 		}
 	}
 
-	if (magstep < 1) {
-		magstep = 1;
+	if (renderer_config.magstep < 1) {
+		renderer_config.magstep = 1;
 	}
 
 	if ((argc - optind) != 1) {

@@ -56,6 +56,8 @@ struct RendererConfig renderer_config = {
 	.display_id = NULL,
 	.inroot = 0,
 	.indexedcolor = 1,
+	.scaler_magstep = 1,
+	.magstep = 1,
 };
 
 /* global renderer data */
@@ -70,7 +72,6 @@ struct RendererData renderer_data = {
 	.redrawall = 1,          /* Redraw all scanlines */
 };
 
-int             magstep = 0;
 unsigned char   palette_cache[tilecachedepth][32];
 
 int

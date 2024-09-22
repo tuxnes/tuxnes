@@ -27,7 +27,7 @@ struct Renderer {
 /* the currently selected renderer */
 extern struct Renderer *renderer;
 
-/* table of renderers, terminated by { 0, 0, 0, 0, 0, 0 } */
+/* table of renderers, terminated by { 0, 0, 0, 0, 0 } */
 extern struct Renderer renderers[];
 
 /* global renderer parameters */
@@ -36,6 +36,8 @@ extern struct RendererConfig {
 	char       *display_id;
 	int        inroot;
 	int        indexedcolor;
+	int        scaler_magstep;         /* HQX scale factor */
+	int        magstep;                /* Final scale factor */
 } renderer_config;
 
 /* global renderer data */
@@ -53,8 +55,6 @@ extern struct RendererData {
 #define maxsize 4
 
 #define tilecachedepth 25
-
-extern int              magstep, scaler_magstep;
 extern unsigned char    palette_cache[tilecachedepth][32];
 
 #endif
