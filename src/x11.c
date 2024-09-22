@@ -253,7 +253,6 @@ InitDisplayX11(int argc, char **argv)
 #endif /* HAVE_SHM */
 	unsigned int depth = DefaultDepth(display, screen);
 	Visual *visual = XDefaultVisual(display, screen);
-	Window rootwindow = RootWindow(display, screen);
 	colormap = DefaultColormap(display, screen);
 	gc = DefaultGC(display, screen);
 
@@ -339,52 +338,51 @@ InitDisplayX11(int argc, char **argv)
 			paletteX11[x] = color.pixel;
 		}
 	}
-	unsigned int w = 256 * renderer_config.scaler_magstep;
-	unsigned int h = 240 * renderer_config.scaler_magstep;
-	window_w = 256 * renderer_config.magstep;
-	window_h = 240 * renderer_config.magstep;
-	int x = 0;
-	int y = 0;
+
+	Window rootwindow = RootWindow(display, screen);
 	unsigned int border_width = 0;
-	int geometry_mask = HeightValue | WidthValue;
-	if (renderer_config.geometry)
-		geometry_mask |= XParseGeometry(renderer_config.geometry, &x, &y, &window_w, &window_h);
 	if (renderer_config.inroot) {
 		window = rootwindow;
 	} else {
-		XSetWindowAttributes attrs;
+		int user_x, user_y;
+		int user_w, user_h;
+		int gravity;
+		XSizeHints sizehints;
+		sizehints.flags = PMinSize | PBaseSize;
+		sizehints.min_width = 256 * renderer_config.magstep;
+		sizehints.min_height = 240 * renderer_config.magstep;
+		sizehints.base_width = 0;
+		sizehints.base_height = 0;
+		int geometry_mask = XWMGeometry(display, screen,
+		                                renderer_config.geometry, NULL,
+		                                border_width, &sizehints,
+		                                &user_x, &user_y, &user_w, &user_h, &gravity);
+		if (geometry_mask & (XValue | YValue)) {
+			sizehints.flags |= USPosition;
+			sizehints.x = user_x;
+			sizehints.y = user_y;
+		}
+		if (geometry_mask & (WidthValue | HeightValue)) {
+			sizehints.flags |= USSize;
+			sizehints.width = user_w;
+			sizehints.height = user_h;
+		}
+		sizehints.flags |= PWinGravity;
+		sizehints.win_gravity = gravity;
 
+		XSetWindowAttributes attrs;
 		attrs.background_pixel = BlackPixel(display, screen);
 		attrs.backing_store = WhenMapped;
 		attrs.cursor = XCreateFontCursor(display, XC_crosshair);
 		window = XCreateWindow(display, rootwindow,
-		                       x, y, window_w, window_h, border_width,
+		                       user_x, user_y, user_w, user_h, border_width,
 		                       /* depth */ CopyFromParent,
 		                       /* class */ InputOutput,
 		                       /* visual */ visual,
 		                       /* valuemask */ CWBackPixel | CWBackingStore | CWCursor,
 		                       /* attributes */ &attrs);
-	}
-	XGetGeometry(display, window, &rootwindow,
-	             &x, &y, &window_w, &window_h, &border_width, &depth);
 
-	if (!renderer_config.inroot) {
 		/* set aspect ratio */
-		XSizeHints sizehints;
-		/* sizehints.flags = PMinSize | PMaxSize | PResizeInc | PAspect | PBaseSize; */
-		/*   sizehints.min_width = 256; */
-		/*   sizehints.min_height = 240; */
-		/*   sizehints.max_width = 256 * maxsize; */
-		/*   sizehints.max_height = 240 * maxsize; */
-		/*   sizehints.width_inc = 256; */
-		/*   sizehints.height_inc = 240; */
-		/*   sizehints.min_aspect.x = 256; */
-		/*   sizehints.min_aspect.y = 240; */
-		/*   sizehints.max_aspect.x = 256; */
-		/*   sizehints.max_aspect.y = 240; */
-		sizehints.flags = PBaseSize;
-		sizehints.base_width = window_w;
-		sizehints.base_height = window_h;
 		XSetWMNormalHints(display, window, &sizehints);
 
 		/* set window manager hints */
@@ -405,6 +403,10 @@ InitDisplayX11(int argc, char **argv)
 		/* pass the command line to the window system */
 		XSetCommand(display, window, argv, argc);
 	}
+	int x = 0;
+	int y = 0;
+	XGetGeometry(display, window, &rootwindow,
+	             &x, &y, &window_w, &window_h, &border_width, &depth);
 
 	XMapWindow(display, window);
 	XSelectInput(display, window, KeyPressMask | KeyReleaseMask | ExposureMask |
@@ -414,6 +416,9 @@ InitDisplayX11(int argc, char **argv)
 	struct timeval time;
 	gettimeofday(&time, NULL);
 	renderer_data.basetime = time.tv_sec;
+
+	unsigned int w = 256 * renderer_config.scaler_magstep;
+	unsigned int h = 240 * renderer_config.scaler_magstep;
 	if (renderer_config.magstep != renderer_config.scaler_magstep) {
 		if (!XRenderSupported()) {
 			fprintf(stderr, "[%s] Scaling requires XRENDER support\n",
