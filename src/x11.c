@@ -812,22 +812,21 @@ HandleKeyboardX11(XEvent ev)
 static void
 RenderImage(XEvent *ev)
 {
-	Drawable target = w;
+	Drawable target;
 	int sx = 0, sy = 0;
+	int dx = 0, dy = 0;
 	unsigned int w_ = image->width, h = image->height;
-	int dx = (width - w_ * renderer_config.magstep) / 2;
-	int dy = (height - h * renderer_config.magstep) / 2;
 
 #ifdef HAVE_XRENDER
-	int old_dx = dx;
-	int old_dy = dy;
-
 	if (renderer_config.magstep != renderer_config.scaler_magstep) {
 		target = scalePixmap;
-		dx = 0;
-		dy = 0;
-	}
+	} else
 #endif
+	{
+		target = w;
+		dx = (width - w_) / 2;
+		dy = (height - h) / 2;
+	}
 
 	switch (renderer_config.scaler_magstep) {
 	case 2:
@@ -843,25 +842,23 @@ RenderImage(XEvent *ev)
 
 #ifdef HAVE_SHM
 	if (shm_attached) {
-		XShmPutImage(display, target, gc, image,
-				sx, sy,
-				dx, dy,
-				w_, h,
-				True);
+		XShmPutImage(display, target, gc, image, sx, sy, dx, dy, w_, h, True);
 		/* hang the event loop until we get a ShmCompletion */
 		ev->type = -1;
 	} else
 #endif
 	{
-		XPutImage(display, target, gc, image,
-				sx, sy,
-				dx, dy,
-				w_, h);
+		XPutImage(display, target, gc, image, sx, sy, dx, dy, w_, h);
 		XFlush(display);
 	}
 
 #ifdef HAVE_XRENDER
 	if (renderer_config.magstep != renderer_config.scaler_magstep) {
+		w_ = 256 * renderer_config.magstep;
+		h  = 240 * renderer_config.magstep;
+		dx = (width - w_) / 2;
+		dy = (height - h) / 2;
+
 		double xscale = (renderer_config.magstep + 0.0) / renderer_config.scaler_magstep, yscale = xscale;
 		XTransform transform =
 		{
@@ -872,7 +869,7 @@ RenderImage(XEvent *ev)
 			}
 		};
 		XRenderSetPictureTransform(display, scalePicture, &transform);
-		XRenderComposite(display, PictOpSrc, scalePicture, None, windowPicture, 0,0, 0,0, old_dx, old_dy, w_*renderer_config.magstep, h*renderer_config.magstep);
+		XRenderComposite(display, PictOpSrc, scalePicture, None, windowPicture, 0,0, 0,0, dx, dy, w_, h);
 	}
 #endif
 }
