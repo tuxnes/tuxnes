@@ -109,13 +109,11 @@ static int      (*oldhandler)(Display *, XErrorEvent *) = 0;
 static Window    window;
 static unsigned int window_w, window_h;
 static Colormap colormap;
+static GC       gc;
 
 static unsigned int paletteX11[64];
 
 static unsigned char    *keystate[32];
-static GC       gc, blackgc;
-static GC       backgroundgc, solidbggc;
-static GC       bgcolorgc;
 static unsigned long    colortableX11[25];
 
 #ifdef HAVE_XRENDER
@@ -253,11 +251,17 @@ InitDisplayX11(int argc, char **argv)
 #ifdef HAVE_SHM
 	shm_status = XShmQueryVersion(display, &shm_major, &shm_minor, &shm_pixmaps);
 #endif /* HAVE_SHM */
+	unsigned int depth = DefaultDepth(display, screen);
 	Visual *visual = XDefaultVisual(display, screen);
 	Window rootwindow = RootWindow(display, screen);
 	colormap = DefaultColormap(display, screen);
-	unsigned long black = BlackPixel(display, screen);
-	unsigned int depth = DefaultDepth(display, screen);
+	gc = DefaultGC(display, screen);
+
+	XGCValues GCValues;
+	GCValues.foreground = WhitePixel(display, screen);
+	GCValues.background = BlackPixel(display, screen);
+	XChangeGC(display, gc, GCForeground | GCBackground, &GCValues);
+
 #if BYTE_ORDER == BIG_ENDIAN
 	pix_swab = (ImageByteOrder(display) != MSBFirst);
 #else
@@ -349,6 +353,7 @@ InitDisplayX11(int argc, char **argv)
 	} else {
 		XSetWindowAttributes attrs;
 
+		attrs.background_pixel = BlackPixel(display, screen);
 		attrs.backing_store = WhenMapped;
 		attrs.cursor = XCreateFontCursor(display, XC_crosshair);
 		window = XCreateWindow(display, rootwindow,
@@ -356,21 +361,11 @@ InitDisplayX11(int argc, char **argv)
 		                       /* depth */ CopyFromParent,
 		                       /* class */ InputOutput,
 		                       /* visual */ visual,
-		                       /* valuemask */ CWBackingStore | CWCursor,
+		                       /* valuemask */ CWBackPixel | CWBackingStore | CWCursor,
 		                       /* attributes */ &attrs);
 	}
 	XGetGeometry(display, window, &rootwindow,
 	             &x, &y, &window_w, &window_h, &border_width, &depth);
-	gc = XCreateGC(display, window, 0, 0);
-	blackgc = XCreateGC(display, window, 0, 0);
-	XSetForeground(display, gc, ~0UL);
-	XSetBackground(display, gc, 0UL);
-	XSetForeground(display, blackgc, 0);
-	XSetBackground(display, blackgc, 0);
-	XGCValues GCValues;
-	GCValues.function = GXor;
-	bgcolorgc = XCreateGC(display, window, GCFunction, &GCValues);
-	XSetBackground(display, bgcolorgc, black);
 
 	if (!renderer_config.inroot) {
 		/* set aspect ratio */
@@ -425,10 +420,6 @@ InitDisplayX11(int argc, char **argv)
 		}
 	}
 
-	backgroundgc = XCreateGC(display, window, 0, 0);
-	XSetBackground(display, backgroundgc, black);
-	solidbggc = XCreateGC(display, window, 0, 0);
-	XSetBackground(display, solidbggc, black);
 	XMapWindow(display, window);
 	XSelectInput(display, window, KeyPressMask | KeyReleaseMask | ExposureMask |
 	             FocusChangeMask | KeymapStateMask | StructureNotifyMask);
@@ -553,7 +544,6 @@ InitDisplayX11(int argc, char **argv)
 		bytes_per_line = image->bytes_per_line;
 		rfb = fb = image->data;
 	}
-	XFillRectangle(display, window, blackgc, 0, 0, window_w, window_h);
 	InitScreenshotX11();
 	fbinit();
 	return 0;
@@ -954,7 +944,7 @@ UpdateDisplayX11(void)
 				 || window_h != ce->height) {
 					window_w = ce->width;
 					window_h = ce->height;
-					XFillRectangle(display, window, blackgc, 0, 0, window_w, window_h);
+					XClearWindow(display, window);
 				}
 			}
 			if (ev.type == Expose) {
@@ -1023,16 +1013,10 @@ UpdateColorsX11(void)
 		color.blue  = NES_palette[VRAM[0x3f00] & 63] << 8 & 0xff00;
 		color.flags = DoRed | DoGreen | DoBlue;
 		XStoreColor(display, colormap, &color);
-		XSetForeground(display, solidbggc, currentbgcolor);
-		XSetForeground(display, bgcolorgc, currentbgcolor);
-		XSetForeground(display, backgroundgc, currentbgcolor);
 	} else /* truecolor */ {
 		currentbgcolor = paletteX11[VRAM[0x3f00] & 63];
 		palette[24] = currentbgcolor;
 		if (oldbgcolor != currentbgcolor) {
-			XSetForeground(display, solidbggc, currentbgcolor);
-			XSetForeground(display, bgcolorgc, currentbgcolor);
-			XSetForeground(display, backgroundgc, currentbgcolor);
 			renderer_data.redrawbackground = 1;
 			renderer_data.needsredraw = 1;
 		}
