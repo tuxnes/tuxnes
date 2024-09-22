@@ -274,12 +274,13 @@ InitDisplayX11(int argc, char **argv)
 	if (depth > 1) {
 		int formats = 0;
 		XPixmapFormatValues *xpfv = XListPixmapFormats(display, &formats);
-
-		for (int i = 0; i < formats; i++)
+		for (int i = 0; i < formats; i++) {
 			if (xpfv[i].depth == depth) {
 				bpp = xpfv[i].bits_per_pixel;
 				break;
 			}
+		}
+		XFree(xpfv);
 	}
 	if (renderer_config.scaler_magstep != 1 & bpp != 32) {
 		fprintf(stderr,
@@ -386,9 +387,6 @@ InitDisplayX11(int argc, char **argv)
 		sizehints.base_height = window_h;
 		XSetWMNormalHints(display, window, &sizehints);
 
-		/* pass the command line to the window system */
-		XSetCommand(display, window, argv, argc);
-
 		/* set window manager hints */
 		XWMHints wmhints;
 		wmhints.flags = InputHint | StateHint;
@@ -398,26 +396,14 @@ InitDisplayX11(int argc, char **argv)
 
 		/* set window title */
 		XClassHint classhints;
-		char *wname[] = {
-			PACKAGE_NAME,
-			PACKAGE
-		};
-		XTextProperty name[2];
-		classhints.res_class = wname[0];
-		classhints.res_name = wname[1];
+		classhints.res_class = PACKAGE_NAME;
+		classhints.res_name = PACKAGE;
 		XSetClassHint(display, window, &classhints);
-		if (!XStringListToTextProperty(wname, 1, name)) {
-			fprintf(stderr, "[%s] Can't set window name property\n",
-			        renderer->name);
-		} else {
-			XSetWMName(display, window, name);
-		}
-		if (!XStringListToTextProperty(wname + 1, 1, name + 1)) {
-			fprintf(stderr, "[%s] Can't set icon name property\n",
-			        renderer->name);
-		} else {
-			XSetWMIconName(display, window, name + 1);
-		}
+		XStoreName(display, window, PACKAGE_NAME);
+		XSetIconName(display, window, PACKAGE);
+
+		/* pass the command line to the window system */
+		XSetCommand(display, window, argv, argc);
 	}
 
 	XMapWindow(display, window);
