@@ -369,8 +369,8 @@ DRAW_IMAGE(int endclock)
 			}
 
 			/* Next line */
-			rptr = rptr0 + nextline;
-			ptr = ptr0 + nextline;
+			rptr = (pixel_t *)((unsigned char *)rptr0 + bytes_per_line);
+			ptr = (pixel_t *)((unsigned char *)ptr0 + bytes_per_line);
 			rptr0 = rptr;
 			ptr0 = ptr;
 			currentline++;

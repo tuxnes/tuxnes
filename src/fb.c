@@ -21,7 +21,6 @@
 
 /* globals */
 
-unsigned int    nextline;
 unsigned int    bpp;
 unsigned int    bpu;
 unsigned int    bytes_per_line;
@@ -76,8 +75,6 @@ drawimage_old(int endclock)
 void
 fbinit(void)
 {
-	/* this is the default inter-line skip */
-	nextline = bytes_per_line;
 	if (renderer->InitDisplay == InitDisplayNone) {
 		/* Point drawimage to the no-op version */
 		drawimage = drawimage_old;
@@ -111,12 +108,10 @@ fbinit(void)
 			drawimage = drawimage8;
 		} else if (bpp == 16) {
 			drawimage = drawimage16;
-			nextline = bytes_per_line / 2;
 		} else if (bpp == 24) {
 			drawimage = drawimage24;
 		} else if (bpp == 32) {
 			drawimage = drawimage32;
-			nextline = bytes_per_line / 4;
 		} else {
 			fprintf(stderr, "Don't know how to handle %dbpp\n", bpp);
 			exit(EXIT_FAILURE);

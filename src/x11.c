@@ -123,18 +123,6 @@ static Picture scalePicture, windowPicture;
 #endif
 static XImage   *image = 0;
 
-// X11 virtual framebuffer
-// This buffer will be passed into an XImage.
-//
-// If we are not applying any filters, it may be the same memory as fb.c's
-// framebuffer, which represents the unaltered image of the console.
-//
-// Otherwise, it will be the output buffer of hqx.
-//
-static char     *xfb = 0;
-static unsigned int xfb_width, xfb_height;
-static int      xfb_bytes_per_line = 0;
-
 // This represents the window dimensions.
 // Default is NES screen resolution, multiplied by scale factor.  However
 // it may be resized by the WM or the user.
@@ -283,7 +271,6 @@ InitDisplayX11(int argc, char **argv)
 	lsb_first = (BitmapBitOrder(display) == LSBFirst);
 	lsn_first = lsb_first; /* who knows? packed 4bpp is really an obscure case */
 	bpu = BitmapUnit(display);
-	unsigned int bitmap_pad = BitmapPad(display);
 	bpp = depth;
 	if (depth > 1) {
 		int formats = 0;
@@ -295,9 +282,9 @@ InitDisplayX11(int argc, char **argv)
 				break;
 			}
 	}
-	if (renderer_config.scaler_magstep != 1 & depth != 32) {
+	if (renderer_config.scaler_magstep != 1 & bpp != 32) {
 		fprintf(stderr,
-			"[%s] HQX will only work at higher bitdepths; disabling\n",
+			"[%s] HQX will only work at 32bpp; disabling\n",
 			renderer->name);
 		renderer_config.scaler_magstep = 1;
 	}
@@ -352,8 +339,8 @@ InitDisplayX11(int argc, char **argv)
 			paletteX11[x] = color.pixel;
 		}
 	}
-	xfb_width = 256 * renderer_config.scaler_magstep;
-	xfb_height = 240 * renderer_config.scaler_magstep;
+	unsigned int xfb_width = 256 * renderer_config.scaler_magstep;
+	unsigned int xfb_height = 240 * renderer_config.scaler_magstep;
 	width = 256 * renderer_config.magstep;
 	height = 240 * renderer_config.magstep;
 	int x = 0;
@@ -474,18 +461,11 @@ InitDisplayX11(int argc, char **argv)
 	}
 #ifdef HAVE_SHM
 	if (shm_status == True) {
-		if (depth == 1)
-			shm_image = XShmCreateImage(display, visual, depth,
-			                            XYBitmap, NULL, &shminfo,
-			                            xfb_width, xfb_height);
-		else
-			shm_image = XShmCreateImage(display, visual, depth,
-			                            ZPixmap, NULL, &shminfo,
-			                            xfb_width, xfb_height);
+		shm_image = XShmCreateImage(display, visual, depth,
+		                            depth == 1 ? XYBitmap : ZPixmap, NULL, &shminfo,
+		                            xfb_width, xfb_height);
 		if (shm_image) {
-			xfb_bytes_per_line = shm_image->bytes_per_line;
-			shminfo.shmid = -1;
-			shminfo.shmid = shmget(IPC_PRIVATE, bytes_per_line * shm_image->height,
+			shminfo.shmid = shmget(IPC_PRIVATE, shm_image->bytes_per_line * shm_image->height,
 			                       IPC_CREAT|0777);
 			if (shminfo.shmid < 0) {
 				perror("shmget");
@@ -511,7 +491,6 @@ InitDisplayX11(int argc, char **argv)
 						exit(EXIT_FAILURE);
 					}
 				}
-				xfb =
 				shminfo.shmaddr =
 				shm_image->data = shmat(shminfo.shmid, 0, 0);
 				shminfo.readOnly = False;
@@ -528,7 +507,7 @@ InitDisplayX11(int argc, char **argv)
 #endif /* HAVE_SHM */
 	if (verbose) {
 		fprintf(stderr,
-		        "[%s] %s visual, depth %d, %dbpp, %s colors, %s %s\n",
+		        "[%s] %s visual, depth %u, %ubpp, %s colors, %s %s\n",
 		        renderer->name,
 		        (visual->class == StaticGray) ? "StaticGray" :
 		        (visual->class == GrayScale) ? "GrayScale" :
@@ -543,33 +522,31 @@ InitDisplayX11(int argc, char **argv)
 		        "XImage");
 	}
 	if (!image) {
-		xfb_bytes_per_line = xfb_width * bpp / 8;
-		if (!(xfb = malloc(xfb_bytes_per_line * xfb_height))) {
+		image = XCreateImage(display, visual, depth,
+		                     depth == 1 ? XYBitmap : ZPixmap, 0, NULL,
+		                     xfb_width, xfb_height, BitmapPad(display), 0);
+		if (!image) {
+			fprintf(stderr, "[%s] Can't allocate image!\n",
+			        renderer->name);
+			exit(EXIT_FAILURE);
+		}
+		if (!(image->data = malloc(image->bytes_per_line * image->height))) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
-		if (depth == 1)
-			image = XCreateImage(display, visual, depth,
-			                     XYBitmap, 0, xfb, xfb_width, xfb_height,
-			                     8, bytes_per_line);
-		else
-			image = XCreateImage(display, visual, depth,
-			                     ZPixmap, 0, xfb, xfb_width, xfb_height,
-			                     bpp, bytes_per_line);
 	}
 	if (renderer_config.scaler_magstep != 1) {
 		// Allocate unscaled image buffer
 		bytes_per_line = 256 * bpp / 8;
-		fb = rfb = malloc(bytes_per_line * 240 / 8);
-		if (!fb) {
+		if (!(rfb = fb = malloc(bytes_per_line * 240))) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
 	} else {
 		// No framebuffer scaling (though we might use XRender to upscale)
 		// This means fb.c and the XImage share the same buffer.
-		rfb = fb = xfb;
-		bytes_per_line = xfb_bytes_per_line;
+		bytes_per_line = image->bytes_per_line;
+		rfb = fb = image->data;
 	}
 	XFillRectangle(display, w,
 	               blackgc, 0, 0,
@@ -837,7 +814,7 @@ RenderImage(XEvent *ev)
 {
 	Drawable target = w;
 	int sx = 0, sy = 0;
-	unsigned int w_ = xfb_width, h = xfb_height;
+	unsigned int w_ = image->width, h = image->height;
 	int dx = (width - w_ * renderer_config.magstep) / 2;
 	int dy = (height - h * renderer_config.magstep) / 2;
 
@@ -854,13 +831,13 @@ RenderImage(XEvent *ev)
 
 	switch (renderer_config.scaler_magstep) {
 	case 2:
-		hq2x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)xfb, xfb_bytes_per_line, 256, 240);
+		hq2x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
 		break;
 	case 3:
-		hq3x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)xfb, xfb_bytes_per_line, 256, 240);
+		hq3x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
 		break;
 	case 4:
-		hq4x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)xfb, xfb_bytes_per_line, 256, 240);
+		hq4x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
 		break;
 	}
 
