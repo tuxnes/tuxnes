@@ -106,7 +106,8 @@ void    UpdateDisplayX11(void);
 /* X11 stuff: */
 static Display  *display;
 static int      (*oldhandler)(Display *, XErrorEvent *) = 0;
-static Window    w;
+static Window    window;
+static unsigned int window_w, window_h;
 static Colormap colormap;
 
 static unsigned int paletteX11[64];
@@ -122,12 +123,6 @@ static Pixmap scalePixmap;
 static Picture scalePicture, windowPicture;
 #endif
 static XImage   *image = 0;
-
-// This represents the window dimensions.
-// Default is NES screen resolution, multiplied by scale factor.  However
-// it may be resized by the WM or the user.
-//
-static unsigned int width, height;
 
 /* externel and forward declarations */
 void    fbinit(void);
@@ -339,42 +334,42 @@ InitDisplayX11(int argc, char **argv)
 			paletteX11[x] = color.pixel;
 		}
 	}
-	unsigned int xfb_width = 256 * renderer_config.scaler_magstep;
-	unsigned int xfb_height = 240 * renderer_config.scaler_magstep;
-	width = 256 * renderer_config.magstep;
-	height = 240 * renderer_config.magstep;
+	unsigned int w = 256 * renderer_config.scaler_magstep;
+	unsigned int h = 240 * renderer_config.scaler_magstep;
+	window_w = 256 * renderer_config.magstep;
+	window_h = 240 * renderer_config.magstep;
 	int x = 0;
 	int y = 0;
 	unsigned int border_width = 0;
 	int geometry_mask = HeightValue | WidthValue;
 	if (renderer_config.geometry)
-		geometry_mask |= XParseGeometry(renderer_config.geometry, &x, &y, &width, &height);
+		geometry_mask |= XParseGeometry(renderer_config.geometry, &x, &y, &window_w, &window_h);
 	if (renderer_config.inroot) {
-		w = rootwindow;
+		window = rootwindow;
 	} else {
 		XSetWindowAttributes attrs;
 
 		attrs.backing_store = WhenMapped;
 		attrs.cursor = XCreateFontCursor(display, XC_crosshair);
-		w = XCreateWindow(display, rootwindow,
-		                  x, y, width, height, border_width,
-		                  /* depth */ CopyFromParent,
-		                  /* class */ InputOutput,
-		                  /* visual */ visual,
-		                  /* valuemask */ CWBackingStore | CWCursor,
-		                  /* attributes */ &attrs);
+		window = XCreateWindow(display, rootwindow,
+		                       x, y, window_w, window_h, border_width,
+		                       /* depth */ CopyFromParent,
+		                       /* class */ InputOutput,
+		                       /* visual */ visual,
+		                       /* valuemask */ CWBackingStore | CWCursor,
+		                       /* attributes */ &attrs);
 	}
-	XGetGeometry(display, w, &rootwindow,
-	             &x, &y, &width, &height, &border_width, &depth);
-	gc = XCreateGC(display, w, 0, 0);
-	blackgc = XCreateGC(display, w, 0, 0);
+	XGetGeometry(display, window, &rootwindow,
+	             &x, &y, &window_w, &window_h, &border_width, &depth);
+	gc = XCreateGC(display, window, 0, 0);
+	blackgc = XCreateGC(display, window, 0, 0);
 	XSetForeground(display, gc, ~0UL);
 	XSetBackground(display, gc, 0UL);
 	XSetForeground(display, blackgc, 0);
 	XSetBackground(display, blackgc, 0);
 	XGCValues GCValues;
 	GCValues.function = GXor;
-	bgcolorgc = XCreateGC(display, w, GCFunction, &GCValues);
+	bgcolorgc = XCreateGC(display, window, GCFunction, &GCValues);
 	XSetBackground(display, bgcolorgc, black);
 
 	if (!renderer_config.inroot) {
@@ -392,19 +387,19 @@ InitDisplayX11(int argc, char **argv)
 		/*   sizehints.max_aspect.x = 256; */
 		/*   sizehints.max_aspect.y = 240; */
 		sizehints.flags = PBaseSize;
-		sizehints.base_width = width;
-		sizehints.base_height = height;
-		XSetWMNormalHints(display, w, &sizehints);
+		sizehints.base_width = window_w;
+		sizehints.base_height = window_h;
+		XSetWMNormalHints(display, window, &sizehints);
 
 		/* pass the command line to the window system */
-		XSetCommand(display, w, argv, argc);
+		XSetCommand(display, window, argv, argc);
 
 		/* set window manager hints */
 		XWMHints wmhints;
 		wmhints.flags = InputHint | StateHint;
 		wmhints.input = True;
 		wmhints.initial_state = NormalState;
-		XSetWMHints(display, w, &wmhints);
+		XSetWMHints(display, window, &wmhints);
 
 		/* set window title */
 		XClassHint classhints;
@@ -415,27 +410,27 @@ InitDisplayX11(int argc, char **argv)
 		XTextProperty name[2];
 		classhints.res_class = wname[0];
 		classhints.res_name = wname[1];
-		XSetClassHint(display, w, &classhints);
+		XSetClassHint(display, window, &classhints);
 		if (!XStringListToTextProperty(wname, 1, name)) {
 			fprintf(stderr, "[%s] Can't set window name property\n",
 			        renderer->name);
 		} else {
-			XSetWMName(display, w, name);
+			XSetWMName(display, window, name);
 		}
 		if (!XStringListToTextProperty(wname + 1, 1, name + 1)) {
 			fprintf(stderr, "[%s] Can't set icon name property\n",
 			        renderer->name);
 		} else {
-			XSetWMIconName(display, w, name + 1);
+			XSetWMIconName(display, window, name + 1);
 		}
 	}
 
-	backgroundgc = XCreateGC(display, w, 0, 0);
+	backgroundgc = XCreateGC(display, window, 0, 0);
 	XSetBackground(display, backgroundgc, black);
-	solidbggc = XCreateGC(display, w, 0, 0);
+	solidbggc = XCreateGC(display, window, 0, 0);
 	XSetBackground(display, solidbggc, black);
-	XMapWindow(display, w);
-	XSelectInput(display, w, KeyPressMask | KeyReleaseMask | ExposureMask |
+	XMapWindow(display, window);
+	XSelectInput(display, window, KeyPressMask | KeyReleaseMask | ExposureMask |
 	             FocusChangeMask | KeymapStateMask | StructureNotifyMask);
 	XFlush(display);
 
@@ -450,12 +445,12 @@ InitDisplayX11(int argc, char **argv)
 		}
 
 #ifdef HAVE_XRENDER
-		scalePixmap = XCreatePixmap(display, w, xfb_width, xfb_height, depth);
+		scalePixmap = XCreatePixmap(display, window, w, h, depth);
 
 		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, DefaultVisual(display, DefaultScreen(display)));
 		XRenderPictureAttributes attrs = {0};
 
-		windowPicture = XRenderCreatePicture(display, w, fmt, 0, &attrs);
+		windowPicture = XRenderCreatePicture(display, window, fmt, 0, &attrs);
 		scalePicture = XRenderCreatePicture(display, scalePixmap, fmt, 0, &attrs);
 #endif
 	}
@@ -463,7 +458,7 @@ InitDisplayX11(int argc, char **argv)
 	if (shm_status == True) {
 		shm_image = XShmCreateImage(display, visual, depth,
 		                            depth == 1 ? XYBitmap : ZPixmap, NULL, &shminfo,
-		                            xfb_width, xfb_height);
+		                            w, h);
 		if (shm_image) {
 			shminfo.shmid = shmget(IPC_PRIVATE, shm_image->bytes_per_line * shm_image->height,
 			                       IPC_CREAT|0777);
@@ -524,7 +519,7 @@ InitDisplayX11(int argc, char **argv)
 	if (!image) {
 		image = XCreateImage(display, visual, depth,
 		                     depth == 1 ? XYBitmap : ZPixmap, 0, NULL,
-		                     xfb_width, xfb_height, BitmapPad(display), 0);
+		                     w, h, BitmapPad(display), 0);
 		if (!image) {
 			fprintf(stderr, "[%s] Can't allocate image!\n",
 			        renderer->name);
@@ -548,9 +543,7 @@ InitDisplayX11(int argc, char **argv)
 		bytes_per_line = image->bytes_per_line;
 		rfb = fb = image->data;
 	}
-	XFillRectangle(display, w,
-	               blackgc, 0, 0,
-	               width, height);
+	XFillRectangle(display, window, blackgc, 0, 0, window_w, window_h);
 	InitScreenshotX11();
 	fbinit();
 	return 0;
@@ -815,7 +808,7 @@ RenderImage(XEvent *ev)
 	Drawable target;
 	int sx = 0, sy = 0;
 	int dx = 0, dy = 0;
-	unsigned int w_ = image->width, h = image->height;
+	unsigned int w = image->width, h = image->height;
 
 #ifdef HAVE_XRENDER
 	if (renderer_config.magstep != renderer_config.scaler_magstep) {
@@ -823,9 +816,9 @@ RenderImage(XEvent *ev)
 	} else
 #endif
 	{
-		target = w;
-		dx = (width - w_) / 2;
-		dy = (height - h) / 2;
+		target = window;
+		dx = (window_w - w) / 2;
+		dy = (window_h - h) / 2;
 	}
 
 	switch (renderer_config.scaler_magstep) {
@@ -842,22 +835,22 @@ RenderImage(XEvent *ev)
 
 #ifdef HAVE_SHM
 	if (shm_attached) {
-		XShmPutImage(display, target, gc, image, sx, sy, dx, dy, w_, h, True);
+		XShmPutImage(display, target, gc, image, sx, sy, dx, dy, w, h, True);
 		/* hang the event loop until we get a ShmCompletion */
 		ev->type = -1;
 	} else
 #endif
 	{
-		XPutImage(display, target, gc, image, sx, sy, dx, dy, w_, h);
+		XPutImage(display, target, gc, image, sx, sy, dx, dy, w, h);
 		XFlush(display);
 	}
 
 #ifdef HAVE_XRENDER
 	if (renderer_config.magstep != renderer_config.scaler_magstep) {
-		w_ = 256 * renderer_config.magstep;
-		h  = 240 * renderer_config.magstep;
-		dx = (width - w_) / 2;
-		dy = (height - h) / 2;
+		w = 256 * renderer_config.magstep;
+		h = 240 * renderer_config.magstep;
+		dx = (window_w - w) / 2;
+		dy = (window_h - h) / 2;
 
 		double xscale = (renderer_config.magstep + 0.0) / renderer_config.scaler_magstep, yscale = xscale;
 		XTransform transform =
@@ -869,7 +862,7 @@ RenderImage(XEvent *ev)
 			}
 		};
 		XRenderSetPictureTransform(display, scalePicture, &transform);
-		XRenderComposite(display, PictOpSrc, scalePicture, None, windowPicture, 0,0, 0,0, dx, dy, w_, h);
+		XRenderComposite(display, PictOpSrc, scalePicture, None, windowPicture, 0,0, 0,0, dx, dy, w, h);
 	}
 #endif
 }
@@ -958,13 +951,11 @@ UpdateDisplayX11(void)
 			if (ev.type == ConfigureNotify) {
 				XConfigureEvent *ce = (XConfigureEvent *)&ev;
 
-				if ((ce->width != width)
-				 || (ce->height != height)) {
-					width = ce->width;
-					height = ce->height;
-					XFillRectangle(display, w,
-					               blackgc, 0, 0,
-					               width, height);
+				if (window_w != ce->width
+				 || window_h != ce->height) {
+					window_w = ce->width;
+					window_h = ce->height;
+					XFillRectangle(display, window, blackgc, 0, 0, window_w, window_h);
 				}
 			}
 			if (ev.type == Expose) {
