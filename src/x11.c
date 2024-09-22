@@ -14,8 +14,6 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
-#include <sys/wait.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -98,6 +96,11 @@
 #include <X11/extensions/Xrender.h>
 #endif
 
+/* external and forward declarations */
+void    fbinit(void);
+void    quit(void);
+void    START(void);
+
 /* exported functions */
 int     InitDisplayX11(int argc, char **argv);
 void    UpdateColorsX11(void);
@@ -105,50 +108,52 @@ void    UpdateDisplayX11(void);
 
 /* X11 stuff: */
 static Display  *display;
-static int      (*oldhandler)(Display *, XErrorEvent *) = 0;
 static Window    window;
 static unsigned int window_w, window_h;
 static Colormap colormap;
 static GC       gc;
-
-static unsigned int paletteX11[64];
+static XImage   *image = NULL;
 
 static unsigned char    *keystate[32];
 static unsigned long    colortableX11[25];
+static unsigned int     paletteX11[64];
 
 #ifdef HAVE_XRENDER
 static Pixmap scalePixmap;
 static Picture scalePicture, windowPicture;
 #endif
-static XImage   *image = 0;
-
-/* externel and forward declarations */
-void    fbinit(void);
-void    quit(void);
-void    START(void);
 
 #ifdef HAVE_SHM
 static XShmSegmentInfo shminfo;
 static Status shm_attached = 0;
 static int shm_attaching = 0;
-static XImage *shm_image = 0;
 static int shm_major_opcode, shm_first_event, shm_first_error;
 
-static void
-cleanup_shm(void)
+static int (*oldhandler)(Display *, XErrorEvent *) = NULL;
+
+static int
+shm_handler(Display *display, XErrorEvent *ev)
 {
-	if (shminfo.shmid >= 0) {
-		if (shm_attached)
-			XShmDetach(display, &shminfo);
-		if (shm_image) {
-			XDestroyImage(shm_image);
-			shm_image = 0;
-		}
-		if (shminfo.shmaddr)
-			shmdt(shminfo.shmaddr);
-		shmctl(shminfo.shmid, IPC_RMID, 0);
-		shminfo.shmid = -1;
+	if (shm_attaching
+	 && (ev->request_code == shm_major_opcode)
+	 && (ev->minor_code == X_ShmAttach)) {
+		shm_attached = False;
+		return 0;
 	}
+	if (oldhandler) {
+		return oldhandler(display, ev);
+	}
+	return 0;
+}
+
+static void
+shm_cleanup(void)
+{
+	XShmDetach(display, &shminfo);
+	shmdt(shminfo.shmaddr);
+	image->data = shminfo.shmaddr = NULL;
+	XDestroyImage(image);
+	image = NULL;
 }
 #endif
 
@@ -175,23 +180,6 @@ SaveScreenshotX11(void)
 	fprintf(stderr,
 	        "cannot capture screenshots; please install Xpm library and then recompile\n");
 #endif /* HAVE_XPM */
-}
-
-static int
-handler(Display *display, XErrorEvent *ev)
-{
-#ifdef HAVE_SHM
-	if (shm_attaching
-	 && (ev->request_code == shm_major_opcode)
-	 && (ev->minor_code == X_ShmAttach)) {
-		shm_attached = False;
-		return 0;
-	}
-#endif
-	if (oldhandler) {
-		return oldhandler(display, ev);
-	}
-	return 0;
 }
 
 static bool
@@ -233,8 +221,7 @@ InitDisplayX11(int argc, char **argv)
 		renderer_config.magstep = maxsize;
 	}
 	display = XOpenDisplay(renderer_config.display_id);
-	oldhandler = XSetErrorHandler(handler);
-	if (display == NULL) {
+	if (!display) {
 		fprintf(stderr,
 		        "%s: [%s] Can't open display: %s\n",
 		        argv[0],
@@ -440,50 +427,47 @@ InitDisplayX11(int argc, char **argv)
 	}
 #ifdef HAVE_SHM
 	if (XQueryExtension(display, "MIT-SHM", &shm_major_opcode, &shm_first_event, &shm_first_error)) {
-		shm_image = XShmCreateImage(display, visual, depth,
-		                            depth == 1 ? XYBitmap : ZPixmap, NULL, &shminfo,
-		                            w, h);
-		if (shm_image) {
-			shminfo.shmid = shmget(IPC_PRIVATE, shm_image->bytes_per_line * shm_image->height,
-			                       IPC_CREAT|0777);
-			if (shminfo.shmid < 0) {
+		image = XShmCreateImage(display, visual, depth,
+		                        depth == 1 ? XYBitmap : ZPixmap, NULL, &shminfo,
+		                        w, h);
+		if (image) {
+			shminfo.shmid = shmget(IPC_PRIVATE, image->bytes_per_line * image->height, IPC_CREAT | 0600);
+			if (shminfo.shmid == -1) {
 				perror("shmget");
-			} else {
-				shminfo.shmaddr = 0;
-				switch (fork()) {
-				case -1:
-					perror("fork");
-					atexit(cleanup_shm);
-				case 0:
-					break;
-				default:
-					{
-						int status = 0;
-
-						atexit(cleanup_shm);
-						while (wait(&status) != -1)
-							if (WIFEXITED(status))
-								exit(WEXITSTATUS(status));
-							else if (WIFSIGNALED(status))
-								raise(WTERMSIG(status));
-						perror("wait");
-						exit(EXIT_FAILURE);
-					}
-				}
-				shminfo.shmaddr =
-				shm_image->data = shmat(shminfo.shmid, 0, 0);
-				shminfo.readOnly = False;
-				XSync(display, False);
-				shm_attaching = 1;
-				shm_attached = XShmAttach(display, &shminfo);
-				XSync(display, False);
-				shm_attaching = 0;
-				if (shm_attached)
-					image = shm_image;
+				goto shm_err1;
 			}
+			shminfo.shmaddr = shmat(shminfo.shmid, NULL, 0);
+			if (shminfo.shmaddr == (void *)-1) {
+				perror("shmat");
+				goto shm_err1;
+			}
+			shminfo.readOnly = False;
+			oldhandler = XSetErrorHandler(shm_handler);
+			XSync(display, False);
+			shm_attaching = 1;
+			shm_attached = XShmAttach(display, &shminfo);
+			XSync(display, False);
+			shm_attaching = 0;
+			if (!shm_attached) {
+				fprintf(stderr,
+					"[%s] XShmAttach failed\n",
+					renderer->name);
+				goto shm_err2;
+			}
+			image->data = shminfo.shmaddr;
+			atexit(shm_cleanup);
+			goto shm_done;
+shm_err2:
+			shmdt(shminfo.shmaddr);
+shm_err1:
+			XDestroyImage(image);
+			image = NULL;
+shm_done:
+			if (shminfo.shmid != -1)
+				shmctl(shminfo.shmid, IPC_RMID, NULL);
 		}
 	}
-#endif /* HAVE_SHM */
+#endif
 	if (verbose) {
 		fprintf(stderr,
 		        "[%s] %s visual, depth %u, %ubpp, %s colors, %s %s\n",
