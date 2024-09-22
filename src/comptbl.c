@@ -26,18 +26,18 @@
 #define TBL_BASE ((unsigned char *)0x10000000)
 #define TBL_BASE2 ((unsigned char *)0x20000000)
 
-unsigned char srcseq[256];      /* source (6502) code sequence */
-unsigned char srcmask[256];     /* source mask */
-unsigned char objseq[256];      /* object (native) code sequence */
-unsigned char objmod[256];      /* object code modifiers/relocators */
-int blocksalloc = 1;            /* next block of memory to allocate following TBL_BASE */
+static unsigned char srcseq[256];      /* source (6502) code sequence */
+static unsigned char srcmask[256];     /* source mask */
+static unsigned char objseq[256];      /* object (native) code sequence */
+static unsigned char objmod[256];      /* object code modifiers/relocators */
+static int blocksalloc = 1;            /* next block of memory to allocate following TBL_BASE */
 /* source data flag, and-mask flag, low-nybble flag, full-byte flag,
    source length flag, dest macro flag, source byte number, dest byte number,
    current input ptr, line number, current decoded byte, obj mod char,
    obj mod offset, obj mod len, source seq len, dest seq len: */
-int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 0,
-  cip = 0, cln = 0, cdb = 0, omc = 0, omo = 0, oml = 0, ssl = 0, dsl = 0;
-unsigned char *datap;
+static int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 0,
+           cip = 0, cln = 0, cdb = 0, omc = 0, omo = 0, oml = 0, ssl = 0, dsl = 0;
+static unsigned char *datap;
 
 static int      do_tree(int, int *);
 static void     memory_error(void);
@@ -45,10 +45,8 @@ static void     memory_error(void);
 int
 main(int argc, char *argv[])
 {
-	int                    x;
 	int                    fd;
-	char                   input[1024], i;
-	int                   *ptr;
+	char                   input[1024];
 
 	fd = open("compdata", O_RDWR | O_TRUNC | O_CREAT, 0666);
 	if (fd < 0)
@@ -74,7 +72,7 @@ main(int argc, char *argv[])
 	while (fgets(input, 1024, stdin)) {
 		cln++;
 		for (cip = 0; (input[cip] != 0) && (input[cip] != '#') && (input[cip] != 10); cip++) {
-			i = input[cip];
+			char i = input[cip];
 			/* Decode hex digits */
 			if (!slf && !dmf) {
 				if ((i >= '0' && i <= '9')
@@ -187,11 +185,11 @@ main(int argc, char *argv[])
 					dsl = dbn;
 					/*
 					printf("\ns: ");
-					for (x=0;x<ssl;x++) printf("%2x", srcseq[x]);
+					for (int x = 0; x < ssl; x++) printf("%2x", srcseq[x]);
 					printf("\nm: ");
-					for (x=0;x<ssl;x++) printf("%2x", srcmask[x]);
+					for (int x = 0; x < ssl; x++) printf("%2x", srcmask[x]);
 					printf("\nd: ");
-					for (x=0;x<dsl;x++) printf("%2x", objseq[x]);
+					for (int x = 0; x < dsl; x++) printf("%2x", objseq[x]);
 					printf("\n");
 					*/
 					sbn = 0;
@@ -202,9 +200,9 @@ main(int argc, char *argv[])
 						memory_error();
 					*datap++ = ssl;
 					*datap++ = dsl;
-					for (x = 0; x < dsl; x++)
+					for (int x = 0; x < dsl; x++)
 						*datap++ = objseq[x];
-					for (x = 0; x < oml; x++)
+					for (int x = 0; x < oml; x++)
 						*datap++ = objmod[x];
 					*datap++ = 0;
 					datap = (unsigned char *)(((unsigned int)datap + 7) & 0xfffffff8);
@@ -221,7 +219,7 @@ main(int argc, char *argv[])
 		}
 	}
 	/* relocate pointers */
-	for (ptr = (int *)TBL_BASE, x = blocksalloc * 256; x--; ptr++) {
+	for (int *ptr = (int *)TBL_BASE, x = blocksalloc * 256; x--; ptr++) {
 		if (*ptr) {
 			if (*ptr & 1)
 				*ptr -= (TBL_BASE2 - TBL_BASE) - blocksalloc * 1024;
@@ -238,7 +236,7 @@ main(int argc, char *argv[])
 parse_error:
 	printf("Parse error at line %d:\n", cln);
 	printf("%s", input);
-	for (x = 0; x < cip; x++)
+	for (int x = 0; x < cip; x++)
 		if (input[x] == 9)
 			printf("%c", 9);
 		else
@@ -252,13 +250,13 @@ parse_error:
 static int
 do_tree(int sbn, int *blockp)
 {
-	int                   *nblockp;
 
 	for (int x = 0; x < 256; x++)
 		if ((x & srcmask[sbn]) == srcseq[sbn]) {
 			if (blockp[x] == 0 || (srcseq[sbn + 1] != 0 && srcmask[sbn + 1] == 0))
 				blockp[x] = (unsigned int)datap | 1;         /* Leaf node */
 			else {
+				int *nblockp;
 				if (blockp[x] & 1) {
 					/* grow tree and copy data to new node */
 					/*printf("allocated block %d\n", blocksalloc); */

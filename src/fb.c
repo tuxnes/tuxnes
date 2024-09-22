@@ -24,8 +24,6 @@
 unsigned int    nextline;
 unsigned int    bpp;
 unsigned int    bpu;
-unsigned int    bitmap_pad;
-unsigned int    depth;
 unsigned int    bytes_per_line;
 unsigned int    lsb_first;
 unsigned int    lsn_first; /* nybbles swapped? Ick! */
@@ -34,10 +32,9 @@ unsigned int    vline = 0;
 unsigned int    vscan = 0;
 unsigned int    frameskip = 0;
 unsigned int    vwrap = 0;
-unsigned int    scanpage = 0;
 char    *fb = 0;
 char    *rfb = 0;
-int      palette_alloc[25];
+static int      palette_alloc[25];
 int     *palette = palette_alloc;
 
 void    (*drawimage)(int);
@@ -48,32 +45,26 @@ void    mmc2_4_latchspr(int);
 
 #define BPP 1
 #include "pixels.h"
-
 #undef BPP
 
 #define BPP 4
 #include "pixels.h"
-
 #undef BPP
 
 #define BPP 8
 #include "pixels.h"
-
 #undef BPP
 
 #define BPP 16
 #include "pixels.h"
-
 #undef BPP
 
 #define BPP 24
 #include "pixels.h"
-
 #undef BPP
 
 #define BPP 32
 #include "pixels.h"
-
 #undef BPP
 
 static void

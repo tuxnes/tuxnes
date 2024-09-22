@@ -22,12 +22,6 @@
 #include "renderer.h"
 #include "sound.h"
 
-int     vbl = 0;
-int     hvscroll = 0;
-int     vramlatch = 0;
-int     hscrollval, vscrollval;
-int     sprite0hit;
-
 /* forward and external declarations */
 void    vs(int, int);
 
@@ -50,13 +44,17 @@ unsigned int    CLOCK;             /* Current scanline position */
 unsigned char   hscrollreg, vscrollreg;
 
 static int last_clock; /* For vblank bit */
+static int vbl = 0;
+static int hvscroll = 0;
+static int vramlatch = 0;
+static int hscrollval, vscrollval;
+static int sprite0hit;
 
 /* This is called whenever the game reads from 2xxx or 4xxx */
 void
 input(int addr)
 {
 	static signed char vram_read;
-	unsigned char *ptr;
 	INRET = 0;
 
 	/* Read PPU status register */
@@ -65,6 +63,7 @@ input(int addr)
 		   the background tile to the time the flag is set is about 40 cycles,
 		   give or take a few. */
 		sprite0hit = spriteram[0] * HCYCLES + HCYCLES + 85 + spriteram[3] + 40;
+		unsigned char *ptr;
 		if (RAM[0x2000] & 0x20)
 			ptr = VRAM + ((spriteram[1] & 0xFE) << 4) + ((spriteram[1] & 1) << 12);         /* 8x16 sprites */
 		else
@@ -467,8 +466,7 @@ trace(int s)
 	   (&s)[1], (&s)[2], (&s)[3], (&s)[4], (&s)[5], (&s)[6],
 	   (&s)[7], (&s)[8], (&s)[9], (&s)[10], (&s)[11], (&s)[12]);
 	 */
-	unsigned int x;
 	char hex[17] = "0123456789ABCDEF";
-	x = ((int *)&s)[4];
+	unsigned int x = ((int *)&s)[4];
 	printf("%c%c%c%c\n", hex[x >> 12], hex[(x & 0xf00) >> 8], hex[(x & 0xf0) >> 4], hex[x & 0xf]);
 }

@@ -97,8 +97,7 @@ static const unsigned char Modes_6502[256] = {
 void
 disas(int loc)
 {
-	unsigned char *ptr;
-	ptr = MAPTABLE[loc >> 12];
+	unsigned char *ptr = MAPTABLE[loc >> 12];
 	while (loc < 0x10000) {
 		int x = ptr[loc];
 		printf("%04x: %02x-%s ", loc++, x, Opcodes_6502[x]);

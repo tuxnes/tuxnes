@@ -18,7 +18,7 @@
 
 extern const unsigned int TRANS_TBL[];
 
-unsigned char *next_code_alloc = CODE_BASE;
+static unsigned char *next_code_alloc = CODE_BASE;
 
 /* Some declarataions for the asm code */
 unsigned int VFLAG;             /* Store overflow flag */
@@ -42,9 +42,7 @@ void disas(int);
 void
 translate(int addr)
 {
-	int saddr;
-	unsigned char src;
-	unsigned char *cptr, *bptr;
+	unsigned char *cptr;
 	unsigned char stop = 0;
 
 	XPC = cptr = next_code_alloc;
@@ -53,9 +51,10 @@ translate(int addr)
 		disas(addr);             /* This will output a disassembly of the 6502 code */
 	}
 	do {
-		saddr = addr;
+		int saddr = addr;
 		INT_MAP[(MAPTABLE[addr >> 12] + addr) - RAM] = (unsigned int)cptr;
 		const unsigned int *ptr = TRANS_TBL;
+		unsigned char src;
 		while (1) {
 			src = *(MAPTABLE[addr >> 12] + addr);
 			addr++;
@@ -75,7 +74,7 @@ translate(int addr)
 			const unsigned char *sptr = (const unsigned char *)((const char *)TRANS_TBL + ptr[src]);
 			int slen = sptr[-1];
 			int dlen = *sptr++;
-			bptr = cptr;
+			unsigned char *bptr = cptr;
 			while (dlen--)
 				*cptr++ = *sptr++;
 			while (*sptr) {

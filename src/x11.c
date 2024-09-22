@@ -17,6 +17,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -121,9 +122,7 @@ void    UpdateDisplayX11(void);
 /* X11 stuff: */
 static Display  *display;
 static int      (*oldhandler)(Display *, XErrorEvent *) = 0;
-static Visual   *visual;
-static Window    rootwindow, w;
-static int       screen;
+static Window    w;
 static Colormap colormap;
 
 static unsigned int paletteX11[64];
@@ -132,13 +131,7 @@ static unsigned char    *keystate[32];
 static GC       gc, blackgc;
 static GC       backgroundgc, solidbggc;
 static GC       bgcolorgc;
-static int      black;
-static XSizeHints       sizehints;
-static XClassHint      classhints;
-static XWMHints        wmhints;
-static XGCValues        GCValues;
 static unsigned long    colortableX11[25];
-static XColor   color;
 
 #ifdef HAVE_XRENDER
 static Pixmap scalePixmap;
@@ -155,14 +148,14 @@ static XImage   *image = 0;
 // Otherwise, it will be the output buffer of hqx.
 //
 static char     *xfb = 0;
-static int      xfb_width, xfb_height;
+static unsigned int xfb_width, xfb_height;
 static int      xfb_bytes_per_line = 0;
 
 // This represents the window dimensions.
 // Default is NES screen resolution, multiplied by scale factor.  However
 // it may be resized by the WM or the user.
 //
-static int width, height;
+static unsigned int width, height;
 
 // If set to a value other than 1, we will allocate a separate fb/rfb buffer
 // for fb.c and invoke hqx with that factor.
@@ -177,10 +170,6 @@ int scaler_magstep = 1;
 void    fbinit(void);
 void    quit(void);
 void    START(void);
-static void     InitScreenshotX11(void);
-static void     SaveScreenshotX11(void);
-static void     HandleKeyboardX11(XEvent ev);
-
 
 #ifdef HAVE_SHM
 
@@ -221,17 +210,12 @@ static void
 SaveScreenshotX11(void)
 {
 #ifdef HAVE_XPM
-	int status;
-
 	screenshot_new();
-	status =
-	  XpmWriteFileFromImage(display, screenshotfile, image, NULL, NULL);
-	if (status == XpmSuccess) {
-		if (verbose) {
-			fprintf(stderr, "Wrote screenshot to %s\n", screenshotfile);
-		}
-	} else {
+	int status = XpmWriteFileFromImage(display, screenshotfile, image, NULL, NULL);
+	if (status != XpmSuccess) {
 		fprintf(stderr, "%s: %s\n", screenshotfile, XpmGetErrorString(status));
+	} else if (verbose) {
+		fprintf(stderr, "Wrote screenshot to %s\n", screenshotfile);
 	}
 #else
 	fprintf(stderr,
@@ -257,12 +241,13 @@ handler(Display *display, XErrorEvent *ev)
 	return 0;
 }
 
-static bool XRenderSupported()
+static bool
+XRenderSupported(void)
 {
 #ifdef HAVE_XRENDER
 	static bool checked = false, enabled = false;
-	int eventBase, errorBase;
 	if (!checked) {
+		int eventBase, errorBase;
 		if (XRenderQueryExtension(display, &eventBase, &errorBase))
 			enabled = true;
 		checked = true;
@@ -276,16 +261,6 @@ static bool XRenderSupported()
 int
 InitDisplayX11(int argc, char **argv)
 {
-	int x, y;
-	int geometry_mask;
-	int border;
-	struct timeval time;
-	char *wname[] = {
-		PACKAGE_NAME,
-		PACKAGE
-	};
-	XTextProperty name[2];
-
 	switch (scaler_magstep) {
 	case 1:
 	case 2:
@@ -314,15 +289,15 @@ InitDisplayX11(int argc, char **argv)
 		        XDisplayName(renderer_config.display_id));
 		exit(EXIT_FAILURE);
 	}
-	screen = XDefaultScreen(display);
+	int screen = XDefaultScreen(display);
 #ifdef HAVE_SHM
 	shm_status = XShmQueryVersion(display, &shm_major, &shm_minor, &shm_pixmaps);
 #endif /* HAVE_SHM */
-	visual = XDefaultVisual(display, screen);
-	rootwindow = RootWindow(display, screen);
+	Visual *visual = XDefaultVisual(display, screen);
+	Window rootwindow = RootWindow(display, screen);
 	colormap = DefaultColormap(display, screen);
-	black = BlackPixel(display, screen);
-	depth = DefaultDepth(display, screen);
+	unsigned long black = BlackPixel(display, screen);
+	unsigned int depth = DefaultDepth(display, screen);
 #if BYTE_ORDER == BIG_ENDIAN
 	pix_swab = (ImageByteOrder(display) != MSBFirst);
 #else
@@ -331,7 +306,7 @@ InitDisplayX11(int argc, char **argv)
 	lsb_first = (BitmapBitOrder(display) == LSBFirst);
 	lsn_first = lsb_first; /* who knows? packed 4bpp is really an obscure case */
 	bpu = BitmapUnit(display);
-	bitmap_pad = BitmapPad(display);
+	unsigned int bitmap_pad = BitmapPad(display);
 	bpp = depth;
 	if (depth > 1) {
 		int formats = 0;
@@ -364,7 +339,6 @@ InitDisplayX11(int argc, char **argv)
 		        "This host may not handle 32bpp display properly.\n"
 		        "======================================================\n",
 		        (BYTE_ORDER == PDP_ENDIAN) ? "PDP" : "Obscure");
-		fflush(stderr);
 	}
 	if ((visual->class & 1) && renderer_config.indexedcolor) {
 		if (XAllocColorCells(display, colormap, 0, 0, 0, colortableX11, 25) == 0) {
@@ -373,11 +347,12 @@ InitDisplayX11(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 		/* Pre-initialize the colormap to known values */
+		XColor color;
 		color.red   = NES_palette[0] >> 8 & 0xff00;
 		color.green = NES_palette[0]      & 0xff00;
 		color.blue  = NES_palette[0] << 8 & 0xff00;
 		color.flags = DoRed | DoGreen | DoBlue;
-		for (x = 0; x <= 24; x++) {
+		for (int x = 0; x <= 24; x++) {
 			color.pixel = colortableX11[x];
 			palette[x] = color.pixel;
 			XStoreColor(display, colormap, &color);
@@ -385,7 +360,8 @@ InitDisplayX11(int argc, char **argv)
 	} else {
 		renderer_config.indexedcolor = 0;
 		/* convert palette to local color format */
-		for (x = 0; x < 64; x++) {
+		for (int x = 0; x < 64; x++) {
+			XColor color;
 			color.pixel = x;
 			color.red   = NES_palette[x] >> 8 & 0xff00;
 			color.green = NES_palette[x]      & 0xff00;
@@ -403,9 +379,10 @@ InitDisplayX11(int argc, char **argv)
 	xfb_height = 240 * scaler_magstep;
 	width = 256 * magstep;
 	height = 240 * magstep;
-	x = 0;
-	y = 0;
-	geometry_mask = HeightValue | WidthValue;
+	int x = 0;
+	int y = 0;
+	unsigned int border_width = 0;
+	int geometry_mask = HeightValue | WidthValue;
 	if (renderer_config.geometry)
 		geometry_mask |= XParseGeometry(renderer_config.geometry, &x, &y, &width, &height);
 	if (renderer_config.inroot) {
@@ -416,30 +393,29 @@ InitDisplayX11(int argc, char **argv)
 		attrs.backing_store = WhenMapped;
 		attrs.cursor = XCreateFontCursor(display, XC_crosshair);
 		w = XCreateWindow(display, rootwindow,
-		                  x, y, width, height, 0,
+		                  x, y, width, height, border_width,
 		                  /* depth */ CopyFromParent,
 		                  /* class */ InputOutput,
 		                  /* visual */ visual,
-		                  /* valuemask */
-		                  CWBackingStore |
-		                  CWCursor,
+		                  /* valuemask */ CWBackingStore | CWCursor,
 		                  /* attributes */ &attrs);
 	}
 	XGetGeometry(display, w, &rootwindow,
-	             &x, &y, &width, &height, &border, &depth);
+	             &x, &y, &width, &height, &border_width, &depth);
 	gc = XCreateGC(display, w, 0, 0);
 	blackgc = XCreateGC(display, w, 0, 0);
 	XSetForeground(display, gc, ~0UL);
 	XSetBackground(display, gc, 0UL);
 	XSetForeground(display, blackgc, 0);
 	XSetBackground(display, blackgc, 0);
+	XGCValues GCValues;
 	GCValues.function = GXor;
 	bgcolorgc = XCreateGC(display, w, GCFunction, &GCValues);
 	XSetBackground(display, bgcolorgc, black);
-	GCValues.function = GXcopy;
 
 	if (!renderer_config.inroot) {
 		/* set aspect ratio */
+		XSizeHints sizehints;
 		/* sizehints.flags = PMinSize | PMaxSize | PResizeInc | PAspect | PBaseSize; */
 		/*   sizehints.min_width = 256; */
 		/*   sizehints.min_height = 240; */
@@ -460,12 +436,19 @@ InitDisplayX11(int argc, char **argv)
 		XSetCommand(display, w, argv, argc);
 
 		/* set window manager hints */
+		XWMHints wmhints;
 		wmhints.flags = InputHint | StateHint;
 		wmhints.input = True;
 		wmhints.initial_state = NormalState;
 		XSetWMHints(display, w, &wmhints);
 
 		/* set window title */
+		XClassHint classhints;
+		char *wname[] = {
+			PACKAGE_NAME,
+			PACKAGE
+		};
+		XTextProperty name[2];
 		classhints.res_class = wname[0];
 		classhints.res_name = wname[1];
 		XSetClassHint(display, w, &classhints);
@@ -491,12 +474,15 @@ InitDisplayX11(int argc, char **argv)
 	XSelectInput(display, w, KeyPressMask | KeyReleaseMask | ExposureMask |
 	             FocusChangeMask | KeymapStateMask | StructureNotifyMask);
 	XFlush(display);
+
+	struct timeval time;
 	gettimeofday(&time, NULL);
 	renderer_data.basetime = time.tv_sec;
 	if (magstep != scaler_magstep) {
 		if (!XRenderSupported()) {
-			fprintf(stderr, "x11: scaling requires XRENDER support\n");
-			exit(1);
+			fprintf(stderr, "[%s] Scaling requires XRENDER support\n",
+			        renderer->name);
+			exit(EXIT_FAILURE);
 		}
 
 #ifdef HAVE_XRENDER
@@ -510,15 +496,15 @@ InitDisplayX11(int argc, char **argv)
 #endif
 	}
 #ifdef HAVE_SHM
-	if ((shm_status == True)) {
+	if (shm_status == True) {
 		if (depth == 1)
 			shm_image = XShmCreateImage(display, visual, depth,
-			                         XYBitmap, NULL, &shminfo,
-			                         xfb_width, xfb_height);
+			                            XYBitmap, NULL, &shminfo,
+			                            xfb_width, xfb_height);
 		else
 			shm_image = XShmCreateImage(display, visual, depth,
-			                         ZPixmap, NULL, &shminfo,
-			                         xfb_width, xfb_height);
+			                            ZPixmap, NULL, &shminfo,
+			                            xfb_width, xfb_height);
 		if (shm_image) {
 			xfb_bytes_per_line = shm_image->bytes_per_line;
 			shminfo.shmid = -1;
@@ -620,7 +606,7 @@ static void
 HandleKeyboardX11(XEvent ev)
 {
 	KeySym keysym = XkbKeycodeToKeysym(display, ev.xkey.keycode, 0, 0);
-	_Bool press = ev.type == KeyPress;
+	bool press = ev.type == KeyPress;
 
 	if (press && keysym == XK_Escape)
 		quit();                    /* ESC */
@@ -874,7 +860,7 @@ RenderImage(XEvent *ev)
 {
 	Drawable target = w;
 	int sx = 0, sy = 0;
-	int w_ = xfb_width, h = xfb_height;
+	unsigned int w_ = xfb_width, h = xfb_height;
 	int dx = (width - w_ * magstep) / 2;
 	int dy = (height - h * magstep) / 2;
 
@@ -891,13 +877,13 @@ RenderImage(XEvent *ev)
 
 	switch (scaler_magstep) {
 	case 2:
-		hq2x_32_rb((uint32_t*)fb, bytes_per_line, (uint32_t*)xfb, xfb_bytes_per_line, 256, 240);
+		hq2x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)xfb, xfb_bytes_per_line, 256, 240);
 		break;
 	case 3:
-		hq3x_32_rb((uint32_t*)fb, bytes_per_line, (uint32_t*)xfb, xfb_bytes_per_line, 256, 240);
+		hq3x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)xfb, xfb_bytes_per_line, 256, 240);
 		break;
 	case 4:
-		hq4x_32_rb((uint32_t*)fb, bytes_per_line, (uint32_t*)xfb, xfb_bytes_per_line, 256, 240);
+		hq4x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)xfb, xfb_bytes_per_line, 256, 240);
 		break;
 	}
 
@@ -1086,8 +1072,10 @@ void
 UpdateColorsX11(void)
 {
 	/* Set Background color */
-	oldbgcolor = currentbgcolor;
+	static unsigned long currentbgcolor;
+	unsigned long oldbgcolor = currentbgcolor;
 	if (renderer_config.indexedcolor) {
+		XColor color;
 		color.pixel = currentbgcolor = colortableX11[24];
 		color.red   = NES_palette[VRAM[0x3f00] & 63] >> 8 & 0xff00;
 		color.green = NES_palette[VRAM[0x3f00] & 63]      & 0xff00;
@@ -1113,12 +1101,13 @@ UpdateColorsX11(void)
 	if (renderer_config.indexedcolor) {
 		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
+				XColor color;
 				color.pixel = colortableX11[x];
 				color.red   = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] >> 8 & 0xff00;
 				color.green = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63]      & 0xff00;
 				color.blue  = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] << 8 & 0xff00;
 				color.flags = DoRed | DoGreen | DoBlue;
-				XStoreColor (display, colormap, &color);
+				XStoreColor(display, colormap, &color);
 				/*printf("color %d (%d) = %6x\n", x, colortableX11[x], paletteX11[VRAM[0x3f01+x+(x/3)]&63]); */
 			}
 		}

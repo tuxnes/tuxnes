@@ -43,11 +43,10 @@ ggtable(char lookup)
 int
 DecodeGameGenieCode(const char *ggcode, int *address, int *data, int *compare)
 {
-	size_t codelen;
 	int decode[9];
 
 	/* make sure the code is either 6 or 8 characters */
-	codelen = strlen(ggcode);
+	size_t codelen = strlen(ggcode);
 	if (codelen != 6
 	 && codelen != 8) {
 		/* printf("invalid number of Game Genie character: %zu\n", codelen); */

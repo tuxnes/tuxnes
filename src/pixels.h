@@ -8,10 +8,6 @@
 
 #include "consts.h"
 
-#undef pixel_t
-
-#undef endian_fix
-
 #if (BPP==1)
 #define endian_fix(x) (x)
 #define pixel_t unsigned char
@@ -60,31 +56,20 @@
 #define DRAW_IMAGE drawimage32
 #endif
 
-#undef rpixmap
-#define rpixmap ((pixel_t *)rfb)
-
-#undef pixmap
-#define pixmap ((pixel_t *)fb)
-
 void
 DRAW_IMAGE(int endclock)
 {
 	static unsigned int lastclock = 0;
 	static unsigned int curhscroll = 0;
+	static unsigned int scanpage = 0;
 	unsigned int curclock = lastclock;
 	unsigned int baseaddr = ((RAM[0x2000] & 0x10) << 8);  /* 0 or 0x1000 */
 	unsigned int currentline = lastclock / HCYCLES;
 	unsigned int hposition = lastclock % HCYCLES;
 	unsigned int x;
-	int s;
-	int hflip, vflip, behind;
-	int d1, d2;
 	int spritebase = (RAM[0x2000] & 0x08) << 9;   /* 0x0 or 0x1000 */
 	int spritesize = 8 << ((RAM[0x2000] & 0x20) >> 5);    /* 8 or 16 */
-	int spritetile;
-	unsigned char linebuffer[256];
 	unsigned char bgmask[256];
-	static unsigned int tile;
 	static int bit;
 	static unsigned char byte1, byte2;
 #if (BPP==24)
@@ -97,8 +82,6 @@ DRAW_IMAGE(int endclock)
 	static pixel_t *ptr, *ptr0;
 #if (BPP==1) || (BPP==4)
 	static pixel_t pix_mask;
-#elif (BPP==24)
-	int pix_byte;
 #endif
 
 	if (frameskip) {
@@ -130,8 +113,8 @@ DRAW_IMAGE(int endclock)
 		else if (hvmirror == 1)
 			scanpage = 0x2000 + ((RAM[0x2000] & 2) << 9);   /* h-mirror, v-layout */
 		curpal[0] = endian_fix(palette[24]);
-		rptr0 = rptr = rpixmap;
-		ptr0 = ptr = pixmap;
+		rptr0 = rptr = (pixel_t *)rfb;
+		ptr0 = ptr = (pixel_t *)fb;
 #if (BPP==1)
 		if (lsb_first) {
 #if DOUBLE
@@ -167,7 +150,7 @@ DRAW_IMAGE(int endclock)
 		/* In hblank */
 		curhscroll = hscrollreg;
 		x = curhscroll;
-		tile = VRAM[scanpage + ((x & 255) >> 3) + (vline << 5)];
+		unsigned int tile = VRAM[scanpage + ((x & 255) >> 3) + (vline << 5)];
 		mmc2_4_latch(baseaddr + (tile << 4) + vscan);
 		mmc2_4_latch(baseaddr + (tile << 4) + vscan + 8);
 		byte1 = VRAM[baseaddr + (tile << 4) + vscan] << (x & 7);
@@ -196,7 +179,7 @@ DRAW_IMAGE(int endclock)
 #elif (BPP == 24)
 				bgmask[hposition - 85] = (((byte1 & 0x80) >> 7)
 				                       |  ((byte2 & 0x80) >> 6));
-				for (pix_byte = 0; pix_byte < 3; pix_byte++) {
+				for (int pix_byte = 0; pix_byte < 3; pix_byte++) {
 					ptr[pix_byte] = (curpal[bgmask[hposition - 85]]) >> (8 * pix_byte);
 				}
 #else /* (BPP != 1) && (BPP != 24) */
@@ -213,7 +196,7 @@ DRAW_IMAGE(int endclock)
 				*ptr = (*rptr & ~pix_mask)
 				     | (*curpal & pix_mask);
 #elif (BPP==24)
-				for (pix_byte = 0; pix_byte < 3; pix_byte++) {
+				for (int pix_byte = 0; pix_byte < 3; pix_byte++) {
 					ptr[pix_byte] = (*curpal) >> (8 * pix_byte);
 				}
 #else /* (BPP != 1) && (BPP != 24) */
@@ -262,7 +245,7 @@ DRAW_IMAGE(int endclock)
 				if ((!osmirror) && (nomirror || !hvmirror))
 					scanpage ^= 0x400;        /* bit 8 of x -> bit 10 of addr */
 			if (bit < 0) {
-				tile = VRAM[scanpage + ((x & 255) >> 3) + (vline << 5)];
+				unsigned int tile = VRAM[scanpage + ((x & 255) >> 3) + (vline << 5)];
 				mmc2_4_latch(baseaddr + (tile << 4) + vscan);
 				mmc2_4_latch(baseaddr + (tile << 4) + vscan + 8);
 				byte1 = VRAM[baseaddr + (tile << 4) + vscan];
@@ -283,13 +266,15 @@ DRAW_IMAGE(int endclock)
 		if (hposition == HCYCLES) {
 			if (RAM[0x2001] & 16) {
 				/* Draw sprites */
+				unsigned char linebuffer[256];
 				memset(linebuffer, 0, 256);      /* Clear buffer for this scanline */
+				int s;
 				for (s = 0; s < 64; s++) {
 					if (spriteram[s * 4] < currentline
 					 && spriteram[s * 4] < 240
 					 && spriteram[s * 4 + 3] < 249
 					 && (spriteram[s * 4] + spritesize >= currentline)) {
-						spritetile = spriteram[s * 4 + 1];
+						int spritetile = spriteram[s * 4 + 1];
 						if ((spritetile == 0xfd) || (spritetile == 0xfe)) {
 							mmc2_4_latchspr(spritetile);
 						}
@@ -300,15 +285,16 @@ DRAW_IMAGE(int endclock)
 					 && spriteram[s * 4] < 240
 					 && spriteram[s * 4 + 3] < 249) {
 						if (spriteram[s * 4] + spritesize >= currentline) {
-							spritetile = spriteram[s * 4 + 1];
+							int spritetile = spriteram[s * 4 + 1];
 							if (spritesize == 16)
 								spritebase = (spritetile & 1) << 12;
-							behind = spriteram[s * 4 + 2] & 0x20;
-							hflip = spriteram[s * 4 + 2] & 0x40;
-							vflip = spriteram[s * 4 + 2] & 0x80;
+							int behind = spriteram[s * 4 + 2] & 0x20;
+							int hflip = spriteram[s * 4 + 2] & 0x40;
+							int vflip = spriteram[s * 4 + 2] & 0x80;
 
 							/* This finds the memory location of the tiles, taking into account
 							   that vertically flipped sprites are in reverse order. */
+							int d1, d2;
 							if (vflip) {
 								if (spriteram[s << 2] >= ((signed int)currentline) - 8) {
 									/* 8x8 sprites and first half of 8x16 sprites */
@@ -372,7 +358,7 @@ DRAW_IMAGE(int endclock)
 						ptr0[offset] = (rptr0[offset] & ~mask)
 						             | endian_fix(palette[linebuffer[x]] & mask);
 #elif (BPP==24)
-						for (pix_byte = 0; pix_byte < 3; pix_byte++) {
+						for (int pix_byte = 0; pix_byte < 3; pix_byte++) {
 							ptr0[(spriteram[s * 4 + 3] + x) * 3 + pix_byte] = endian_fix(palette[linebuffer[x]]) >> (8 * pix_byte);
 						}
 #else /* (BPP != 1) && (BPP != 24) */
@@ -408,7 +394,7 @@ DRAW_IMAGE(int endclock)
 				scanpage = 0x2000 + ((RAM[0x2000] & 1) << 10);      /* v-mirror, h-layout */
 			else if (hvmirror == 1)
 				scanpage = 0x2000 + (((RAM[0x2000] & 2) << 9) ^ (vwrap << 10));     /* h-mirror, v-layout */
-			tile = VRAM[scanpage + ((x & 255) >> 3) + (vline << 5)];
+			unsigned int tile = VRAM[scanpage + ((x & 255) >> 3) + (vline << 5)];
 			mmc2_4_latch(baseaddr + (tile << 4) + vscan);
 			mmc2_4_latch(baseaddr + (tile << 4) + vscan + 8);
 			byte1 = VRAM[baseaddr + (tile << 4) + vscan] << (x & 7);
@@ -430,3 +416,5 @@ DRAW_IMAGE(int endclock)
 }
 
 #undef DRAW_IMAGE
+#undef pixel_t
+#undef endian_fix

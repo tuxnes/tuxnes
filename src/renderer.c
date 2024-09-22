@@ -71,7 +71,6 @@ struct RendererData renderer_data = {
 };
 
 int             magstep = 0;
-unsigned int    currentbgcolor, oldbgcolor;
 unsigned char   palette_cache[tilecachedepth][32];
 
 int

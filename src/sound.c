@@ -273,7 +273,7 @@ static int sample_format_number;
 static int bytes_per_sample = 1;
 static int signed_samples   = 0;
 
-struct snd_event {
+static struct snd_event {
 	unsigned long        addr;                /* address of write */
 	unsigned int         count;                /* cycle count */
 	unsigned char        value;                /* value of write */
@@ -403,11 +403,9 @@ InitAudio(void)
 			int desired_fragmentsize = 0;
 #ifdef SNDCTL_DSP_RESET
 			if (!ioctl(audiofd, SNDCTL_DSP_RESET)) {
-				int desired_audiorate;
-				int desired_audiostereo;
 				const struct SampleFormat *desired_sample_format = sample_format;
 
-				desired_audiorate = sound_config.audiorate;
+				int desired_audiorate = sound_config.audiorate;
 				if (ioctl(audiofd, SNDCTL_DSP_SPEED, &sound_config.audiorate))
 					perror(sound_config.audiofile);
 
@@ -418,7 +416,7 @@ InitAudio(void)
 					        desired_audiorate,
 					        sound_config.audiorate);
 				}
-				desired_audiostereo = sound_config.audiostereo;
+				int desired_audiostereo = sound_config.audiostereo;
 				if (desired_audiostereo == 1) {
 					fprintf(stderr, "Stereo desired, but unsupported.  Mono forced. - pez\n");
 					desired_audiostereo = 0;
@@ -610,7 +608,6 @@ UpdateAudio(void) /* called freq times a sec */
 	/* #define is faster than assigning to a var */
 #define CUR_EVENT snd_event_buf[head]
 	         long  samp_temp;
-	         short temp_wavelen;
 	unsigned int   count = 0;
 	unsigned int   sample = 0;
 	unsigned char  dmc_shift = 0;
@@ -660,7 +657,7 @@ UpdateAudio(void) /* called freq times a sec */
 						wavelen_sq1 -= ((wavelen_sq1 >> sq1_right_shift) + 1);
 						if (wavelen_sq1 < 0) wavelen_sq1 = 0;
 					} else {
-						temp_wavelen = wavelen_sq1 + (wavelen_sq1 >> sq1_right_shift);
+						short temp_wavelen = wavelen_sq1 + (wavelen_sq1 >> sq1_right_shift);
 						if (temp_wavelen >= 0x0800) {
 							sq1_sw_no_carry = 0;
 						} else {
@@ -685,7 +682,7 @@ UpdateAudio(void) /* called freq times a sec */
 						wavelen_sq2 -= (wavelen_sq2 >> sq2_right_shift);
 						if (wavelen_sq2 < 0) wavelen_sq2 = 0;
 					} else {
-						temp_wavelen = wavelen_sq2 + (wavelen_sq2 >> sq2_right_shift);
+						short temp_wavelen = wavelen_sq2 + (wavelen_sq2 >> sq2_right_shift);
 						if (temp_wavelen >= 0x0800) {
 							sq2_sw_no_carry = 0;
 						} else {
@@ -712,7 +709,7 @@ UpdateAudio(void) /* called freq times a sec */
 						wavelen_noi -= (wavelen_noi >> noi_right_shift);
 						if (wavelen_noi < 0) wavelen_noi = 0;
 					} else {
-						temp_wavelen = wavelen_noi + (wavelen_noi >> noi_right_shift);
+						short temp_wavelen = wavelen_noi + (wavelen_noi >> noi_right_shift);
 						if (temp_wavelen >= 0x0800) {
 							noi_sw_no_carry = 0;
 						} else {

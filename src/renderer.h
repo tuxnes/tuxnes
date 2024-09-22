@@ -55,7 +55,6 @@ extern struct RendererData {
 #define tilecachedepth 25
 
 extern int              magstep, scaler_magstep;
-extern unsigned int     currentbgcolor, oldbgcolor;
 extern unsigned char    palette_cache[tilecachedepth][32];
 
 #endif

@@ -44,9 +44,9 @@
 
 unsigned char  *ROM_BASE;
 unsigned char  *VROM_BASE;
-char    *filename;
-const char      *homedir;
-char     savefile[1024];
+static char    *filename;
+static const char *homedir;
+static char     savefile[1024];
 char    *tuxnesdir;                /* buffer for $HOME/.tuxnes dir */
 char    *basefilename;  /* base filename without the extensions */
 unsigned int    ROM_PAGES;
@@ -54,17 +54,13 @@ unsigned int    VROM_PAGES;
 unsigned int    ROM_MASK;
 unsigned int    VROM_MASK;
 unsigned int    VROM_MASK_1k;
-const char *sample_format_name = "8";
-int     dirtyheader = 0;
+static const char *sample_format_name = "8";
 int     disassemble = 0;
 int     dolink = 0;
 unsigned int    MAPPERNUMBER = 0;
-int     SRAM_ENABLED;
 int     irqflag = 0;
 int     mapmirror = 0;
-int     mapperoverride = 0;
 int     ignorebadinstr = 0;
-int     showheader = 0;
 int     unisystem = 0;
 int     verbose = 0;
 
@@ -84,7 +80,7 @@ static void     help_palettes(int);
 static void     help_sound(int);
 
 /* help variables */
-const struct {
+static const struct {
 	int is_terse;
 	const char *name, *desc;
 	void (*dfn)(int);
@@ -127,8 +123,8 @@ static void     help(const char *progname, const char *topic);
 
 #ifdef HAVE_LIBM
 extern unsigned int *ntsc_palette(double hue, double tint);
-double hue = 332.0;
-double tint = 0.5;
+static double hue = 332.0;
+static double tint = 0.5;
 #endif /* HAVE_LIBM */
 
 static void     loadpal(char *);
@@ -140,7 +136,7 @@ void    quit(void);
 void    START(void);
 
 /* color palettes */
-struct {
+static struct {
 	const char *name, *desc;
 	unsigned int data[64];
 } palettes[] = {
@@ -364,11 +360,10 @@ struct {
 	}
 };
 
-unsigned char *palremap = 0, *paldata = 0;
+static unsigned char *palremap = 0, *paldata = 0;
 unsigned int *NES_palette = 0;
-int monochrome = 0;
 
-void (*oldtraphandler)(int);
+static void (*oldtraphandler)(int);
 
 /****************************************************************************/
 
@@ -721,7 +716,7 @@ help_controls(int terse)
 static void
 restoresavedgame(void)
 {
-	int fd, result;
+	int fd;
 	char buffer[1024];
 	struct stat statbuf;
 	*savefile = 0;
@@ -729,7 +724,7 @@ restoresavedgame(void)
 	if (*buffer && buffer[strlen(buffer) - 1] == '/')
 		buffer[strlen(buffer) - 1] = 0;
 	strcat(buffer, "/.tuxnes");
-	result = stat(buffer, &statbuf);
+	int result = stat(buffer, &statbuf);
 	if (result == 0) {
 		int x;
 		for (x = strlen(filename) - 1; x > 0 && filename[x - 1] != '/'; x--);
@@ -792,7 +787,6 @@ loadpal(char *palfile)
 	/* for the raw palette data */
 	unsigned char palette[192];
 	int pens;
-	size_t len;
 	int fd = -1;
 
 	if (unisystem && !palremap)
@@ -802,14 +796,15 @@ loadpal(char *palfile)
 	if (palfile) {
 		char *buffer;
 
-		len = strlen(palfile) + 1;
+		size_t len = strlen(palfile) + 1;
 		if (!(buffer = malloc(len))) {
 			perror("loadpal: malloc");
 			return;
 		}
 		memcpy(buffer, palfile, len);
 		palfile = buffer;
-	} if (palfile) {
+	}
+	if (palfile) {
 		if ((fd = open(palfile, O_RDONLY)) < 0) {
 			perror(palfile);
 			free(palfile);
@@ -819,7 +814,7 @@ loadpal(char *palfile)
 	if (paldata && !palfile) {
 		char *buffer;
 
-		len = strlen(filename) + 1;
+		size_t len = strlen(filename) + 1;
 		if (!(buffer = malloc(len))) {
 			perror("loadpal: malloc");
 			return;
@@ -830,7 +825,8 @@ loadpal(char *palfile)
 	if (!palfile) {
 		if (palremap)
 			return;
-		if (!(palfile = malloc((len = strlen(filename)) + 11))) {
+		size_t len = strlen(filename);
+		if (!(palfile = malloc(len + 11))) {
 			perror("loadpal: malloc");
 			return;
 		}
@@ -977,14 +973,13 @@ loadpal(char *palfile)
 int
 main(int argc, char **argv)
 {
-	int audiofd;
-	int size;
 	int cmirror = 0;
-	DIR *dir;             /* for checking if .tuxnes directory is present */
 	char *palfile = NULL; /* palette file */
-
+	int monochrome = 0;
 	char *ggcode = NULL;
-	int parseret;
+	int mapperoverride = 0;
+	int dirtyheader = 0;
+	int showheader = 0;
 
 	/* Find the user's home directory */
 	if (!(homedir = getenv("HOME"))) {
@@ -1002,7 +997,7 @@ main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	sprintf(tuxnesdir, "%s%s", homedir, "/.tuxnes/");
-	dir = opendir(tuxnesdir);
+	DIR *dir = opendir(tuxnesdir);
 	if ((dir == NULL) && (errno == ENOENT)) {
 		mkdir(tuxnesdir, 0777);
 		if ((dir = opendir(tuxnesdir)) == NULL) {
@@ -1022,6 +1017,7 @@ main(int argc, char **argv)
 	disassemble = 0;
 
 	/* check for the default output device */
+	int audiofd;
 	if ((audiofd = open(DSP, O_WRONLY | O_APPEND)) < 0)
 		sound_config.audiofile = NULL;
 	else {
@@ -1077,13 +1073,13 @@ main(int argc, char **argv)
 			{0, 0, 0, 0}
 		};
 
-		parseret = getopt_long(argc, argv,
+		int parseret = getopt_long(argc, argv,
 #ifdef HAVE_LIBM
-		                       "N::"
+		                           "N::"
 #endif
-		                       "bcdfhHg:j:J:lm:M:F:R:p:P:vV1::2::s::Sr:E::Q::D:ieG:XKI",
-		                       long_options,
-		                       NULL);
+		                           "bcdfhHg:j:J:lm:M:F:R:p:P:vV1::2::s::Sr:E::Q::D:ieG:XKI",
+		                           long_options,
+		                           NULL);
 		if (parseret == -1)
 			break;
 
@@ -1202,11 +1198,10 @@ main(int argc, char **argv)
 			if (optarg && *optarg) {
 				unsigned int *partial = 0;
 				int partials = 0;
-				size_t len;
 
 				palfile = 0;
 				NES_palette = 0;
-				len = strlen(optarg);
+				size_t len = strlen(optarg);
 				for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
 					if (!strcmp(palettes[i].name, optarg)) {
 						NES_palette = palettes[i].data;
@@ -1256,9 +1251,7 @@ main(int argc, char **argv)
 		case 'N':
 			if (optarg) {
 				char *p;
-				double foo;
-
-				foo = strtod(optarg, &p);
+				double foo = strtod(optarg, &p);
 				if (optarg != p) {
 					hue = foo;
 					while (hue < 0.0) hue += 360.0;
@@ -1311,8 +1304,6 @@ main(int argc, char **argv)
 	*/
 	{
 		char *p, *basestart, *baseend;
-		size_t len;
-
 		basestart = p = filename;
 		baseend = NULL;
 		while (*p == '.') p++;
@@ -1329,7 +1320,7 @@ main(int argc, char **argv)
 		}
 		if (!baseend) baseend = p;
 
-		len = baseend - basestart;
+		size_t len = baseend - basestart;
 		if (!(basefilename = malloc(len + 1))) {
 			perror("main: malloc");
 			exit(EXIT_FAILURE);
@@ -1345,9 +1336,7 @@ main(int argc, char **argv)
 	{
 		const struct SampleFormat *match = 0;
 		int partials = 0;
-		size_t len;
-
-		len = strlen(sample_format_name);
+		size_t len = strlen(sample_format_name);
 		for (sample_format = sample_formats; sample_format->name; sample_format++)
 			if (!strcmp(sample_format->name, sample_format_name)) {
 				break;
@@ -1357,9 +1346,7 @@ main(int argc, char **argv)
 			}
 		if (*sample_format_name && !sample_format->name) {
 			char *tail;
-			int sample_format_number;
-
-			sample_format_number = strtoul(sample_format_name, &tail, 0);
+			int sample_format_number = strtoul(sample_format_name, &tail, 0);
 			if (!*tail) {
 				for (sample_format = sample_formats; sample_format->name; sample_format++) {
 					if (sample_format_number == sample_format->number)
@@ -1410,7 +1397,7 @@ main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	size = load_rom(filename);
+	int size = load_rom(filename);
 	if (verbose)
 		fprintf(stderr, "Rom size: %d\n", size);
 
@@ -1445,10 +1432,8 @@ main(int argc, char **argv)
 	MAPTABLE[6] = MAPTABLE[7] = RAM;      /* Save RAM */
 	MAPTABLE[3] = RAM + 0x2000;
 	MAPTABLE[5] = RAM;            /* 3xxx and 5xxx really shouldn't be mapped to anything, but they're mapped to some unused ram just to prevent pagefaults by weird code that tries to access these areas. */
-	SRAM_ENABLED = 1;
+	int SRAM_ENABLED = 1;
 	if (!strncmp("NES\x1a", (char *)ROM, 4)) {  /* .NES */
-		int used;
-
 		ROM_BASE = ROM + 16;      /* 16 bytes for .nes header */
 
 		/* check for battery-backed SRAM */
@@ -1505,7 +1490,7 @@ main(int argc, char **argv)
 		VROM_PAGES = ROM[5];
 
 		/* calculate used space in image */
-		used = 16                    /* header size */
+		int used = 16                /* header size */
 		  + ((ROM[6] & 4) ? 512 : 0) /* trainer size */
 		  + 16384 * ROM_PAGES        /* PRG-ROM pages */
 		  + 8192 * VROM_PAGES;       /* CHR-ROM pages */
@@ -1631,7 +1616,6 @@ main(int argc, char **argv)
 	}
 	if (palremap) {
 		unsigned int *new_palette;
-		int pen;
 
 		if (!(new_palette = malloc(64 * sizeof *new_palette))) {
 			fprintf(stderr, "Can't remap palette: ");
@@ -1640,7 +1624,7 @@ main(int argc, char **argv)
 		} else {
 			if (verbose)
 				fprintf(stderr, "Remapping palette\n");
-			for (pen = 0; pen < 64; pen++)
+			for (int pen = 0; pen < 64; pen++)
 				new_palette[pen] = (palremap[pen] <= 64)
 				  ? NES_palette[palremap[pen]]
 				  : NES_palette[pen];
@@ -1653,9 +1637,7 @@ main(int argc, char **argv)
 
 	/* (Possibly) convert palette to monochrome */
 	if (monochrome) {
-		int pen;
-
-		for (pen = 0; pen < 64; pen++) {
+		for (int pen = 0; pen < 64; pen++) {
 			unsigned long red, blue, green, gray;
 
 			red   = NES_palette[pen] >> 16 & 0xff;

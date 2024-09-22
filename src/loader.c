@@ -31,11 +31,10 @@
 static int
 load_rom_zip(const char *filename)
 {
-	unzFile romfd;
 	int size = 0;
 	int res;
 
-	romfd = unzOpen(filename);
+	unzFile romfd = unzOpen(filename);
 	if (!romfd) {
 		perror(filename);
 		exit(EXIT_FAILURE);
@@ -47,11 +46,10 @@ load_rom_zip(const char *filename)
 	     res = unzGoToNextFile(romfd)) {
 		unz_file_info fileinfo;
 		char filename[256 + 1];
-		const char *extension;
 
 		unzGetCurrentFileInfo(romfd, &fileinfo, filename, sizeof filename, NULL, 0, NULL, 0);
 		filename[sizeof filename - 1] = '\0';
-		extension = strrchr(filename, '.');
+		const char *extension = strrchr(filename, '.');
 		if (extension && !strcasecmp(extension, ".nes")) {
 			size = fileinfo.uncompressed_size;
 			break;
@@ -96,11 +94,10 @@ load_rom_zip(const char *filename)
 static int
 load_rom_gz(const char *filename)
 {
-	gzFile romfd;
 	int size = 0;
 	int c;
 
-	romfd = gzopen(filename, "rb");
+	gzFile romfd = gzopen(filename, "rb");
 	if (!romfd) {
 		perror(filename);
 		exit(EXIT_FAILURE);
@@ -125,18 +122,15 @@ load_rom(const char *filename)
 	}
 	return load_rom_gz(filename);
 #else
-	int romfd;
-	int size;
-
 	/* Open ROM file */
-	romfd = open(filename, O_RDONLY);
+	int romfd = open(filename, O_RDONLY);
 	if (romfd < 0) {
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
 
 	/* Get file size */
-	size = lseek(romfd, 0, SEEK_END);
+	int size = lseek(romfd, 0, SEEK_END);
 	lseek(romfd, 0, SEEK_SET);
 
 	if (size < 0) {

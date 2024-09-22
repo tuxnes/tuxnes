@@ -25,7 +25,6 @@ static int screenshotnumber = 0;
 void
 screenshot_init(const char *ext)
 {
-	DIR *dir;
 	struct dirent *dirp;
 
 	/* Allocate space for (tuxnesdir) + (basefilename-snap-xxxx) + (ext) + ('\0') */
@@ -37,7 +36,7 @@ screenshot_init(const char *ext)
 	sprintf(screenshotfile, "%s-snap-", basefilename);
 
 	/* open the screenshot directory */
-	dir = opendir(tuxnesdir);
+	DIR *dir = opendir(tuxnesdir);
 	if (dir == NULL) {
 		return;
 	}
