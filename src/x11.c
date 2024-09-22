@@ -49,40 +49,34 @@
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
-#ifdef HAVE_X11_VROOT_H
-
 /*
  * Get this from the xscreensaver package if you want support for virtual
  * root windows
  */
-
+#ifdef HAVE_X11_VROOT_H
 #include <X11/vroot.h>
-
-#endif /* HAVE_X11_VROOT_H */
+#endif
 
 /* check for XPM support */
-#if defined(HAVE_LIBXPM) && defined(HAVE_X11_XPM_H)
-
-#include <X11/xpm.h>
-
+#if defined(HAVE_LIBXPM) \
+ && defined(HAVE_X11_XPM_H)
 #define HAVE_XPM 1
+#include <X11/xpm.h>
 #endif
 
 /* check for X Extension support */
-#if defined(HAVE_LIBXEXT) && defined(HAVE_X11_EXTENSIONS_XEXT_H)
-
-#include <X11/extensions/Xext.h>
-
+#if defined(HAVE_LIBXEXT) \
+ && defined(HAVE_X11_EXTENSIONS_XEXT_H)
 #define HAVE_XEXT 1
+#include <X11/extensions/Xext.h>
 #endif
 
 /* check for X Shared Memory extension */
-#if defined(HAVE_XEXT) && defined(HAVE_SYS_IPC_H) && \
-    defined(HAVE_SYS_SHM_H) && defined(HAVE_X11_EXTENSIONS_XSHM_H)
+#if defined(HAVE_XEXT) \
+ && defined(HAVE_SYS_IPC_H) \
+ && defined(HAVE_SYS_SHM_H) \
+ && defined(HAVE_X11_EXTENSIONS_XSHM_H)
 #define HAVE_SHM 1
-#endif
-
-#ifdef HAVE_SHM
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
@@ -92,27 +86,17 @@
 #endif
 #endif
 
-#ifdef HAVE_X11_EXTENSIONS_SCRNSAVER_H
-#include <X11/extensions/scrnsaver.h>
+#if defined(HAVE_LIBXSS) \
+ && defined(HAVE_X11_EXTENSIONS_SCRNSAVER_H)
 #define HAVE_SCRNSAVER 1
+#include <X11/extensions/scrnsaver.h>
 #endif
 
-#if defined(HAVE_LIBXRENDER) && defined(HAVE_X11_EXTENSIONS_XRENDER_H)
-#define HAVE_XRENDER
-#endif
-
-#ifdef HAVE_XRENDER
+#if defined(HAVE_LIBXRENDER) \
+ && defined(HAVE_X11_EXTENSIONS_XRENDER_H)
+#define HAVE_XRENDER 1
 #include <X11/extensions/Xrender.h>
 #endif
-
-#endif /* HAVE_X */
-
-#define ARRAY_LEN(x) (sizeof (x) / sizeof *(x))
-
-#define screen_on (RAM[0x2001]&8)
-#define sprites_on (RAM[0x2001]&16)
-
-#ifdef HAVE_X
 
 /* exported functions */
 int     InitDisplayX11(int argc, char **argv);
@@ -203,7 +187,9 @@ cleanup_shm(void)
 static void
 InitScreenshotX11(void)
 {
+#ifdef HAVE_XPM
 	screenshot_init(".xpm");
+#endif
 }
 
 static void
