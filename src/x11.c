@@ -222,24 +222,6 @@ InitDisplayX11(int argc, char **argv)
 	GCValues.background = BlackPixel(display, screen);
 	XChangeGC(display, gc, GCForeground | GCBackground, &GCValues);
 
-	bpp = depth;
-	if (depth > 1) {
-		int formats = 0;
-		XPixmapFormatValues *xpfv = XListPixmapFormats(display, &formats);
-		for (int i = 0; i < formats; i++) {
-			if (xpfv[i].depth == depth) {
-				bpp = xpfv[i].bits_per_pixel;
-				break;
-			}
-		}
-		XFree(xpfv);
-	}
-	if (renderer_config.scaler_magstep > 1 & bpp != 32) {
-		fprintf(stderr,
-			"[%s] HQX will only work at 32bpp; disabling\n",
-			renderer->name);
-		renderer_config.scaler_magstep = 1;
-	}
 	if (renderer_config.scaler_magstep > renderer_config.magstep) {
 		renderer_config.magstep = renderer_config.scaler_magstep;
 	}
@@ -493,6 +475,11 @@ shm_done:
 
 	/* render to a separate unscaled framebuffer when client-side scaling */
 	if (renderer_config.scaler_magstep > 1) {
+		if (bpp != 32) {
+			fprintf(stderr, "[%s] HQX will only work at 32bpp\n",
+				renderer->name);
+			exit(EXIT_FAILURE);
+		}
 		bytes_per_line = 256 * bpp / 8;
 		if (!(rfb = fb = malloc(bytes_per_line * 240))) {
 			perror("malloc");
