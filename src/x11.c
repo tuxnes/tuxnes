@@ -243,16 +243,6 @@ InitDisplayX11(int argc, char **argv)
 	if (renderer_config.scaler_magstep > renderer_config.magstep) {
 		renderer_config.magstep = renderer_config.scaler_magstep;
 	}
-	if ((BYTE_ORDER != BIG_ENDIAN) && (BYTE_ORDER != LITTLE_ENDIAN)
-	 && (bpp == 32)) {
-		fprintf(stderr,
-		        "======================================================\n"
-		        "Warning: %s-endian Host Detected\n"
-		        "\n"
-		        "This host may not handle 32bpp display properly.\n"
-		        "======================================================\n",
-		        (BYTE_ORDER == PDP_ENDIAN) ? "PDP" : "Obscure");
-	}
 	if ((visual->class & 1) && renderer_config.indexedcolor) {
 		if (XAllocColorCells(display, colormap, 0, 0, 0, colortableX11, 25) == 0) {
 			fprintf(stderr, "%s: [%s] Can't allocate colors!\n",
@@ -482,11 +472,24 @@ shm_done:
 	bpu = image->bitmap_unit;
 	lsb_first = image->bitmap_bit_order == LSBFirst;
 	lsn_first = lsb_first; /* who knows? packed 4bpp is really an obscure case */
+	pix_swab = 0;
 #if BYTE_ORDER == BIG_ENDIAN
-	pix_swab = image->byte_order == LSBFirst;
-#else
-	pix_swab = image->byte_order == MSBFirst;
+	if (image->byte_order == LSBFirst) {
+		pix_swab = 1;
+	} else if (image->byte_order != MSBFirst)
+#elif BYTE_ORDER == LITTLE_ENDIAN
+	if (image->byte_order == MSBFirst) {
+		pix_swab = 1;
+	} else if (image->byte_order != LSBFirst)
 #endif
+	{
+		fprintf(stderr,
+		        "======================================================\n"
+		        "Warning: Mixed-endian host or pixel format detected\n"
+		        "\n"
+		        "This host may not render properly.\n"
+		        "======================================================\n");
+	}
 
 	/* render to a separate unscaled framebuffer when client-side scaling */
 	if (renderer_config.scaler_magstep > 1) {
