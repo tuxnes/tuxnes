@@ -211,9 +211,9 @@ InitDisplayX11(int argc, char **argv)
 		        XDisplayName(renderer_config.display_id));
 		exit(EXIT_FAILURE);
 	}
-	int screen = XDefaultScreen(display);
+	int screen = DefaultScreen(display);
 	unsigned int depth = DefaultDepth(display, screen);
-	Visual *visual = XDefaultVisual(display, screen);
+	Visual *visual = DefaultVisual(display, screen);
 	colormap = DefaultColormap(display, screen);
 	gc = DefaultGC(display, screen);
 
@@ -222,14 +222,6 @@ InitDisplayX11(int argc, char **argv)
 	GCValues.background = BlackPixel(display, screen);
 	XChangeGC(display, gc, GCForeground | GCBackground, &GCValues);
 
-#if BYTE_ORDER == BIG_ENDIAN
-	pix_swab = (ImageByteOrder(display) != MSBFirst);
-#else
-	pix_swab = (ImageByteOrder(display) == MSBFirst);
-#endif
-	lsb_first = (BitmapBitOrder(display) == LSBFirst);
-	lsn_first = lsb_first; /* who knows? packed 4bpp is really an obscure case */
-	bpu = BitmapUnit(display);
 	bpp = depth;
 	if (depth > 1) {
 		int formats = 0;
@@ -242,14 +234,11 @@ InitDisplayX11(int argc, char **argv)
 		}
 		XFree(xpfv);
 	}
-	if (renderer_config.scaler_magstep != 1 & bpp != 32) {
+	if (renderer_config.scaler_magstep > 1 & bpp != 32) {
 		fprintf(stderr,
 			"[%s] HQX will only work at 32bpp; disabling\n",
 			renderer->name);
 		renderer_config.scaler_magstep = 1;
-	}
-	if (renderer_config.scaler_magstep != 1) {
-		hqxInit();
 	}
 	if (renderer_config.scaler_magstep > renderer_config.magstep) {
 		renderer_config.magstep = renderer_config.scaler_magstep;
@@ -390,7 +379,7 @@ InitDisplayX11(int argc, char **argv)
 #ifdef HAVE_XRENDER
 		scalePixmap = XCreatePixmap(display, window, w, h, depth);
 
-		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, DefaultVisual(display, DefaultScreen(display)));
+		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, visual);
 		XRenderPictureAttributes attrs = {0};
 
 		windowPicture = XRenderCreatePicture(display, window, fmt, 0, &attrs);
@@ -449,24 +438,9 @@ shm_done:
 				shmctl(shminfo.shmid, IPC_RMID, NULL);
 		}
 	}
+	if (!image)
 #endif
-	if (verbose) {
-		fprintf(stderr,
-		        "[%s] %s visual, depth %u, %ubpp, %s colors, %s %s\n",
-		        renderer->name,
-		        (visual->class == StaticGray) ? "StaticGray" :
-		        (visual->class == GrayScale) ? "GrayScale" :
-		        (visual->class == StaticColor) ? "StaticColor" :
-		        (visual->class == PseudoColor) ? "PseudoColor" :
-		        (visual->class == TrueColor) ? "TrueColor" :
-		        (visual->class == DirectColor) ? "DirectColor" :
-		        "Unknown",
-		        depth, bpp,
-		        renderer_config.indexedcolor ? "dynamic" : "static",
-		        image ? "shared-memory" : "plain",
-		        "XImage");
-	}
-	if (!image) {
+	{
 		image = XCreateImage(display, visual, depth,
 		                     depth == 1 ? XYBitmap : ZPixmap, 0, NULL,
 		                     w, h, BitmapPad(display), 0);
@@ -480,18 +454,48 @@ shm_done:
 			exit(EXIT_FAILURE);
 		}
 	}
-	if (renderer_config.scaler_magstep != 1) {
-		// Allocate unscaled image buffer
+
+	if (verbose) {
+		fprintf(stderr,
+		        "[%s] %s visual, depth %d, %dbpp, %s colors, %s %s\n",
+		        renderer->name,
+		        (visual->class == StaticGray) ? "StaticGray" :
+		        (visual->class == GrayScale) ? "GrayScale" :
+		        (visual->class == StaticColor) ? "StaticColor" :
+		        (visual->class == PseudoColor) ? "PseudoColor" :
+		        (visual->class == TrueColor) ? "TrueColor" :
+		        (visual->class == DirectColor) ? "DirectColor" :
+		        "Unknown",
+		        image->depth, image->bits_per_pixel,
+		        renderer_config.indexedcolor ? "dynamic" : "static",
+#ifdef HAVE_SHM
+		        shm_attached ? "shared-memory" :
+#endif
+		        "plain",
+		        "XImage");
+	}
+
+	/* set globals for fbinit/drawimage */
+	rfb = fb = image->data;
+	bytes_per_line = image->bytes_per_line;
+	bpp = image->bits_per_pixel;
+	bpu = image->bitmap_unit;
+	lsb_first = image->bitmap_bit_order == LSBFirst;
+	lsn_first = lsb_first; /* who knows? packed 4bpp is really an obscure case */
+#if BYTE_ORDER == BIG_ENDIAN
+	pix_swab = image->byte_order == LSBFirst;
+#else
+	pix_swab = image->byte_order == MSBFirst;
+#endif
+
+	/* render to a separate unscaled framebuffer when client-side scaling */
+	if (renderer_config.scaler_magstep > 1) {
 		bytes_per_line = 256 * bpp / 8;
 		if (!(rfb = fb = malloc(bytes_per_line * 240))) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
-	} else {
-		// No framebuffer scaling (though we might use XRender to upscale)
-		// This means fb.c and the XImage share the same buffer.
-		bytes_per_line = image->bytes_per_line;
-		rfb = fb = image->data;
+		hqxInit();
 	}
 	InitScreenshotX11();
 	fbinit();
