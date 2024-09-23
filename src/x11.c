@@ -222,9 +222,6 @@ InitDisplayX11(int argc, char **argv)
 	GCValues.background = BlackPixel(display, screen);
 	XChangeGC(display, gc, GCForeground | GCBackground, &GCValues);
 
-	if (renderer_config.scaler_magstep > renderer_config.magstep) {
-		renderer_config.magstep = renderer_config.scaler_magstep;
-	}
 	if ((visual->class & 1) && renderer_config.indexedcolor) {
 		if (XAllocColorCells(display, colormap, 0, 0, 0, colortableX11, 25) == 0) {
 			fprintf(stderr, "%s: [%s] Can't allocate colors!\n",
@@ -261,6 +258,16 @@ InitDisplayX11(int argc, char **argv)
 		}
 	}
 
+	/* magstep determines minimum window size */
+	if (renderer_config.magstep <= renderer_config.scaler_magstep) {
+		renderer_config.magstep = renderer_config.scaler_magstep;
+	} else if (!XRenderSupported()) {
+		fprintf(stderr, "[%s] Enlargement requires XRENDER support\n",
+		        renderer->name);
+		exit(EXIT_FAILURE);
+	}
+
+	/* allocate window (server-side drawable) */
 	Window rootwindow = RootWindow(display, screen);
 	unsigned int border_width = 0;
 	if (renderer_config.inroot) {
@@ -339,16 +346,13 @@ InitDisplayX11(int argc, char **argv)
 	gettimeofday(&time, NULL);
 	renderer_data.basetime = time.tv_sec;
 
+	/* scaler_magstep determines XImage size */
 	unsigned int w = 256 * renderer_config.scaler_magstep;
 	unsigned int h = 240 * renderer_config.scaler_magstep;
-	if (renderer_config.magstep != renderer_config.scaler_magstep) {
-		if (!XRenderSupported()) {
-			fprintf(stderr, "[%s] Scaling requires XRENDER support\n",
-			        renderer->name);
-			exit(EXIT_FAILURE);
-		}
 
+	/* transfer to a separate drawable when server-side scaling */
 #ifdef HAVE_XRENDER
+	if (renderer_config.magstep > renderer_config.scaler_magstep) {
 		scalePixmap = XCreatePixmap(display, window, w, h, depth);
 
 		XRenderPictFormat *fmt = XRenderFindVisualFormat(display, visual);
@@ -366,8 +370,10 @@ InitDisplayX11(int argc, char **argv)
 			}
 		};
 		XRenderSetPictureTransform(display, scalePicture, &transform);
-#endif
 	}
+#endif
+
+	/* allocate XImage (client-side framebuffer) */
 #ifdef HAVE_SHM
 	if (XQueryExtension(display, "MIT-SHM", &shm_major_opcode, &shm_first_event, &shm_first_error)) {
 		image = XShmCreateImage(display, visual, depth,
@@ -754,7 +760,7 @@ RenderImage(XEvent *ev)
 	unsigned int w = image->width, h = image->height;
 
 #ifdef HAVE_XRENDER
-	if (renderer_config.magstep != renderer_config.scaler_magstep) {
+	if (renderer_config.magstep > renderer_config.scaler_magstep) {
 		target = scalePixmap;
 	} else
 #endif
@@ -789,7 +795,7 @@ RenderImage(XEvent *ev)
 	}
 
 #ifdef HAVE_XRENDER
-	if (renderer_config.magstep != renderer_config.scaler_magstep) {
+	if (renderer_config.magstep > renderer_config.scaler_magstep) {
 		w = 256 * renderer_config.magstep;
 		h = 240 * renderer_config.magstep;
 		dx = (window_w - w) / 2;
