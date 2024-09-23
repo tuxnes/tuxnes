@@ -1233,16 +1233,28 @@ main(int argc, char **argv)
 			renderer_config.geometry = optarg;
 			break;
 		case 'E':
-			if (optarg && *optarg)
+			if (optarg && *optarg) {
 				renderer_config.magstep = atoi(optarg);
-			else
+				if (renderer_config.magstep < 1
+				 || renderer_config.magstep > maxsize) {
+					fprintf(stderr, "%s: unsupported enlargement factor\n", optarg);
+					exit(EX_USAGE);
+				}
+			} else {
 				renderer_config.magstep = 2;
+			}
 			break;
 		case 'Q':
-			if (optarg && *optarg)
+			if (optarg && *optarg) {
 				renderer_config.scaler_magstep = atoi(optarg);
-			else
+				if (renderer_config.scaler_magstep < 1
+				 || renderer_config.scaler_magstep > 4) {
+					fprintf(stderr, "%s: unsupported HQX scale factor\n", optarg);
+					exit(EX_USAGE);
+				}
+			} else {
 				renderer_config.scaler_magstep = 2;
+			}
 			break;
 		case 'r':
 			rendname = optarg;
@@ -1283,10 +1295,6 @@ main(int argc, char **argv)
 			exit(EX_USAGE);
 			break;
 		}
-	}
-
-	if (renderer_config.magstep < 1) {
-		renderer_config.magstep = 1;
 	}
 
 	if ((argc - optind) != 1) {

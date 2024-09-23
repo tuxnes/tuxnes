@@ -202,24 +202,6 @@ XRenderSupported(void)
 int
 InitDisplayX11(int argc, char **argv)
 {
-	switch (renderer_config.scaler_magstep) {
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-		break;
-	default:
-		fprintf(stderr,
-			"[%s] Scale factor %d is not valid for HQX\n",
-			renderer->name, renderer_config.scaler_magstep);
-		renderer_config.scaler_magstep = renderer_config.scaler_magstep > 1 ? 2 : 1;
-	}
-	if (renderer_config.magstep > maxsize) {
-		fprintf(stderr,
-		        "[%s] Enlargement factor %d is too large!\n",
-		        renderer->name, renderer_config.magstep);
-		renderer_config.magstep = maxsize;
-	}
 	display = XOpenDisplay(renderer_config.display_id);
 	if (!display) {
 		fprintf(stderr,
