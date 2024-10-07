@@ -958,12 +958,11 @@ void
 UpdateColorsX11(void)
 {
 	/* Set Background color */
-	static unsigned long currentbgcolor;
-	unsigned long oldbgcolor = currentbgcolor;
+	static unsigned char oldbgcolor;
 	if (renderer_config.indexedcolor) {
 		unsigned int palcolor = NES_palette[VRAM[0x3f00] & 0x3f];
 		XColor color;
-		color.pixel = currentbgcolor = colortableX11[24];
+		color.pixel = colortableX11[24];
 		color.flags = DoRed | DoGreen | DoBlue;
 		color.red    = palcolor >> 16 & 0xff;
 		color.green  = palcolor >>  8 & 0xff;
@@ -973,9 +972,9 @@ UpdateColorsX11(void)
 		color.blue  |= color.blue  << 8;
 		XStoreColor(display, colormap, &color);
 	} else /* truecolor */ {
-		currentbgcolor = paletteX11[VRAM[0x3f00] & 0x3f];
-		palette[24] = currentbgcolor;
-		if (oldbgcolor != currentbgcolor) {
+		palette[24] = paletteX11[VRAM[0x3f00] & 0x3f];
+		if (oldbgcolor != VRAM[0x3f00]) {
+			oldbgcolor = VRAM[0x3f00];
 			renderer_data.redrawbackground = 1;
 			renderer_data.needsredraw = 1;
 		}
