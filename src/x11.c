@@ -116,7 +116,7 @@ static XImage   *image = NULL;
 
 static unsigned char    *keystate[32];
 static unsigned long    colortableX11[25];
-static unsigned int     paletteX11[64];
+static unsigned long    paletteX11[64];
 
 #ifdef HAVE_XRENDER
 static Pixmap scalePixmap;
@@ -229,11 +229,15 @@ InitDisplayX11(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 		/* Pre-initialize the colormap to known values */
+		unsigned int palcolor = NES_palette[0];
 		XColor color;
-		color.red   = NES_palette[0] >> 8 & 0xff00;
-		color.green = NES_palette[0]      & 0xff00;
-		color.blue  = NES_palette[0] << 8 & 0xff00;
 		color.flags = DoRed | DoGreen | DoBlue;
+		color.red    = palcolor >> 16 & 0xff;
+		color.green  = palcolor >>  8 & 0xff;
+		color.blue   = palcolor       & 0xff;
+		color.red   |= color.red   << 8;
+		color.green |= color.green << 8;
+		color.blue  |= color.blue  << 8;
 		for (int x = 0; x <= 24; x++) {
 			color.pixel = colortableX11[x];
 			palette[x] = color.pixel;
@@ -243,12 +247,14 @@ InitDisplayX11(int argc, char **argv)
 		renderer_config.indexedcolor = 0;
 		/* convert palette to local color format */
 		for (int x = 0; x < 64; x++) {
+			unsigned int palcolor = NES_palette[x];
 			XColor color;
-			color.pixel = x;
-			color.red   = NES_palette[x] >> 8 & 0xff00;
-			color.green = NES_palette[x]      & 0xff00;
-			color.blue  = NES_palette[x] << 8 & 0xff00;
-			color.flags = DoRed | DoGreen | DoBlue;
+			color.red    = palcolor >> 16 & 0xff;
+			color.green  = palcolor >>  8 & 0xff;
+			color.blue   = palcolor       & 0xff;
+			color.red   |= color.red   << 8;
+			color.green |= color.green << 8;
+			color.blue  |= color.blue  << 8;
 			if (XAllocColor(display, colormap, &color) == 0) {
 				fprintf(stderr, "%s: [%s] Can't allocate colors!\n",
 				        *argv, renderer->name);
@@ -955,15 +961,19 @@ UpdateColorsX11(void)
 	static unsigned long currentbgcolor;
 	unsigned long oldbgcolor = currentbgcolor;
 	if (renderer_config.indexedcolor) {
+		unsigned int palcolor = NES_palette[VRAM[0x3f00] & 0x3f];
 		XColor color;
 		color.pixel = currentbgcolor = colortableX11[24];
-		color.red   = NES_palette[VRAM[0x3f00] & 63] >> 8 & 0xff00;
-		color.green = NES_palette[VRAM[0x3f00] & 63]      & 0xff00;
-		color.blue  = NES_palette[VRAM[0x3f00] & 63] << 8 & 0xff00;
 		color.flags = DoRed | DoGreen | DoBlue;
+		color.red    = palcolor >> 16 & 0xff;
+		color.green  = palcolor >>  8 & 0xff;
+		color.blue   = palcolor       & 0xff;
+		color.red   |= color.red   << 8;
+		color.green |= color.green << 8;
+		color.blue  |= color.blue  << 8;
 		XStoreColor(display, colormap, &color);
 	} else /* truecolor */ {
-		currentbgcolor = paletteX11[VRAM[0x3f00] & 63];
+		currentbgcolor = paletteX11[VRAM[0x3f00] & 0x3f];
 		palette[24] = currentbgcolor;
 		if (oldbgcolor != currentbgcolor) {
 			renderer_data.redrawbackground = 1;
@@ -975,14 +985,20 @@ UpdateColorsX11(void)
 	if (renderer_config.indexedcolor) {
 		for (int x = 0; x < 24; x++) {
 			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
+				unsigned int palcolor = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 0x3f];
 				XColor color;
 				color.pixel = colortableX11[x];
-				color.red   = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] >> 8 & 0xff00;
-				color.green = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63]      & 0xff00;
-				color.blue  = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 63] << 8 & 0xff00;
 				color.flags = DoRed | DoGreen | DoBlue;
+				color.red    = palcolor >> 16 & 0xff;
+				color.green  = palcolor >>  8 & 0xff;
+				color.blue   = palcolor       & 0xff;
+				color.red   |= color.red   << 8;
+				color.green |= color.green << 8;
+				color.blue  |= color.blue  << 8;
 				XStoreColor(display, colormap, &color);
-				/*printf("color %d (%d) = %6x\n", x, colortableX11[x], paletteX11[VRAM[0x3f01+x+(x/3)]&63]); */
+#if 0
+				printf("color %d (%lu) = %06x\n", x, color.pixel, palcolor);
+#endif
 			}
 		}
 		memcpy(palette_cache[0], VRAM + 0x3f00, 32);
@@ -993,7 +1009,7 @@ UpdateColorsX11(void)
 		/* Already done in InitDisplayX11 */
 	} else /* truecolor */ {
 		for (int x = 0; x < 24; x++) {
-			palette[x] = paletteX11[VRAM[0x3f01 + x + (x / 3)] & 63];
+			palette[x] = paletteX11[VRAM[0x3f01 + x + (x / 3)] & 0x3f];
 		}
 	}
 }
