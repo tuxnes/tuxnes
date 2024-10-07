@@ -957,33 +957,27 @@ UpdateDisplayX11(void)
 void
 UpdateColorsX11(void)
 {
-	/* Set Background color */
-	static unsigned char oldbgcolor;
-	if (renderer_config.indexedcolor) {
-		unsigned int palcolor = NES_palette[VRAM[0x3f00] & 0x3f];
-		XColor color;
-		color.pixel = colortableX11[24];
-		color.flags = DoRed | DoGreen | DoBlue;
-		color.red    = palcolor >> 16 & 0xff;
-		color.green  = palcolor >>  8 & 0xff;
-		color.blue   = palcolor       & 0xff;
-		color.red   |= color.red   << 8;
-		color.green |= color.green << 8;
-		color.blue  |= color.blue  << 8;
-		XStoreColor(display, colormap, &color);
-	} else /* truecolor */ {
-		palette[24] = paletteX11[VRAM[0x3f00] & 0x3f];
-		if (oldbgcolor != VRAM[0x3f00]) {
-			oldbgcolor = VRAM[0x3f00];
-			renderer_data.redrawbackground = 1;
-			renderer_data.needsredraw = 1;
-		}
-	}
+	static unsigned char palette_cache[32];
 
-	/* Tile colors */
 	if (renderer_config.indexedcolor) {
+		/* Background color */
+		if (VRAM[0x3f00] != palette_cache[0]) {
+			unsigned int palcolor = NES_palette[VRAM[0x3f00] & 0x3f];
+			XColor color;
+			color.pixel = colortableX11[24];
+			color.flags = DoRed | DoGreen | DoBlue;
+			color.red    = palcolor >> 16 & 0xff;
+			color.green  = palcolor >>  8 & 0xff;
+			color.blue   = palcolor       & 0xff;
+			color.red   |= color.red   << 8;
+			color.green |= color.green << 8;
+			color.blue  |= color.blue  << 8;
+			XStoreColor(display, colormap, &color);
+		}
+
+		/* Tile colors */
 		for (int x = 0; x < 24; x++) {
-			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[0][1 + x + (x / 3)]) {
+			if (VRAM[0x3f01 + x + (x / 3)] != palette_cache[1 + x + (x / 3)]) {
 				unsigned int palcolor = NES_palette[VRAM[0x3f01 + x + (x / 3)] & 0x3f];
 				XColor color;
 				color.pixel = colortableX11[x];
@@ -1000,17 +994,20 @@ UpdateColorsX11(void)
 #endif
 			}
 		}
-		memcpy(palette_cache[0], VRAM + 0x3f00, 32);
-	}
-
-	/* Set palette tables */
-	if (renderer_config.indexedcolor) {
-		/* Already done in InitDisplayX11 */
 	} else /* truecolor */ {
+		if (VRAM[0x3f00] != palette_cache[0]) {
+			renderer_data.redrawbackground = 1;
+			renderer_data.needsredraw = 1;
+		}
+
+		/* Set palette tables */
+		palette[24] = paletteX11[VRAM[0x3f00] & 0x3f];
 		for (int x = 0; x < 24; x++) {
 			palette[x] = paletteX11[VRAM[0x3f01 + x + (x / 3)] & 0x3f];
 		}
 	}
+
+	memcpy(palette_cache, &VRAM[0x3f00], 32);
 }
 
 #endif /* HAVE_X */

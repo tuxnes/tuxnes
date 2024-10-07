@@ -72,8 +72,6 @@ struct RendererData renderer_data = {
 	.redrawall = 1,          /* Redraw all scanlines */
 };
 
-unsigned char   palette_cache[tilecachedepth][32];
-
 int
 InitDisplayAuto(int argc, char **argv)
 {

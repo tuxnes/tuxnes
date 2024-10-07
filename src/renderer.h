@@ -54,7 +54,4 @@ extern struct RendererData {
 
 #define maxsize 4
 
-#define tilecachedepth 25
-extern unsigned char    palette_cache[tilecachedepth][32];
-
 #endif
