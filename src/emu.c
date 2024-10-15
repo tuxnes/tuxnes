@@ -361,7 +361,7 @@ static struct {
 };
 
 static unsigned char *palremap = 0, *paldata = 0;
-unsigned int *NES_palette = 0;
+unsigned int *NES_palette = NULL;
 
 static void (*oldtraphandler)(int);
 
@@ -1191,39 +1191,34 @@ main(int argc, char **argv)
 			sound_config.reverb = 1;
 			break;
 		case 'p':
-			palfile = optarg ? optarg : 0;
-			NES_palette = 0;
+			palfile = optarg;
+			NES_palette = NULL;
 			break;
 		case 'P':
-			if (optarg && *optarg) {
-				unsigned int *partial = 0;
-				int partials = 0;
-
-				palfile = 0;
-				NES_palette = 0;
+			{
+				unsigned int *match = NULL;
+				size_t partials = 0;
 				size_t len = strlen(optarg);
-				for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
+				for (size_t i = 0; i < ARRAY_LEN(palettes); i++) {
 					if (!strcmp(palettes[i].name, optarg)) {
-						NES_palette = palettes[i].data;
+						match = palettes[i].data;
+						partials = 1;
 						break;
 					} else if (!strncmp(palettes[i].name, optarg, len)) {
-						partial = palettes[i].data;
+						match = palettes[i].data;
 						partials++;
 					}
-				if ((partials == 1) && !NES_palette)
-					NES_palette = partial;
-				if (!NES_palette) {
+				}
+				if (partials != 1) {
 					if (partials)
-						fprintf(stderr, "%s: palette name `%s' is ambiguous\n",
-						        *argv, optarg);
+						fprintf(stderr, "%s: palette name `%s' is ambiguous\n", *argv, optarg);
 					else
-						fprintf(stderr, "%s: unrecognized palette name `%s'\n",
-						        *argv, optarg);
+						fprintf(stderr, "%s: unrecognized palette name `%s'\n", *argv, optarg);
 					exit(EX_USAGE);
 				}
+				palfile = NULL;
+				NES_palette = match;
 			}
-			else
-				NES_palette = palettes[0].data;
 			break;
 		case 'V':
 			help_version(0);
