@@ -122,7 +122,7 @@ static const struct {
 static void     help(const char *progname, const char *topic);
 
 #ifdef HAVE_LIBM
-extern unsigned int *ntsc_palette(double hue, double tint);
+extern void ntsc_palette(double hue, double tint, unsigned int outbuf[64]);
 static double hue = 332.0;
 static double tint = 0.5;
 #endif /* HAVE_LIBM */
@@ -362,6 +362,7 @@ static struct {
 
 static unsigned char *palremap = 0, *paldata = 0;
 unsigned int *NES_palette = NULL;
+static unsigned int palette_buf[64];
 
 static void (*oldtraphandler)(int);
 
@@ -942,27 +943,22 @@ loadpal(char *palfile)
 	}
 
 	/* convert the palette */
-	if (!(NES_palette = malloc(64 * sizeof *NES_palette))) {
-		perror("malloc");
-		free(palfile);
-		return;
-	}
 	for (int pen = 0; pen < 64; pen++) {
 		if (pen < pens) {
-			NES_palette[pen] =
-			  (((unsigned long)palette[pen * 3]) << 16) |
-			  (((unsigned long)palette[pen * 3 + 1]) << 8) |
-			  (((unsigned long)palette[pen * 3 + 2]));
+			palette_buf[pen] = palette[pen * 3]     << 16
+			                 | palette[pen * 3 + 1] << 8
+			                 | palette[pen * 3 + 2];
 		} else {
 			if (unisystem)
-				NES_palette[pen] = palettes[ARRAY_LEN(palettes) - 1].data[pen];
+				palette_buf[pen] = palettes[ARRAY_LEN(palettes) - 1].data[pen];
 			else
-				NES_palette[pen] = palettes[0].data[pen];
+				palette_buf[pen] = palettes[0].data[pen];
 		}
 		/* dump the loaded palette to stdout in C format, for adding to palettes[] */
-		/*       printf("0x%6.6x%s", NES_palette[pen], */
+		/*       printf("0x%6.6x%s", palette_buf[pen], */
 		/*              (pen < 63) ? ((pen + 1) % 4) ? ", " : ",\n" : "\n"); */
 	}
+	NES_palette = palette_buf;
 
 	/* clean up */
 	free(palfile);
@@ -1279,7 +1275,9 @@ main(int argc, char **argv)
 					exit(EX_USAGE);
 				}
 			}
-			NES_palette = ntsc_palette(hue, tint);
+			ntsc_palette(hue, tint, palette_buf);
+			palfile = NULL;
+			NES_palette = palette_buf;
 			break;
 #endif
 		case OPTVAL_DISPLAY:

@@ -46,10 +46,8 @@ static const double br[3][4] = {
 	{0.00, 0.24, 0.47, 0.77}
 };
 
-static unsigned int ntsc_palette_data[64];
-
-unsigned int *
-ntsc_palette(double hue, double tint)
+void
+ntsc_palette(double hue, double tint, unsigned int outbuf[64])
 {
 
 /******/
@@ -119,12 +117,11 @@ ntsc_palette(double hue, double tint)
 			if (g < 0) g = 0;
 			if (b < 0) b = 0;
 
-			ntsc_palette_data[(x<<4)|z] = (r << 16) | (g << 8) | b;
+			outbuf[(x<<4)|z] = (r << 16) | (g << 8) | b;
 
 /* The variables R, G, and B now contain our actual RGB values. */
 		}
 	}
-	return ntsc_palette_data;
 }
 
 #endif /* HAVE_LIBM */
