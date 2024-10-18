@@ -26,7 +26,7 @@ extern unsigned short int hscroll[], vscroll[];
 extern unsigned char     linereg[];
 extern unsigned char     spriteram[];
 extern unsigned char     vram[];
-extern unsigned int     *NES_palette;
+extern const unsigned int *NES_palette;
 extern unsigned char    *MAPTABLE[];
 extern unsigned int      hvmirror;
 extern unsigned int      nomirror;

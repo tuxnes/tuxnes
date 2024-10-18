@@ -136,7 +136,7 @@ void    quit(void);
 void    START(void);
 
 /* color palettes */
-static struct {
+static const struct {
 	const char *name, *desc;
 	unsigned int data[64];
 } palettes[] = {
@@ -361,7 +361,7 @@ static struct {
 };
 
 static unsigned char *palremap = 0, *paldata = 0;
-unsigned int *NES_palette = NULL;
+const unsigned int *NES_palette = NULL;
 static unsigned int palette_buf[64];
 
 static void (*oldtraphandler)(int);
@@ -1192,7 +1192,7 @@ main(int argc, char **argv)
 			break;
 		case 'P':
 			{
-				unsigned int *match = NULL;
+				const unsigned int *match = NULL;
 				size_t partials = 0;
 				size_t len = strlen(optarg);
 				for (size_t i = 0; i < ARRAY_LEN(palettes); i++) {
@@ -1616,24 +1616,16 @@ main(int argc, char **argv)
 			}
 	}
 	if (palremap) {
-		unsigned int *new_palette;
+		unsigned int new_palette[64];
 
-		if (!(new_palette = malloc(64 * sizeof *new_palette))) {
-			fprintf(stderr, "Can't remap palette: ");
-			fflush(stderr);
-			perror("malloc");
-		} else {
-			if (verbose)
-				fprintf(stderr, "Remapping palette\n");
-			for (int pen = 0; pen < 64; pen++)
-				new_palette[pen] = (palremap[pen] <= 64)
-				  ? NES_palette[palremap[pen]]
-				  : NES_palette[pen];
-			memcpy(NES_palette,
-			       new_palette,
-			       64 * sizeof *NES_palette);
-			free(new_palette);
-		}
+		if (verbose)
+			fprintf(stderr, "Remapping palette\n");
+		for (int pen = 0; pen < 64; pen++)
+			new_palette[pen] = (palremap[pen] < 64)
+			                 ? NES_palette[palremap[pen]]
+			                 : NES_palette[pen];
+		memcpy(palette_buf, new_palette, sizeof palette_buf);
+		NES_palette = palette_buf;
 	}
 
 	/* (Possibly) convert palette to monochrome */
@@ -1647,8 +1639,9 @@ main(int argc, char **argv)
 			gray = 0.299 * red + 0.587 * green + 0.114 * blue;
 			if (gray > 0xffU)
 				gray = 0xffU;
-			NES_palette[pen] = (gray << 16) | (gray << 8) | gray;
+			palette_buf[pen] = (gray << 16) | (gray << 8) | gray;
 		}
+		NES_palette = palette_buf;
 	}
 
 	/* enter the Game Genie codes */
