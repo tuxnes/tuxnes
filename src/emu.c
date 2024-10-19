@@ -853,8 +853,7 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 
 		if ((count = read(fd, buf, 8)) < 0) {
 			perror(palfile);
-			free(filename_buf);
-			return;
+			goto read_err;
 		}
 		/* handler for iNES-style hexadecimal palette files */
 		if (count == 8
@@ -877,8 +876,7 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 
 				if ((count = read(fd, buf, 8)) < 0) {
 					perror(palfile);
-					free(filename_buf);
-					return;
+					goto read_err;
 				}
 				if (count < 8)
 					break;
@@ -886,8 +884,7 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 					memmove(buf, buf + 1, 7);
 					if ((count = read(fd, buf + 7, 1)) < 0) {
 						perror(palfile);
-						free(filename_buf);
-						return;
+						goto read_err;
 					}
 					if (count < 1)
 						break;
@@ -909,14 +906,20 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 			if (count) memcpy(palette, buf, count);
 			if ((pens = read(fd, palette + count, 192 - count)) < 0) {
 				perror(palfile);
-				free(filename_buf);
-				return;
+				pens = count / 3;
+				goto read_err;
 			}
 			pens += count;
 			pens /= 3;
 		}
+read_err:
 		close(fd);
+		fd = -1;
 	}
+
+	/* clean up */
+	free(filename_buf);
+	palfile = filename_buf = NULL;
 
 	/* convert the palette */
 	for (int pen = 0; pen < 64; pen++) {
@@ -937,9 +940,6 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 #endif
 	}
 	NES_palette = palette_buf;
-
-	/* clean up */
-	free(filename_buf);
 }
 
 /****************************************************************************/
