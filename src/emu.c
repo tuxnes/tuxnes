@@ -786,10 +786,7 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 	int fd = -1;
 
 	/* lowest priority:  default built-in palette */
-	if (unisystem && !palremap)
-		NES_palette = palettes[ARRAY_LEN(palettes) - 1].data;
-	else
-		NES_palette = palettes[0].data;
+	NES_palette = palettes[unisystem ? ARRAY_LEN(palettes) - 1 : 0].data;
 
 	/* 1st priority:  --palfile argument */
 	if (palfile) {
@@ -806,8 +803,10 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 
 	/* 3rd/4th/5th priority:  search for .pal files (skipped if palette is remapped) */
 	if (!palfile) {
-		if (palremap)
+		if (palremap) {
+			NES_palette = palettes[0].data;
 			return;
+		}
 		size_t len = strlen(filename);
 		if (!(filename_buf = malloc(len + 11))) {
 			perror("loadpal: malloc");
@@ -922,24 +921,22 @@ read_err:
 	palfile = filename_buf = NULL;
 
 	/* convert the palette */
-	for (int pen = 0; pen < 64; pen++) {
-		if (pen < pens) {
-			palette_buf[pen] = palette[pen * 3    ] << 16
-			                 | palette[pen * 3 + 1] << 8
-			                 | palette[pen * 3 + 2];
-		} else {
-			if (unisystem)
-				palette_buf[pen] = palettes[ARRAY_LEN(palettes) - 1].data[pen];
-			else
-				palette_buf[pen] = palettes[0].data[pen];
-		}
+	if (pens) {
+		memcpy(palette_buf, NES_palette, sizeof palette_buf);
+		for (int pen = 0; pen < 64; pen++) {
+			if (pen < pens) {
+				palette_buf[pen] = palette[pen * 3    ] << 16
+				                 | palette[pen * 3 + 1] << 8
+				                 | palette[pen * 3 + 2];
+			}
 #if 0
-		/* dump the loaded palette to stdout in C format, for adding to palettes[] */
-		printf("0x%6.6x%s", palette_buf[pen],
-		       (pen < 63) ? ((pen + 1) % 4) ? ", " : ",\n" : "\n");
+			/* dump the loaded palette to stdout in C format, for adding to palettes[] */
+			printf("0x%6.6x%s", palette_buf[pen],
+			       (pen < 63) ? ((pen + 1) % 4) ? ", " : ",\n" : "\n");
 #endif
+		}
+		NES_palette = palette_buf;
 	}
-	NES_palette = palette_buf;
 }
 
 /****************************************************************************/
