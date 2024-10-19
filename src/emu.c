@@ -909,19 +909,21 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 						break;
 				}
 				sscanf(buf, "%x,%x,%x", &r, &g, &b);
-				palette[pens * 3] = r;
+				palette[pens * 3    ] = r;
 				palette[pens * 3 + 1] = g;
 				palette[pens * 3 + 2] = b;
 			}
+
+		/* handler for Nesticle-style raw palette files */
 		} else {
-			/* handler for Nesticle-style raw palette files */
 			if (count) memcpy(palette, buf, count);
-			if ((pens = read(fd, palette + count, 192 - count) / 3) < 0) {
+			if ((pens = read(fd, palette + count, 192 - count)) < 0) {
 				perror(palfile);
 				free(filename_buf);
 				return;
 			}
-			pens += count / 3;
+			pens += count;
+			pens /= 3;
 		}
 		close(fd);
 	}
@@ -929,7 +931,7 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 	/* convert the palette */
 	for (int pen = 0; pen < 64; pen++) {
 		if (pen < pens) {
-			palette_buf[pen] = palette[pen * 3]     << 16
+			palette_buf[pen] = palette[pen * 3    ] << 16
 			                 | palette[pen * 3 + 1] << 8
 			                 | palette[pen * 3 + 2];
 		} else {
