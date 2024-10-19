@@ -782,7 +782,7 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 	/* for the raw palette data */
 	unsigned char palette[192];
 	char *filename_buf = NULL;
-	int pens;
+	int pens = 0;
 	int fd = -1;
 
 	/* lowest priority:  default built-in palette */
@@ -840,78 +840,68 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 		}
 	}
 
+	/* read the raw palette data -- it's ok if it's short */
 	if (verbose) {
 		fprintf(stderr, "Reading palette from %s\n", palfile);
 	}
-	/* read the raw palette data -- it's ok if it's short */
 	if ((fd < 0) && paldata) {
 		memcpy(palette, paldata, 192);
 		pens = 64;
 	} else {
-		char buf[9];
+		char buf[8];
 		ssize_t count;
 
-		if ((count = read(fd, buf, 9)) < 0) {
+		if ((count = read(fd, buf, 8)) < 0) {
 			perror(palfile);
 			free(filename_buf);
 			return;
 		}
 		/* handler for iNES-style hexadecimal palette files */
-		if ((count == 9)
+		if (count == 8
 		 && isxdigit(buf[0])
 		 && isxdigit(buf[1])
-		 && (buf[2] == ',')
+		 && buf[2] == ','
 		 && isxdigit(buf[3])
 		 && isxdigit(buf[4])
-		 && (buf[5] == ',')
+		 && buf[5] == ','
 		 && isxdigit(buf[6])
-		 && isxdigit(buf[7])
-		 && ((buf[8] == '\r')
-		  || (buf[8] == '\n')
-		  || isspace(buf[8]))) {
-			for (pens = 0; pens < 64; pens++) {
+		 && isxdigit(buf[7])) {
+			while (1) {
 				int r, g, b;
-
-				if (pens) {
-					if ((count = read(fd, buf, 9)) < 0) {
-						perror(palfile);
-						free(filename_buf);
-						return;
-					}
-					if (count == 8) {
-						buf[count++] = '\n';
-					}
-					if (count < 9)
-						break;
-					while ((*buf == '\r')
-					    || (*buf == '\n')
-					    || isspace(*buf)) {
-						memmove(buf, buf + 1, 8);
-						if ((count = read(fd, buf + 8, 1)) < 0) {
-							perror(palfile);
-							free(filename_buf);
-							return;
-						}
-					}
-					if (count < 1)
-						break;
-					if (!(isxdigit(buf[0])
-					   && isxdigit(buf[1])
-					   && (buf[2] == ',')
-					   && isxdigit(buf[3])
-					   && isxdigit(buf[4])
-					   && (buf[5] == ',')
-					   && isxdigit(buf[6])
-					   && isxdigit(buf[7])
-					   && ((buf[8] == '\r')
-					    || (buf[8] == '\n')
-					    || isspace(buf[8]))))
-						break;
-				}
 				sscanf(buf, "%x,%x,%x", &r, &g, &b);
 				palette[pens * 3    ] = r;
 				palette[pens * 3 + 1] = g;
 				palette[pens * 3 + 2] = b;
+				if (++pens >= 64)
+					break;
+
+				if ((count = read(fd, buf, 8)) < 0) {
+					perror(palfile);
+					free(filename_buf);
+					return;
+				}
+				if (count < 8)
+					break;
+				while (isspace(*buf)) {
+					memmove(buf, buf + 1, 7);
+					if ((count = read(fd, buf + 7, 1)) < 0) {
+						perror(palfile);
+						free(filename_buf);
+						return;
+					}
+					if (count < 1)
+						break;
+				}
+				if (!(count == 1
+				   && isxdigit(buf[0])
+				   && isxdigit(buf[1])
+				   && buf[2] == ','
+				   && isxdigit(buf[3])
+				   && isxdigit(buf[4])
+				   && buf[5] == ','
+				   && isxdigit(buf[6])
+				   && isxdigit(buf[7])))
+					break;
 			}
 
 		/* handler for Nesticle-style raw palette files */
@@ -940,9 +930,11 @@ loadpal(const char *palfile, const unsigned char *palremap, const unsigned char 
 			else
 				palette_buf[pen] = palettes[0].data[pen];
 		}
+#if 0
 		/* dump the loaded palette to stdout in C format, for adding to palettes[] */
-		/*       printf("0x%6.6x%s", palette_buf[pen], */
-		/*              (pen < 63) ? ((pen + 1) % 4) ? ", " : ",\n" : "\n"); */
+		printf("0x%6.6x%s", palette_buf[pen],
+		       (pen < 63) ? ((pen + 1) % 4) ? ", " : ",\n" : "\n");
+#endif
 	}
 	NES_palette = palette_buf;
 
