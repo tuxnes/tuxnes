@@ -119,17 +119,12 @@ static const struct {
 	  "All help topics",
 	  (void (*)(int))0 }
 };
-static void     help(const char *progname, const char *topic);
 
 #ifdef HAVE_LIBM
 extern void ntsc_palette(double hue, double tint, unsigned int outbuf[64]);
 static double hue = 332.0;
 static double tint = 0.5;
 #endif /* HAVE_LIBM */
-
-static void     loadpal(char *);
-static void     restoresavedgame(void);
-static void     traphandler(int);
 
 extern const char *const MapperName[];
 void    quit(void);
@@ -360,7 +355,6 @@ static const struct {
 	}
 };
 
-static unsigned char *palremap = 0, *paldata = 0;
 const unsigned int *NES_palette = NULL;
 static unsigned int palette_buf[64];
 
@@ -783,79 +777,69 @@ restoresavedgame(void)
 /****************************************************************************/
 
 static void
-loadpal(char *palfile)
+loadpal(const char *palfile, const unsigned char *palremap, const unsigned char *paldata)
 {
 	/* for the raw palette data */
 	unsigned char palette[192];
+	char *filename_buf = NULL;
 	int pens;
 	int fd = -1;
 
+	/* lowest priority:  default built-in palette */
 	if (unisystem && !palremap)
 		NES_palette = palettes[ARRAY_LEN(palettes) - 1].data;
 	else
 		NES_palette = palettes[0].data;
-	if (palfile) {
-		char *buffer;
 
-		size_t len = strlen(palfile) + 1;
-		if (!(buffer = malloc(len))) {
-			perror("loadpal: malloc");
-			return;
-		}
-		memcpy(buffer, palfile, len);
-		palfile = buffer;
-	}
+	/* 1st priority:  --palfile argument */
 	if (palfile) {
 		if ((fd = open(palfile, O_RDONLY)) < 0) {
 			perror(palfile);
-			free(palfile);
-			palfile = 0;
+			palfile = NULL;
 		}
 	}
-	if (paldata && !palfile) {
-		char *buffer;
 
-		size_t len = strlen(filename) + 1;
-		if (!(buffer = malloc(len))) {
-			perror("loadpal: malloc");
-			return;
-		}
-		memcpy(buffer, filename, len);
-		palfile = buffer;
+	/* 2nd priority:  paldata appended to ROM */
+	if (!palfile && paldata) {
+		palfile = filename;
 	}
+
+	/* 3rd/4th/5th priority:  search for .pal files (skipped if palette is remapped) */
 	if (!palfile) {
 		if (palremap)
 			return;
 		size_t len = strlen(filename);
-		if (!(palfile = malloc(len + 11))) {
+		if (!(filename_buf = malloc(len + 11))) {
 			perror("loadpal: malloc");
 			return;
 		}
-		strcpy(palfile, filename);
+		strcpy(filename_buf, filename);
 		/* .NES -> .pal */
 		if ((len > 4)
-		 && (palfile[len - 4] == '.')
-		 && (tolower(palfile[len - 3]) == 'n')
-		 && (tolower(palfile[len - 2]) == 'e')
-		 && (tolower(palfile[len - 1]) == 's'))
-			palfile[len -= 4] = '\0';
-		strcat(palfile + len, ".pal");
+		 && (filename_buf[len - 4] == '.')
+		 && (tolower(filename_buf[len - 3]) == 'n')
+		 && (tolower(filename_buf[len - 2]) == 'e')
+		 && (tolower(filename_buf[len - 1]) == 's'))
+			filename_buf[len -= 4] = '\0';
+		strcat(filename_buf + len, ".pal");
+		palfile = filename_buf;
 		if ((fd = open(palfile, O_RDONLY)) < 0) {
-			if ((fd = open("tuxnes.pal", O_RDONLY)) < 0) {
-				while (len && (palfile[len] != '/'))
+			palfile = "tuxnes.pal";
+			if ((fd = open(palfile, O_RDONLY)) < 0) {
+				while (len && (filename_buf[len] != '/'))
 					len--;
-				palfile[len] = '/';
-				palfile[len + 1] = '\0';
-				strcat(palfile + len, "tuxnes.pal");
+				filename_buf[len] = '/';
+				filename_buf[len + 1] = '\0';
+				strcat(filename_buf + len, "tuxnes.pal");
+				palfile = filename_buf;
 				if ((fd = open(palfile, O_RDONLY)) < 0) {
-					free(palfile);
+					free(filename_buf);
 					return;
 				}
-			} else {
-				strcpy(palfile, "tuxnes.pal");
 			}
 		}
 	}
+
 	if (verbose) {
 		fprintf(stderr, "Reading palette from %s\n", palfile);
 	}
@@ -869,7 +853,7 @@ loadpal(char *palfile)
 
 		if ((count = read(fd, buf, 9)) < 0) {
 			perror(palfile);
-			free(palfile);
+			free(filename_buf);
 			return;
 		}
 		/* handler for iNES-style hexadecimal palette files */
@@ -891,7 +875,7 @@ loadpal(char *palfile)
 				if (pens) {
 					if ((count = read(fd, buf, 9)) < 0) {
 						perror(palfile);
-						free(palfile);
+						free(filename_buf);
 						return;
 					}
 					if (count == 8) {
@@ -905,7 +889,7 @@ loadpal(char *palfile)
 						memmove(buf, buf + 1, 8);
 						if ((count = read(fd, buf + 8, 1)) < 0) {
 							perror(palfile);
-							free(palfile);
+							free(filename_buf);
 							return;
 						}
 					}
@@ -934,7 +918,7 @@ loadpal(char *palfile)
 			if (count) memcpy(palette, buf, count);
 			if ((pens = read(fd, palette + count, 192 - count) / 3) < 0) {
 				perror(palfile);
-				free(palfile);
+				free(filename_buf);
 				return;
 			}
 			pens += count / 3;
@@ -961,7 +945,7 @@ loadpal(char *palfile)
 	NES_palette = palette_buf;
 
 	/* clean up */
-	free(palfile);
+	free(filename_buf);
 }
 
 /****************************************************************************/
@@ -970,7 +954,9 @@ int
 main(int argc, char **argv)
 {
 	int cmirror = 0;
-	char *palfile = NULL; /* palette file */
+	const char *palfile = NULL;
+	const unsigned char *palremap = NULL;
+	const unsigned char *paldata = NULL;
 	int monochrome = 0;
 	char *ggcode = NULL;
 	int mapperoverride = 0;
@@ -1607,13 +1593,14 @@ main(int argc, char **argv)
 	if (SRAM_ENABLED)
 		restoresavedgame();
 	if (!NES_palette)
-		loadpal(palfile);
-	if (verbose) {
-		for (size_t i = 0; i < ARRAY_LEN(palettes); i++)
+		loadpal(palfile, palremap, paldata);
+	if (verbose && NES_palette != palette_buf) {
+		for (size_t i = 0; i < ARRAY_LEN(palettes); i++) {
 			if (NES_palette == palettes[i].data) {
 				fprintf(stderr, "Using built-in palette \"%s\"\n", palettes[i].name);
 				break;
 			}
+		}
 	}
 	if (palremap) {
 		unsigned int new_palette[64];
