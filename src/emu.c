@@ -173,22 +173,22 @@ static const struct {
 	  0xc0ffff, 0x000000, 0x000000, 0x000000 }
 	},
 	{ "chris", "Chris Covell's NES palette",
-	{ 0x808080, 0x003DA6, 0x0012B0, 0x440096,
-	  0xA1005E, 0xC70028, 0xBA0600, 0x8C1700,
-	  0x5C2F00, 0x104500, 0x054A00, 0x00472E,
-	  0x004166, 0x000000, 0x050505, 0x050505,
-	  0xC7C7C7, 0x0077FF, 0x2155FF, 0x8237FA,
-	  0xEB2FB5, 0xFF2950, 0xFF2200, 0xD63200,
-	  0xC46200, 0x358000, 0x058F00, 0x008A55,
-	  0x0099CC, 0x212121, 0x090909, 0x090909,
-	  0xFFFFFF, 0x0FD7FF, 0x69A2FF, 0xD480FF,
-	  0xFF45F3, 0xFF618B, 0xFF8833, 0xFF9C12,
-	  0xFABC20, 0x9FE30E, 0x2BF035, 0x0CF0A4,
-	  0x05FBFF, 0x5E5E5E, 0x0D0D0D, 0x0D0D0D,
-	  0xFFFFFF, 0xA6FCFF, 0xB3ECFF, 0xDAABEB,
-	  0xFFA8F9, 0xFFABB3, 0xFFD2B0, 0xFFEFA6,
-	  0xFFF79C, 0xD7E895, 0xA6EDAF, 0xA2F2DA,
-	  0x99FFFC, 0xDDDDDD, 0x111111, 0x111111 }
+	{ 0X808080, 0X003da6, 0X0012b0, 0X440096,
+	  0Xa1005e, 0Xc70028, 0Xba0600, 0X8c1700,
+	  0X5c2f00, 0X104500, 0X054a00, 0X00472e,
+	  0X004166, 0X000000, 0X050505, 0X050505,
+	  0Xc7c7c7, 0X0077ff, 0X2155ff, 0X8237fa,
+	  0Xeb2fb5, 0Xff2950, 0Xff2200, 0Xd63200,
+	  0Xc46200, 0X358000, 0X058f00, 0X008a55,
+	  0X0099cc, 0X212121, 0X090909, 0X090909,
+	  0Xffffff, 0X0fd7ff, 0X69a2ff, 0Xd480ff,
+	  0Xff45f3, 0Xff618b, 0Xff8833, 0Xff9c12,
+	  0Xfabc20, 0X9fe30e, 0X2bf035, 0X0cf0a4,
+	  0X05fbff, 0X5e5e5e, 0X0d0d0d, 0X0d0d0d,
+	  0Xffffff, 0Xa6fcff, 0Xb3ecff, 0Xdaabeb,
+	  0Xffa8f9, 0Xffabb3, 0Xffd2b0, 0Xffefa6,
+	  0Xfff79c, 0Xd7e895, 0Xa6edaf, 0Xa2f2da,
+	  0X99fffc, 0Xdddddd, 0X111111, 0X111111 }
 	},
 	{ "matt", "Matthew Conte's NES palette",
 	{ 0x808080, 0x0000bb, 0x3700bf, 0x8400a6,
@@ -923,17 +923,10 @@ read_err:
 	/* convert the palette */
 	if (pens) {
 		memcpy(palette_buf, NES_palette, sizeof palette_buf);
-		for (int pen = 0; pen < 64; pen++) {
-			if (pen < pens) {
-				palette_buf[pen] = palette[pen * 3    ] << 16
-				                 | palette[pen * 3 + 1] << 8
-				                 | palette[pen * 3 + 2];
-			}
-#if 0
-			/* dump the loaded palette to stdout in C format, for adding to palettes[] */
-			printf("0x%6.6x%s", palette_buf[pen],
-			       (pen < 63) ? ((pen + 1) % 4) ? ", " : ",\n" : "\n");
-#endif
+		for (int pen = 0; pen < pens; pen++) {
+			palette_buf[pen] = palette[pen * 3    ] << 16
+			                 | palette[pen * 3 + 1] << 8
+			                 | palette[pen * 3 + 2];
 		}
 		NES_palette = palette_buf;
 	}
@@ -1585,13 +1578,22 @@ main(int argc, char **argv)
 		restoresavedgame();
 	if (!NES_palette)
 		loadpal(palfile, palremap, paldata);
-	if (verbose && NES_palette != palette_buf) {
-		for (size_t i = 0; i < ARRAY_LEN(palettes); i++) {
-			if (NES_palette == palettes[i].data) {
-				fprintf(stderr, "Using built-in palette \"%s\"\n", palettes[i].name);
-				break;
+	if (NES_palette != palette_buf) {
+		if (verbose) {
+			for (size_t i = 0; i < ARRAY_LEN(palettes); i++) {
+				if (NES_palette == palettes[i].data) {
+					fprintf(stderr, "Using built-in palette \"%s\"\n", palettes[i].name);
+					break;
+				}
 			}
 		}
+#if 0
+	} else {
+		for (size_t i = 0; i < 64; i++) {
+			/* dump the loaded palette to stdout in C format, for adding to palettes[] */
+			printf("0x%6.6x%s", palette_buf[i], ((i + 1) % 4) ? ", " : ",\n");
+		}
+#endif
 	}
 	if (palremap) {
 		unsigned int new_palette[64];
