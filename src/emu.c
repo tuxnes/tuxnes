@@ -1227,8 +1227,6 @@ main(int argc, char **argv)
 				double foo = strtod(optarg, &p);
 				if (optarg != p) {
 					hue = foo;
-					while (hue < 0.0) hue += 360.0;
-					while (hue >= 360.0) hue -= 360.0;
 				}
 				if (*p == ',') {
 					optarg = p+1;
@@ -1611,15 +1609,12 @@ main(int argc, char **argv)
 	/* (Possibly) convert palette to monochrome */
 	if (monochrome) {
 		for (int pen = 0; pen < 64; pen++) {
-			unsigned long red, blue, green, gray;
-
-			red   = NES_palette[pen] >> 16 & 0xff;
-			green = NES_palette[pen] >>  8 & 0xff;
-			blue  = NES_palette[pen]       & 0xff;
-			gray = 0.299 * red + 0.587 * green + 0.114 * blue;
-			if (gray > 0xffU)
-				gray = 0xffU;
-			palette_buf[pen] = (gray << 16) | (gray << 8) | gray;
+			unsigned int r = NES_palette[pen] >> 16 & 0xff;
+			unsigned int g = NES_palette[pen] >>  8 & 0xff;
+			unsigned int b = NES_palette[pen]       & 0xff;
+			unsigned int y = 0.299 * r + 0.587 * g + 0.114 * b;
+			if (y > 0xffU) y = 0xffU;
+			palette_buf[pen] = (y << 16) | (y << 8) | y;
 		}
 		NES_palette = palette_buf;
 	}
