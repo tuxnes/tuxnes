@@ -124,10 +124,10 @@ input(int addr)
 	if (addr == 0x2007) {
 		INRET = vram_read;
 		VRAMPTR &= 0x3fff;
-		if (osmirror && VRAMPTR >= 0x2000 && VRAMPTR <= 0x2FFF)
+		if (VRAMPTR >= 0x3f00)
+			vram_read = VRAM[VRAMPTR & ((VRAMPTR & 0x3) ? 0x3f1f : 0x3f0f)];
+		else if (osmirror && VRAMPTR >= 0x2000 && VRAMPTR < 0x3000)
 			vram_read = VRAM[VRAMPTR & 0x23FF];     /* one screen */
-		else if (VRAMPTR > 0x3f00)
-			vram_read = VRAM[VRAMPTR & 0x3f1f];
 		else if (!nomirror && hvmirror && VRAMPTR >= 0x2400 && VRAMPTR < 0x2c00)
 			vram_read = VRAM[VRAMPTR - 0x400];
 		else
@@ -332,14 +332,11 @@ output(int addr, int val)
 		/* For debugging */
 		/*if (CLOCK < VBL && (RAM[0x2001] & 8)) printf("vram write during refresh! "); */
 		/*printf("VRAM: %4x=%2x (+%d) scan %d\n", VRAMPTR, val, 1 << (((*(unsigned char *)REG1 & 4) >> 2) * 5), CLOCK); */
-		if ((VRAMPTR & 0x3f0f) == 0x3f00)
-			VRAM[0x3f00] =
-			VRAM[0x3f10] = (unsigned char)val;      /* Background color is mirrored between palettes */
-		else if ((VRAMPTR & 0x3f00) == 0x3f00) {
+		if (VRAMPTR >= 0x3f00) {
 			/* Write to color palette */
 
 			/* FIXME: when CLOCK<VBL we should switch into static-color mode */
-			VRAM[VRAMPTR & 0x3f1f] = (unsigned char)val;
+			VRAM[VRAMPTR & ((VRAMPTR & 0x3) ? 0x3f1f : 0x3f0f)] = (unsigned char)val;
 
 			/* FIXME - This might flicker on palettized displays; see
 			 * above for suggested fix, or use the "--static-color"
