@@ -843,7 +843,6 @@ UpdateDisplayX11(void)
 	if (!nodisplay) {
 		drawimage(PBL);
 		if (!frameskip) {
-			UpdateColorsX11();
 			RenderImage(&ev);
 			renderer_data.redrawall = renderer_data.needsredraw = 0;
 		}
