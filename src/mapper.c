@@ -26,7 +26,6 @@ extern unsigned int      VROM_PAGES;
 extern unsigned int      ROM_MASK;
 extern unsigned int      VROM_MASK;
 extern unsigned int      VROM_MASK_1k;
-extern unsigned int      mapmirror;
 extern unsigned int      irqflag;
 
 extern void (*drawimage)(int);
@@ -92,6 +91,8 @@ void mmc2_4_latchspr(int);
 
 /* ROM mapper table (pointers) */
 unsigned char *MAPTABLE[17];
+
+unsigned int mapmirror;
 
 static int prgmask;
 static int chrmask;

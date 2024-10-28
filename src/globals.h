@@ -28,6 +28,7 @@ extern unsigned char     spriteram[];
 extern unsigned char     vram[];
 extern const unsigned int *NES_palette;
 extern unsigned char    *MAPTABLE[];
+extern unsigned int      mapmirror;
 extern unsigned int      hvmirror;
 extern unsigned int      nomirror;
 extern unsigned int      osmirror;

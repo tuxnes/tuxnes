@@ -59,7 +59,6 @@ int     disassemble = 0;
 int     dolink = 0;
 unsigned int    MAPPERNUMBER = 0;
 int     irqflag = 0;
-int     mapmirror = 0;
 int     ignorebadinstr = 0;
 int     unisystem = 0;
 int     verbose = 0;
@@ -1489,7 +1488,6 @@ main(int argc, char **argv)
 		VROM_PAGES = 2;
 		VROM_BASE = ROM + 32768;
 		nomirror = 1;
-		mapmirror = 0;
 	} else {
 		fprintf(stderr, "Unrecognized ROM file format\n");
 		exit(EXIT_FAILURE);
@@ -1541,35 +1539,34 @@ main(int argc, char **argv)
 
 	MapperInit[MAPPERNUMBER]();
 
-	if (cmirror == 1 && mapmirror == 0) {
-		if (verbose && !hvmirror)
-			fprintf(stderr, "Overriding default vertical mirroring.\n");
-		hvmirror = 1;
-	}
-	if (cmirror == 2 && mapmirror == 0) {
-		if (verbose && hvmirror)
-			fprintf(stderr, "Overriding default horizontal mirroring.\n");
-		hvmirror = 0;
-	}
-	if (cmirror == 3 && mapmirror == 0) {
-		if (verbose && !nomirror && !osmirror)
-			fprintf(stderr, "Overriding default mirroring.\n");
-		osmirror = 1;
-	}
-	if (cmirror == 4 && mapmirror == 0) {
-		if (verbose && !nomirror)
-			fprintf(stderr, "Overriding default mirroring.\n");
-		nomirror = 1;
-	}
-	if (verbose && mapmirror == 0) {
-		if (nomirror)
-			fprintf(stderr, "Using no mirroring.\n");
-		else if (osmirror)
-			fprintf(stderr, "Using one-screen mirroring.\n");
-		else if (hvmirror)
-			fprintf(stderr, "Using horizontal mirroring\n");
-		else
-			fprintf(stderr, "Using vertical mirroring\n");
+	if (!mapmirror) {
+		if (cmirror == 1) {
+			if (verbose && !hvmirror)
+				fprintf(stderr, "Overriding default vertical mirroring.\n");
+			hvmirror = 1;
+		} else if (cmirror == 2) {
+			if (verbose && hvmirror)
+				fprintf(stderr, "Overriding default horizontal mirroring.\n");
+			hvmirror = 0;
+		} else if (cmirror == 3) {
+			if (verbose && !nomirror && !osmirror)
+				fprintf(stderr, "Overriding default mirroring.\n");
+			osmirror = 1;
+		} else if (cmirror == 4) {
+			if (verbose && !nomirror)
+				fprintf(stderr, "Overriding default mirroring.\n");
+			nomirror = 1;
+		}
+		if (verbose) {
+			if (nomirror)
+				fprintf(stderr, "Using no mirroring.\n");
+			else if (osmirror)
+				fprintf(stderr, "Using one-screen mirroring.\n");
+			else if (hvmirror)
+				fprintf(stderr, "Using horizontal mirroring\n");
+			else
+				fprintf(stderr, "Using vertical mirroring\n");
+		}
 	}
 
 	if (SRAM_ENABLED)
