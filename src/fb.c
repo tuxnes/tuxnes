@@ -16,7 +16,6 @@
 #include <string.h>
 
 #include "globals.h"
-#include "mapper.h"
 #include "renderer.h"
 
 /* globals */

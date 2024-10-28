@@ -23,9 +23,9 @@
 #include <unistd.h>
 
 #define ALLOC_SIZE 0x48d801     /* approximately 4.69MB */
-#define TBL_BASE ((unsigned char *)0x10000000)
-#define TBL_BASE2 ((unsigned char *)0x20000000)
 
+static unsigned char *TBL_BASE;
+static unsigned char *TBL_BASE2;
 static unsigned char srcseq[256];      /* source (6502) code sequence */
 static unsigned char srcmask[256];     /* source mask */
 static unsigned char objseq[256];      /* object (native) code sequence */
@@ -53,17 +53,19 @@ main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	lseek(fd, 0x1000000, SEEK_SET);
 	ftruncate(fd, 0x1000000);
-	if (mmap(TBL_BASE, ALLOC_SIZE,
+	TBL_BASE = mmap((void *)0x10000000, ALLOC_SIZE,
 	         PROT_READ | PROT_WRITE,
 	         MAP_FIXED | MAP_SHARED,
-	         fd, 0) == MAP_FAILED) {
+	         fd, 0);
+	if (TBL_BASE == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	if (mmap(TBL_BASE2, ALLOC_SIZE,
+	TBL_BASE2 = mmap((void *)0x20000000, ALLOC_SIZE,
 	         PROT_READ | PROT_WRITE,
 	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
-	         -1, 0) == MAP_FAILED) {
+	         -1, 0);
+	if (TBL_BASE2 == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}

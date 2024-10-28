@@ -9,8 +9,8 @@
 #include "config.h"
 #endif
 
+#include "globals.h"
 #include "loader.h"
-#include "mapper.h"
 
 #ifdef HAVE_LIBZ
 #include <zlib.h>

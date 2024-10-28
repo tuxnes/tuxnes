@@ -31,7 +31,6 @@
 #include "globals.h"
 #include "joystick.h"
 #include "loader.h"
-#include "mapper.h"
 #include "renderer.h"
 #include "sound.h"
 
@@ -41,6 +40,11 @@
 #define DSP "/dev/dsp"
 
 #define ARRAY_LEN(x) (sizeof (x) / sizeof *(x))
+
+unsigned char  *RAM;
+unsigned char  *ROM;
+unsigned char  *CODE_BASE;
+unsigned int   *INT_MAP;
 
 unsigned char  *ROM_BASE;
 unsigned char  *VROM_BASE;
@@ -406,12 +410,12 @@ quit(void)
 	free(basefilename);
 
 	/* Save ram */
-	for (int x = 0; ((long long *)(RAM + 0x6000))[x] == 0; x++)
+	for (int x = 0; ((long long *)NVRAM)[x] == 0; x++)
 		if (x >= 1023)
 			exit(EXIT_SUCCESS);      /* Nothing to save */
 	int fd = open(savefile, O_CREAT | O_RDWR, 0666);
 	if (fd > 0) {
-		write(fd, RAM + 0x6000, 8192);
+		write(fd, NVRAM, 8192);
 		close(fd);
 		exit(EXIT_SUCCESS);
 	}
@@ -747,7 +751,7 @@ restoresavedgame(void)
 		strcat(savefile, ".sav");
 	}
 	if ((fd = open(savefile, O_RDWR)) >= 0) {
-		read(fd, RAM + 0x6000, 8192);
+		read(fd, NVRAM, 8192);
 		close(fd);
 	} else {
 		/* In this special case, there is a ~/.tuxnes directory but no save
@@ -757,7 +761,7 @@ restoresavedgame(void)
 		buffer[1019] = 0;
 		strcat(buffer, ".sav");
 		if ((fd = open(buffer, O_RDWR)) >= 0) {
-			read(fd, RAM + 0x6000, 8192);
+			read(fd, NVRAM, 8192);
 			close(fd);
 		} else {
 			/* Finally, if no save file is found either place, look for a
@@ -767,7 +771,7 @@ restoresavedgame(void)
 			buffer[strlen(buffer) - 4] = 0;
 			strcat(buffer, ".sav");
 			fd = open(buffer, O_RDWR);
-			read(fd, RAM + 0x6000, 8192);
+			read(fd, NVRAM, 8192);
 			close(fd);
 		}
 	}
@@ -1336,31 +1340,35 @@ main(int argc, char **argv)
 	}
 
 	/* Allocate memory */
-	if (mmap(ROM, 0x300000,
+	ROM = mmap((void *)_ROM, 0x300000,
 	         PROT_READ | PROT_WRITE,
 	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
-	         -1, 0) == MAP_FAILED) {
+	         -1, 0);
+	if (ROM == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	if (mmap(RAM, 0x8000,
+	RAM = mmap((void *)_RAM, 0x8000,
 	         PROT_READ | PROT_WRITE,
 	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
-	         -1, 0) == MAP_FAILED) {
+	         -1, 0);
+	if (RAM == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	if (mmap(CODE_BASE, 0x800000,
+	CODE_BASE = mmap((void *)_CODE_BASE, 0x800000,
 	         PROT_READ | PROT_WRITE | PROT_EXEC,
 	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
-	         -1, 0) == MAP_FAILED) {
+	         -1, 0);
+	if (CODE_BASE == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	if (mmap(INT_MAP, 0x400000,
+	INT_MAP = mmap((void *)_INT_MAP, 0x400000,
 	         PROT_READ | PROT_WRITE,
 	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
-	         -1, 0) == MAP_FAILED) {
+	         -1, 0);
+	if (INT_MAP == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}

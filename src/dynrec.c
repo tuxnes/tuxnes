@@ -13,12 +13,11 @@
 #endif
 
 #include <stdio.h>
-#include "mapper.h"
 #include "globals.h"
 
 extern const unsigned int TRANS_TBL[];
 
-static unsigned char *next_code_alloc = CODE_BASE;
+static unsigned char *next_code_alloc = (unsigned char *)_CODE_BASE;
 
 /* Some declarataions for the asm code */
 unsigned int VFLAG;             /* Store overflow flag */

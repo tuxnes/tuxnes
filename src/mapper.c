@@ -17,7 +17,6 @@
 
 #include "consts.h"
 #include "globals.h"
-#include "mapper.h"
 
 /* some globals */
 extern unsigned char    *VROM_BASE;

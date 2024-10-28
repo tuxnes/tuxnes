@@ -20,7 +20,6 @@
 #include "consts.h"
 #include "globals.h"
 #include "joystick.h"
-#include "mapper.h"
 #include "renderer.h"
 
 #ifdef HAVE_X

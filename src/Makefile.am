@@ -21,7 +21,7 @@ tuxnes_SOURCES = \
 	controller.c controller.h \
 	joystick.c joystick.h \
 	loader.c loader.h \
-	mapper.c mapper.h \
+	mapper.c \
 	ntsc_pal.c \
 	sound.c sound.h \
 	renderer.c renderer.h \

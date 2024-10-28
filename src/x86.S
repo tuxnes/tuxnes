@@ -7,7 +7,22 @@
  */
 
 #include "consts.h"
-#include "mapper.h"
+
+#define _ZPMEM (_RAM+0x0000)
+#define _STACK (_RAM+0x0100)    /* Stack at 0100 */
+#define _REG1  (_RAM+0x2000)    /* ioregs mapped to 2000 in 6502 memory */
+#define _REG2  (_RAM+0x4000)    /* ioregs mapped to 4000 in 6502 memory */
+#define _NVRAM (_RAM+0x6000)    /* Battery RAM (mapped to 6000 in 6502 address space) */
+
+#define _VFLAG    VFLAG         /* Store overflow flag */
+#define _FLAGS    FLAGS         /* Store 6502 process status reg */
+#define _STACKPTR STACKPTR      /* Store 6502 stack pointer */
+#define _PCR      PCR           /* Store 6502 program counter */
+#define _XPC      XPC           /* Translated program counter */
+#define _INRET    INRET         /* Input data return value */
+#define _CTNI     CTNI          /* Cycles to next interrupt */
+#define _DMOD     DMOD          /* Dest addr to modify */
+#define _LASTBANK LASTBANK      /* Last memory page code executed in */
 
 .section .note.GNU-stack,"",@progbits
 

@@ -132,7 +132,6 @@
 
 #include "consts.h"
 #include "globals.h"
-#include "mapper.h"
 #include "sound.h"
 
 /* local functions */

@@ -63,6 +63,18 @@ extern void     *XPC;               /* Translated program counter */
 extern signed int       INRET;        /* Input data return value */
 extern signed int       CTNI;         /* Cycles to next interrupt */
 
+extern unsigned char *RAM;
+extern unsigned char *ROM;
+extern unsigned char *CODE_BASE;
+extern unsigned int  *INT_MAP;
+
+#define ZPMEM     (RAM+0x0000)      /* Zero page */
+#define STACK     (RAM+0x0100)      /* stack page */
+#define REG1      (RAM+0x2000)
+#define REG2      (RAM+0x4000)
+#define NVRAM     (RAM+0x6000)      /* Battery RAM */
+#define VRAM      vram              /* Video memory */
+
 /* configuration variables */
 struct configvars {
 	char *tuxnesdir;  /* the home directory */

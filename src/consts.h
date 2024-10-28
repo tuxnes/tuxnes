@@ -18,4 +18,9 @@
 #define PBL     81840   /* PPU cycles per frame (not counting vblank) */
 #define PPF     89342   /* PPU cycles per frame */
 
+#define _RAM       0x10000000   /* NES internal 2k RAM */
+#define _ROM       0x10010000   /* ROM Image */
+#define _CODE_BASE 0x12000000   /* translated code */
+#define _INT_MAP   0x13000000   /* translation address map */
+
 #endif

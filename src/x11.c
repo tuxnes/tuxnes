@@ -35,7 +35,6 @@
 #include "controller.h"
 #include "globals.h"
 #include "joystick.h"
-#include "mapper.h"
 #include "renderer.h"
 #include "screenshot.h"
 
