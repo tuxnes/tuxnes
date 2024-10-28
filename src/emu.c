@@ -1400,9 +1400,10 @@ main(int argc, char **argv)
 	MAPTABLE[6] = MAPTABLE[7] = RAM;      /* Save RAM */
 	MAPTABLE[3] = RAM + 0x2000;
 	MAPTABLE[5] = RAM;            /* 3xxx and 5xxx really shouldn't be mapped to anything, but they're mapped to some unused ram just to prevent pagefaults by weird code that tries to access these areas. */
+	ROM_BASE = ROM;
 	int SRAM_ENABLED = 1;
 	if (!strncmp("NES\x1a", (char *)ROM, 4)) {  /* .NES */
-		ROM_BASE = ROM + 16;      /* 16 bytes for .nes header */
+		ROM_BASE += 16;       /* 16 bytes for .nes header */
 
 		/* check for battery-backed SRAM */
 		if (!(ROM[6] & 2))
@@ -1451,17 +1452,12 @@ main(int argc, char **argv)
 			unisystem = 1;
 		}
 
-		VROM_BASE = ROM_BASE + ROM[4] * 16384;
-		if (ROM[5])
-			memcpy(VRAM, VROM_BASE, 8192);
+		/* calculate used space in image */
 		ROM_PAGES = ROM[4];
 		VROM_PAGES = ROM[5];
-
-		/* calculate used space in image */
-		int used = 16                /* header size */
-		  + ((ROM[6] & 4) ? 512 : 0) /* trainer size */
-		  + 16384 * ROM_PAGES        /* PRG-ROM pages */
-		  + 8192 * VROM_PAGES;       /* CHR-ROM pages */
+		int used = (int)(ROM_BASE - ROM)    /* header + trainer size */
+		         + 16384 * ROM_PAGES        /* PRG-ROM pages */
+		         + 8192 * VROM_PAGES;       /* CHR-ROM pages */
 
 		/* handle palette remapping/redefinition tables */
 		if (size == (used + 64)) {
@@ -1481,12 +1477,9 @@ main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	} else if (size == 40960) {
 		/* No header, assume raw image */
-		ROM_BASE = ROM;
 		MAPPERNUMBER = 0;
-		memcpy(VRAM, ROM + 32768, 8192);
 		ROM_PAGES = 2;
 		VROM_PAGES = 2;
-		VROM_BASE = ROM + 32768;
 		nomirror = 1;
 	} else {
 		fprintf(stderr, "Unrecognized ROM file format\n");
@@ -1518,6 +1511,10 @@ main(int argc, char **argv)
 
 	/* VROM mask for 1k-sized pages */
 	VROM_MASK_1k = (VROM_MASK << 3) | 7;
+
+	VROM_BASE = ROM_BASE + ROM_PAGES * 16384;
+	if (VROM_PAGES)
+		memcpy(VRAM, VROM_BASE, 8192);
 
 	MapperInit[MAPPERNUMBER]();
 
