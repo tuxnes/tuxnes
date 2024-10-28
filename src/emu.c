@@ -1505,34 +1505,16 @@ main(int argc, char **argv)
 	}
 
 	/* How many ROM address bits are used */
-	if (ROM_PAGES <= 2)
-		ROM_MASK = 1;
-	else if (ROM_PAGES <= 4)
-		ROM_MASK = 3;
-	else if (ROM_PAGES <= 8)
-		ROM_MASK = 7;
-	else if (ROM_PAGES <= 16)
-		ROM_MASK = 15;
-	else if (ROM_PAGES <= 32)
-		ROM_MASK = 31;
-	else
-		ROM_MASK = 63;
+	ROM_MASK = 2;
+	while (ROM_MASK < ROM_PAGES)
+		ROM_MASK <<= 1;
+	ROM_MASK -= 1;
 
 	/* How many VROM address bits are used */
-	if (VROM_PAGES <= 2)
-		VROM_MASK = 1;
-	else if (VROM_PAGES <= 4)
-		VROM_MASK = 3;
-	else if (VROM_PAGES <= 8)
-		VROM_MASK = 7;
-	else if (VROM_PAGES <= 16)
-		VROM_MASK = 15;
-	else if (VROM_PAGES <= 32)
-		VROM_MASK = 31;
-	else if (VROM_PAGES <= 64)
-		VROM_MASK = 63;
-	else
-		VROM_MASK = 127;
+	VROM_MASK = 2;
+	while (VROM_MASK < VROM_PAGES)
+		VROM_MASK <<= 1;
+	VROM_MASK -= 1;
 
 	/* VROM mask for 1k-sized pages */
 	VROM_MASK_1k = (VROM_MASK << 3) | 7;
