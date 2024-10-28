@@ -46,7 +46,8 @@ unsigned char   hscrollreg, vscrollreg;
 static int last_clock; /* For vblank bit */
 static int vbl = 0;
 static int hvscroll = 0;
-static int vramlatch = 0;
+static unsigned int vramlatch = 0;
+static unsigned int VRAMPTR; /* address to read/write video memory */
 static int hscrollval, vscrollval;
 static int sprite0hit;
 
@@ -133,8 +134,7 @@ input(int addr)
 		else
 			vram_read = VRAM[VRAMPTR];
 		VRAMPTR += 1 << (((*(unsigned char *)REG1 & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
-		if (VRAMPTR > 0x3FFF)
-			VRAMPTR &= 0x3fff;
+		VRAMPTR &= 0x3fff;
 		/*printf("VRAM Read: %4x=%2x (scan %d)\n", VRAMPTR, INRET, CLOCK); */
 
 		/*
@@ -369,10 +369,7 @@ output(int addr, int val)
 			VRAM[VRAMPTR] = (unsigned char)val;
 
 		VRAMPTR += 1 << (((*(unsigned char *)REG1 & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
-		if (VRAMPTR > 0x3FFF) {
-			/* printf("help - vramptr >0x3fff!\n"); exit(EXIT_FAILURE); */
-			VRAMPTR &= 0x3fff;
-		}
+		VRAMPTR &= 0x3fff;
 	}
 
 	/* Write to pAPU registers */

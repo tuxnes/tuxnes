@@ -25,7 +25,6 @@
 #define _INRET    INRET         /* Input data return value */
 #define _CTNI     CTNI          /* Cycles to next interrupt */
 #define _SCANPOS  SCANPOS       /* Current scanline position */
-#define _VRAMPTR  VRAMPTR       /* address to read/write video memory */
 #define _DMOD     DMOD          /* Dest addr to modify */
 #define _LASTBANK LASTBANK      /* Last memory page code executed in */
 

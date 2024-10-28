@@ -28,7 +28,6 @@ unsigned int PCR;               /* Store 6502 program counter */
 void *XPC;                      /* Translated program counter */
 signed int INRET;               /* Input data return value */
 signed int CTNI;                /* Cycles to next interrupt */
-unsigned int VRAMPTR;           /* address to read/write video memory */
 unsigned int DMOD;              /* Dest addr to modify */
 unsigned int LASTBANK;          /* Last memory page code executed in */
 

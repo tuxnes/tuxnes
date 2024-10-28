@@ -61,7 +61,6 @@ extern unsigned int     STACKPTR;   /* Store 6502 stack pointer */
 extern void     *XPC;               /* Translated program counter */
 extern signed int       INRET;        /* Input data return value */
 extern signed int       CTNI;         /* Cycles to next interrupt */
-extern unsigned int     VRAMPTR;    /* address to read/write video memory */
 
 /* configuration variables */
 struct configvars {
