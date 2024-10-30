@@ -22,27 +22,27 @@
 #include <string.h>
 #include <unistd.h>
 
-#define ALLOC_SIZE 0x48d800     /* approximately 4.69MB */
+#define BLOCK_SIZE (256 * sizeof (int *))
+#define TREE_SIZE (4662 * BLOCK_SIZE)
+#define DATA_SIZE (9624)
 
-static unsigned char *TBL_BASE;
-static unsigned char *TBL_BASE2;
+static unsigned char *tree;
+static unsigned char *data, *datap;
 static unsigned char srcseq[256];      /* source (6502) code sequence */
 static unsigned char srcmask[256];     /* source mask */
 static unsigned char objseq[256];      /* object (native) code sequence */
 static unsigned char objmod[256];      /* object code modifiers/relocators */
-static int blocksalloc = 1;            /* next block of memory to allocate following TBL_BASE */
+static int blocksalloc = 1;            /* next block of memory to allocate following tree */
 /* source data flag, and-mask flag, low-nybble flag, full-byte flag,
    source length flag, dest macro flag, source byte number, dest byte number,
    current input ptr, line number, current decoded byte, obj mod char,
    obj mod offset, obj mod len, source seq len, dest seq len: */
 static int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 0,
            cip = 0, cln = 0, cdb = 0, omc = 0, omo = 0, oml = 0, ssl = 0, dsl = 0;
-static unsigned char *datap;
 
 #define align8(x) (((unsigned int)(x) + 7) & 0xfffffff8)
 
 static int      do_tree(int, int *);
-static void     memory_error(void);
 
 int
 main(int argc, char *argv[])
@@ -55,25 +55,25 @@ main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	lseek(fd, 0x1000000, SEEK_SET);
 	ftruncate(fd, 0x1000000);
-	TBL_BASE = mmap((void *)0x10000000, ALLOC_SIZE,
-	         PROT_READ | PROT_WRITE,
-	         MAP_FIXED | MAP_SHARED,
-	         fd, 0);
-	if (TBL_BASE == MAP_FAILED) {
+	tree = mmap((void *)0x10000000, TREE_SIZE,
+	            PROT_READ | PROT_WRITE,
+	            MAP_FIXED | MAP_SHARED,
+	            fd, 0);
+	if (tree == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	TBL_BASE2 = mmap((void *)0x20000000, ALLOC_SIZE,
-	         PROT_READ | PROT_WRITE,
-	         MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
-	         -1, 0);
-	if (TBL_BASE2 == MAP_FAILED) {
+	data = mmap((void *)0x20000000, DATA_SIZE,
+	            PROT_READ | PROT_WRITE,
+	            MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+	            -1, 0);
+	if (data == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	memset(TBL_BASE, 0, 1024);
-	datap = TBL_BASE2;
-	while (fgets(input, 1024, stdin)) {
+	memset(tree, 0, BLOCK_SIZE);
+	datap = data;
+	while (fgets(input, sizeof input, stdin)) {
 		cln++;
 		for (cip = 0; (input[cip] != 0) && (input[cip] != '#') && (input[cip] != 10); cip++) {
 			char i = input[cip];
@@ -198,10 +198,12 @@ main(int argc, char *argv[])
 					*/
 					sbn = 0;
 					dbn = 0;
-					do_tree(sbn, (int *)TBL_BASE);
+					do_tree(sbn, (int *)tree);
 
-					if (align8((datap - TBL_BASE2) + dsl + oml + 3) > ALLOC_SIZE)
-						memory_error();
+					if (align8((datap - data) + dsl + oml + 3) > DATA_SIZE) {
+						printf("%s:%d: Buffer memory exceeded, increase %s and recompile\n", __FILE__, __LINE__, "DATA_SIZE");
+						exit(EXIT_FAILURE);
+					}
 					*datap++ = ssl;
 					*datap++ = dsl;
 					for (int x = 0; x < dsl; x++)
@@ -223,18 +225,18 @@ main(int argc, char *argv[])
 		}
 	}
 	/* relocate pointers */
-	for (int *ptr = (int *)TBL_BASE, x = blocksalloc * 256; x--; ptr++) {
+	for (int *ptr = (int *)tree, x = blocksalloc * 256; x--; ptr++) {
 		if (*ptr) {
 			if (*ptr & 1)
-				*ptr -= (TBL_BASE2 - TBL_BASE) - blocksalloc * 1024;
-			*ptr -= (int)TBL_BASE;
+				*ptr -= (data - tree) - blocksalloc * BLOCK_SIZE;
+			*ptr -= (int)tree;
 		}
 	}
 	if (fsync(fd) != 0)
 		exit(EXIT_FAILURE);
-	lseek(fd, blocksalloc * 1024, SEEK_SET);
-	ftruncate(fd, blocksalloc * 1024);
-	write(fd, TBL_BASE2, datap - TBL_BASE2);
+	lseek(fd, blocksalloc * BLOCK_SIZE, SEEK_SET);
+	ftruncate(fd, blocksalloc * BLOCK_SIZE);
+	write(fd, data, datap - data);
 	exit(EXIT_SUCCESS);
 
 parse_error:
@@ -264,9 +266,11 @@ do_tree(int sbn, int *blockp)
 				if (blockp[x] & 1) {
 					/* grow tree and copy data to new node */
 					/*printf("allocated block %d\n", blocksalloc); */
-					nblockp = (int *)(TBL_BASE + (blocksalloc++) * 1024);
-					if ((blocksalloc << 10) > ALLOC_SIZE)
-						memory_error();
+					nblockp = (int *)(tree + (blocksalloc++) * BLOCK_SIZE);
+					if ((blocksalloc * BLOCK_SIZE) > TREE_SIZE) {
+						printf("%s:%d: Buffer memory exceeded, increase %s and recompile\n", __FILE__, __LINE__, "TREE_SIZE");
+						exit(EXIT_FAILURE);
+					}
 					for (int y = 0; y < 256; y++)
 						nblockp[y] = blockp[x];
 					blockp[x] = (int)nblockp;
@@ -280,12 +284,4 @@ do_tree(int sbn, int *blockp)
 			}
 		}
 	return 0;
-}
-
-static void
-memory_error(void)
-{
-	printf("Buffer memory exceeded in comptbl\n");
-	printf(__FILE__ ":%d: increase ALLOC_SIZE and recompile\n", __LINE__);
-	exit(EXIT_FAILURE);
 }
