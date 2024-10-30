@@ -44,7 +44,7 @@
 unsigned char  *RAM;
 unsigned char  *ROM;
 unsigned char  *CODE_BASE;
-unsigned int   *INT_MAP;
+unsigned char **INT_MAP;
 
 unsigned char  *ROM_BASE;
 unsigned char  *VROM_BASE;

@@ -17,16 +17,17 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#define BLOCK_SIZE (256 * sizeof (int *))
+#define BLOCK_SIZE (256 * sizeof (uintptr_t *))
 #define TREE_SIZE (4662 * BLOCK_SIZE)
 #define DATA_SIZE (9624)
 
-static unsigned char *tree;
+static uintptr_t *tree;
 static unsigned char *data, *datap;
 static unsigned char srcseq[256];      /* source (6502) code sequence */
 static unsigned char srcmask[256];     /* source mask */
@@ -40,9 +41,9 @@ static int blocksalloc = 1;            /* next block of memory to allocate follo
 static int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 0,
            cip = 0, cln = 0, cdb = 0, omc = 0, omo = 0, oml = 0, ssl = 0, dsl = 0;
 
-#define align8(x) (((unsigned int)(x) + 7) & 0xfffffff8)
+#define align8(x) (((uintptr_t)(x) + (uintptr_t)7) & ~(uintptr_t)7)
 
-static int      do_tree(int, int *);
+static int      do_tree(int, uintptr_t *);
 
 int
 main(int argc, char *argv[])
@@ -198,7 +199,7 @@ main(int argc, char *argv[])
 					*/
 					sbn = 0;
 					dbn = 0;
-					do_tree(sbn, (int *)tree);
+					do_tree(sbn, tree);
 
 					if (align8((datap - data) + dsl + oml + 3) > DATA_SIZE) {
 						printf("%s:%d: Buffer memory exceeded, increase %s and recompile\n", __FILE__, __LINE__, "DATA_SIZE");
@@ -225,11 +226,14 @@ main(int argc, char *argv[])
 		}
 	}
 	/* relocate pointers */
-	for (int *ptr = (int *)tree, x = blocksalloc * 256; x--; ptr++) {
+	for (uintptr_t *ptr = tree, x = 256 * blocksalloc; x--; ptr++) {
 		if (*ptr) {
-			if (*ptr & 1)
-				*ptr -= (data - tree) - blocksalloc * BLOCK_SIZE;
-			*ptr -= (int)tree;
+			if (*ptr & 1) {
+				*ptr -= (uintptr_t)data;
+				*ptr += blocksalloc * BLOCK_SIZE;
+			} else {
+				*ptr -= (uintptr_t)tree;
+			}
 		}
 	}
 	if (fsync(fd) != 0)
@@ -254,30 +258,29 @@ parse_error:
 
 /* Recursively build binary search tree */
 static int
-do_tree(int sbn, int *blockp)
+do_tree(int sbn, uintptr_t *blockp)
 {
-
 	for (int x = 0; x < 256; x++)
 		if ((x & srcmask[sbn]) == srcseq[sbn]) {
 			if (blockp[x] == 0 || (srcseq[sbn + 1] != 0 && srcmask[sbn + 1] == 0))
-				blockp[x] = (unsigned int)datap | 1;         /* Leaf node */
+				blockp[x] = (uintptr_t)datap | 1;  /* Leaf node */
 			else {
-				int *nblockp;
+				uintptr_t *nblockp;
 				if (blockp[x] & 1) {
 					/* grow tree and copy data to new node */
 					/*printf("allocated block %d\n", blocksalloc); */
-					nblockp = (int *)(tree + (blocksalloc++) * BLOCK_SIZE);
+					nblockp = &tree[256 * blocksalloc++];
 					if ((blocksalloc * BLOCK_SIZE) > TREE_SIZE) {
 						printf("%s:%d: Buffer memory exceeded, increase %s and recompile\n", __FILE__, __LINE__, "TREE_SIZE");
 						exit(EXIT_FAILURE);
 					}
 					for (int y = 0; y < 256; y++)
 						nblockp[y] = blockp[x];
-					blockp[x] = (int)nblockp;
+					blockp[x] = (uintptr_t)nblockp;
 				} else {
 					/* traverse existing branch */
 					/*printf("following ptr...%x %x %x\n", srcseq[sbn], srcseq[sbn+1], srcmask[sbn+1]); */
-					nblockp = (int *)blockp[x];
+					nblockp = (uintptr_t *)blockp[x];
 				}
 
 				do_tree(sbn + 1, nblockp);

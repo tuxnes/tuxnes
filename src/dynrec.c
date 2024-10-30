@@ -12,10 +12,11 @@
 #include "config.h"
 #endif
 
+#include <stdint.h>
 #include <stdio.h>
 #include "globals.h"
 
-extern const unsigned int TRANS_TBL[];
+extern const uintptr_t TRANS_TBL[];
 
 static unsigned char *next_code_alloc = (unsigned char *)_CODE_BASE;
 
@@ -45,23 +46,23 @@ translate(int addr)
 
 	XPC = cptr = next_code_alloc;
 	if (disassemble) {
-		printf("\n[%4x] (%8x) -> %8x\n", addr, (int)(MAPTABLE[addr >> 12] + addr), (int)cptr);
+		printf("\n[%04x] (%p) -> %p\n", addr, MAPTABLE[addr >> 12] + addr, cptr);
 		disas(addr);             /* This will output a disassembly of the 6502 code */
 	}
 	do {
 		int saddr = addr;
-		INT_MAP[(MAPTABLE[addr >> 12] + addr) - RAM] = (unsigned int)cptr;
-		const unsigned int *ptr = TRANS_TBL;
+		INT_MAP[(MAPTABLE[addr >> 12] + addr) - RAM] = cptr;
+		const uintptr_t *ptr = TRANS_TBL;
 		unsigned char src;
 		while (1) {
 			src = *(MAPTABLE[addr >> 12] + addr);
 			addr++;
-			/*printf("%x%x", src>>4, src&0xF);fflush(stdout); */
+			/*printf("%02x", src);fflush(stdout); */
 			if (ptr[src] == 0)
 				break;
 			if (ptr[src] & 1)
 				break;
-			ptr = (const unsigned int *)((const char *)TRANS_TBL + ptr[src]);
+			ptr = (const uintptr_t *)((const char *)TRANS_TBL + ptr[src]);
 		}
 		if (ptr[src] == 0) {
 			addr = saddr + 1;
@@ -135,7 +136,7 @@ translate(int addr)
 			addr = saddr + slen;
 		}
 	} while (!stop);
-	while ((int)cptr & 15)
+	while ((uintptr_t)cptr & 0xf)
 		*cptr++ = NOP;
 	next_code_alloc = cptr;
 }

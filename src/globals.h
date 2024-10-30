@@ -66,7 +66,7 @@ extern signed int       CTNI;         /* Cycles to next interrupt */
 extern unsigned char *RAM;
 extern unsigned char *ROM;
 extern unsigned char *CODE_BASE;
-extern unsigned int  *INT_MAP;
+extern unsigned char **INT_MAP;
 
 #define ZPMEM     (RAM+0x0000)      /* Zero page */
 #define STACK     (RAM+0x0100)      /* stack page */
