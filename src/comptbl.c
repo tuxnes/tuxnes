@@ -54,19 +54,18 @@ main(int argc, char *argv[])
 	fd = open("compdata", O_RDWR | O_TRUNC | O_CREAT, 0666);
 	if (fd < 0)
 		exit(EXIT_FAILURE);
-	lseek(fd, 0x1000000, SEEK_SET);
-	ftruncate(fd, 0x1000000);
-	tree = mmap((void *)0x10000000, TREE_SIZE,
+	ftruncate(fd, TREE_SIZE);
+	tree = mmap(NULL, TREE_SIZE,
 	            PROT_READ | PROT_WRITE,
-	            MAP_FIXED | MAP_SHARED,
+	            MAP_SHARED,
 	            fd, 0);
 	if (tree == MAP_FAILED) {
 		perror("mmap");
 		exit(EXIT_FAILURE);
 	}
-	data = mmap((void *)0x20000000, DATA_SIZE,
+	data = mmap(NULL, DATA_SIZE,
 	            PROT_READ | PROT_WRITE,
-	            MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+	            MAP_PRIVATE | MAP_ANONYMOUS,
 	            -1, 0);
 	if (data == MAP_FAILED) {
 		perror("mmap");
