@@ -22,7 +22,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define ALLOC_SIZE 0x48d801     /* approximately 4.69MB */
+#define ALLOC_SIZE 0x48d800     /* approximately 4.69MB */
 
 static unsigned char *TBL_BASE;
 static unsigned char *TBL_BASE2;
@@ -38,6 +38,8 @@ static int blocksalloc = 1;            /* next block of memory to allocate follo
 static int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 0,
            cip = 0, cln = 0, cdb = 0, omc = 0, omo = 0, oml = 0, ssl = 0, dsl = 0;
 static unsigned char *datap;
+
+#define align8(x) (((unsigned int)(x) + 7) & 0xfffffff8)
 
 static int      do_tree(int, int *);
 static void     memory_error(void);
@@ -198,7 +200,7 @@ main(int argc, char *argv[])
 					dbn = 0;
 					do_tree(sbn, (int *)TBL_BASE);
 
-					if ((datap - TBL_BASE2) + dsl + oml + 3 > ALLOC_SIZE)
+					if (align8((datap - TBL_BASE2) + dsl + oml + 3) > ALLOC_SIZE)
 						memory_error();
 					*datap++ = ssl;
 					*datap++ = dsl;
@@ -207,7 +209,7 @@ main(int argc, char *argv[])
 					for (int x = 0; x < oml; x++)
 						*datap++ = objmod[x];
 					*datap++ = 0;
-					datap = (unsigned char *)(((unsigned int)datap + 7) & 0xfffffff8);
+					datap = (unsigned char *)align8(datap);
 					sdf = 1;
 					sbn = 0;
 					dbn = 0;
@@ -263,7 +265,7 @@ do_tree(int sbn, int *blockp)
 					/* grow tree and copy data to new node */
 					/*printf("allocated block %d\n", blocksalloc); */
 					nblockp = (int *)(TBL_BASE + (blocksalloc++) * 1024);
-					if ((blocksalloc << 10) >= ALLOC_SIZE)
+					if ((blocksalloc << 10) > ALLOC_SIZE)
 						memory_error();
 					for (int y = 0; y < 256; y++)
 						nblockp[y] = blockp[x];
