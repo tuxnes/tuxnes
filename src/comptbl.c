@@ -75,7 +75,7 @@ main(int argc, char *argv[])
 	datap = data;
 	while (fgets(input, sizeof input, stdin)) {
 		cln++;
-		for (cip = 0; (input[cip] != 0) && (input[cip] != '#') && (input[cip] != 10); cip++) {
+		for (cip = 0; (input[cip] != 0) && (input[cip] != '#') && (input[cip] != '\n'); cip++) {
 			char i = input[cip];
 			/* Decode hex digits */
 			if (!slf && !dmf) {
@@ -84,11 +84,11 @@ main(int argc, char *argv[])
 					if (fbf)
 						goto parse_error;   /* one byte at a time only */
 					if (lnf) {
-						cdb |= (i | 32) - ((i | 32) > 96) * 39 - 48;
+						cdb |= (i | 32) - ((i | 32) >= 'a') * ('a' - 0xa - '0') - '0';
 						lnf = 0;
 						fbf = 1;
 					} else {
-						cdb = ((i | 32) - ((i | 32) > 96) * 39 - 48) << 4;
+						cdb = ((i | 32) - ((i | 32) >= 'a') * ('a' - 0xa - '0') - '0') << 4;
 						lnf = 1;
 					}
 				} else {
@@ -100,7 +100,7 @@ main(int argc, char *argv[])
 					/* Decode source length */
 					if (i < '0' || i > '9')
 						goto parse_error;   /* Not a number! */
-					ssl = i - 48;
+					ssl = i - '0';
 					slf = 0;
 				}
 			}
@@ -149,7 +149,7 @@ main(int argc, char *argv[])
 					 || i == '^')
 						omc = i;
 					if (i >= '0' && i <= '9')
-						omo = i - 48;
+						omo = i - '0';
 					if (i == ']') {
 						dmf = 0;
 						if (omc == 0)
@@ -239,10 +239,7 @@ parse_error:
 	printf("Parse error at line %d:\n", cln);
 	printf("%s", input);
 	for (int x = 0; x < cip; x++)
-		if (input[x] == 9)
-			printf("%c", 9);
-		else
-			printf(" ");
+		putchar(input[x] == '\t' ? input[x] : ' ');
 	printf("^\n");
 	exit(EXIT_FAILURE);
 }
