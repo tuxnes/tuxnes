@@ -43,7 +43,7 @@ static int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 
 
 #define align8(x) (((uintptr_t)(x) + (uintptr_t)7) & ~(uintptr_t)7)
 
-static void do_tree(int, uintptr_t *);
+static void do_tree(int, int, uintptr_t *);
 
 int
 main(int argc, char *argv[])
@@ -128,11 +128,6 @@ main(int argc, char *argv[])
 					sdf = 0;
 					if (ssl < sbn)
 						goto parse_error;   /* Bytes read greater than length! */
-					while (sbn <= ssl) {
-						srcmask[sbn] = 0;
-						srcseq[sbn] = 0xff;
-						sbn++;
-					}
 				}
 			} else {
 				/* Parse target data */
@@ -186,19 +181,17 @@ main(int argc, char *argv[])
 					if (lnf | dmf)
 						goto parse_error;
 					/* done, insert into table */
-					dsl = dbn;
-					/*
-					printf("\ns: ");
-					for (int x = 0; x < ssl; x++) printf("%2x", srcseq[x]);
-					printf("\nm: ");
-					for (int x = 0; x < ssl; x++) printf("%2x", srcmask[x]);
-					printf("\nd: ");
-					for (int x = 0; x < dsl; x++) printf("%2x", objseq[x]);
+#if 0
+					printf("\ns:");
+					for (int x = 0; x < sbn; x++) printf(" %02x", srcseq[x]);
+					printf("\nm:");
+					for (int x = 0; x < sbn; x++) printf(" %02x", srcmask[x]);
+					printf("\nd:");
+					for (int x = 0; x < dbn; x++) printf(" %02x", objseq[x]);
 					printf("\n");
-					*/
-					sbn = 0;
-					dbn = 0;
-					do_tree(sbn, tree);
+#endif
+					dsl = dbn;
+					do_tree(0, sbn, tree);
 
 					if (align8((datap - data) + dsl + oml + 3) > DATA_SIZE) {
 						printf("%s:%d: Buffer memory exceeded, increase %s and recompile\n", __FILE__, __LINE__, "DATA_SIZE");
@@ -257,17 +250,19 @@ parse_error:
 
 /* Recursively build binary search tree */
 static void
-do_tree(int sbn, uintptr_t *blockp)
+do_tree(int sbn, int len, uintptr_t *blockp)
 {
 	for (int x = 0; x < 256; x++) {
 		if ((x & srcmask[sbn]) == srcseq[sbn]) {
-			if (srcseq[sbn + 1] != 0 && srcmask[sbn + 1] == 0) {
+			if (sbn + 1 == len) {
 				blockp[x] = (uintptr_t)datap | 1;  /* Leaf node */
 			} else {
 				uintptr_t *nblockp;
 				if (blockp[x] == 0 || blockp[x] & 1) {
 					/* grow tree and copy data to new node */
-					/*printf("allocated block %d\n", blocksalloc); */
+#if 0
+					printf("allocated block %d\n", blocksalloc);
+#endif
 					nblockp = &tree[256 * blocksalloc++];
 					if ((blocksalloc * BLOCK_SIZE) > TREE_SIZE) {
 						printf("%s:%d: Buffer memory exceeded, increase %s and recompile\n", __FILE__, __LINE__, "TREE_SIZE");
@@ -278,11 +273,13 @@ do_tree(int sbn, uintptr_t *blockp)
 					blockp[x] = (uintptr_t)nblockp;
 				} else {
 					/* traverse existing branch */
-					/*printf("following ptr...%x %x %x\n", srcseq[sbn], srcseq[sbn+1], srcmask[sbn+1]); */
+#if 0
+					printf("following ptr...%02x %02x/%02x\n", srcseq[sbn], srcseq[sbn+1], srcmask[sbn+1]);
+#endif
 					nblockp = (uintptr_t *)blockp[x];
 				}
 
-				do_tree(sbn + 1, nblockp);
+				do_tree(sbn + 1, len, nblockp);
 			}
 		}
 	}
