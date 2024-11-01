@@ -44,6 +44,7 @@ static int ddf, amf, lnf, fbf, slf, dmf, sbn, dbn,
 #define align8(x) (((uintptr_t)(x) + (uintptr_t)7) & ~(uintptr_t)7)
 
 static void do_tree(int, int, uintptr_t *);
+static void deduplicate(void);
 
 int
 main(int argc, char *argv[])
@@ -208,14 +209,17 @@ main(int argc, char *argv[])
 			}
 		}
 	}
+
+	deduplicate();
+
 	/* relocate pointers */
-	for (uintptr_t *ptr = tree, x = 256 * blocksalloc; x--; ptr++) {
-		if (*ptr) {
-			if (*ptr & 1) {
-				*ptr -= (uintptr_t)data;
-				*ptr += blocksalloc * BLOCK_SIZE;
+	for (uintptr_t *p = &tree[256 * blocksalloc]; p-- > tree; ) {
+		if (*p) {
+			if (*p & 1) {
+				*p -= (uintptr_t)data;
+				*p += blocksalloc * BLOCK_SIZE;
 			} else {
-				*ptr -= (uintptr_t)tree;
+				*p -= (uintptr_t)tree;
 			}
 		}
 	}
@@ -234,7 +238,6 @@ parse_error:
 	printf("^\n");
 	exit(EXIT_FAILURE);
 }
-
 
 /* Recursively build binary search tree */
 static void
@@ -268,6 +271,45 @@ do_tree(int sbn, int len, uintptr_t *blockp)
 				}
 
 				do_tree(sbn + 1, len, nblockp);
+			}
+		}
+	}
+}
+
+static void
+deduplicate(void)
+{
+	for (int x = blocksalloc; x--; ) {
+		uintptr_t *blockx = &tree[256 * x];
+
+		/* check if block x is unique by comparing to every block y before it */
+		for (int y = x; y--; ) {
+			uintptr_t *blocky = &tree[256 * y];
+#if 0
+			printf("comparing block %d with %d\n", x, y);
+#endif
+			if (memcmp(blockx, blocky, BLOCK_SIZE) == 0) {
+				/* x and y are duplicates, x is after y, remove x */
+#if 0
+				printf("replacing block %d with %d\n", x, y);
+#endif
+				for (uintptr_t *p = &tree[256 * blocksalloc]; p-- > tree; ) {
+					if (*p == (uintptr_t)blockx) {
+						/* change all references of x to y (can only occur in blocks
+						 * before x since leaves are always at higher addresses,
+						 * therefore blocks after x don't need to be re-analyzed) */
+						*p = (uintptr_t)blocky;
+					} else if (*p > (uintptr_t)blockx && !(*p & 1)) {
+						/* decrement all pointers pointing after x for the memmove
+						 * (does not affect the uniqueness of anything after x) */
+						*p -= BLOCK_SIZE;
+					}
+				}
+				/* delete x, move to next block */
+				if (x < --blocksalloc) {
+					memmove(blockx, blockx + 256, (blocksalloc - x) * BLOCK_SIZE);
+				}
+				break;
 			}
 		}
 	}
