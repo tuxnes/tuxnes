@@ -6,7 +6,7 @@
 # This is the translation table for converting 6502 code into native code
 # for x86 processors.  I have used the GNU standard for the representation
 # of operands, which is: source,destination.  Be aware that Intel uses the
-# opposite ordering in their documentation (destination preceeds source).
+# opposite ordering in their documentation (destination precedes source).
 #
 # I have adopted the following register usage conventions:
 #
@@ -22,21 +22,21 @@
 #
 # %edi is used to store the sign and zero flags.  This is usually done by
 # sign-extending the result of arithmetic operations into %edi.  The
-# equivilence branch instructions check the lower 8 bits of %edi against
+# equivalence branch instructions check the lower 8 bits of %edi against
 # zero, and the sign branch instructions check bit 8 (0x100) of %edi.  While
 # in many cases it would be sufficient to check only bit 7 to determine
 # the sign, some 6502 instructions (such as BIT) can set the sign and zero
-# flags independently, so a mechanism must be provided to accomodate this.
+# flags independently, so a mechanism must be provided to accommodate this.
 # Sign extension unfortunately is relatively slow (3 cycles) on a Pentium
 # processor.  An alternative would be to store the sign and zero flags in
-# seperate memory locations, but as this would also require additional CPU
+# separate memory locations, but as this would also require additional CPU
 # cycles to read/write memory, I see little advantage in this approach,
 # especially considering that the sign-extension can be precomputed for
 # immediate data, thus eliminating the 3-cycle penalty for most data load
 # operations.
 #
 # This file consists of a substitution table for replacing 6502 code with
-# native equivilents.  The format is as follows:
+# native equivalents.  The format is as follows:
 #
 # (6502 instruction bytes),length:  (native instruction bytes) /
 #
@@ -120,7 +120,7 @@
 # 0000-0800 - NES internal RAM
 # 2000-2007 - I/O register area 1 (see io.c)
 # 4000-4015 - I/O register area 2 (see io.c)
-# 6000-7FFF - Nonvolitile RAM for save data
+# 6000-7FFF - Nonvolatile RAM for save data
 # 8000-FFFF - Reads ROM, writes output to mapper (see mapper.c)
 
 
