@@ -43,7 +43,7 @@ static int sdf = 1, amf = 0, lnf = 0, fbf = 0, slf = 0, dmf = 0, sbn = 0, dbn = 
 
 #define align8(x) (((uintptr_t)(x) + (uintptr_t)7) & ~(uintptr_t)7)
 
-static int      do_tree(int, uintptr_t *);
+static void do_tree(int, uintptr_t *);
 
 int
 main(int argc, char *argv[])
@@ -256,16 +256,16 @@ parse_error:
 
 
 /* Recursively build binary search tree */
-static int
+static void
 do_tree(int sbn, uintptr_t *blockp)
 {
-	for (int x = 0; x < 256; x++)
+	for (int x = 0; x < 256; x++) {
 		if ((x & srcmask[sbn]) == srcseq[sbn]) {
-			if (blockp[x] == 0 || (srcseq[sbn + 1] != 0 && srcmask[sbn + 1] == 0))
+			if (srcseq[sbn + 1] != 0 && srcmask[sbn + 1] == 0) {
 				blockp[x] = (uintptr_t)datap | 1;  /* Leaf node */
-			else {
+			} else {
 				uintptr_t *nblockp;
-				if (blockp[x] & 1) {
+				if (blockp[x] == 0 || blockp[x] & 1) {
 					/* grow tree and copy data to new node */
 					/*printf("allocated block %d\n", blocksalloc); */
 					nblockp = &tree[256 * blocksalloc++];
@@ -285,5 +285,5 @@ do_tree(int sbn, uintptr_t *blockp)
 				do_tree(sbn + 1, nblockp);
 			}
 		}
-	return 0;
+	}
 }
