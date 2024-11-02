@@ -10,6 +10,9 @@
 #include "config.h"
 #endif
 
+/* if you'd like defocusing to pause emulation, define this */
+#undef PAUSE_ON_DEFOCUS
+
 #include <hqx.h>
 
 #include <sys/types.h>
@@ -861,36 +864,25 @@ UpdateDisplayX11(void)
 		while (XPending(display) || ev.type == -1) {
 			XNextEvent(display, &ev);
 			/*printf("event %d\n", ev.type); */
-			if (ev.type == DestroyNotify)
+			if (ev.type == DestroyNotify) {
 				quit();
-			/* if you'd like defocusing to pause emulation, define this */
 #ifdef PAUSE_ON_DEFOCUS
-			if (ev.type == FocusIn)
+			} else if (ev.type == FocusIn) {
 				renderer_data.pause_display = 0;
-			if (ev.type == FocusOut)
+			} else if (ev.type == FocusOut) {
 				renderer_data.pause_display = 1;
 #endif
-			if (ev.type == MapNotify) {
-				XExposeEvent *xev = (XExposeEvent *)&ev;
-
-				xev->type = Expose;
-				xev->count = 0;
+			} else if (ev.type == MapNotify) {
 				nodisplay = 0;
-				renderer_data.needsredraw = renderer_data.redrawall = 1;
 			} else if (ev.type == UnmapNotify) {
 				nodisplay = 1;
-				renderer_data.needsredraw = renderer_data.redrawall = 0;
-			}
-			/* Handle keyboard input */
-			if (ev.type == KeyPress || ev.type == KeyRelease) {
+			} else if (ev.type == KeyPress || ev.type == KeyRelease) {
 				HandleKeyboardX11(ev);
-			}
-			if (ev.type == KeymapNotify) {
+			} else if (ev.type == KeymapNotify) {
 				memcpy(keystate, ((XKeymapEvent *)&ev)->key_vector, 32);
 				controller[0] = controller[1] = 0;
 				controllerd[0] = controllerd[1] = 0;
-			}
-			if (ev.type == ConfigureNotify) {
+			} else if (ev.type == ConfigureNotify) {
 				XConfigureEvent *ce = (XConfigureEvent *)&ev;
 
 				if (window_w != ce->width
@@ -899,13 +891,11 @@ UpdateDisplayX11(void)
 					window_h = ce->height;
 					XClearWindow(display, window);
 				}
-			}
-			if (ev.type == Expose) {
-
+			} else if (ev.type == Expose) {
 				XExposeEvent *xev = (XExposeEvent *)&ev;
 
 				if (!xev->count) {
-					RenderImage(&ev);
+					renderer_data.needsredraw = 1;
 				}
 			}
 			if (renderer_data.pause_display && renderer_data.needsredraw) {
