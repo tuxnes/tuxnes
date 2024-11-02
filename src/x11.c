@@ -906,12 +906,10 @@ UpdateDisplayX11(void)
 		renderer_data.desync = 1;
 	}
 
-	if (mapped) {
+	if (mapped && !frameskip) {
 		drawimage(PBL);
-		if (!frameskip) {
-			RenderImage();
-			renderer_data.redrawall = renderer_data.needsredraw = 0;
-		}
+		RenderImage();
+		renderer_data.redrawall = renderer_data.needsredraw = 0;
 	}
 
 	/* Slow down if we're getting ahead */
