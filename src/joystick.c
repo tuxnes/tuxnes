@@ -239,6 +239,7 @@ stick_read(int stick)
 				unsigned char nes_button = js_nesmaps[stick].button[js.number];
 				if (nes_button == PAUSEDISPLAY) {
 					if (js.value) {
+						renderer_data.desync = 1;
 						renderer_data.pause_display = !renderer_data.pause_display;
 					}
 				} else {

@@ -712,54 +712,65 @@ HandleKeyboardX11(const XEvent *ev)
 		case XK_Pause:
 		case XK_P:
 		case XK_p:
+			renderer_data.desync = 1;
 			renderer_data.pause_display = !renderer_data.pause_display;
 			break;
 		case XK_grave:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 1;
 			renderer_data.doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_1:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 0;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_2:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 2;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_3:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 3;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_4:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 4;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_5:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 5;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_6:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 6;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_7:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 7;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_8:
+			renderer_data.desync = 1;
 			renderer_data.halfspeed = 0;
 			renderer_data.doublespeed = 8;
 			renderer_data.pause_display = 0;
 			break;
 		case XK_0:
+			renderer_data.desync = 1;
 			renderer_data.pause_display = 1;
 			break;
 		}
@@ -794,8 +805,10 @@ HandleEventX11(const XEvent *ev)
 		mapped = 0;
 #ifdef PAUSE_ON_DEFOCUS
 	} else if (ev->type == FocusIn) {
+		renderer_data.desync = 1;
 		renderer_data.pause_display = 0;
 	} else if (ev->type == FocusOut) {
+		renderer_data.desync = 1;
 		renderer_data.pause_display = 1;
 #endif
 	} else if (ev->type == KeyPress || ev->type == KeyRelease) {
@@ -925,7 +938,6 @@ UpdateDisplayX11(void)
 
 		if (renderer_data.pause_display) {
 			usleep(16666);
-			renderer_data.desync = 1;
 			if (renderer_data.needsredraw) {
 				RenderImage();
 				renderer_data.needsredraw = 0;

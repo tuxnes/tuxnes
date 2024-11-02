@@ -155,7 +155,6 @@ UpdateDisplayNone(void)
 
 		if (renderer_data.pause_display) {
 			usleep(16666);
-			renderer_data.desync = 1;
 		}
 	} while (renderer_data.pause_display);
 
