@@ -282,6 +282,7 @@ InitDisplayX11(int argc, char **argv)
 	unsigned int border_width = 0;
 	if (renderer_config.inroot) {
 		window = rootwindow;
+		mapped = 1;
 	} else {
 		int user_x, user_y;
 		int user_w, user_h;
@@ -347,9 +348,12 @@ InitDisplayX11(int argc, char **argv)
 	XGetGeometry(display, window, &rootwindow,
 	             &x, &y, &window_w, &window_h, &border_width, &depth);
 
+	XSelectInput(display, window, ExposureMask | StructureNotifyMask
+#ifdef PAUSE_ON_DEFOCUS
+	                            | FocusChangeMask
+#endif
+	                            | KeyPressMask | KeyReleaseMask | KeymapStateMask);
 	XMapWindow(display, window);
-	XSelectInput(display, window, KeyPressMask | KeyReleaseMask | ExposureMask |
-	             FocusChangeMask | KeymapStateMask | StructureNotifyMask);
 	XFlush(display);
 
 	struct timeval time;
@@ -767,23 +771,12 @@ HandleEventX11(const XEvent *ev)
 #if 0
 	printf("event %d\n", ev->type);
 #endif
-	if (ev->type == DestroyNotify) {
-		quit();
-#ifdef PAUSE_ON_DEFOCUS
-	} else if (ev->type == FocusIn) {
-		renderer_data.pause_display = 0;
-	} else if (ev->type == FocusOut) {
-		renderer_data.pause_display = 1;
-#endif
-	} else if (ev->type == MapNotify) {
-		mapped = 1;
-	} else if (ev->type == UnmapNotify) {
-		mapped = 0;
-	} else if (ev->type == KeyPress || ev->type == KeyRelease) {
-		HandleKeyboardX11(ev);
-	} else if (ev->type == KeymapNotify) {
-		controller[0] = controller[1] = 0;
-		controllerd[0] = controllerd[1] = 0;
+	if (ev->type == Expose) {
+		const XExposeEvent *xev = (const XExposeEvent *)&ev;
+
+		if (!xev->count) {
+			renderer_data.needsredraw = 1;
+		}
 	} else if (ev->type == ConfigureNotify) {
 		const XConfigureEvent *ce = (const XConfigureEvent *)ev;
 
@@ -793,12 +786,23 @@ HandleEventX11(const XEvent *ev)
 			window_h = ce->height;
 			XClearWindow(display, window);
 		}
-	} else if (ev->type == Expose) {
-		const XExposeEvent *xev = (const XExposeEvent *)&ev;
-
-		if (!xev->count) {
-			renderer_data.needsredraw = 1;
-		}
+	} else if (ev->type == DestroyNotify) {
+		quit();
+	} else if (ev->type == MapNotify) {
+		mapped = 1;
+	} else if (ev->type == UnmapNotify) {
+		mapped = 0;
+#ifdef PAUSE_ON_DEFOCUS
+	} else if (ev->type == FocusIn) {
+		renderer_data.pause_display = 0;
+	} else if (ev->type == FocusOut) {
+		renderer_data.pause_display = 1;
+#endif
+	} else if (ev->type == KeyPress || ev->type == KeyRelease) {
+		HandleKeyboardX11(ev);
+	} else if (ev->type == KeymapNotify) {
+		controller[0] = controller[1] = 0;
+		controllerd[0] = controllerd[1] = 0;
 #ifdef HAVE_SHM
 	} else if (shm_attached && ev->type == shm_first_event + ShmCompletion) {
 		shm_incomplete = 0;
