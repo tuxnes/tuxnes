@@ -15,6 +15,8 @@
 
 #include <hqx.h>
 
+#include <errno.h>
+#include <poll.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <stdbool.h>
@@ -880,7 +882,6 @@ RenderImage(void)
 void
 UpdateDisplayX11(void)
 {
-	static XEvent ev;
 	struct timeval time;
 	static unsigned int frame;
 	unsigned int timeframe;
@@ -919,14 +920,43 @@ UpdateDisplayX11(void)
 	}
 
 	/* Input loop */
+	struct pollfd fds[] = {
+		{ .fd = jsfd[0], .events = POLLIN, },
+		{ .fd = jsfd[1], .events = POLLIN, },
+		{ .fd = ConnectionNumber(display), .events = POLLIN, },
+	};
+	int nready;
 	do {
-		/* Handle joystick input */
-		js_handle_input();
+		if (XPending(display)) {
+			fds[0].revents = 0;
+			fds[1].revents = 0;
+			fds[2].revents = POLLIN;
+			nready = 1;
+		} else {
+			nready = poll(fds, 3, renderer_data.pause_display || shm_incomplete ? -1 : 0);
+		}
+		if (nready < 0) {
+			if (errno != EINTR && errno != EAGAIN) {
+				perror("poll");
+				exit(EXIT_FAILURE);
+			}
+		} else if (nready > 0) {
+			if (fds[0].revents)
+				fds[0].fd = js_handle_input(0);
+			if (fds[1].revents)
+				fds[1].fd = js_handle_input(1);
+			if (fds[2].revents) {
+				static XEvent ev;
+				XNextEvent(display, &ev);
+				HandleEventX11(&ev);
+			}
+		}
 
-		/* Handle X input */
-		while (XPending(display) || shm_incomplete) {
-			XNextEvent(display, &ev);
-			HandleEventX11(&ev);
+		if (renderer_data.pause_display && !shm_incomplete) {
+			if (renderer_data.needsredraw) {
+				RenderImage();
+				renderer_data.needsredraw = 0;
+			}
 		}
 
 #ifdef HAVE_SCRNSAVER
@@ -935,15 +965,7 @@ UpdateDisplayX11(void)
 			XScreenSaverSuspend(display, 0);
 		}
 #endif
-
-		if (renderer_data.pause_display) {
-			usleep(16666);
-			if (renderer_data.needsredraw) {
-				RenderImage();
-				renderer_data.needsredraw = 0;
-			}
-		}
-	} while (renderer_data.pause_display);
+	} while (nready);
 
 #ifdef HAVE_SCRNSAVER
 	if (!sssuspend && mapped) {

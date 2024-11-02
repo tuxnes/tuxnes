@@ -35,7 +35,7 @@
 #define PAUSEDISPLAY 0xff
 
 const char *jsdevice[JS_MAX_NES_STICKS] = { NULL, NULL };
-static int jsfd[JS_MAX_NES_STICKS] = { -1, -1 };
+int jsfd[JS_MAX_NES_STICKS] = { -1, -1 };
 
 
 struct js_nesmap {
@@ -188,9 +188,6 @@ stick_open(int stick)
 		        (version      ) & 0xff);
 	}
 
-	/* set joystick to non-blocking */
-	fcntl(jsfd[stick], F_SETFL, O_NONBLOCK);
-
 	/* modify button map for a 2-button joystick */
 	if (buttons == 2) {
 		if (!js_usermapped2button[stick][0])
@@ -219,12 +216,13 @@ js_init(void)
 
 
 #ifdef HAVE_LINUX_JOYSTICK_H
-static void
+static int
 stick_read(int stick)
 {
 	struct js_event js;
 
-	while (read(jsfd[stick], &js, sizeof (struct js_event)) == sizeof (struct js_event)) {
+	ssize_t nbytes = read(jsfd[stick], &js, sizeof js);
+	if (nbytes == sizeof js) {
 #if 0
 		/* verbose joystick reporting */
 		if (verbose) {
@@ -257,30 +255,28 @@ stick_read(int stick)
 			}
 			break;
 		}
-	}
-
-	if (errno != EAGAIN) {
-		if (errno) {
-			perror(jsdevice[stick]);
-		} else {
+	} else {
+		if (nbytes > 0) {
 			fprintf(stderr, "%s: device violates joystick protocol, disabling\n",
 			        jsdevice[stick]);
-			close(jsfd[stick]);
-			jsfd[stick] = -1;
+		} else if (nbytes < 0) {
+			perror(jsdevice[stick]);
 		}
+		close(jsfd[stick]);
+		jsfd[stick] = -1;
 	}
+	return jsfd[stick];
 }
 #endif /* HAVE_LINUX_JOYSTICK_H */
 
 
-void
-js_handle_input(void)
+int
+js_handle_input(int stick)
 {
 #ifdef HAVE_LINUX_JOYSTICK_H
-	for (int stick = 0; stick < JS_MAX_NES_STICKS; ++stick) {
-		if (jsfd[stick] >= 0) {
-			stick_read(stick);
-		}
+	if (stick < JS_MAX_NES_STICKS && jsfd[stick] >= 0) {
+		return stick_read(stick);
 	}
+	return -1;
 #endif /* HAVE_LINUX_JOYSTICK_H */
 }

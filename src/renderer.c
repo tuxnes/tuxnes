@@ -10,6 +10,8 @@
 #include "config.h"
 #endif
 
+#include <errno.h>
+#include <poll.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <stdio.h>
@@ -149,14 +151,25 @@ UpdateDisplayNone(void)
 	}
 
 	/* Input loop */
+	struct pollfd fds[] = {
+		{ .fd = jsfd[0], .events = POLLIN, },
+		{ .fd = jsfd[1], .events = POLLIN, },
+	};
+	int nready;
 	do {
-		/* Handle joystick input */
-		js_handle_input();
-
-		if (renderer_data.pause_display) {
-			usleep(16666);
+		nready = poll(fds, 2, renderer_data.pause_display ? -1 : 0);
+		if (nready < 0) {
+			if (errno != EINTR && errno != EAGAIN) {
+				perror("poll");
+				exit(EXIT_FAILURE);
+			}
+		} else if (nready > 0) {
+			if (fds[0].revents)
+				fds[0].fd = js_handle_input(0);
+			if (fds[1].revents)
+				fds[1].fd = js_handle_input(1);
 		}
-	} while (renderer_data.pause_display);
+	} while (nready);
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);

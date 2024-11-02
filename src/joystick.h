@@ -5,9 +5,10 @@
 #define JOYSTICK_H
 
 extern const char *jsdevice[2];
+extern int jsfd[2];
 
 void js_set_nesmaps(const char *);
 void js_init(void);
-void js_handle_input(void);
+int js_handle_input(int);
 
 #endif
