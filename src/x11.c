@@ -125,6 +125,7 @@ static Pixmap scalePixmap;
 static Picture scalePicture, windowPicture;
 #endif
 
+static int shm_incomplete = 0;
 #ifdef HAVE_SHM
 static XShmSegmentInfo shminfo;
 static Status shm_attached = 0;
@@ -760,7 +761,7 @@ HandleKeyboardX11(XEvent ev)
 }
 
 static void
-RenderImage(XEvent *ev)
+RenderImage(void)
 {
 	Drawable target;
 	int sx = 0, sy = 0;
@@ -794,7 +795,7 @@ RenderImage(XEvent *ev)
 	if (shm_attached) {
 		XShmPutImage(display, target, gc, image, sx, sy, dx, dy, w, h, True);
 		/* hang the event loop until we get a ShmCompletion */
-		ev->type = -1;
+		shm_incomplete = 1;
 	} else
 #endif
 	{
@@ -845,7 +846,7 @@ UpdateDisplayX11(void)
 	if (!nodisplay) {
 		drawimage(PBL);
 		if (!frameskip) {
-			RenderImage(&ev);
+			RenderImage();
 			renderer_data.redrawall = renderer_data.needsredraw = 0;
 		}
 	}
@@ -861,7 +862,7 @@ UpdateDisplayX11(void)
 		js_handle_input();
 
 		/* Handle X input */
-		while (XPending(display) || ev.type == -1) {
+		while (XPending(display) || shm_incomplete) {
 			XNextEvent(display, &ev);
 			/*printf("event %d\n", ev.type); */
 			if (ev.type == DestroyNotify) {
@@ -897,10 +898,10 @@ UpdateDisplayX11(void)
 				if (!xev->count) {
 					renderer_data.needsredraw = 1;
 				}
-			}
-			if (renderer_data.pause_display && renderer_data.needsredraw) {
-				RenderImage(&ev);
-				renderer_data.needsredraw = 0;
+#ifdef HAVE_SHM
+			} else if (shm_attached && ev.type == shm_first_event + ShmCompletion) {
+				shm_incomplete = 0;
+#endif
 			}
 		}
 
@@ -914,6 +915,10 @@ UpdateDisplayX11(void)
 		if (renderer_data.pause_display) {
 			usleep(16666);
 			renderer_data.desync = 1;
+			if (renderer_data.needsredraw) {
+				RenderImage();
+				renderer_data.needsredraw = 0;
+			}
 		}
 	} while (renderer_data.pause_display);
 
