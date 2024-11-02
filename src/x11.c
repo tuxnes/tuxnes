@@ -917,7 +917,7 @@ UpdateDisplayX11(void)
 		}
 
 #ifdef HAVE_SCRNSAVER
-		if (renderer_data.pause_display && sssuspend) {
+		if (sssuspend && (!mapped || renderer_data.pause_display)) {
 			sssuspend = 0;
 			XScreenSaverSuspend(display, 0);
 		}
@@ -934,7 +934,7 @@ UpdateDisplayX11(void)
 	} while (renderer_data.pause_display);
 
 #ifdef HAVE_SCRNSAVER
-	if (!sssuspend) {
+	if (!sssuspend && mapped) {
 		sssuspend = 1;
 		XScreenSaverSuspend(display, 1);
 	}
