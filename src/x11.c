@@ -112,6 +112,7 @@ void    UpdateDisplayX11(void);
 static Display  *display;
 static Window    window;
 static unsigned int window_w, window_h;
+static int      mapped;
 static Colormap colormap;
 static GC       gc;
 static XImage   *image = NULL;
@@ -508,10 +509,10 @@ shm_done:
 }
 
 static void
-HandleKeyboardX11(XEvent ev)
+HandleKeyboardX11(const XEvent *ev)
 {
-	KeySym keysym = XkbKeycodeToKeysym(display, ev.xkey.keycode, 0, 0);
-	bool press = ev.type == KeyPress;
+	KeySym keysym = XkbKeycodeToKeysym(display, ev->xkey.keycode, 0, 0);
+	bool press = ev->type == KeyPress;
 
 	if (press && keysym == XK_Escape)
 		quit();                    /* ESC */
@@ -761,6 +762,51 @@ HandleKeyboardX11(XEvent ev)
 }
 
 static void
+HandleEventX11(const XEvent *ev)
+{
+#if 0
+	printf("event %d\n", ev->type);
+#endif
+	if (ev->type == DestroyNotify) {
+		quit();
+#ifdef PAUSE_ON_DEFOCUS
+	} else if (ev->type == FocusIn) {
+		renderer_data.pause_display = 0;
+	} else if (ev->type == FocusOut) {
+		renderer_data.pause_display = 1;
+#endif
+	} else if (ev->type == MapNotify) {
+		mapped = 1;
+	} else if (ev->type == UnmapNotify) {
+		mapped = 0;
+	} else if (ev->type == KeyPress || ev->type == KeyRelease) {
+		HandleKeyboardX11(ev);
+	} else if (ev->type == KeymapNotify) {
+		controller[0] = controller[1] = 0;
+		controllerd[0] = controllerd[1] = 0;
+	} else if (ev->type == ConfigureNotify) {
+		const XConfigureEvent *ce = (const XConfigureEvent *)ev;
+
+		if (window_w != ce->width
+		 || window_h != ce->height) {
+			window_w = ce->width;
+			window_h = ce->height;
+			XClearWindow(display, window);
+		}
+	} else if (ev->type == Expose) {
+		const XExposeEvent *xev = (const XExposeEvent *)&ev;
+
+		if (!xev->count) {
+			renderer_data.needsredraw = 1;
+		}
+#ifdef HAVE_SHM
+	} else if (shm_attached && ev->type == shm_first_event + ShmCompletion) {
+		shm_incomplete = 0;
+#endif
+	}
+}
+
+static void
 RenderImage(void)
 {
 	Drawable target;
@@ -821,7 +867,6 @@ UpdateDisplayX11(void)
 	struct timeval time;
 	static unsigned int frame;
 	unsigned int timeframe;
-	static int nodisplay = 0;
 #ifdef HAVE_SCRNSAVER
 	static int sssuspend = 0;
 #endif
@@ -843,7 +888,7 @@ UpdateDisplayX11(void)
 		renderer_data.desync = 1;
 	}
 
-	if (!nodisplay) {
+	if (mapped) {
 		drawimage(PBL);
 		if (!frameskip) {
 			RenderImage();
@@ -864,45 +909,7 @@ UpdateDisplayX11(void)
 		/* Handle X input */
 		while (XPending(display) || shm_incomplete) {
 			XNextEvent(display, &ev);
-			/*printf("event %d\n", ev.type); */
-			if (ev.type == DestroyNotify) {
-				quit();
-#ifdef PAUSE_ON_DEFOCUS
-			} else if (ev.type == FocusIn) {
-				renderer_data.pause_display = 0;
-			} else if (ev.type == FocusOut) {
-				renderer_data.pause_display = 1;
-#endif
-			} else if (ev.type == MapNotify) {
-				nodisplay = 0;
-			} else if (ev.type == UnmapNotify) {
-				nodisplay = 1;
-			} else if (ev.type == KeyPress || ev.type == KeyRelease) {
-				HandleKeyboardX11(ev);
-			} else if (ev.type == KeymapNotify) {
-				memcpy(keystate, ((XKeymapEvent *)&ev)->key_vector, 32);
-				controller[0] = controller[1] = 0;
-				controllerd[0] = controllerd[1] = 0;
-			} else if (ev.type == ConfigureNotify) {
-				XConfigureEvent *ce = (XConfigureEvent *)&ev;
-
-				if (window_w != ce->width
-				 || window_h != ce->height) {
-					window_w = ce->width;
-					window_h = ce->height;
-					XClearWindow(display, window);
-				}
-			} else if (ev.type == Expose) {
-				XExposeEvent *xev = (XExposeEvent *)&ev;
-
-				if (!xev->count) {
-					renderer_data.needsredraw = 1;
-				}
-#ifdef HAVE_SHM
-			} else if (shm_attached && ev.type == shm_first_event + ShmCompletion) {
-				shm_incomplete = 0;
-#endif
-			}
+			HandleEventX11(&ev);
 		}
 
 #ifdef HAVE_SCRNSAVER
