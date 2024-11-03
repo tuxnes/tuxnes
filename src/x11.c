@@ -901,6 +901,13 @@ UpdateDisplayX11(void)
 	static int sssuspend = 0;
 #endif
 
+	if (!frameskip) {
+		RedrawImageX11();
+		if (mapped) {
+			RefreshImageX11();
+		}
+	}
+
 	/* Check the time.  If we're getting behind, skip a frame to stay in sync. */
 	gettimeofday(&time, NULL);
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
@@ -916,13 +923,6 @@ UpdateDisplayX11(void)
 	} else if (frame < timeframe - 20 && frame % 20 == 0) {
 		/* If we're more than 20 frames behind, might as well stop counting. */
 		renderer_data.desync = 1;
-	}
-
-	if (!frameskip) {
-		RedrawImageX11();
-		if (mapped) {
-			RefreshImageX11();
-		}
 	}
 
 	/* Slow down if we're getting ahead */
