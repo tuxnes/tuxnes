@@ -128,7 +128,7 @@ UpdateDisplayNone(void)
 	static unsigned int frame;
 	unsigned int timeframe;
 
-	/* Check the time.  If we're getting behind, skip a frame to stay in sync. */
+	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
@@ -140,9 +140,14 @@ UpdateDisplayNone(void)
 	if (renderer_data.desync) {
 		renderer_data.desync = 0;
 		frame = timeframe;
-	} else if (frame < timeframe - 20 && frame % 20 == 0) {
-		/* If we're more than 20 frames behind, might as well stop counting. */
-		renderer_data.desync = 1;
+	}
+	frameskip = frame < timeframe;
+	if (frameskip && frame % 20 == 0) {
+		frameskip = 0;
+		if (frame < timeframe - 20) {
+			/* If we're more than 20 frames behind, might as well stop counting. */
+			renderer_data.desync = 1;
+		}
 	}
 
 	/* Slow down if we're getting ahead */
@@ -170,18 +175,6 @@ UpdateDisplayNone(void)
 				fds[1].fd = js_handle_input(1);
 		}
 	} while (nready);
-
-	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
-	gettimeofday(&time, NULL);
-	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
-	if (renderer_data.halfspeed)
-		timeframe >>= 1;
-	else if (renderer_data.doublespeed)
-		timeframe *= renderer_data.doublespeed;
-	if (frame >= timeframe || frame % 20 == 0)
-		frameskip = 0;
-	else
-		frameskip = 1;
 }
 
 /* Update the colors on the screen if the palette changed */
