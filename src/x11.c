@@ -926,7 +926,7 @@ UpdateDisplayX11(void)
 	}
 
 	/* Slow down if we're getting ahead */
-	if (frame > timeframe + 1 && frameskip == 0) {
+	if (frame > timeframe + 1) {
 		usleep(16666 * (frame - timeframe - 1));
 	}
 
