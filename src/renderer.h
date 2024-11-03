@@ -47,7 +47,7 @@ extern struct RendererData {
 	int        halfspeed;
 	int        doublespeed;
 	int        desync;
-	int        needsredraw;            /* Refresh screen display */
+	int        needsrefresh;           /* Refresh screen display */
 	int        redrawbackground;       /* Redraw tile background */
 	int        redrawall;              /* Redraw all scanlines */
 } renderer_data;

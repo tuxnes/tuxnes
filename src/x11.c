@@ -788,7 +788,7 @@ HandleEventX11(const XEvent *ev)
 		const XExposeEvent *xev = (const XExposeEvent *)&ev;
 
 		if (!xev->count) {
-			renderer_data.needsredraw = 1;
+			renderer_data.needsrefresh = 1;
 		}
 	} else if (ev->type == ConfigureNotify) {
 		const XConfigureEvent *ce = (const XConfigureEvent *)ev;
@@ -826,7 +826,29 @@ HandleEventX11(const XEvent *ev)
 }
 
 static void
-RenderImage(void)
+RedrawImageX11(void)
+{
+	drawimage(PBL);
+
+	switch (renderer_config.scaler_magstep) {
+	case 2:
+		hq2x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
+		break;
+	case 3:
+		hq3x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
+		break;
+	case 4:
+		hq4x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
+		break;
+	}
+
+	renderer_data.needsrefresh = 1;
+	renderer_data.redrawbackground = 0;
+	renderer_data.redrawall = 0;
+}
+
+static void
+RefreshImageX11(void)
 {
 	Drawable target;
 	int sx = 0, sy = 0;
@@ -842,18 +864,6 @@ RenderImage(void)
 		target = window;
 		dx = (window_w - w) / 2;
 		dy = (window_h - h) / 2;
-	}
-
-	switch (renderer_config.scaler_magstep) {
-	case 2:
-		hq2x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
-		break;
-	case 3:
-		hq3x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
-		break;
-	case 4:
-		hq4x_32_rb((uint32_t *)fb, bytes_per_line, (uint32_t *)image->data, image->bytes_per_line, 256, 240);
-		break;
 	}
 
 #ifdef HAVE_SHM
@@ -877,6 +887,8 @@ RenderImage(void)
 		XRenderComposite(display, PictOpSrc, scalePicture, None, windowPicture, 0,0, 0,0, dx, dy, w, h);
 	}
 #endif
+
+	renderer_data.needsrefresh = 0;
 }
 
 void
@@ -906,10 +918,11 @@ UpdateDisplayX11(void)
 		renderer_data.desync = 1;
 	}
 
-	if (mapped && !frameskip) {
-		drawimage(PBL);
-		RenderImage();
-		renderer_data.redrawall = renderer_data.needsredraw = 0;
+	if (!frameskip) {
+		RedrawImageX11();
+		if (mapped) {
+			RefreshImageX11();
+		}
 	}
 
 	/* Slow down if we're getting ahead */
@@ -950,11 +963,8 @@ UpdateDisplayX11(void)
 			}
 		}
 
-		if (renderer_data.pause_display && !shm_incomplete) {
-			if (renderer_data.needsredraw) {
-				RenderImage();
-				renderer_data.needsredraw = 0;
-			}
+		if (renderer_data.needsrefresh && renderer_data.pause_display && !shm_incomplete && mapped) {
+			RefreshImageX11();
 		}
 
 #ifdef HAVE_SCRNSAVER
@@ -971,10 +981,6 @@ UpdateDisplayX11(void)
 		XScreenSaverSuspend(display, 1);
 	}
 #endif
-
-	renderer_data.needsredraw = 0;
-	renderer_data.redrawbackground = 0;
-	renderer_data.redrawall = 0;
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
@@ -1033,7 +1039,6 @@ UpdateColorsX11(void)
 	} else /* truecolor */ {
 		if (VRAM[0x3f00] != palette_cache[0]) {
 			renderer_data.redrawbackground = 1;
-			renderer_data.needsredraw = 1;
 		}
 
 		/* Set palette tables */

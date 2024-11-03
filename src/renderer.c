@@ -68,9 +68,9 @@ struct RendererData renderer_data = {
 	.halfspeed = 0,
 	.doublespeed = 0,
 	.desync = 1,
-	.needsredraw = 1,        /* Refresh screen display */
-	.redrawbackground = 1,   /* Redraw tile background */
-	.redrawall = 1,          /* Redraw all scanlines */
+	.needsrefresh = 1,
+	.redrawbackground = 1,
+	.redrawall = 1,
 };
 
 int
