@@ -358,10 +358,6 @@ InitDisplayX11(int argc, char **argv)
 	XMapWindow(display, window);
 	XFlush(display);
 
-	struct timeval time;
-	gettimeofday(&time, NULL);
-	renderer_data.basetime = time.tv_sec;
-
 	/* scaler_magstep determines XImage size */
 	unsigned int w = 256 * renderer_config.scaler_magstep;
 	unsigned int h = 240 * renderer_config.scaler_magstep;
@@ -910,6 +906,8 @@ UpdateDisplayX11(void)
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
+	if (renderer_data.desync)
+		renderer_data.basetime = time.tv_sec;
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
 	frame++;

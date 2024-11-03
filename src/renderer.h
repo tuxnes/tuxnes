@@ -12,6 +12,8 @@
 #define HAVE_X 1
 #endif /* !defined(X_DISPLAY_MISSING) */
 
+#include <sys/time.h>
+
 /* only the no-op renderer `none' is universally known */
 extern int      InitDisplayNone(int argc, char **argv);
 extern void     UpdateColorsNone(void);
@@ -42,7 +44,7 @@ extern struct RendererConfig {
 
 /* global renderer data */
 extern struct RendererData {
-	int        basetime;
+	time_t     basetime;
 	int        pause_display;
 	int        halfspeed;
 	int        doublespeed;

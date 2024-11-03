@@ -113,11 +113,7 @@ InitDisplayAuto(int argc, char **argv)
 int
 InitDisplayNone(int argc, char **argv)
 {
-	struct timeval time;
-
 	fbinit();
-	gettimeofday(&time, NULL);
-	renderer_data.basetime = time.tv_sec;
 	return 0;
 }
 
@@ -130,6 +126,8 @@ UpdateDisplayNone(void)
 
 	/* Check the time.  If we're getting behind, skip next frame to stay in sync. */
 	gettimeofday(&time, NULL);
+	if (renderer_data.desync)
+		renderer_data.basetime = time.tv_sec;
 	timeframe = (time.tv_sec - renderer_data.basetime) * 50 + time.tv_usec / 20000;     /* PAL */
 	timeframe = (time.tv_sec - renderer_data.basetime) * 60 + time.tv_usec / 16666;     /* NTSC */
 	frame++;
