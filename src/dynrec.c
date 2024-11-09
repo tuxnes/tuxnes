@@ -35,6 +35,11 @@ unsigned int LASTBANK;          /* Last memory page code executed in */
 #define NOP 0x90
 #define BRK 0xCC
 
+#define host_addr(tgt_addr) (MAPTABLE[(tgt_addr) >> 12] + (tgt_addr))
+#define sbyte(tgt_addr)     (*(signed char *)host_addr((tgt_addr)))
+#define ubyte(tgt_addr)     (*host_addr((tgt_addr)))
+#define uword(tgt_addr)     (ubyte((tgt_addr)) + (ubyte((tgt_addr) + 1) << 8))
+
 /* forward and external declarations */
 void disas(int);
 
@@ -46,18 +51,20 @@ translate(int addr)
 
 	XPC = cptr = next_code_alloc;
 	if (disassemble) {
-		printf("\n[%04x] (%p) -> %p\n", addr, MAPTABLE[addr >> 12] + addr, cptr);
+		printf("\n[%04x] (%p) -> %p\n", addr, host_addr(addr), cptr);
 		disas(addr);             /* This will output a disassembly of the 6502 code */
 	}
 	do {
 		int saddr = addr;
-		INT_MAP[(MAPTABLE[addr >> 12] + addr) - RAM] = cptr;
+		INT_MAP[host_addr(addr) - RAM] = cptr;
 		const uintptr_t *ptr = TRANS_TBL;
 		unsigned char src;
 		while (1) {
-			src = *(MAPTABLE[addr >> 12] + addr);
+			src = ubyte(addr);
 			addr++;
-			/*printf("%02x", src);fflush(stdout); */
+#if 0
+			printf("%02x", src);
+#endif
 			if (ptr[src] == 0)
 				break;
 			if (ptr[src] & 1)
@@ -66,7 +73,9 @@ translate(int addr)
 		}
 		if (ptr[src] == 0) {
 			addr = saddr + 1;
-			/*printf("!%2x-NULL!", src); */
+#if 0
+			printf("!%02x-NULL!", src);
+#endif
 			if (!ignorebadinstr)
 				*cptr++ = BRK;
 		} else {
@@ -81,27 +90,29 @@ translate(int addr)
 				m = *sptr++;
 				l = *sptr++;
 				o = *sptr++;
-				/*printf("[%c%d %d]", m, o, l);fflush(stdout); */
+#if 0
+				printf("[%c%d %d]", m, o, l);
+#endif
 				if (m == '!')
 					stop = 1;
 				else if (m == 'B')
-					bptr[l] = *(MAPTABLE[(saddr + o) >> 12] + (saddr + o));
+					bptr[l] = ubyte(saddr + o);
 				else if (m == 'C')
-					bptr[l] = ~*(MAPTABLE[(saddr + o) >> 12] + (saddr + o));
+					bptr[l] = ~ubyte(saddr + o);
 				else if (m == 'D')
 					*(unsigned int *)(bptr + l) = (unsigned int)bptr + l + o;
 				else if (m == 'E')
-					*(int *)(bptr + l) = *(signed char *)(MAPTABLE[(saddr + o) >> 12] + (saddr + o));
+					*(int *)(bptr + l) = sbyte(saddr + o);
 				else if (m == 'Z')
-					*(unsigned int *)(bptr + l) = (unsigned int)ZPMEM + *(MAPTABLE[(saddr + o) >> 12] + saddr + o);
+					*(unsigned int *)(bptr + l) = (unsigned int)ZPMEM + ubyte(saddr + o);
 				else if (m == 'A')
-					*(unsigned int *)(bptr + l) = (unsigned int)RAM + *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) << 8);
+					*(unsigned int *)(bptr + l) = (unsigned int)RAM + uword(saddr + o);
 				else if (m == 'L')
 					*(unsigned int *)(bptr + l) = (unsigned int)RAM;
 				else if (m == 'W')
-					*(unsigned short *)(bptr + l) = *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) << 8);
+					*(unsigned short *)(bptr + l) = uword(saddr + o);
 				else if (m == 'X')
-					*(unsigned int *)(bptr + l) = (unsigned int)(MAPTABLE + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) >> 4));
+					*(unsigned int *)(bptr + l) = (unsigned int)(MAPTABLE + (ubyte(saddr + o + 1) >> 4));
 				else if (m == 'M')
 					*(unsigned int *)(bptr + l) = (unsigned int)(MAPTABLE);
 				else if (m == 'T')
@@ -109,9 +120,9 @@ translate(int addr)
 				else if (m == 'P')
 					*(unsigned short *)(bptr + l) = saddr + o;
 				else if (m == 'R')
-					*(int *)(bptr + l) = *(signed char *)(MAPTABLE[(saddr + o) >> 12] + saddr + o) + saddr + o + 1;
+					*(int *)(bptr + l) = sbyte(saddr + o) + saddr + o + 1;
 				else if (m == 'J')
-					*(unsigned int *)(bptr + l) = *(MAPTABLE[(saddr + o) >> 12] + saddr + o) + (*(MAPTABLE[(saddr + o + 1) >> 12] + saddr + o + 1) << 8);
+					*(unsigned int *)(bptr + l) = uword(saddr + o);
 				else if (m == 'S')
 					*(void **)(bptr + l) = &STACKPTR;
 				else if (m == 'V')
@@ -129,12 +140,15 @@ translate(int addr)
 				else if (m == 'Y')
 					*(int *)(bptr + l) = (int)Mapper[MAPPERNUMBER] - (int)(bptr + l) - 4;
 				else if (m == '>')
-					bptr[l] += ((*(signed char *)(MAPTABLE[(saddr + o) >> 12] + saddr + o) + saddr + o + 1) & 0xFF00) != ((saddr + o + 1) & 0xFF00);
+					bptr[l] += ((sbyte(saddr + o) + saddr + o + 1) & 0xFF00) != ((saddr + o + 1) & 0xFF00);
 				else if (m == '^')
 					bptr[l] = ignorebadinstr ? NOP : BRK;
 			}
 			addr = saddr + slen;
 		}
+#if 0
+		printf("\n");
+#endif
 	} while (!stop);
 	while ((uintptr_t)cptr & 0xf)
 		*cptr++ = NOP;
