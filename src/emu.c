@@ -131,7 +131,6 @@ static double tint = 0.5;
 
 extern const char *const MapperName[];
 void    quit(void);
-void    START(void);
 
 /* color palettes */
 static const struct {

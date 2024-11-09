@@ -103,7 +103,6 @@
 /* external and forward declarations */
 void    fbinit(void);
 void    quit(void);
-void    START(void);
 
 /* exported functions */
 int     InitDisplayX11(int argc, char **argv);

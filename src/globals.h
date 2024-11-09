@@ -11,10 +11,11 @@
 #include "consts.h"
 
 /* Asm linkage */
-extern void     *INPUT;
-extern void     *OUTPUT;
-extern void     *U;
-extern void     *NMI;
+extern void     START(void);
+extern void     INPUT(void);
+extern void     OUTPUT(void);
+extern void     U(void);
+extern void     NMI(void);
 extern unsigned int      MAPPERNUMBER;
 extern unsigned char    *ROM_BASE;
 extern void     (*const MapperInit[])(void);
