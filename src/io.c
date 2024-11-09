@@ -454,12 +454,11 @@ donmi(void)
 void
 trace(int s)
 {
-	/*
-	   printf("branch, stack: %x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x\n",
-	   (&s)[1], (&s)[2], (&s)[3], (&s)[4], (&s)[5], (&s)[6],
-	   (&s)[7], (&s)[8], (&s)[9], (&s)[10], (&s)[11], (&s)[12]);
-	 */
-	char hex[17] = "0123456789ABCDEF";
-	unsigned int x = ((int *)&s)[4];
-	printf("%c%c%c%c\n", hex[x >> 12], hex[(x & 0xf00) >> 8], hex[(x & 0xf0) >> 4], hex[x & 0xf]);
+#if 0
+	printf("branch, stack: %x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x\n",
+	       (&s)[1], (&s)[2], (&s)[3], (&s)[4], (&s)[5], (&s)[6],
+	       (&s)[7], (&s)[8], (&s)[9], (&s)[10], (&s)[11], (&s)[12]);
+#else
+	printf("%04x\n", (&s)[4] & 0xffff);
+#endif
 }
