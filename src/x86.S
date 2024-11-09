@@ -14,16 +14,6 @@
 #define _REG2  (_RAM+0x4000)    /* ioregs mapped to 4000 in 6502 memory */
 #define _NVRAM (_RAM+0x6000)    /* Battery RAM (mapped to 6000 in 6502 address space) */
 
-#define _VFLAG    VFLAG         /* Store overflow flag */
-#define _FLAGS    FLAGS         /* Store 6502 process status reg */
-#define _STACKPTR STACKPTR      /* Store 6502 stack pointer */
-#define _PCR      PCR           /* Store 6502 program counter */
-#define _XPC      XPC           /* Translated program counter */
-#define _INRET    INRET         /* Input data return value */
-#define _CTNI     CTNI          /* Cycles to next interrupt */
-#define _DMOD     DMOD          /* Dest addr to modify */
-#define _LASTBANK LASTBANK      /* Last memory page code executed in */
-
 .section .note.GNU-stack,"",@progbits
 
 
@@ -43,9 +33,9 @@ START:
 	mov $VBL,%ebx
 	mov %esi,CLOCK
 	sub %ebx,%esi
-	mov %esi,_CTNI
+	mov %esi,CTNI
 	mov $_STACK+0xff,%ebx
-	mov %ebx,_STACKPTR
+	mov %ebx,STACKPTR
 	xor %eax,%eax
 	xor %ecx,%ecx
 	xor %edx,%edx
@@ -63,23 +53,23 @@ START:
 U:
 
 /* This will trace all branches for debugging */
-/*	mov %ebx,_PCR */
+/*	mov %ebx,PCR */
 /*	mov -4(%esp),%ebx */
-/*	mov %ebx,_DMOD */
-/*	mov _PCR,%ebx */
+/*	mov %ebx,DMOD */
+/*	mov PCR,%ebx */
 /*	pusha */
 /*	call trace */
 /*	popa */
-/*	mov _DMOD,%ebx */
+/*	mov DMOD,%ebx */
 /*	mov %ebx,-4(%esp) */
-/*	mov _PCR,%ebx */
+/*	mov PCR,%ebx */
 
 	test %esi,%esi
 	jns NMI
-	mov %ebx,_PCR
+	mov %ebx,PCR
 	mov -4(%esp),%ebx
-	mov %ebx,_DMOD
-	mov _PCR,%ebx
+	mov %ebx,DMOD
+	mov PCR,%ebx
 	cmp $0x7fff,%ebx
 	jle selfmod
 recompile:
@@ -95,24 +85,24 @@ recompile:
 	jne 0f
 recompile_always:
 	pusha
-	mov _PCR,%ebx
+	mov PCR,%ebx
 	push %ebx
 	call translate
 	pop %ebx
 	popa
-	mov _XPC,%ebx
+	mov XPC,%ebx
 0:
 	push %ecx
 	cmpl $0,dolink
 	jz 1f  /* to disable linking (for debugging) */
-	mov _PCR,%ecx
+	mov PCR,%ecx
 	and $0xFFFFF000,%ecx
-	cmp %ecx,_LASTBANK
-	mov %ecx,_LASTBANK
+	cmp %ecx,LASTBANK
+	mov %ecx,LASTBANK
 	jne 1f /* don't link across memory banks - mapper might change! */
 	cmp $0x7fff,%ecx
 	jle 1f /* don't link to RAM code */
-	mov _DMOD,%ecx
+	mov DMOD,%ecx
 	test %ecx,%ecx
 	jz 1f  /* skip null address */
 	push %eax
@@ -132,7 +122,7 @@ recompile_always:
 NMI:
 	pusha
 	mov $7,%esi
-	sub _CTNI,%esi
+	sub CTNI,%esi
 	add CLOCK,%esi
 	sub $CPF,%esi
 	sbb %ecx,%ecx
@@ -149,17 +139,17 @@ NMI:
 	popa
 	pusha
 /* push return address */
-	movl   _STACKPTR,%eax
+	movl   STACKPTR,%eax
 	movb   %bh,(%eax)
 	decl   %eax
 	orl    $0x100,%eax
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
-	andl   $0x3C,_FLAGS
+	andl   $0x3C,FLAGS
 	xorl   %ebx,%ebx
 	add    $0xffffffff,%ebp
-	mov    _FLAGS,%ebp
+	mov    FLAGS,%ebp
 	adc    $0,%ebp
 	testl  $0xff,%edi
 	setz   %bl
@@ -169,7 +159,7 @@ NMI:
 	shrl   %ebx
 	andl   $0x80,%ebx
 	orl    %ebx,%ebp
-	movl   _VFLAG,%ebx
+	movl   VFLAG,%ebx
 	addl   $0x80,%ebx
 	addl   $0xffffff00,%ebx
 	sbbl   %ebx,%ebx
@@ -177,28 +167,28 @@ NMI:
 	orl    %ebp,%ebx
 	movb   %bl,(%eax)
 	decb   %al
-	mov    %al,_STACKPTR
+	mov    %al,STACKPTR
 	popa
 	movl   $0,-4(%esp)
-	movl   _CTNI,%esi
+	movl   CTNI,%esi
 	movl   MAPTABLE+60,%ebx
-	andl   $0x2C,_FLAGS
-	orl    $0x04,_FLAGS
+	andl   $0x2C,FLAGS
+	orl    $0x04,FLAGS
 	movzwl 0xFFFA(%ebx),%ebx
 	jmp U
 2:    /* don't do NMI */
 skipint:
 	popa
 	movl $0,-4(%esp)
-	mov _CTNI,%esi
+	mov CTNI,%esi
 	jmp U
 
 irq:
 	movl CLOCK,%eax
 	subl $VBL,%eax
-	movl %eax,_CTNI
+	movl %eax,CTNI
 /* Check interrupt-disable flag */
-	movl _FLAGS,%eax
+	movl FLAGS,%eax
 	movl $0,irqflag
 	testl $0x04,%eax
 	jnz skipint
@@ -216,17 +206,17 @@ irq:
 	popa
 	pusha
 /* push return address */
-	movl   _STACKPTR,%eax
+	movl   STACKPTR,%eax
 	movb   %bh,(%eax)
 	decl   %eax
 	orl    $0x100,%eax
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
-	andl   $0x3C,_FLAGS
+	andl   $0x3C,FLAGS
 	xorl   %ebx,%ebx
 	add    $0xffffffff,%ebp
-	mov    _FLAGS,%ebp
+	mov    FLAGS,%ebp
 	adc    $0,%ebp
 	testl  $0xff,%edi
 	setz   %bl
@@ -236,7 +226,7 @@ irq:
 	shrl   %ebx
 	andl   $0x80,%ebx
 	orl    %ebx,%ebp
-	movl   _VFLAG,%ebx
+	movl   VFLAG,%ebx
 	addl   $0x80,%ebx
 	addl   $0xffffff00,%ebx
 	sbbl   %ebx,%ebx
@@ -244,13 +234,13 @@ irq:
 	orl    %ebp,%ebx
 	movb   %bl,(%eax)
 	decb   %al
-	mov    %al,_STACKPTR
+	mov    %al,STACKPTR
 	popa
 	movl   $0,-4(%esp)
-	movl   _CTNI,%esi
+	movl   CTNI,%esi
 	movl   MAPTABLE+60,%ebx
-	andl   $0x2C,_FLAGS
-	orl    $0x04,_FLAGS
+	andl   $0x2C,FLAGS
+	orl    $0x04,FLAGS
 	movzwl 0xFFFE(%ebx),%ebx
 	jmp U
 .type NMI,@function
@@ -261,8 +251,8 @@ irq:
 INPUT:
 	pusha
 	mov %esi,%ecx
-	sub _CTNI,%esi
-	mov %ecx,_CTNI
+	sub CTNI,%esi
+	mov %ecx,CTNI
 	add CLOCK,%esi
 	sub $CPF,%esi
 	sbb %ecx,%ecx
@@ -273,8 +263,8 @@ INPUT:
 	call input
 	pop %ebx
 	popa
-	movl _CTNI,%esi
-	movsbl _INRET,%edi
+	movl CTNI,%esi
+	movsbl INRET,%edi
 	ret
 .type INPUT,@function
 .size INPUT,.-INPUT
@@ -284,8 +274,8 @@ INPUT:
 OUTPUT:
 	pusha
 	mov %esi,%ecx
-	sub _CTNI,%esi
-	mov %ecx,_CTNI
+	sub CTNI,%esi
+	mov %ecx,CTNI
 	add CLOCK,%esi
 	sub $CPF,%esi
 	sbb %ecx,%ecx
@@ -298,7 +288,7 @@ OUTPUT:
 	pop %ebx
 	pop %eax
 	popa
-	movl _CTNI,%esi
+	movl CTNI,%esi
 	ret
 .type OUTPUT,@function
 .size OUTPUT,.-OUTPUT
@@ -317,8 +307,8 @@ MAPPER_NONE:
 MAPPER_MMC1:
 	pusha
 	mov %esi,%ecx
-	sub _CTNI,%esi
-	mov %ecx,_CTNI
+	sub CTNI,%esi
+	mov %ecx,CTNI
 	add CLOCK,%esi
 	sub $CPF,%esi
 	sbb %ecx,%ecx
@@ -331,7 +321,7 @@ MAPPER_MMC1:
 	pop %ebx
 	pop %eax
 	popa
-	movl _CTNI,%esi
+	movl CTNI,%esi
 	ret
 .type MAPPER_MMC1,@function
 .size MAPPER_MMC1,.-MAPPER_MMC1
@@ -369,8 +359,8 @@ MAPPER_CNROM:
 MAPPER_MMC3:
 	pusha
 	mov %esi,%ecx
-	sub _CTNI,%esi
-	mov %ecx,_CTNI
+	sub CTNI,%esi
+	mov %ecx,CTNI
 	add CLOCK,%esi
 	sub $CPF,%esi
 	sbb %ecx,%ecx
@@ -383,7 +373,7 @@ MAPPER_MMC3:
 	pop %ebx
 	pop %eax
 	popa
-	movl _CTNI,%esi
+	movl CTNI,%esi
 	ret
 .type MAPPER_MMC3,@function
 .size MAPPER_MMC3,.-MAPPER_MMC3
@@ -407,8 +397,8 @@ MAPPER_MMC5:
 MAPPER_AOROM:
 	pusha
 	mov %esi,%ecx
-	sub _CTNI,%esi
-	mov %ecx,_CTNI
+	sub CTNI,%esi
+	mov %ecx,CTNI
 	add CLOCK,%esi
 	sub $CPF,%esi
 	sbb %ecx,%ecx
@@ -421,7 +411,7 @@ MAPPER_AOROM:
 	pop %ebx
 	pop %eax
 	popa
-	movl _CTNI,%esi
+	movl CTNI,%esi
 	ret
 .type MAPPER_AOROM,@function
 .size MAPPER_AOROM,.-MAPPER_AOROM
@@ -844,8 +834,8 @@ selfmod:
 	cmpb $0xb1,_RAM(%ebx)
 	je ildaziy
 i_done:
-	movl %ebx,_PCR
-	movl $0,_DMOD
+	movl %ebx,PCR
+	movl $0,DMOD
 	jmp recompile
 
 ijmp:
@@ -887,7 +877,7 @@ ildainp:
 
 ijsr:
 	pushl  %eax
-	mov    _STACKPTR,%eax
+	mov    STACKPTR,%eax
 	add    $2,%ebx
 	mov    %bh,(%eax)
 	decl   %eax
@@ -895,7 +885,7 @@ ijsr:
 	movb   %bl,(%eax)
 	decb   %al
 	addl   $6,%esi
-	movb   %al,_STACKPTR
+	movb   %al,STACKPTR
 	popl   %eax
 	movzwl _RAM-1(%ebx),%ebx
 	jmp i_next
@@ -1067,7 +1057,7 @@ iadcz:
 	leal   3(%esi),%esi
 	sbbl   %ebp,%ebp
 	popl   %ebx
-	movl   %eax,_VFLAG
+	movl   %eax,VFLAG
 	addl   $2,%ebx
 	movsbl %al,%edi
 	jmp i_next
@@ -1090,7 +1080,7 @@ iadcimm:
 	leal   2(%esi),%esi
 	sbbl   %ebp,%ebp
 	popl   %ebx
-	movl   %eax,_VFLAG
+	movl   %eax,VFLAG
 	addl   $2,%ebx
 	movsbl %al,%edi
 	jmp i_next
@@ -1117,7 +1107,7 @@ isbcx: /* No I/O */
 	addl   $0xffffffff,%ebp
 	adcl   %ebx,%eax
 	sbbl   %ebp,%ebp
-	movl   %eax,_VFLAG
+	movl   %eax,VFLAG
 	movsbl %al,%edi
 	popl   %ebx
 	addl   $3,%ebx
@@ -1466,7 +1456,7 @@ isbcimm:
 	leal   2(%esi),%esi
 	sbbl   %ebp,%ebp
 	popl   %ebx
-	movl   %eax,_VFLAG
+	movl   %eax,VFLAG
 	addl   $2,%ebx
 	movsbl %al,%edi
 	jmp i_next
@@ -1670,7 +1660,7 @@ ibitz:
 	leal   0(,%edi,8),%ebx
 	andl   %eax,%edi
 	andl   $0x200,%ebx
-	movl   %ebx,_VFLAG
+	movl   %ebx,VFLAG
 	popl   %ebx
 	jmp i_next
 
@@ -1743,7 +1733,7 @@ isbcz:
 	leal   3(%esi),%esi
 	sbbl   %ebp,%ebp
 	popl   %ebx
-	movl   %eax,_VFLAG
+	movl   %eax,VFLAG
 	addl   $2,%ebx
 	movsbl %al,%edi
 	jmp i_next
@@ -1777,12 +1767,12 @@ irolz:
 irts:
 	xorl   %ebx,%ebx
 	pushl  %eax
-	movb   _STACKPTR,%bl
+	movb   STACKPTR,%bl
 	xorl   %eax,%eax
 	incb   %bl
 	movb   _STACK(%ebx),%al
 	incb   %bl
-	movb   %bl,_STACKPTR
+	movb   %bl,STACKPTR
 	movb   _STACK(%ebx),%ah
 	leal   0x6(%esi),%esi
 	leal   0x1(%eax),%ebx
