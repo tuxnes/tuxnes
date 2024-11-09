@@ -59,7 +59,9 @@ U:
 	mov    %ebx,DMOD
 	mov    PCR,%ebx
 	pusha
+	push   %ebx
 	call   trace
+	pop    %ebx
 	popa
 	mov    DMOD,%ebx
 	mov    %ebx,-4(%esp)

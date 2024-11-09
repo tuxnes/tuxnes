@@ -12,6 +12,7 @@
 #include "config.h"
 #endif
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -28,7 +29,7 @@ void    vs(int, int);
 int     donmi(void);
 void    input(int);
 void    output(int, int);
-void    trace(int);
+void    trace(int, ...);
 
 /* Declaration of global variables */
 unsigned char   vram[16384];
@@ -448,17 +449,18 @@ donmi(void)
 
 /*
  * this is left in here for debugging purposes but is not normally called:
- * FIXME: this makes assumptions about the exact parameter passing
- * implementation!
  */
 void
-trace(int s)
+trace(int pc, ...)
 {
 #if 0
-	printf("branch, stack: %x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x\n",
-	       (&s)[1], (&s)[2], (&s)[3], (&s)[4], (&s)[5], (&s)[6],
-	       (&s)[7], (&s)[8], (&s)[9], (&s)[10], (&s)[11], (&s)[12]);
+	va_list ap;
+	va_start(ap, pc);
+	/* x86 registers:  %edi, %esi, %ebp, %esp, %ebx, %edx, %ecx, %eax */
+	/* 6502 registers: N&Z, Cycle counter, C, -, PC, Y, X, A */
+	vprintf("branch, stack: %x,%d,%x,%x,%x,%x,%x,%x\n", ap);
+	va_end(ap);
 #else
-	printf("%04x\n", (&s)[4] & 0xffff);
+	printf("%04x\n", pc);
 #endif
 }
