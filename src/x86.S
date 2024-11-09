@@ -43,7 +43,7 @@ START:
 	xor %edi,%edi
 	movl $0,-4(%esp)
 	movl MAPTABLE+60,%ebx
-	movzwl 0xFFFC(%ebx),%ebx
+	movzwl 0xfffc(%ebx),%ebx
 	jmp U
 .type START,@function
 .size START,.-START
@@ -96,7 +96,7 @@ recompile_always:
 	cmpl $0,dolink
 	jz 1f  /* to disable linking (for debugging) */
 	mov PCR,%ecx
-	and $0xFFFFF000,%ecx
+	and $0xfffff000,%ecx
 	cmp %ecx,LASTBANK
 	mov %ecx,LASTBANK
 	jne 1f /* don't link across memory banks - mapper might change! */
@@ -146,7 +146,7 @@ NMI:
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
-	andl   $0x3C,FLAGS
+	andl   $0x3c,FLAGS
 	xorl   %ebx,%ebx
 	add    $0xffffffff,%ebp
 	mov    FLAGS,%ebp
@@ -172,9 +172,9 @@ NMI:
 	movl   $0,-4(%esp)
 	movl   CTNI,%esi
 	movl   MAPTABLE+60,%ebx
-	andl   $0x2C,FLAGS
+	andl   $0x2c,FLAGS
 	orl    $0x04,FLAGS
-	movzwl 0xFFFA(%ebx),%ebx
+	movzwl 0xfffa(%ebx),%ebx
 	jmp U
 2:    /* don't do NMI */
 skipint:
@@ -213,7 +213,7 @@ irq:
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
-	andl   $0x3C,FLAGS
+	andl   $0x3c,FLAGS
 	xorl   %ebx,%ebx
 	add    $0xffffffff,%ebp
 	mov    FLAGS,%ebp
@@ -239,9 +239,9 @@ irq:
 	movl   $0,-4(%esp)
 	movl   CTNI,%esi
 	movl   MAPTABLE+60,%ebx
-	andl   $0x2C,FLAGS
+	andl   $0x2c,FLAGS
 	orl    $0x04,FLAGS
-	movzwl 0xFFFE(%ebx),%ebx
+	movzwl 0xfffe(%ebx),%ebx
 	jmp U
 .type NMI,@function
 .size NMI,.-NMI
@@ -894,7 +894,7 @@ ilday:
 	movzwl _RAM+1(%ebx),%eax
 	andl  $0xff,%edx
 	addl  %edx,%eax
-	/*andl  $0xFFFF,%eax - unnecessary as MAPTABLE should take care of this */
+	/*andl  $0xffff,%eax - unnecessary as MAPTABLE should take care of this */
 	movl  %eax,%edi
 	cmpb  %dl,%al
 	adcl  $4,%esi  /* 1 extra cycle if page boundary is crossed (dl>al) */
@@ -1086,7 +1086,7 @@ iadcimm:
 	jmp i_next
 
 isec:
-	orl    $0xFFFFFFFF,%ebp
+	orl    $0xffffffff,%ebp
 	addl   $2,%esi
 	addl   $1,%ebx
 	jmp i_next
@@ -1115,7 +1115,7 @@ isbcx: /* No I/O */
 
 istax:
 	addl  $3,%ebx
-	andl  $0xFF,%ecx
+	andl  $0xff,%ecx
 	pushl %ebx
 	movzwl _RAM-2(%ebx),%ebx
 	addl  %ecx,%ebx
@@ -1159,7 +1159,7 @@ ilsr:
 
 iphp:
 	pushl  %ebx
-	andl   $0x3C,FLAGS
+	andl   $0x3c,FLAGS
 	xorl   %ebx,%ebx
 	add    $0xffffffff,%ebp
 	mov    FLAGS,%ebp
@@ -1190,7 +1190,7 @@ iphp:
 	jmp i_next
 
 ildaziy:
-	andl $0xFF,%edx
+	andl $0xff,%edx
 	movzbl _RAM+1(%ebx),%eax
 	movzwl _RAM(%eax),%edi
 	addl   %edx,%edi
@@ -1232,7 +1232,7 @@ iplp:
 	xorl   $0x2,%ebp
 	andl   $0x200,%edi
 	andl   $0x1,%ebp
-	andl   $0x3C,FLAGS
+	andl   $0x3c,FLAGS
 	movl   %edi,VFLAG
 	leal   (%ebp,%ebp,1),%edi
 	andl   $0x104,%edi
@@ -1382,7 +1382,7 @@ ibne:
 	addl %eax,%ebx
 	cmpb %al,%bl
 	adcl $1,%esi
-	andl $0xFFFF,%ebx
+	andl $0xffff,%ebx
 	popl  %eax
 	jmp i_next
 
@@ -1420,7 +1420,7 @@ ibcc:
 	addl %eax,%ebx
 	cmpb %al,%bl
 	adcl $1,%esi
-	andl $0xFFFF,%ebx
+	andl $0xffff,%ebx
 	popl  %eax
 	jmp i_next
 
@@ -1463,7 +1463,7 @@ isbcimm:
 
 istay:
 	addl  $3,%ebx
-	andl  $0xFF,%edx
+	andl  $0xff,%edx
 	pushl %ebx
 	movzwl _RAM-2(%ebx),%ebx
 	addl  %edx,%ebx
@@ -1507,7 +1507,7 @@ ibeq:
 	addl %eax,%ebx
 	cmpb %al,%bl
 	adcl $1,%esi
-	andl $0xFFFF,%ebx
+	andl $0xffff,%ebx
 	popl  %eax
 	jmp i_next
 
@@ -1531,7 +1531,7 @@ ibpl:
 	addl %eax,%ebx
 	cmpb %al,%bl
 	adcl $1,%esi
-	andl $0xFFFF,%ebx
+	andl $0xffff,%ebx
 	popl  %eax
 	jmp i_next
 
@@ -1625,7 +1625,7 @@ ibmi:
 	addl %eax,%ebx
 	cmpb %al,%bl
 	adcl $1,%esi
-	andl $0xFFFF,%ebx
+	andl $0xffff,%ebx
 	popl  %eax
 	jmp i_next
 
@@ -1705,7 +1705,7 @@ irorz:
 	pushl %ebx
 	movzbl _RAM-1(%ebx),%ebx
 	addl  $5,%esi
-	addl  $0xFFFFFFFF,%ebp
+	addl  $0xffffffff,%ebp
 	rcrb  _RAM(%ebx)
 	movsbl _RAM(%ebx),%edi
 	sbbl %ebp,%ebp
@@ -1748,7 +1748,7 @@ ibcs:
 	addl %eax,%ebx
 	cmpb %al,%bl
 	adcl $1,%esi
-	andl $0xFFFF,%ebx
+	andl $0xffff,%ebx
 	popl  %eax
 	jmp i_next
 
@@ -1757,7 +1757,7 @@ irolz:
 	pushl %ebx
 	movzbl _RAM-1(%ebx),%ebx
 	addl  $5,%esi
-	addl  $0xFFFFFFFF,%ebp
+	addl  $0xffffffff,%ebp
 	rclb  _RAM(%ebx)
 	movsbl _RAM(%ebx),%edi
 	sbbl %ebp,%ebp
