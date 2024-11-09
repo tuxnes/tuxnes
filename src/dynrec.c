@@ -86,10 +86,9 @@ translate(int addr)
 			while (dlen--)
 				*cptr++ = *sptr++;
 			while (*sptr) {
-				unsigned char m, l, o;
-				m = *sptr++;
-				l = *sptr++;
-				o = *sptr++;
+				unsigned char m = *sptr++;
+				unsigned char l = *sptr++;
+				unsigned char o = *sptr++;
 #if 0
 				printf("[%c%d %d]", m, o, l);
 #endif
@@ -100,45 +99,45 @@ translate(int addr)
 				else if (m == 'C')
 					bptr[l] = ~ubyte(saddr + o);
 				else if (m == 'D')
-					*(unsigned int *)(bptr + l) = (unsigned int)bptr + l + o;
+					*(void **)&bptr[l] = &bptr[l + o];
 				else if (m == 'E')
-					*(int *)(bptr + l) = sbyte(saddr + o);
+					*(int *)&bptr[l] = sbyte(saddr + o);
 				else if (m == 'Z')
-					*(unsigned int *)(bptr + l) = (unsigned int)ZPMEM + ubyte(saddr + o);
+					*(void **)&bptr[l] = &ZPMEM[ubyte(saddr + o)];
 				else if (m == 'A')
-					*(unsigned int *)(bptr + l) = (unsigned int)RAM + uword(saddr + o);
+					*(void **)&bptr[l] = &RAM[uword(saddr + o)];
 				else if (m == 'L')
-					*(unsigned int *)(bptr + l) = (unsigned int)RAM;
+					*(void **)&bptr[l] = RAM;
 				else if (m == 'W')
-					*(unsigned short *)(bptr + l) = uword(saddr + o);
+					*(unsigned short *)&bptr[l] = uword(saddr + o);
 				else if (m == 'X')
-					*(unsigned int *)(bptr + l) = (unsigned int)(MAPTABLE + (ubyte(saddr + o + 1) >> 4));
+					*(void **)&bptr[l] = &MAPTABLE[ubyte(saddr + o + 1) >> 4];
 				else if (m == 'M')
-					*(unsigned int *)(bptr + l) = (unsigned int)(MAPTABLE);
+					*(void **)&bptr[l] = MAPTABLE;
 				else if (m == 'T')
-					*(unsigned int *)(bptr + l) = (unsigned int)STACK;
+					*(void **)&bptr[l] = STACK;
 				else if (m == 'P')
-					*(unsigned short *)(bptr + l) = saddr + o;
+					*(unsigned short *)&bptr[l] = saddr + o;
 				else if (m == 'R')
-					*(int *)(bptr + l) = sbyte(saddr + o) + saddr + o + 1;
+					*(int *)&bptr[l] = sbyte(saddr + o) + saddr + o + 1;
 				else if (m == 'J')
-					*(unsigned int *)(bptr + l) = uword(saddr + o);
+					*(unsigned int *)&bptr[l] = uword(saddr + o);
 				else if (m == 'S')
-					*(void **)(bptr + l) = &STACKPTR;
+					*(void **)&bptr[l] = &STACKPTR;
 				else if (m == 'V')
-					*(void **)(bptr + l) = &VFLAG;
+					*(void **)&bptr[l] = &VFLAG;
 				else if (m == 'F')
-					*(void **)(bptr + l) = &FLAGS;
+					*(void **)&bptr[l] = &FLAGS;
 				else if (m == 'I')
-					*(int *)(bptr + l) = (int)&INPUT - (int)(bptr + l) - 4;
+					*(void **)&bptr[l] = (void *)((unsigned char *)&INPUT - &bptr[l + 4]);
 				else if (m == 'O')
-					*(int *)(bptr + l) = (int)&OUTPUT - (int)(bptr + l) - 4;
+					*(void **)&bptr[l] = (void *)((unsigned char *)&OUTPUT - &bptr[l + 4]);
 				else if (m == 'U')
-					*(int *)(bptr + l) = (int)&U - (int)(bptr + l) - 4;
+					*(void **)&bptr[l] = (void *)((unsigned char *)&U - &bptr[l + 4]);
 				else if (m == 'N')
-					*(int *)(bptr + l) = (int)&NMI - (int)(bptr + l) - 4;
+					*(void **)&bptr[l] = (void *)((unsigned char *)&NMI - &bptr[l + 4]);
 				else if (m == 'Y')
-					*(int *)(bptr + l) = (int)Mapper[MAPPERNUMBER] - (int)(bptr + l) - 4;
+					*(void **)&bptr[l] = (void *)((unsigned char *)Mapper[MAPPERNUMBER] - &bptr[l + 4]);
 				else if (m == '>')
 					bptr[l] += ((sbyte(saddr + o) + saddr + o + 1) & 0xFF00) != ((saddr + o + 1) & 0xFF00);
 				else if (m == '^')
