@@ -20,17 +20,6 @@ extern const uintptr_t TRANS_TBL[];
 
 static unsigned char *next_code_alloc = (unsigned char *)_CODE_BASE;
 
-/* Some declarataions for the asm code */
-unsigned int VFLAG;             /* Store overflow flag */
-unsigned int FLAGS;             /* Store 6502 process status reg */
-unsigned int STACKPTR;          /* Store 6502 stack pointer */
-unsigned int PCR;               /* Store 6502 program counter */
-void *XPC;                      /* Translated program counter */
-signed int INRET;               /* Input data return value */
-signed int CTNI;                /* Cycles to next interrupt */
-unsigned int DMOD;              /* Dest addr to modify */
-unsigned int LASTBANK;          /* Last memory page code executed in */
-
 /* x86-specific definitions */
 #define NOP 0x90
 #define BRK 0xCC

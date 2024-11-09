@@ -26,6 +26,27 @@ TRANS_TBL:
 .size TRANS_TBL,.-TRANS_TBL
 
 
+.macro defvar vis, size, name
+.\vis \name
+\name:
+.zero \size
+.type \name,@object
+.size \name,.-\name
+.endm
+
+.section .bss
+.balign 4
+defvar globl, 4, VFLAG          /* Store overflow flag */
+defvar globl, 4, FLAGS          /* Store 6502 process status reg */
+defvar globl, 4, STACKPTR       /* Store 6502 stack pointer */
+defvar local, 4, PCR            /* Store 6502 program counter */
+defvar globl, 4, XPC            /* Translated program counter */
+defvar globl, 4, INRET          /* Input data return value */
+defvar globl, 4, CTNI           /* Cycles to next interrupt */
+defvar local, 4, DMOD           /* Dest addr to modify */
+defvar local, 4, LASTBANK       /* Last memory page code executed in */
+
+
 .section .text
 .globl START
 START:
