@@ -84,7 +84,9 @@ NMI:
 	movl   irqflag,%eax
 	testl  %eax,%eax
 	jnz    irq
+	sub    $0xc,%esp
 	call   donmi
+	add    $0xc,%esp
 	testl  %eax,%eax
 	jz     skipint
 /* do the actual NMI code */
@@ -202,6 +204,8 @@ irq:
 .globl INPUT
 INPUT:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
 	mov    %esi,%ecx
 	sub    CTNI,%esi
 	mov    %ecx,CTNI
@@ -211,9 +215,10 @@ INPUT:
 	and    $CPF,%ecx
 	add    %ecx,%esi
 	mov    %esi,CLOCK
+	sub    $0xc,%esp
 	push   %ebx
 	call   input
-	pop    %ebx
+	mov    %ebp,%esp
 	popa
 	movl   CTNI,%esi
 	movsbl INRET,%edi
@@ -225,6 +230,8 @@ INPUT:
 .globl OUTPUT
 OUTPUT:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
 	mov    %esi,%ecx
 	sub    CTNI,%esi
 	mov    %ecx,CTNI
@@ -234,11 +241,11 @@ OUTPUT:
 	and    $CPF,%ecx
 	add    %ecx,%esi
 	mov    %esi,CLOCK
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   output
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	movl   CTNI,%esi
 	ret
@@ -258,6 +265,8 @@ MAPPER_NONE:
 .globl MAPPER_MMC1
 MAPPER_MMC1:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
 	mov    %esi,%ecx
 	sub    CTNI,%esi
 	mov    %ecx,CTNI
@@ -267,11 +276,11 @@ MAPPER_MMC1:
 	and    $CPF,%ecx
 	add    %ecx,%esi
 	mov    %esi,CLOCK
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   mmc1
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	movl   CTNI,%esi
 	ret
@@ -282,11 +291,13 @@ MAPPER_MMC1:
 .globl MAPPER_UNROM
 MAPPER_UNROM:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   unrom
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_UNROM,@function
@@ -296,11 +307,13 @@ MAPPER_UNROM:
 .globl MAPPER_CNROM
 MAPPER_CNROM:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   cnrom
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_CNROM,@function
@@ -310,6 +323,8 @@ MAPPER_CNROM:
 .globl MAPPER_MMC3
 MAPPER_MMC3:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
 	mov    %esi,%ecx
 	sub    CTNI,%esi
 	mov    %ecx,CTNI
@@ -319,11 +334,11 @@ MAPPER_MMC3:
 	and    $CPF,%ecx
 	add    %ecx,%esi
 	mov    %esi,CLOCK
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   mmc3
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	movl   CTNI,%esi
 	ret
@@ -334,11 +349,13 @@ MAPPER_MMC3:
 .globl MAPPER_MMC5
 MAPPER_MMC5:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   mmc5
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_MMC5,@function
@@ -348,6 +365,8 @@ MAPPER_MMC5:
 .globl MAPPER_AOROM
 MAPPER_AOROM:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
 	mov    %esi,%ecx
 	sub    CTNI,%esi
 	mov    %ecx,CTNI
@@ -357,11 +376,11 @@ MAPPER_AOROM:
 	and    $CPF,%ecx
 	add    %ecx,%esi
 	mov    %esi,CLOCK
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   aorom
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	movl   CTNI,%esi
 	ret
@@ -372,11 +391,13 @@ MAPPER_AOROM:
 .globl MAPPER_MMC2
 MAPPER_MMC2:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   mmc2
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_MMC2,@function
@@ -386,11 +407,13 @@ MAPPER_MMC2:
 .globl MAPPER_MMC4
 MAPPER_MMC4:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   mmc4
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_MMC4,@function
@@ -400,11 +423,13 @@ MAPPER_MMC4:
 .globl MAPPER_CLRDRMS
 MAPPER_CLRDRMS:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   clrdrms
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_CLRDRMS,@function
@@ -414,11 +439,13 @@ MAPPER_CLRDRMS:
 .globl MAPPER_CPROM
 MAPPER_CPROM:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   cprom
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_CPROM,@function
@@ -428,11 +455,13 @@ MAPPER_CPROM:
 .globl MAPPER_100IN1
 MAPPER_100IN1:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   m100in1
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_100IN1,@function
@@ -442,11 +471,13 @@ MAPPER_100IN1:
 .globl MAPPER_NAMCOT106
 MAPPER_NAMCOT106:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   namcot106
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_NAMCOT106,@function
@@ -456,11 +487,13 @@ MAPPER_NAMCOT106:
 .globl MAPPER_VRC2_A
 MAPPER_VRC2_A:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   vrc2_a
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_VRC2_A,@function
@@ -470,11 +503,13 @@ MAPPER_VRC2_A:
 .globl MAPPER_VRC2_B
 MAPPER_VRC2_B:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   vrc2_b
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_VRC2_B,@function
@@ -484,11 +519,13 @@ MAPPER_VRC2_B:
 .globl MAPPER_G101
 MAPPER_G101:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   g101
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_G101,@function
@@ -498,11 +535,13 @@ MAPPER_G101:
 .globl MAPPER_TAITO_TC0190
 MAPPER_TAITO_TC0190:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   taito_tc0190
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_TAITO_TC0190,@function
@@ -512,11 +551,13 @@ MAPPER_TAITO_TC0190:
 .globl MAPPER_TENGEN_RAMBO1
 MAPPER_TENGEN_RAMBO1:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   tengen_rambo1
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_TENGEN_RAMBO1,@function
@@ -526,11 +567,13 @@ MAPPER_TENGEN_RAMBO1:
 .globl MAPPER_GNROM
 MAPPER_GNROM:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   gnrom
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_GNROM,@function
@@ -540,11 +583,13 @@ MAPPER_GNROM:
 .globl MAPPER_SUNSOFT4
 MAPPER_SUNSOFT4:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   sunsoft4
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_SUNSOFT4,@function
@@ -554,11 +599,13 @@ MAPPER_SUNSOFT4:
 .globl MAPPER_FME7
 MAPPER_FME7:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   fme7
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_FME7,@function
@@ -568,11 +615,13 @@ MAPPER_FME7:
 .globl MAPPER_CAMERICA
 MAPPER_CAMERICA:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   camerica
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_CAMERICA,@function
@@ -582,11 +631,13 @@ MAPPER_CAMERICA:
 .globl MAPPER_IREM_74HC161_32
 MAPPER_IREM_74HC161_32:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   irem_74hc161_32
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_IREM_74HC161_32,@function
@@ -596,11 +647,13 @@ MAPPER_IREM_74HC161_32:
 .globl MAPPER_VS
 MAPPER_VS:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   vs
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_VS,@function
@@ -610,11 +663,13 @@ MAPPER_VS:
 .globl MAPPER_SUPERVISION
 MAPPER_SUPERVISION:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   supervision
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_SUPERVISION,@function
@@ -624,11 +679,13 @@ MAPPER_SUPERVISION:
 .globl MAPPER_NINA7
 MAPPER_NINA7:
 	pusha
+	mov    %esp,%ebp
+	and    $-16,%esp
+	sub    $0x8,%esp
 	push   %eax
 	push   %ebx
 	call   nina7
-	pop    %ebx
-	pop    %eax
+	mov    %ebp,%esp
 	popa
 	ret
 .type MAPPER_NINA7,@function
@@ -642,11 +699,13 @@ U:
 	mov    -4(%esp),%ebx
 	mov    %ebx,DMOD
 	mov    PCR,%ebx
+	sub    $0x8,%esp
 	pusha
 	push   %ebx
 	call   trace
 	pop    %ebx
 	popa
+	add    $0x8,%esp
 	mov    DMOD,%ebx
 	mov    %ebx,-4(%esp)
 	mov    PCR,%ebx
@@ -673,10 +732,11 @@ recompile:
 	jne    0f
 recompile_always:
 	pusha
+	sub    $0x8,%esp
 	mov    PCR,%ebx
 	push   %ebx
 	call   translate
-	pop    %ebx
+	add    $0xc,%esp
 	popa
 	mov    XPC,%ebx
 0:
