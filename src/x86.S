@@ -70,79 +70,6 @@ START:
 .size START,.-START
 
 
-.globl U
-U:
-
-#if 0
-/* This will trace all branches for debugging */
-	mov    %ebx,PCR
-	mov    -4(%esp),%ebx
-	mov    %ebx,DMOD
-	mov    PCR,%ebx
-	pusha
-	push   %ebx
-	call   trace
-	pop    %ebx
-	popa
-	mov    DMOD,%ebx
-	mov    %ebx,-4(%esp)
-	mov    PCR,%ebx
-#endif
-
-	test   %esi,%esi
-	jns    NMI
-	mov    %ebx,PCR
-	mov    -4(%esp),%ebx
-	mov    %ebx,DMOD
-	mov    PCR,%ebx
-	cmp    $0x7fff,%ebx
-	jle    selfmod
-recompile:
-	push   %eax
-	mov    %ebx,%eax
-	shr    $12,%eax
-	sub    $_RAM,%ebx
-	mov    MAPTABLE(,%eax,4),%eax
-	add    %ebx,%eax
-	mov    _INT_MAP(,%eax,4),%ebx
-	pop    %eax
-	test   %ebx,%ebx
-	jne    0f
-recompile_always:
-	pusha
-	mov    PCR,%ebx
-	push   %ebx
-	call   translate
-	pop    %ebx
-	popa
-	mov    XPC,%ebx
-0:
-	push   %ecx
-	cmpl   $0,dolink
-	jz     1f  /* to disable linking (for debugging) */
-	mov    PCR,%ecx
-	and    $0xfffff000,%ecx
-	cmp    %ecx,LASTBANK
-	mov    %ecx,LASTBANK
-	jne    1f /* don't link across memory banks - mapper might change! */
-	cmp    $0x7fff,%ecx
-	jle    1f /* don't link to RAM code */
-	mov    DMOD,%ecx
-	test   %ecx,%ecx
-	jz     1f  /* skip null address */
-	push   %eax
-	mov    %ebx,%eax
-	sub    %ecx,%eax
-	sub    $4,%eax
-	mov    %eax,(%ecx)
-	pop    %eax
-1:
-	pop    %ecx
-	jmp    *%ebx
-.type U,@function
-.size U,.-U
-
-
 .globl NMI
 NMI:
 	pusha
@@ -707,6 +634,74 @@ MAPPER_NINA7:
 .type MAPPER_NINA7,@function
 .size MAPPER_NINA7,.-MAPPER_NINA7
 
+
+.globl U
+U:
+#if 0  /* This will trace all branches for debugging */
+	mov    %ebx,PCR
+	mov    -4(%esp),%ebx
+	mov    %ebx,DMOD
+	mov    PCR,%ebx
+	pusha
+	push   %ebx
+	call   trace
+	pop    %ebx
+	popa
+	mov    DMOD,%ebx
+	mov    %ebx,-4(%esp)
+	mov    PCR,%ebx
+#endif
+
+	test   %esi,%esi
+	jns    NMI
+	mov    %ebx,PCR
+	mov    -4(%esp),%ebx
+	mov    %ebx,DMOD
+	mov    PCR,%ebx
+	cmp    $0x7fff,%ebx
+	jle    selfmod
+recompile:
+	push   %eax
+	mov    %ebx,%eax
+	shr    $12,%eax
+	sub    $_RAM,%ebx
+	mov    MAPTABLE(,%eax,4),%eax
+	add    %ebx,%eax
+	mov    _INT_MAP(,%eax,4),%ebx
+	pop    %eax
+	test   %ebx,%ebx
+	jne    0f
+recompile_always:
+	pusha
+	mov    PCR,%ebx
+	push   %ebx
+	call   translate
+	pop    %ebx
+	popa
+	mov    XPC,%ebx
+0:
+	push   %ecx
+	cmpl   $0,dolink
+	jz     1f  /* to disable linking (for debugging) */
+	mov    PCR,%ecx
+	and    $0xfffff000,%ecx
+	cmp    %ecx,LASTBANK
+	mov    %ecx,LASTBANK
+	jne    1f /* don't link across memory banks - mapper might change! */
+	cmp    $0x7fff,%ecx
+	jle    1f /* don't link to RAM code */
+	mov    DMOD,%ecx
+	test   %ecx,%ecx
+	jz     1f  /* skip null address */
+	push   %eax
+	mov    %ebx,%eax
+	sub    %ecx,%eax
+	sub    $4,%eax
+	mov    %eax,(%ecx)
+	pop    %eax
+1:
+	pop    %ecx
+	jmp    *%ebx
 
 /*
  * This is an interpreter to handle self-modifying code.
@@ -1803,3 +1798,6 @@ irts:
 	leal   0x1(%eax),%ebx
 	popl   %eax
 	jmp    i_next
+
+.type U,@function
+.size U,.-U
