@@ -27,7 +27,7 @@ void    vs(int, int);
 
 /* Called by x86.S */
 int     donmi(void);
-void    input(int);
+int     input(int);
 void    output(int, int);
 void    trace(int, ...);
 
@@ -52,11 +52,11 @@ static int hscrollval, vscrollval;
 static int sprite0hit;
 
 /* This is called whenever the game reads from 2xxx or 4xxx */
-void
+int
 input(int addr)
 {
 	static signed char vram_read;
-	INRET = 0;
+	signed char INRET = 0;
 
 	/* Read PPU status register */
 	if (addr == 0x2002) {
@@ -191,6 +191,8 @@ input(int addr)
 	(&addr)[1], (&addr)[2], (&addr)[3], (&addr)[4], (&addr)[5], (&addr)[6],
 	(&addr)[7], (&addr)[8], (&addr)[9], (&addr)[10], (&addr)[11], (&addr)[12]);
 	*/
+
+	return INRET;
 }
 
 /* This is called whenever the game writes to 2xxx or 4xxx */

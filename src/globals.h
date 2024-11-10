@@ -62,8 +62,6 @@ extern int      unisystem;
 extern unsigned int VFLAG;          /* Store overflow flag */
 extern unsigned int FLAGS;          /* Store 6502 process status reg */
 extern unsigned int STACKPTR;       /* Store 6502 stack pointer */
-extern void        *XPC;            /* Translated program counter */
-extern signed int   INRET;          /* Input data return value */
 extern signed int   CTNI;           /* Cycles to next interrupt */
 
 extern unsigned char *RAM;

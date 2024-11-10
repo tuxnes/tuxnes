@@ -40,8 +40,6 @@ defvar globl, 4, VFLAG          /* Store overflow flag */
 defvar globl, 4, FLAGS          /* Store 6502 process status reg */
 defvar globl, 4, STACKPTR       /* Store 6502 stack pointer */
 defvar local, 4, PCR            /* Store 6502 program counter */
-defvar globl, 4, XPC            /* Translated program counter */
-defvar globl, 4, INRET          /* Input data return value */
 defvar globl, 4, CTNI           /* Cycles to next interrupt */
 defvar local, 4, DMOD           /* Dest addr to modify */
 defvar local, 4, LASTBANK       /* Last memory page code executed in */
@@ -219,9 +217,9 @@ INPUT:
 	push   %ebx
 	call   input
 	mov    %ebp,%esp
+	mov    %eax,(%esp)
 	popa
 	movl   CTNI,%esi
-	movsbl INRET,%edi
 	ret
 .type INPUT,@function
 .size INPUT,.-INPUT
@@ -737,8 +735,8 @@ recompile_always:
 	push   %ebx
 	call   translate
 	add    $0xc,%esp
+	mov    %eax,0x10(%esp)
 	popa
-	mov    XPC,%ebx
 0:
 	push   %ecx
 	cmpl   $0,dolink

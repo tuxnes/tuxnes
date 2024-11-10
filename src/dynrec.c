@@ -32,13 +32,12 @@ static unsigned char *next_code_alloc = (unsigned char *)_CODE_BASE;
 /* forward and external declarations */
 void disas(int);
 
-void
+void *
 translate(int addr)
 {
-	unsigned char *cptr;
+	unsigned char *cptr = next_code_alloc;
 	unsigned char stop = 0;
 
-	XPC = cptr = next_code_alloc;
 	if (disassemble) {
 		printf("\n[%04x] (%p) -> %p\n", addr, host_addr(addr), cptr);
 		disas(addr);             /* This will output a disassembly of the 6502 code */
@@ -140,5 +139,7 @@ translate(int addr)
 	} while (!stop);
 	while ((uintptr_t)cptr & 0xf)
 		*cptr++ = NOP;
+	void *XPC = next_code_alloc;
 	next_code_alloc = cptr;
+	return XPC;
 }
