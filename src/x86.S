@@ -93,8 +93,7 @@ NMI:
 /* push return address */
 	movl   STACKPTR,%eax
 	movb   %bh,(%eax)
-	decl   %eax
-	orl    $0x100,%eax
+	decb   %al
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
@@ -160,8 +159,7 @@ irq:
 /* push return address */
 	movl   STACKPTR,%eax
 	movb   %bh,(%eax)
-	decl   %eax
-	orl    $0x100,%eax
+	decb   %al
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
@@ -954,18 +952,17 @@ ildainp:
 	jmp    i_next
 
 ijsr:
+	add    $2,%ebx
 	pushl  %eax
 	mov    STACKPTR,%eax
-	add    $2,%ebx
 	mov    %bh,(%eax)
-	decl   %eax
-	orl    $0x100,%eax
+	decb   %al
 	movb   %bl,(%eax)
 	decb   %al
-	addl   $6,%esi
 	movb   %al,STACKPTR
 	popl   %eax
 	movzwl _RAM-1(%ebx),%ebx
+	addl   $6,%esi
 	jmp    i_next
 
 ilday:
@@ -1653,14 +1650,14 @@ itxa:
 	jmp    i_next
 
 ipla:
-	movl   STACKPTR,%edi
-	incl   %ebx
-	subl   $0xff,%edi
-	addl   $4,%esi
-	orl    $0x100,%edi
-	movl   %edi,STACKPTR
-	movzbl (%edi),%eax
+	movl   STACKPTR,%eax
+	incb   %al
+	movb   %al,STACKPTR
+	movb   (%eax),%al
+	movzbl %al,%eax
 	movsbl %al,%edi
+	incl   %ebx
+	addl   $4,%esi
 	jmp    i_next
 
 icmpimm:
@@ -1845,16 +1842,15 @@ irolz:
 irts:
 	xorl   %ebx,%ebx
 	pushl  %eax
-	movb   STACKPTR,%bl
-	xorl   %eax,%eax
-	incb   %bl
-	movb   _STACK(%ebx),%al
-	incb   %bl
-	movb   %bl,STACKPTR
-	movb   _STACK(%ebx),%ah
-	leal   0x6(%esi),%esi
-	leal   0x1(%eax),%ebx
+	movl   STACKPTR,%eax
+	incb   %al
+	movb   (%eax),%bl
+	incb   %al
+	movb   (%eax),%bh
+	movb   %al,STACKPTR
 	popl   %eax
+	addl   $1,%ebx
+	addl   $6,%esi
 	jmp    i_next
 
 .type U,@function

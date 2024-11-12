@@ -130,8 +130,7 @@
 	50                      # pushl  %eax
 	b8 [P+2]                # movl   $[P+2],%eax
 	88 23                   # movb   %ah,(%ebx)
-	4b                      # decl   %ebx
-	81 cb 00 01 00 00       # orl    $0x100,%ebx
+	fe cb                   # decb   %bl
 	88 03                   # movb   %al,(%ebx)
 	fe cb                   # decb   %bl
 	a1 [F]                  # movl   FLAGS,%eax
@@ -233,7 +232,7 @@
 	83 e3 40                # andl   $0x40,%ebx
 	09 eb                   # orl    %ebp,%ebx
 	8b 2d [S]               # movl   STACKPTR,%ebp
-	88 5d 00                # movb   %bl,0x0(%ebp)
+	88 5d 00                # movb   %bl,(%ebp)
 	83 e3 01                # andl   $0x1,%ebx
 	fe 0d [S]               # decb   STACKPTR
 	89 dd                   # movl   %ebx,%ebp
@@ -372,18 +371,17 @@
 # 1f - (bad)
 # 20 - JSR
 20,3:
-	8b 1d [S]               # movl   STACKPTR,%ebx
+	bb [P+2]                # movl   $[P+2],%ebx
 	50                      # pushl  %eax
-	b8 [P+2]                # movl   $[P+2],%eax
-	88 23                   # movb   %ah,(%ebx)
-	4b                      # decl   %ebx
-	81 cb 00 01 00 00       # orl    $0x100,%ebx
-	88 03                   # movb   %al,(%ebx)
-	fe cb                   # decb   %bl
-	83 c6 06                # addl   $0x6,%esi
+	a1 [S]                  # movl   STACKPTR,%eax
+	88 38                   # movb   %bh,(%eax)
+	fe c8                   # decb   %al
+	88 18                   # movb   %bl,(%eax)
+	fe c8                   # decb   %al
+	a2 [S]                  # movb   %al,STACKPTR
 	58                      # popl   %eax
-	88 1d [S]               # movb   %bl,STACKPTR
 	bb [W+1] 00 00          # movl   $0000[W+1],%ebx
+	83 c6 06                # addl   $6,%esi
 	0f 89 [N]               # jns    NMI
 	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
 	e9 [U]                  # jmp    U
@@ -605,12 +603,11 @@
 	89 3d [V]               # movl   %edi,VFLAG
 	8d 3c 5d 00 00 00 00    # leal   0x0(,%ebx,2),%edi
 	81 e7 04 01 00 00       # andl   $0x104,%edi
-	31 db                   # xorl   %ebx,%ebx
-	8a 1d [S]               # movb   STACKPTR,%bl
+	8b 1d [S]               # movl   STACKPTR,%ebx
 	fe c3                   # incb   %bl
-	8a ab [T]               # movb   STACK(%ebx),%ch
+	8a 2b                   # movb   (%ebx),%ch
 	fe c3                   # incb   %bl
-	8a b3 [T]               # movb   STACK(%ebx),%dh
+	8a 33                   # movb   (%ebx),%dh
 	88 1d [S]               # movb   %bl,STACKPTR
 	31 db                   # xorl   %ebx,%ebx
 	86 eb                   # xchgb  %ch,%bl
@@ -802,16 +799,15 @@
 60,1:
 	31 db                   # xorl   %ebx,%ebx
 	50                      # pushl  %eax
-	8a 1d [S]               # movb   STACKPTR,%bl
-	31 c0                   # xorl   %eax,%eax
-	fe c3                   # incb   %bl
-	8a 83 [T]               # movb   STACK(%ebx),%al
-	fe c3                   # incb   %bl
-	88 1d [S]               # movb   %bl,STACKPTR
-	8a a3 [T]               # movb   STACK(%ebx),%ah
-	8d 76 06                # leal   0x6(%esi),%esi
-	8d 58 01                # leal   0x1(%eax),%ebx
+	a1 [S]                  # movl   STACKPTR,%eax
+	fe c0                   # incb   %al
+	8a 18                   # movb   (%eax),%bl
+	fe c0                   # incb   %al
+	8a 38                   # movb   (%eax),%bh
+	a2 [S]                  # movb   %al,STACKPTR
 	58                      # popl   %eax
+	83 c3 01                # addl   $1,%ebx
+	83 c6 06                # addl   $6,%esi
 	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
 	e9 [U]                  # jmp    U
 	[!]                     #  end of function; stop translating
@@ -869,13 +865,13 @@
 # 67 - (bad)
 # 68 - PLA
 68,1:
-	31 c0                   # xorl   %eax,%eax
-	a0 [S]                  # movb   STACKPTR,%al
+	a1 [S]                  # movl   STACKPTR,%eax
 	fe c0                   # incb   %al
-	8d 76 04                # leal   0x4(%esi),%esi
 	a2 [S]                  # movb   %al,STACKPTR
-	8a 80 [T]               # movb   STACK(%eax),%al
+	8a 00                   # movb   (%eax),%al
+	0f b6 c0                # movzbl %al,%eax
 	0f be f8                # movsbl %al,%edi
+	83 c6 04                # addl   $4,%esi
 	/
 # 69 - ADC - Immediate
 69,2:
