@@ -49,13 +49,15 @@ defvar local, 4, LASTBANK       /* Last memory page code executed in */
 .globl START
 START:
 	xor    %esi,%esi
-	mov    $VBL,%ebx
 	mov    %esi,CLOCK
-	sub    %ebx,%esi
+	sub    $VBL,%esi
 	mov    %esi,CTNI
-	mov    $_STACK+0xff,%ebx
-	mov    %ebx,STACKPTR
+	mov    $_STACK+0xfd,%eax
+	mov    %eax,STACKPTR
+	mov    $0x04,%eax
+	mov    %eax,FLAGS
 	xor    %eax,%eax
+	mov    %eax,VFLAG
 	xor    %ecx,%ecx
 	xor    %edx,%edx
 	xor    %ebp,%ebp
