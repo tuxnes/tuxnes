@@ -394,11 +394,11 @@
 24,2:
 	0f be 3d [Z+1]          # movsbl ZP,%edi
 	0d 00 01 00 00          # orl    $0x100,%eax
-	83 c6 03                # addl   $0x3,%esi
-	8d 1c fd 00 00 00 00    # leal   0x0(,%edi,8),%ebx
-	21 c7                   # andl   %eax,%edi
-	81 e3 00 02 00 00       # andl   $0x200,%ebx
+	8d 1c 3f                # leal   (%edi,%edi,1),%ebx
+	81 e3 80 00 00 00       # andl   $0x80,%ebx
 	89 1d [V]               # movl   %ebx,VFLAG
+	21 c7                   # andl   %eax,%edi
+	83 c6 03                # addl   $3,%esi
 	/
 # 25 - AND - Zero Page
 25,2:
@@ -422,8 +422,8 @@
 	88 1d [S]               # movb   %bl,STACKPTR
 	8b 2b                   # movl   (%ebx),%ebp
 	89 2d [F]               # movl   %ebp,FLAGS
-	8d 3c ed 00 00 00 00    # leal   (,%ebp,8),%edi
-	81 e7 00 02 00 00       # andl   $0x200,%edi
+	8d 7c 2d 00             # leal   (%ebp,%ebp,1),%edi
+	81 e7 80 00 00 00       # andl   $0x80,%edi
 	89 3d [V]               # movl   %edi,VFLAG
 	83 f5 02                # xorl   $0x2,%ebp
 	8d 7c 2d 00             # leal   (%ebp,%ebp,1),%edi
@@ -457,11 +457,11 @@
 	8b 1d [X+1]             # movl   XADDRMAP,%ebx
 	0d 00 01 00 00          # orl    $0x100,%eax
 	0f be bb [W+1] 00 00    # movsbl ADDR(%ebx),%edi
-	83 c6 04                # addl   $0x4,%esi
-	8d 1c fd 00 00 00 00    # leal   0x0(,%edi,8),%ebx
-	21 c7                   # andl   %eax,%edi
-	81 e3 00 02 00 00       # andl   $0x200,%ebx
+	8d 1c 3f                # leal   (%edi,%edi,1),%ebx
+	81 e3 80 00 00 00       # andl   $0x80,%ebx
 	89 1d [V]               # movl   %ebx,VFLAG
+	21 c7                   # andl   %eax,%edi
+	83 c6 04                # addl   $4,%esi
 	/
 # 2d - AND - Absolute
 2d,3:
@@ -584,8 +584,8 @@
 	fe c3                   # incb   %bl
 	8b 2b                   # movl   (%ebx),%ebp
 	89 2d [F]               # movl   %ebp,FLAGS
-	8d 3c ed 00 00 00 00    # leal   (,%ebp,8),%edi
-	81 e7 00 02 00 00       # andl   $0x200,%edi
+	8d 7c 2d 00             # leal   (%ebp,%ebp,1),%edi
+	81 e7 80 00 00 00       # andl   $0x80,%edi
 	89 3d [V]               # movl   %edi,VFLAG
 	83 f5 02                # xorl   $0x2,%ebp
 	8d 7c 2d 00             # leal   (%ebp,%ebp,1),%edi
@@ -686,7 +686,7 @@
 	0f 89 [N]               # jns    NMI
 	8b 1d [V]               # movl   VFLAG,%ebx
 	81 c3 80 00 00 00       # addl   $0x80,%ebx
-	f7 c3 00 ff ff ff       # testl  $0xffffff00,%ebx
+	f7 c3 00 ff ff ff       # testl  $-256,%ebx
 	bb [R+1]                # movl   $[R+1],%ebx
 	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
 	0f 84 [U]               # je     U
@@ -918,7 +918,7 @@
 	0f 89 [N]               # jns    NMI
 	8b 1d [V]               # movl   VFLAG,%ebx
 	81 c3 80 00 00 00       # addl   $0x80,%ebx
-	f7 c3 00 ff ff ff       # testl  $0xffffff00,%ebx
+	f7 c3 00 ff ff ff       # testl  $-256,%ebx
 	bb [R+1]                # movl   $[R+1],%ebx
 	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
 	0f 85 [U]               # jne    U
@@ -2453,11 +2453,11 @@ ac 02 20,3:
 	0d 00 ff ff ff          # orl    $0xffffff00,%eax
 	bb 02 20 00 00          # movl   $0x2002,%ebx
 	e8 [I]                  # call   INPUT
-	83 c6 04                # addl   $0x4,%esi
-	8d 1c fd 00 00 00 00    # leal   0x0(,%edi,8),%ebx
-	21 c7                   # andl   %eax,%edi
-	81 e3 00 02 00 00       # andl   $0x200,%ebx
+	8d 1c 3f                # leal   (%edi,%edi,1),%ebx
+	81 e3 80 00 00 00       # andl   $0x80,%ebx
 	89 1d [V]               # movl   %ebx,VFLAG
+	21 c7                   # andl   %eax,%edi
+	83 c6 04                # addl   $4,%esi
 	/
 
 # LDA $2007 - Read VRAM

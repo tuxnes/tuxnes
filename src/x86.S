@@ -1303,8 +1303,8 @@ iplp:
 	movl   %edi,STACKPTR
 	movl   (%edi),%ebp
 	movl   %ebp,FLAGS
-	leal   (,%ebp,8),%edi
-	andl   $0x200,%edi
+	leal   (%ebp,%ebp,1),%edi
+	andl   $0x80,%edi
 	movl   %edi,VFLAG
 	xorl   $0x2,%ebp
 	leal   (%ebp,%ebp,1),%edi
@@ -1727,16 +1727,16 @@ ildyinp:
 
 ibitz:
 	movzbl _RAM+1(%ebx),%edi
-	addl   $0x2,%ebx
 	orl    $0x100,%eax
 	movsbl _RAM(%edi),%edi
 	pushl  %ebx
-	addl   $0x3,%esi
-	leal   0(,%edi,8),%ebx
-	andl   %eax,%edi
-	andl   $0x200,%ebx
+	leal   (%edi,%edi,1),%ebx
+	andl   $0x80,%ebx
 	movl   %ebx,VFLAG
+	andl   %eax,%edi
 	popl   %ebx
+	addl   $2,%ebx
+	addl   $3,%esi
 	jmp    i_next
 
 icpximm:
