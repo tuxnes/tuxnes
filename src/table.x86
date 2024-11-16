@@ -126,42 +126,39 @@
 
 # 00 - BRK
 00,1:
-	8b 1d [S]               # movl   STACKPTR,%ebx
 	50                      # pushl  %eax
-	b8 [P+2]                # movl   $[P+2],%eax
-	88 23                   # movb   %ah,(%ebx)
-	fe cb                   # decb   %bl
-	88 03                   # movb   %al,(%ebx)
-	fe cb                   # decb   %bl
-	a1 [F]                  # movl   FLAGS,%eax
-	88 1d [S]               # movb   %bl,STACKPTR
-	83 e0 3c                # andl   $0x3c,%eax
+	a1 [S]                  # movl   STACKPTR,%eax
+	bb [P+2]                # movl   $[P+2],%ebx
+	88 38                   # movb   %bh,(%eax)
+	fe c8                   # decb   %al
+	88 18                   # movb   %bl,(%eax)
+	fe c8                   # decb   %al
+	8b 1d [F]               # movl   FLAGS,%ebx
+	83 e3 0c                # andl   $0x0c,%ebx
+	83 c5 ff                # addl   $-1,%ebp
+	83 d3 00                # adcl   $0,%ebx
+	89 fd                   # movl   %edi,%ebp
+	d1 ed                   # shrl   %ebp
+	81 e5 80 00 00 00       # andl   $0x80,%ebp
+	09 dd                   # orl    %ebx,%ebp
 	31 db                   # xorl   %ebx,%ebx
-	83 c8 14                # orl    $0x14,%eax
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	89 c5                   # movl   %eax,%ebp
-	a3 [F]                  # movl   %eax,FLAGS
-	58                      # popl   %eax
-	83 d5 00                # adcl   $0x0,%ebp
 	f7 c7 ff 00 00 00       # testl  $0xff,%edi
 	0f 94 c3                # setz   %bl
-	8d 6c 5d 00             # leal   0x0(%ebp,%ebx,2),%ebp
-	89 fb                   # movl   %edi,%ebx
-	d1 eb                   # shrl   %ebx
-	81 e3 80 00 00 00       # andl   $0x80,%ebx
-	09 dd                   # orl    %ebx,%ebp
+	8d 6c 5d 00             # leal   (%ebp,%ebx,2),%ebp
 	8b 1d [V]               # movl   VFLAG,%ebx
 	81 c3 80 00 00 00       # addl   $0x80,%ebx
-	81 c3 00 ff ff ff       # addl   $0xffffff00,%ebx
+	81 c3 00 ff ff ff       # addl   $-256,%ebx
 	19 db                   # sbbl   %ebx,%ebx
 	83 e3 40                # andl   $0x40,%ebx
 	09 eb                   # orl    %ebp,%ebx
-	8b 2d [S]               # movl   STACKPTR,%ebp
-	88 5d 00                # movb   %bl,(%ebp)
-	83 e3 01                # andl   $0x1,%ebx
-	fe 0d [S]               # decb   STACKPTR
-	89 dd                   # movl   %ebx,%ebp
-	83 c6 07                # addl   $0x7,%esi
+	83 e5 01                # andl   $0x1,%ebp
+	83 cb 30                # orl    $0x30,%ebx
+	83 0d [F] 04            # orl    $0x04,FLAGS
+	88 18                   # movb   %bl,(%eax)
+	fe c8                   # decb   %al
+	a2 [S]                  # movb   %al,STACKPTR
+	58                      # popl   %eax
+	83 c6 07                # addl   $7,%esi
 	bb [M]                  # movl   $MAPTABLE,%ebx
 	8b 5b 3c                # movl   0x3c(%ebx),%ebx
 	0f b7 9b fe ff 00 00    # movzwl 0xfffe(%ebx),%ebx
@@ -211,31 +208,31 @@
 # 07 - (bad)
 # 08 - PHP
 08,1:
-	83 25 [F] 3c            # andl   $0x3c,FLAGS
+	8b 1d [F]               # movl   FLAGS,%ebx
+	83 e3 0c                # andl   $0x0c,%ebx
+	83 c5 ff                # addl   $-1,%ebp
+	83 d3 00                # adcl   $0,%ebx
+	89 fd                   # movl   %edi,%ebp
+	d1 ed                   # shrl   %ebp
+	81 e5 80 00 00 00       # andl   $0x80,%ebp
+	09 dd                   # orl    %ebx,%ebp
 	31 db                   # xorl   %ebx,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	8b 2d [F]               # movl   FLAGS,%ebp
-	83 d5 00                # adcl   $0x0,%ebp
 	f7 c7 ff 00 00 00       # testl  $0xff,%edi
 	0f 94 c3                # setz   %bl
-	8d 76 03                # leal   0x3(%esi),%esi
-	8d 6c 5d 00             # leal   0x0(%ebp,%ebx,2),%ebp
-	89 fb                   # movl   %edi,%ebx
-	83 cd 20                # orl    $0x20,%ebp
-	d1 eb                   # shrl   %ebx
-	81 e3 80 00 00 00       # andl   $0x80,%ebx
-	09 dd                   # orl    %ebx,%ebp
+	8d 6c 5d 00             # leal   (%ebp,%ebx,2),%ebp
 	8b 1d [V]               # movl   VFLAG,%ebx
 	81 c3 80 00 00 00       # addl   $0x80,%ebx
-	81 c3 00 ff ff ff       # addl   $0xffffff00,%ebx
+	81 c3 00 ff ff ff       # addl   $-256,%ebx
 	19 db                   # sbbl   %ebx,%ebx
 	83 e3 40                # andl   $0x40,%ebx
 	09 eb                   # orl    %ebp,%ebx
+	83 cb 30                # orl    $0x30,%ebx
 	8b 2d [S]               # movl   STACKPTR,%ebp
 	88 5d 00                # movb   %bl,(%ebp)
-	83 e3 01                # andl   $0x1,%ebx
 	fe 0d [S]               # decb   STACKPTR
+	83 e3 01                # andl   $0x1,%ebx
 	89 dd                   # movl   %ebx,%ebp
+	83 c6 03                # addl   $3,%esi
 	/
 # 09 - ORA - Immediate
 09,2:
@@ -420,23 +417,19 @@
 # 27 - (bad)
 # 28 - PLP
 28,1:
-	8b 3d [S]               # movl   STACKPTR,%edi
-	81 ef ff 00 00 00       # subl   $0xff,%edi
-	81 cf 00 01 00 00       # orl    $0x100,%edi
-	89 3d [S]               # movl   %edi,STACKPTR
-	8b 1f                   # movl   (%edi),%ebx
-	8d 76 04                # leal   0x4(%esi),%esi
-	89 dd                   # movl   %ebx,%ebp
-	83 e5 3c                # andl   $0x3c,%ebp
-	8d 3c dd 00 00 00 00    # leal   0x0(,%ebx,8),%edi
-	83 f3 02                # xorl   $0x2,%ebx
+	8b 1d [S]               # movl   STACKPTR,%ebx
+	fe c3                   # incb   %bl
+	88 1d [S]               # movb   %bl,STACKPTR
+	8b 2b                   # movl   (%ebx),%ebp
 	89 2d [F]               # movl   %ebp,FLAGS
-	89 dd                   # movl   %ebx,%ebp
+	8d 3c ed 00 00 00 00    # leal   (,%ebp,8),%edi
 	81 e7 00 02 00 00       # andl   $0x200,%edi
-	83 e5 01                # andl   $0x1,%ebp
 	89 3d [V]               # movl   %edi,VFLAG
-	8d 3c 1b                # leal   (%ebx,%ebx,1),%edi
+	83 f5 02                # xorl   $0x2,%ebp
+	8d 7c 2d 00             # leal   (%ebp,%ebp,1),%edi
 	81 e7 04 01 00 00       # andl   $0x104,%edi
+	83 e5 01                # andl   $0x1,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # 29 - AND - Immediate
 29,2:
@@ -587,23 +580,17 @@
 # 3f - (bad)
 # 40 - RTI
 40,1:
-	8b 3d [S]               # movl   STACKPTR,%edi
-	81 ef ff 00 00 00       # subl   $0xff,%edi
-	81 cf 00 01 00 00       # orl    $0x100,%edi
-	89 3d [S]               # movl   %edi,STACKPTR
-	8b 1f                   # movl   (%edi),%ebx
-	89 dd                   # movl   %ebx,%ebp
-	83 e5 3c                # andl   $0x3c,%ebp
-	8d 3c dd 00 00 00 00    # leal   0x0(,%ebx,8),%edi
-	83 f3 02                # xorl   $0x2,%ebx
-	89 2d [F]               # movl   %ebp,FLAGS
-	89 dd                   # movl   %ebx,%ebp
-	81 e7 00 02 00 00       # andl   $0x200,%edi
-	83 e5 01                # andl   $0x1,%ebp
-	89 3d [V]               # movl   %edi,VFLAG
-	8d 3c 5d 00 00 00 00    # leal   0x0(,%ebx,2),%edi
-	81 e7 04 01 00 00       # andl   $0x104,%edi
 	8b 1d [S]               # movl   STACKPTR,%ebx
+	fe c3                   # incb   %bl
+	8b 2b                   # movl   (%ebx),%ebp
+	89 2d [F]               # movl   %ebp,FLAGS
+	8d 3c ed 00 00 00 00    # leal   (,%ebp,8),%edi
+	81 e7 00 02 00 00       # andl   $0x200,%edi
+	89 3d [V]               # movl   %edi,VFLAG
+	83 f5 02                # xorl   $0x2,%ebp
+	8d 7c 2d 00             # leal   (%ebp,%ebp,1),%edi
+	81 e7 04 01 00 00       # andl   $0x104,%edi
+	83 e5 01                # andl   $0x1,%ebp
 	fe c3                   # incb   %bl
 	8a 2b                   # movb   (%ebx),%ch
 	fe c3                   # incb   %bl
@@ -612,7 +599,7 @@
 	31 db                   # xorl   %ebx,%ebx
 	86 eb                   # xchgb  %ch,%bl
 	86 f7                   # xchgb  %dh,%bh
-	83 c6 06                # addl   $0x6,%esi
+	83 c6 06                # addl   $6,%esi
 	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
 	e9 [U]                  # jmp    U
 	[!]
@@ -995,7 +982,7 @@
 # 78 - SEI
 78,1:
 	83 c6 02                # addl   $0x2,%esi
-	83 0d [F] 04            # or     $0x4,FLAGS
+	83 0d [F] 04            # orl    $0x4,FLAGS
 	/
 
 # 79 - ADC - Absolute,Y
@@ -1843,7 +1830,7 @@ f6,2:
 # f8 - SED
 f8,1: #What happens on a real NES when the CPU is put into decimal mode?
 	83 c6 02                # addl   $0x2,%esi
-	83 0d [F] 08            # orb    $0x8,FLAGS
+	83 0d [F] 08            # orl    $0x8,FLAGS
 	/
 # f9 - SBC - Absolute,Y
 f9,3:

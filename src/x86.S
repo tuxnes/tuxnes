@@ -91,42 +91,42 @@ NMI:
 	jz     skipint
 /* do the actual NMI code */
 	popa
-	pusha
 /* push return address */
+	pushl  %eax
 	movl   STACKPTR,%eax
 	movb   %bh,(%eax)
 	decb   %al
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
-	andl   $0x3c,FLAGS
+	movl   FLAGS,%ebx
+	andl   $0x0c,%ebx
+	addl   $-1,%ebp
+	adcl   $0,%ebx
+	movl   %edi,%ebp
+	shrl   %ebp
+	andl   $0x80,%ebp
+	orl    %ebx,%ebp
 	xorl   %ebx,%ebx
-	add    $0xffffffff,%ebp
-	mov    FLAGS,%ebp
-	adc    $0,%ebp
 	testl  $0xff,%edi
 	setz   %bl
-	shll   %ebx
-	orl    %ebx,%ebp
-	movl   %edi,%ebx
-	shrl   %ebx
-	andl   $0x80,%ebx
-	orl    %ebx,%ebp
+	leal   (%ebp,%ebx,2),%ebp
 	movl   VFLAG,%ebx
 	addl   $0x80,%ebx
-	addl   $0xffffff00,%ebx
+	addl   $-256,%ebx
 	sbbl   %ebx,%ebx
 	andl   $0x40,%ebx
 	orl    %ebp,%ebx
+	andl   $0x1,%ebp
+	orl    $0x20,%ebx
+	orl    $0x04,FLAGS
 	movb   %bl,(%eax)
 	decb   %al
-	mov    %al,STACKPTR
-	popa
+	movb   %al,STACKPTR
+	popl   %eax
 	movl   $0,-4(%esp)
 	movl   CTNI,%esi
 	movl   MAPTABLE+60,%ebx
-	andl   $0x2c,FLAGS
-	orl    $0x04,FLAGS
 	movzwl 0xfffa(%ebx),%ebx
 	jmp    U
 2:    /* don't do NMI */
@@ -157,42 +157,42 @@ irq:
 	jz     skipint
 /* do IRQ */
 	popa
-	pusha
 /* push return address */
+	pushl  %eax
 	movl   STACKPTR,%eax
 	movb   %bh,(%eax)
 	decb   %al
 	movb   %bl,(%eax)
 	decb   %al
 /* php */
-	andl   $0x3c,FLAGS
+	movl   FLAGS,%ebx
+	andl   $0x0c,%ebx
+	addl   $-1,%ebp
+	adcl   $0,%ebx
+	movl   %edi,%ebp
+	shrl   %ebp
+	andl   $0x80,%ebp
+	orl    %ebx,%ebp
 	xorl   %ebx,%ebx
-	add    $0xffffffff,%ebp
-	mov    FLAGS,%ebp
-	adc    $0,%ebp
 	testl  $0xff,%edi
 	setz   %bl
-	shll   %ebx
-	orl    %ebx,%ebp
-	movl   %edi,%ebx
-	shrl   %ebx
-	andl   $0x80,%ebx
-	orl    %ebx,%ebp
+	leal   (%ebp,%ebx,2),%ebp
 	movl   VFLAG,%ebx
 	addl   $0x80,%ebx
-	addl   $0xffffff00,%ebx
+	addl   $-256,%ebx
 	sbbl   %ebx,%ebx
 	andl   $0x40,%ebx
 	orl    %ebp,%ebx
+	andl   $0x1,%ebp
+	orl    $0x20,%ebx
+	orl    $0x04,FLAGS
 	movb   %bl,(%eax)
 	decb   %al
-	mov    %al,STACKPTR
-	popa
+	movb   %al,STACKPTR
+	popl   %eax
 	movl   $0,-4(%esp)
 	movl   CTNI,%esi
 	movl   MAPTABLE+60,%ebx
-	andl   $0x2c,FLAGS
-	orl    $0x04,FLAGS
 	movzwl 0xfffe(%ebx),%ebx
 	jmp    U
 .type NMI,@function
@@ -1236,34 +1236,33 @@ ilsr:
 
 iphp:
 	pushl  %ebx
-	andl   $0x3c,FLAGS
+	movl   FLAGS,%ebx
+	andl   $0x0c,%ebx
+	addl   $-1,%ebp
+	adcl   $0,%ebx
+	movl   %edi,%ebp
+	shrl   %ebp
+	andl   $0x80,%ebp
+	orl    %ebx,%ebp
 	xorl   %ebx,%ebx
-	add    $0xffffffff,%ebp
-	mov    FLAGS,%ebp
-	adc    $0,%ebp
 	testl  $0xff,%edi
 	setz   %bl
-	shll   %ebx
-	orl    %ebx,%ebp
-	movl   %edi,%ebx
-	orl    $0x20,%ebp
-	shrl   %ebx
-	andl   $0x80,%ebx
-	orl    %ebx,%ebp
+	leal   (%ebp,%ebx,2),%ebp
 	movl   VFLAG,%ebx
 	addl   $0x80,%ebx
-	addl   $0xffffff00,%ebx
+	addl   $-256,%ebx
 	sbbl   %ebx,%ebx
 	andl   $0x40,%ebx
 	orl    %ebp,%ebx
+	orl    $0x30,%ebx
 	movl   STACKPTR,%ebp
 	movb   %bl,(%ebp)
-	andl   $0x1,%ebx
 	decb   STACKPTR
+	andl   $0x1,%ebx
 	movl   %ebx,%ebp
 	popl   %ebx
-	addl   $3,%esi
 	incl   %ebx
+	addl   $3,%esi
 	jmp    i_next
 
 ildaziy:
@@ -1303,17 +1302,16 @@ iplp:
 	orl    $0x100,%edi
 	movl   %edi,STACKPTR
 	movl   (%edi),%ebp
-	addl   $4,%esi
 	movl   %ebp,FLAGS
-	leal   0x0(,%ebp,8),%edi
-	xorl   $0x2,%ebp
+	leal   (,%ebp,8),%edi
 	andl   $0x200,%edi
-	andl   $0x1,%ebp
-	andl   $0x3c,FLAGS
 	movl   %edi,VFLAG
+	xorl   $0x2,%ebp
 	leal   (%ebp,%ebp,1),%edi
 	andl   $0x104,%edi
+	andl   $0x1,%ebp
 	incl   %ebx
+	addl   $4,%esi
 	jmp    i_next
 
 iasl:
