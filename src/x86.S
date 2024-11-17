@@ -808,6 +808,8 @@ selfmod:
 	je     ilsr
 	cmpb   $0x4c,_RAM(%ebx)
 	je     ijmp
+	cmpb   $0x50,_RAM(%ebx)
+	je     ibvc
 	cmpb   $0x58,_RAM(%ebx)
 	je     icli
 	cmpb   $0x60,_RAM(%ebx)
@@ -822,6 +824,8 @@ selfmod:
 	je     iadcimm
 	cmpb   $0x6c,_RAM(%ebx)
 	je     ijmpind
+	cmpb   $0x70,_RAM(%ebx)
+	je     ibvs
 	cmpb   $0x78,_RAM(%ebx)
 	je     isei
 	cmpb   $0x84,_RAM(%ebx)
@@ -985,70 +989,57 @@ ibpl:
 	addl   $2,%ebx
 	addl   $2,%esi
 	testl  $0x100,%edi
-	jne    i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
+	jz     ibrel
 	jmp    i_next
 
 ibmi:
 	addl   $2,%ebx
 	addl   $2,%esi
 	testl  $0x100,%edi
-	je     i_next
+	jnz    ibrel
+	jmp    i_next
+
+ibvc:
+	addl   $2,%ebx
+	addl   $2,%esi
 	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
+	movl   VFLAG,%eax
+	addl   $0x80,%eax
+	testl  $-256,%eax
 	popl   %eax
+	jz     ibrel
+	jmp    i_next
+
+ibvs:
+	addl   $2,%ebx
+	addl   $2,%esi
+	pushl  %eax
+	movl   VFLAG,%eax
+	addl   $0x80,%eax
+	testl  $-256,%eax
+	popl   %eax
+	jnz    ibrel
 	jmp    i_next
 
 ibcc:
 	addl   $2,%ebx
 	addl   $2,%esi
 	testl  %ebp,%ebp
-	jnz    i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
+	jz     ibrel
 	jmp    i_next
 
 ibcs:
 	addl   $2,%ebx
 	addl   $2,%esi
 	testl  %ebp,%ebp
-	jz     i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
+	jnz    ibrel
 	jmp    i_next
 
 ibne:
 	addl   $2,%ebx
 	addl   $2,%esi
 	testl  $0xff,%edi
-	jz     i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
+	jnz    ibrel
 	jmp    i_next
 
 ibeq:
@@ -1056,12 +1047,14 @@ ibeq:
 	addl   $2,%esi
 	testl  $0xff,%edi
 	jnz    i_next
+ibrel:
 	pushl  %eax
 	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
+	addw   %ax,%bx
 	cmpb   %al,%bl
+	adcb   $0,%ah
+	sarb   %ah
 	adcl   $1,%esi
-	andl   $0xffff,%ebx
 	popl   %eax
 	jmp    i_next
 
