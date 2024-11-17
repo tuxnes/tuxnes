@@ -327,7 +327,7 @@
 # 18 - CLC
 18,1:
 	31 ed                   # xorl   %ebp,%ebp
-	83 c6 02                # addl   $0x2,%esi
+	83 c6 02                # addl   $2,%esi
 	/
 # 19 - ORA - Absolute,Y
 19,3:
@@ -536,8 +536,8 @@
 # 37 - (bad)
 # 38 - SEC
 38,1:
-	83 c6 02                # addl   $0x2,%esi
-	83 cd ff                # orl    $0xffffffff,%ebp
+	83 cd ff                # orl    $-1,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 
 # 39 - AND - Absolute,Y
@@ -739,8 +739,8 @@
 # 57 - (bad)
 # 58 - CLI
 58,1:
-	83 c6 02                # addl   $0x2,%esi
 	80 25 [F] fb            # andb   $0xfb,FLAGS
+	83 c6 02                # addl   $2,%esi
 	/
 # 59 - EOR - Absolute,Y
 59,3:
@@ -980,8 +980,8 @@
 # 77 - (bad)
 # 78 - SEI
 78,1:
-	83 c6 02                # addl   $0x2,%esi
-	83 0d [F] 04            # orl    $0x4,FLAGS
+	80 0d [F] 04            # orb    $0x04,FLAGS
+	83 c6 02                # addl   $2,%esi
 	/
 
 # 79 - ADC - Absolute,Y
@@ -1341,8 +1341,8 @@ b6,2:
 # b7 - (bad)
 # b8 - CLV
 b8,1:
-	83 c6 02                # addl   $0x2,%esi
-	c7 05 [V] 00 00 00 00   # movl   $0x0,VFLAG
+	c7 05 [V] 00 00 00 00   # movl   $0,VFLAG
+	83 c6 02                # addl   $2,%esi
 	/
 # b9 - LDA - Absolute,Y
 b9,3:
@@ -1592,8 +1592,8 @@ d6,2:
 # d7 - (bad)
 # d8 - CLD
 d8,1:
-	83 c6 02                # addl   $0x2,%esi
 	80 25 [F] f7            # andb   $0xf7,FLAGS
+	83 c6 02                # addl   $2,%esi
 	/
 # d9 - CMP - Absolute,Y
 d9,3:
@@ -1827,8 +1827,8 @@ f6,2:
 # f7 - (bad)
 # f8 - SED
 f8,1: #What happens on a real NES when the CPU is put into decimal mode?
-	83 c6 02                # addl   $0x2,%esi
-	83 0d [F] 08            # orl    $0x8,FLAGS
+	80 0d [F] 08            # orb    $0x08,FLAGS
+	83 c6 02                # addl   $2,%esi
 	/
 # f9 - SBC - Absolute,Y
 f9,3:
@@ -1939,20 +1939,20 @@ a0 00,2: # LDY #$00  (clear registers)
 18 69,3:
 	0f be c0                # movsbl %al,%eax
 	83 c0 [B+2]             # addl   $[B+2],%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # SEC followed by SBC -> SUB
 31 e9,3:
-	bd 01 00 00 00          # movl   $0x1,%ebp
 	0f be c0                # movsbl %al,%eax
 	83 e8 [B+2]             # subl   $[B+2],%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	83 dd 00                # sbbl   $0,%ebp
+	f5                      # cmc
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 
 # Repeated NOP

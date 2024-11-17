@@ -808,6 +808,8 @@ selfmod:
 	je     ilsr
 	cmpb   $0x4c,_RAM(%ebx)
 	je     ijmp
+	cmpb   $0x58,_RAM(%ebx)
+	je     icli
 	cmpb   $0x60,_RAM(%ebx)
 	je     irts
 	cmpb   $0x65,_RAM(%ebx)
@@ -820,6 +822,8 @@ selfmod:
 	je     iadcimm
 	cmpb   $0x6c,_RAM(%ebx)
 	je     ijmpind
+	cmpb   $0x78,_RAM(%ebx)
+	je     isei
 	cmpb   $0x84,_RAM(%ebx)
 	je     istyz
 	cmpb   $0x85,_RAM(%ebx)
@@ -876,6 +880,8 @@ selfmod:
 	je     ildaziy
 	cmpb   $0xb5,_RAM(%ebx)
 	je     ildazx
+	cmpb   $0xb8,_RAM(%ebx)
+	je     iclv
 	cmpb   $0xb9,_RAM(%ebx)
 	je     ilday
 	cmpb   $0xba,_RAM(%ebx)
@@ -898,6 +904,8 @@ selfmod:
 	je     idec
 	cmpb   $0xd0,_RAM(%ebx)
 	je     ibne
+	cmpb   $0xd8,_RAM(%ebx)
+	je     icld
 	cmpb   $0xe0,_RAM(%ebx)
 	je     icpximm
 	cmpb   $0xe5,_RAM(%ebx)
@@ -914,6 +922,8 @@ selfmod:
 	je     iinc
 	cmpb   $0xf0,_RAM(%ebx)
 	je     ibeq
+	cmpb   $0xf8,_RAM(%ebx)
+	je     ised
 	cmpb   $0xfd,_RAM(%ebx)
 	je     isbcx
 
@@ -1056,15 +1066,45 @@ ibeq:
 	jmp    i_next
 
 iclc:
+	incl   %ebx
 	xorl   %ebp,%ebp
 	addl   $2,%esi
-	addl   $1,%ebx
 	jmp    i_next
 
 isec:
-	orl    $0xffffffff,%ebp
+	incl   %ebx
+	orl    $-1,%ebp
 	addl   $2,%esi
-	addl   $1,%ebx
+	jmp    i_next
+
+icli:
+	incl   %ebx
+	andb   $0xfb,FLAGS
+	addl   $2,%esi
+	jmp    i_next
+
+isei:
+	incl   %ebx
+	orb    $0x04,FLAGS
+	addl   $2,%esi
+	jmp    i_next
+
+icld:
+	incl   %ebx
+	andb   $0xf7,FLAGS
+	addl   $2,%esi
+	jmp    i_next
+
+ised:
+	incl   %ebx
+	orb    $0x08,FLAGS
+	addl   $2,%esi
+	jmp    i_next
+
+iclv:
+	incl   %ebx
+	movl   $0,VFLAG
+	addl   $2,%esi
 	jmp    i_next
 
 iphp:
