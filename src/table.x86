@@ -628,10 +628,10 @@
 # 48 - PHA
 48,1:
 	8b 1d [S]               # movl   STACKPTR,%ebx
-	83 c6 03                # addl   $0x3,%esi
 	88 03                   # movb   %al,(%ebx)
 	fe cb                   # decb   %bl
 	88 1d [S]               # movb   %bl,STACKPTR
+	83 c6 03                # addl   $3,%esi
 	/
 # 49 - EOR - Immediate
 49,2:
@@ -856,7 +856,6 @@
 	fe c0                   # incb   %al
 	a2 [S]                  # movb   %al,STACKPTR
 	8a 00                   # movb   (%eax),%al
-	0f b6 c0                # movzbl %al,%eax
 	0f be f8                # movsbl %al,%edi
 	83 c6 04                # addl   $4,%esi
 	/
@@ -1077,9 +1076,9 @@
 # 89 - (bad)
 # 8a - TXA
 8a,1:
-	0f be c1                # movsbl %cl,%eax
-	83 c6 02                # addl   $0x2,%esi  # cycle count +2
-	89 c7                   # movl   %eax,%edi
+	88 c8                   # movb   %cl,%al
+	0f be f8                # movsbl %al,%edi
+	83 c6 02                # addl   $2,%esi
 	/
 # 8b - (bad)
 # 8c - STY - Absolute
@@ -1156,9 +1155,9 @@
 # 97 - (bad)
 # 98 - TYA
 98,1:
-	0f be c2                # movsbl %dl,%eax
-	83 c6 02                # addl   $0x2,%esi  # cycle count +2
-	89 c7                   # movl   %eax,%edi
+	88 d0                   # movb   %dl,%al
+	0f be f8                # movsbl %al,%edi
+	83 c6 02                # addl   $2,%esi
 	/
 # 99 - STA - Absolute,Y
 99,3:
@@ -1169,7 +1168,7 @@
 # 9a - TXS
 9a,1:
 	88 0d [S]               # movb   %cl,STACKPTR
-	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	83 c6 02                # addl   $2,%esi
 	/
 # 9b - (bad)
 # 9c - (bad)
@@ -1243,9 +1242,9 @@ a6,2:
 # a7 - (bad)
 # a8 - TAY
 a8,1:
-	89 c2                   # movl   %eax,%edx
-	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	88 c2                   # movb   %al,%dl
 	0f be fa                # movsbl %dl,%edi
+	83 c6 02                # addl   $2,%esi
 	/
 # a9 - LDA - Immediate
 a9,2:
@@ -1255,9 +1254,9 @@ a9,2:
 	/
 # aa - TAX
 aa,1:
-	89 c1                   # movl   %eax,%ecx
-	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	88 c1                   # movb   %al,%cl
 	0f be f9                # movsbl %cl,%edi
+	83 c6 02                # addl   $2,%esi
 	/
 # ab - (bad)
 # ac - LDY - Absolute
@@ -1359,10 +1358,9 @@ b9,3:
 	/
 # ba - TSX
 ba,1:
-	31 c9                   # xorl   %ecx,%ecx
-	83 c6 02                # addl   $0x2,%esi
 	8a 0d [S]               # movb   STACKPTR,%cl
 	0f be f9                # movsbl %cl,%edi
+	83 c6 02                # addl   $2,%esi
 	/
 # bb - (bad)
 # bc - LDY - Absolute,X

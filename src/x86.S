@@ -844,6 +844,8 @@ selfmod:
 	je     itya
 	cmpb   $0x99,_RAM(%ebx)
 	je     istay
+	cmpb   $0x9a,_RAM(%ebx)
+	je     itxs
 	cmpb   $0x9d,_RAM(%ebx)
 	je     istax
 	cmpb   $0xa0,_RAM(%ebx)
@@ -876,6 +878,8 @@ selfmod:
 	je     ildazx
 	cmpb   $0xb9,_RAM(%ebx)
 	je     ilday
+	cmpb   $0xba,_RAM(%ebx)
+	je     itsx
 	cmpb   $0xbc,_RAM(%ebx)
 	je     ildyx
 	cmpb   $0xbd,_RAM(%ebx)
@@ -1064,6 +1068,7 @@ isec:
 	jmp    i_next
 
 iphp:
+	incl   %ebx
 	pushl  %ebx
 	movl   FLAGS,%ebx
 	andl   $0x0c,%ebx
@@ -1090,11 +1095,11 @@ iphp:
 	andl   $0x1,%ebx
 	movl   %ebx,%ebp
 	popl   %ebx
-	incl   %ebx
 	addl   $3,%esi
 	jmp    i_next
 
 iplp:
+	incl   %ebx
 	movl   STACKPTR,%edi
 	subl   $0xff,%edi
 	orl    $0x100,%edi
@@ -1108,58 +1113,69 @@ iplp:
 	leal   (%ebp,%ebp,1),%edi
 	andl   $0x104,%edi
 	andl   $0x1,%ebp
-	incl   %ebx
 	addl   $4,%esi
 	jmp    i_next
 
 ipha:
+	incl   %ebx
 	push   %ebx
 	movl   STACKPTR,%ebx
-	addl   $0x3,%esi
 	movb   %al,(%ebx)
 	decb   %bl
 	movb   %bl,STACKPTR
 	popl   %ebx
-	incl   %ebx
+	addl   $3,%esi
 	jmp    i_next
 
 ipla:
+	incl   %ebx
 	movl   STACKPTR,%eax
 	incb   %al
 	movb   %al,STACKPTR
 	movb   (%eax),%al
-	movzbl %al,%eax
 	movsbl %al,%edi
-	incl   %ebx
 	addl   $4,%esi
 	jmp    i_next
 
-itax:
-	movl   %eax,%ecx
-	addl   $2,%esi
-	movsbl %cl,%edi
+itxs:
 	incl   %ebx
+	movb   %cl,STACKPTR
+	addl   $2,%esi
+	jmp    i_next
+
+itsx:
+	incl   %ebx
+	movb   STACKPTR,%cl
+	movsbl %cl,%edi
+	addl   $2,%esi
+	jmp    i_next
+
+itax:
+	incl   %ebx
+	movb   %al,%cl
+	movsbl %cl,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 itxa:
-	movl   %ecx,%eax
-	addl   $2,%esi
-	movsbl %cl,%edi
 	incl   %ebx
+	movb   %cl,%al
+	movsbl %al,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 itay:
-	movl   %eax,%edx
-	addl   $2,%esi
-	movsbl %dl,%edi
 	incl   %ebx
+	movb   %al,%dl
+	movsbl %dl,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 itya:
-	movl   %edx,%eax
 	incl   %ebx
+	movb   %dl,%al
+	movsbl %al,%edi
 	addl   $2,%esi
-	movsbl %dl,%edi
 	jmp    i_next
 
 ildaimm:
