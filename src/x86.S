@@ -918,6 +918,11 @@ i_done:
 	movl   $0,DMOD
 	jmp    recompile
 
+inop:
+	inc    %ebx
+	add    $2,%esi
+	jmp    i_next
+
 ijmp:
 	movzwl _RAM+1(%ebx),%ebx
 	add    $3,%esi
@@ -934,27 +939,6 @@ ijmpind:
 	popl   %eax
 	jmp    i_next
 
-ilda:
-	movzwl _RAM+1(%ebx),%edi
-	movl   %edi,%eax
-	subl   $0x2000,%edi
-	addl   $4,%esi
-	addl   $3,%ebx
-	cmpl   $0x4000,%edi
-	jb     ildainp
-	movl   %eax,%edi
-	shrl   $0xc,%eax
-	movl   MAPTABLE(,%eax,4),%eax
-	movsbl (%edi,%eax,1),%eax
-	movl   %eax,%edi
-	jmp    i_next
-ildainp:
-	xchg   %eax,%ebx
-	call   INPUT
-	movl   %eax,%ebx
-	movl   %edi,%eax
-	jmp    i_next
-
 ijsr:
 	add    $2,%ebx
 	pushl  %eax
@@ -969,66 +953,102 @@ ijsr:
 	addl   $6,%esi
 	jmp    i_next
 
-ilday:
-	movzwl _RAM+1(%ebx),%eax
-	andl   $0xff,%edx
-	addl   %edx,%eax
-	/*andl  $0xffff,%eax - unnecessary as MAPTABLE should take care of this */
-	movl   %eax,%edi
-	cmpb   %dl,%al
-	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (dl>al) */
-	subl   $0x2000,%edi
-	addl   $3,%ebx
-	cmpl   $0x4000,%edi
-	jb     ildainp
-	movl   %eax,%edi
-	shrl   $0xc,%eax
-	movl   MAPTABLE(,%eax,4),%eax
-	movsbl (%edi,%eax,1),%eax
-	movl   %eax,%edi
+irts:
+	xorl   %ebx,%ebx
+	pushl  %eax
+	movl   STACKPTR,%eax
+	incb   %al
+	movb   (%eax),%bl
+	incb   %al
+	movb   (%eax),%bh
+	movb   %al,STACKPTR
+	popl   %eax
+	addl   $1,%ebx
+	addl   $6,%esi
 	jmp    i_next
 
-ista:
-	addl   $3,%ebx
-	pushl  %ebx
-	movzwl _RAM-2(%ebx),%ebx
-	addl   $4,%esi
-	subl   $0x2000,%ebx
-	cmpl   $0x3000,%ebx
-	jb     istaout
-	addl   $0x2000,%ebx
-	testl  $0x8000,%ebx
-	jnz    istamapper
-	movb   %al,_RAM(%ebx)
-	popl   %ebx
-	jmp    i_next
-istaout:
-	addl   $0x2000,%ebx
-	call   OUTPUT
-	popl   %ebx
-	jmp    i_next
-istamapper:
-	pushl  %ecx
-	movl   MAPPERNUMBER,%ecx
-	movl   Mapper(,%ecx,4),%ecx
-	call   *%ecx
-	popl   %ecx
-	popl   %ebx
-	jmp    i_next
-
-ildaimm:
-	movsbl _RAM+1(%ebx),%eax
-	movl   %eax,%edi
+ibpl:
 	addl   $2,%ebx
 	addl   $2,%esi
+	testl  $0x100,%edi
+	jne    i_next
+	pushl  %eax
+	movsbl _RAM-1(%ebx),%eax
+	addl   %eax,%ebx
+	cmpb   %al,%bl
+	adcl   $1,%esi
+	andl   $0xffff,%ebx
+	popl   %eax
 	jmp    i_next
 
-ildaz:
-	movzbl _RAM+1(%ebx),%eax
-	movsbl _RAM(%eax),%eax
-	movl   %eax,%edi
+ibmi:
 	addl   $2,%ebx
-	addl   $3,%esi
+	addl   $2,%esi
+	testl  $0x100,%edi
+	je     i_next
+	pushl  %eax
+	movsbl _RAM-1(%ebx),%eax
+	addl   %eax,%ebx
+	cmpb   %al,%bl
+	adcl   $1,%esi
+	andl   $0xffff,%ebx
+	popl   %eax
+	jmp    i_next
+
+ibcc:
+	addl   $2,%ebx
+	addl   $2,%esi
+	testl  %ebp,%ebp
+	jnz    i_next
+	pushl  %eax
+	movsbl _RAM-1(%ebx),%eax
+	addl   %eax,%ebx
+	cmpb   %al,%bl
+	adcl   $1,%esi
+	andl   $0xffff,%ebx
+	popl   %eax
+	jmp    i_next
+
+ibcs:
+	addl   $2,%ebx
+	addl   $2,%esi
+	testl  %ebp,%ebp
+	jz     i_next
+	pushl  %eax
+	movsbl _RAM-1(%ebx),%eax
+	addl   %eax,%ebx
+	cmpb   %al,%bl
+	adcl   $1,%esi
+	andl   $0xffff,%ebx
+	popl   %eax
+	jmp    i_next
+
+ibne:
+	addl   $2,%ebx
+	addl   $2,%esi
+	testl  $0xff,%edi
+	jz     i_next
+	pushl  %eax
+	movsbl _RAM-1(%ebx),%eax
+	addl   %eax,%ebx
+	cmpb   %al,%bl
+	adcl   $1,%esi
+	andl   $0xffff,%ebx
+	popl   %eax
+	jmp    i_next
+
+ibeq:
+	addl   $2,%ebx
+	addl   $2,%esi
+	testl  $0xff,%edi
+	jnz    i_next
+	pushl  %eax
+	movsbl _RAM-1(%ebx),%eax
+	addl   %eax,%ebx
+	cmpb   %al,%bl
+	adcl   $1,%esi
+	andl   $0xffff,%ebx
+	popl   %eax
 	jmp    i_next
 
 iclc:
@@ -1037,203 +1057,10 @@ iclc:
 	addl   $1,%ebx
 	jmp    i_next
 
-itax:
-	movl   %eax,%ecx
-	addl   $2,%esi
-	movsbl %cl,%edi
-	incl   %ebx
-	jmp    i_next
-
-ildyx:
-	movzwl _RAM+1(%ebx),%edx
-	andl   $0xff,%ecx
-	addl   %ecx,%edx
-	movl   %edx,%edi
-	cmpb   %cl,%dl
-	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (cl>dl) */
-	subl   $0x2000,%edi
-	addl   $3,%ebx
-	cmpl   $0x4000,%edi
-	jb     ildyinp
-	movl   %edx,%edi
-	shrl   $0xc,%edx
-	movl   MAPTABLE(,%edx,4),%edx
-	movsbl (%edi,%edx,1),%edx
-	movl   %edx,%edi
-	jmp    i_next
-
-isty:
-	addl   $3,%ebx
-	pushl  %ebx
-	movzwl _RAM-2(%ebx),%ebx
-	addl   $4,%esi
-	subl   $0x2000,%ebx
-	cmpl   $0x4000,%ebx
-	jb     istyout
-	addl   $0x2000,%ebx
-	testl  $0x8000,%ebx
-	jnz    istymapper
-	movb   %dl,_RAM(%ebx)
-	popl   %ebx
-	jmp    i_next
-istyout:
-	addl   $0x2000,%ebx
-	xchg   %edx,%eax
-	call   OUTPUT
-	xchg   %edx,%eax
-	popl   %ebx
-	jmp    i_next
-istymapper:
-	pushl  %ecx
-	movl   MAPPERNUMBER,%ecx
-	movl   Mapper(,%ecx,4),%ecx
-	xchg   %edx,%eax
-	call   *%ecx
-	xchg   %edx,%eax
-	popl   %ecx
-	popl   %ebx
-	jmp    i_next
-
-ildximm:
-	movsbl _RAM+1(%ebx),%ecx
-	movl   %ecx,%edi
-	addl   $2,%ebx
-	addl   $2,%esi
-	jmp    i_next
-
-ildyimm:
-	movsbl _RAM+1(%ebx),%edx
-	movl   %edx,%edi
-	addl   $2,%ebx
-	addl   $2,%esi
-	jmp    i_next
-
-ildax:
-	movzwl _RAM+1(%ebx),%eax
-	andl   $0xff,%ecx
-	addl   %ecx,%eax
-	movl   %eax,%edi
-	cmpb   %cl,%al
-	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (cl>al) */
-	subl   $0x2000,%edi
-	addl   $3,%ebx
-	cmpl   $0x4000,%edi
-	jb     ildainp
-	movl   %eax,%edi
-	shrl   $0xc,%eax
-	movl   MAPTABLE(,%eax,4),%eax
-	movsbl (%edi,%eax,1),%eax
-	movl   %eax,%edi
-	jmp    i_next
-
-iadcz:
-	movsbl %al,%eax
-	pushl  %ebx
-	movzbl _RAM+1(%ebx),%ebx
-	movsbl _RAM(%ebx),%ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   3(%esi),%esi
-	sbbl   %ebp,%ebp
-	popl   %ebx
-	movl   %eax,VFLAG
-	addl   $2,%ebx
-	movsbl %al,%edi
-	jmp    i_next
-
-istaz:
-	addl   $2,%ebx
-	pushl  %ebx
-	movzbl _RAM-1(%ebx),%ebx
-	addl   $3,%esi
-	movb   %al,_RAM(%ebx)
-	popl   %ebx
-	jmp    i_next
-
-iadcimm:
-	movsbl %al,%eax
-	pushl  %ebx
-	movsbl _RAM+1(%ebx),%ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   2(%esi),%esi
-	sbbl   %ebp,%ebp
-	popl   %ebx
-	movl   %eax,VFLAG
-	addl   $2,%ebx
-	movsbl %al,%edi
-	jmp    i_next
-
 isec:
 	orl    $0xffffffff,%ebp
 	addl   $2,%esi
 	addl   $1,%ebx
-	jmp    i_next
-
-isbcx: /* No I/O */
-	pushl  %ebx
-	movzwl _RAM+1(%ebx),%ebx
-	andl   $0xff,%ecx
-	addl   %ecx,%ebx
-	movl   %ebx,%edi
-	cmpb   %cl,%bl
-	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (cl>bl) */
-	shrl   $0xc,%ebx
-	movl   MAPTABLE(,%ebx,4),%ebx
-	movsbl %al,%eax
-	movsbl (%edi,%ebx,1),%ebx
-	xorl   $0xffffffff,%ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	sbbl   %ebp,%ebp
-	movl   %eax,VFLAG
-	movsbl %al,%edi
-	popl   %ebx
-	addl   $3,%ebx
-	jmp    i_next
-
-istax:
-	addl   $3,%ebx
-	andl   $0xff,%ecx
-	pushl  %ebx
-	movzwl _RAM-2(%ebx),%ebx
-	addl   %ecx,%ebx
-	addl   $5,%esi
-	subl   $0x2000,%ebx
-	cmpl   $0x4000,%ebx
-	jb     istaout
-	addl   $0x2000,%ebx
-	testl  $0x8000,%ebx
-	jnz    istamapper
-	movb   %al,_RAM(%ebx)
-	popl   %ebx
-	jmp    i_next
-
-ipha:
-	push   %ebx
-	movl   STACKPTR,%ebx
-	addl   $0x3,%esi
-	movb   %al,(%ebx)
-	decb   %bl
-	movb   %bl,STACKPTR
-	popl   %ebx
-	incl   %ebx
-	jmp    i_next
-
-iinx:
-	inc    %ecx
-	inc    %ebx
-	add    $2,%esi
-	movsbl %cl,%edi
-	jmp    i_next
-
-ilsr:
-	shrl   %eax
-	incl   %ebx
-	sbbl   %ebp,%ebp
-	andl   $0x7f,%eax
-	addl   $2,%esi
-	movl   %eax,%edi
 	jmp    i_next
 
 iphp:
@@ -1267,6 +1094,247 @@ iphp:
 	addl   $3,%esi
 	jmp    i_next
 
+iplp:
+	movl   STACKPTR,%edi
+	subl   $0xff,%edi
+	orl    $0x100,%edi
+	movl   %edi,STACKPTR
+	movl   (%edi),%ebp
+	movl   %ebp,FLAGS
+	leal   (%ebp,%ebp,1),%edi
+	andl   $0x80,%edi
+	movl   %edi,VFLAG
+	xorl   $0x2,%ebp
+	leal   (%ebp,%ebp,1),%edi
+	andl   $0x104,%edi
+	andl   $0x1,%ebp
+	incl   %ebx
+	addl   $4,%esi
+	jmp    i_next
+
+ipha:
+	push   %ebx
+	movl   STACKPTR,%ebx
+	addl   $0x3,%esi
+	movb   %al,(%ebx)
+	decb   %bl
+	movb   %bl,STACKPTR
+	popl   %ebx
+	incl   %ebx
+	jmp    i_next
+
+ipla:
+	movl   STACKPTR,%eax
+	incb   %al
+	movb   %al,STACKPTR
+	movb   (%eax),%al
+	movzbl %al,%eax
+	movsbl %al,%edi
+	incl   %ebx
+	addl   $4,%esi
+	jmp    i_next
+
+itax:
+	movl   %eax,%ecx
+	addl   $2,%esi
+	movsbl %cl,%edi
+	incl   %ebx
+	jmp    i_next
+
+itxa:
+	movl   %ecx,%eax
+	addl   $2,%esi
+	movsbl %cl,%edi
+	incl   %ebx
+	jmp    i_next
+
+itay:
+	movl   %eax,%edx
+	addl   $2,%esi
+	movsbl %dl,%edi
+	incl   %ebx
+	jmp    i_next
+
+itya:
+	movl   %edx,%eax
+	incl   %ebx
+	addl   $2,%esi
+	movsbl %dl,%edi
+	jmp    i_next
+
+ildaimm:
+	movsbl _RAM+1(%ebx),%eax
+	movl   %eax,%edi
+	addl   $2,%ebx
+	addl   $2,%esi
+	jmp    i_next
+
+ildximm:
+	movsbl _RAM+1(%ebx),%ecx
+	movl   %ecx,%edi
+	addl   $2,%ebx
+	addl   $2,%esi
+	jmp    i_next
+
+ildyimm:
+	movsbl _RAM+1(%ebx),%edx
+	movl   %edx,%edi
+	addl   $2,%ebx
+	addl   $2,%esi
+	jmp    i_next
+
+ildaz:
+	movzbl _RAM+1(%ebx),%eax
+	movsbl _RAM(%eax),%eax
+	movl   %eax,%edi
+	addl   $2,%ebx
+	addl   $3,%esi
+	jmp    i_next
+
+ildxz:
+	movzbl _RAM+1(%ebx),%ecx
+	movsbl _RAM(%ecx),%ecx
+	movl   %ecx,%edi
+	addl   $2,%ebx
+	addl   $3,%esi
+	jmp    i_next
+
+ildyz:
+	movzbl _RAM+1(%ebx),%edx
+	movsbl _RAM(%edx),%edx
+	movl   %edx,%edi
+	addl   $2,%ebx
+	addl   $3,%esi
+	jmp    i_next
+
+ildazx:
+	movzbl _RAM+1(%ebx),%eax
+	addl   %ecx,%eax
+	addl   $2,%ebx
+	andl   $0xff,%eax
+	addl   $4,%esi
+	movsbl _RAM(%eax),%eax
+	movl   %eax,%edi
+	jmp    i_next
+
+ilda:
+	movzwl _RAM+1(%ebx),%edi
+	movl   %edi,%eax
+	subl   $0x2000,%edi
+	addl   $4,%esi
+	addl   $3,%ebx
+	cmpl   $0x4000,%edi
+	jb     ildainp
+	movl   %eax,%edi
+	shrl   $0xc,%eax
+	movl   MAPTABLE(,%eax,4),%eax
+	movsbl (%edi,%eax,1),%eax
+	movl   %eax,%edi
+	jmp    i_next
+ildainp:
+	xchg   %eax,%ebx
+	call   INPUT
+	movl   %eax,%ebx
+	movl   %edi,%eax
+	jmp    i_next
+
+ildx:
+	movzwl _RAM+1(%ebx),%edi
+	movl   %edi,%ecx
+	subl   $0x2000,%edi
+	addl   $4,%esi
+	addl   $3,%ebx
+	cmpl   $0x4000,%edi
+	jb     ildxinp
+	movl   %ecx,%edi
+	shrl   $0xc,%ecx
+	movl   MAPTABLE(,%ecx,4),%ecx
+	movsbl (%edi,%ecx,1),%ecx
+	movl   %ecx,%edi
+	jmp    i_next
+ildxinp:
+	xchg   %ecx,%ebx
+	call   INPUT
+	movl   %ecx,%ebx
+	movl   %edi,%ecx
+	jmp    i_next
+
+ildy:
+	movzwl _RAM+1(%ebx),%edi
+	movl   %edi,%edx
+	subl   $0x2000,%edi
+	addl   $4,%esi
+	addl   $3,%ebx
+	cmpl   $0x4000,%edi
+	jb     ildyinp
+	movl   %edx,%edi
+	shrl   $0xc,%edx
+	movl   MAPTABLE(,%edx,4),%edx
+	movsbl (%edi,%edx,1),%edx
+	movl   %edx,%edi
+	jmp    i_next
+ildyinp:
+	xchg   %edx,%ebx
+	call   INPUT
+	movl   %edx,%ebx
+	movl   %edi,%edx
+	jmp    i_next
+
+ildax:
+	movzwl _RAM+1(%ebx),%eax
+	andl   $0xff,%ecx
+	addl   %ecx,%eax
+	movl   %eax,%edi
+	cmpb   %cl,%al
+	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (cl>al) */
+	subl   $0x2000,%edi
+	addl   $3,%ebx
+	cmpl   $0x4000,%edi
+	jb     ildainp
+	movl   %eax,%edi
+	shrl   $0xc,%eax
+	movl   MAPTABLE(,%eax,4),%eax
+	movsbl (%edi,%eax,1),%eax
+	movl   %eax,%edi
+	jmp    i_next
+
+ilday:
+	movzwl _RAM+1(%ebx),%eax
+	andl   $0xff,%edx
+	addl   %edx,%eax
+	/*andl  $0xffff,%eax - unnecessary as MAPTABLE should take care of this */
+	movl   %eax,%edi
+	cmpb   %dl,%al
+	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (dl>al) */
+	subl   $0x2000,%edi
+	addl   $3,%ebx
+	cmpl   $0x4000,%edi
+	jb     ildainp
+	movl   %eax,%edi
+	shrl   $0xc,%eax
+	movl   MAPTABLE(,%eax,4),%eax
+	movsbl (%edi,%eax,1),%eax
+	movl   %eax,%edi
+	jmp    i_next
+
+ildyx:
+	movzwl _RAM+1(%ebx),%edx
+	andl   $0xff,%ecx
+	addl   %ecx,%edx
+	movl   %edx,%edi
+	cmpb   %cl,%dl
+	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (cl>dl) */
+	subl   $0x2000,%edi
+	addl   $3,%ebx
+	cmpl   $0x4000,%edi
+	jb     ildyinp
+	movl   %edx,%edi
+	shrl   $0xc,%edx
+	movl   MAPTABLE(,%edx,4),%edx
+	movsbl (%edi,%edx,1),%edx
+	movl   %edx,%edi
+	jmp    i_next
+
 ildaziy:
 	andl   $0xff,%edx
 	movzbl _RAM+1(%ebx),%eax
@@ -1293,142 +1361,13 @@ ildaziyinp:
 	movl   %edi,%eax
 	jmp    i_next
 
-inop:
-	inc    %ebx
-	add    $2,%esi
-	jmp    i_next
-
-iplp:
-	movl   STACKPTR,%edi
-	subl   $0xff,%edi
-	orl    $0x100,%edi
-	movl   %edi,STACKPTR
-	movl   (%edi),%ebp
-	movl   %ebp,FLAGS
-	leal   (%ebp,%ebp,1),%edi
-	andl   $0x80,%edi
-	movl   %edi,VFLAG
-	xorl   $0x2,%ebp
-	leal   (%ebp,%ebp,1),%edi
-	andl   $0x104,%edi
-	andl   $0x1,%ebp
-	incl   %ebx
-	addl   $4,%esi
-	jmp    i_next
-
-iasl:
-	addb   %al,%al
-	incl   %ebx
-	sbbl   %ebp,%ebp
-	addl   $2,%esi
-	movsbl %al,%edi
-	jmp    i_next
-
-itay:
-	movl   %eax,%edx
-	addl   $2,%esi
-	movsbl %dl,%edi
-	incl   %ebx
-	jmp    i_next
-
-iandimm:
-	andb   _RAM+1(%ebx),%al
+istaz:
 	addl   $2,%ebx
-	addl   $2,%esi
-	movsbl %al,%edi
-	jmp    i_next
-
-ildxz:
-	movzbl _RAM+1(%ebx),%ecx
-	movsbl _RAM(%ecx),%ecx
-	movl   %ecx,%edi
-	addl   $2,%ebx
-	addl   $3,%esi
-	jmp    i_next
-
-ildyz:
-	movzbl _RAM+1(%ebx),%edx
-	movsbl _RAM(%edx),%edx
-	movl   %edx,%edi
-	addl   $2,%ebx
-	addl   $3,%esi
-	jmp    i_next
-
-idec: /* None of the I/O regs are read/write so shouldn't need to check that */
-	addl   $3,%ebx
 	pushl  %ebx
-	movzwl _RAM-2(%ebx),%ebx
-	addl   $6,%esi
-	testl  $0x8000,%ebx
-	jnz    idecmapper
-	decb   _RAM(%ebx)
-	movsbl _RAM(%ebx),%edi
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $3,%esi
+	movb   %al,_RAM(%ebx)
 	popl   %ebx
-	jmp    i_next
-idecmapper:
-	movl   %ebx,%edi
-	pushl  %eax
-	shrl   $0xc,%edi
-	pushl  %ecx
-	movl   MAPPERNUMBER,%ecx
-	movl   MAPTABLE(,%edi,4),%edi
-	movl   Mapper(,%ecx,4),%ecx
-	movb   (%edi,%ebx,1),%al
-	decb   %al
-	movsbl %al,%edi
-	call   *%ecx
-	popl   %ecx
-	popl   %eax
-	popl   %ebx
-	jmp    i_next
-
-iinc: /* None of the I/O regs are read/write so shouldn't need to check that */
-	addl   $3,%ebx
-	pushl  %ebx
-	movzwl _RAM-2(%ebx),%ebx
-	addl   $6,%esi
-	testl  $0x8000,%ebx
-	jnz    iincmapper
-	incb   _RAM(%ebx)
-	movsbl _RAM(%ebx),%edi
-	popl   %ebx
-	jmp    i_next
-iincmapper:
-	movl   %ebx,%edi
-	pushl  %eax
-	shrl   $0xc,%edi
-	pushl  %ecx
-	movl   MAPPERNUMBER,%ecx
-	movl   MAPTABLE(,%edi,4),%edi
-	movl   Mapper(,%ecx,4),%ecx
-	movb   (%edi,%ebx,1),%al
-	incb   %al
-	movsbl %al,%edi
-	call   *%ecx
-	popl   %ecx
-	popl   %eax
-	popl   %ebx
-	jmp    i_next
-
-ioraimm:
-	orb    _RAM+1(%ebx),%al
-	addl   $2,%ebx
-	addl   $2,%esi
-	movsbl %al,%edi
-	jmp    i_next
-
-idey:
-	decl   %edx
-	incl   %ebx
-	addl   $2,%esi
-	movsbl %dl,%edi
-	jmp    i_next
-
-itya:
-	movl   %edx,%eax
-	incl   %ebx
-	addl   $2,%esi
-	movsbl %dl,%edi
 	jmp    i_next
 
 istxz:
@@ -1449,20 +1388,6 @@ istyz:
 	popl   %ebx
 	jmp    i_next
 
-ibne:
-	addl   $2,%ebx
-	addl   $2,%esi
-	testl  $0xff,%edi
-	jz     i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
-	jmp    i_next
-
 istazx:
 	addl   $2,%ebx
 	pushl  %ebx
@@ -1473,80 +1398,13 @@ istazx:
 	popl   %ebx
 	jmp    i_next
 
-idex:
-	dec    %ecx
-	inc    %ebx
-	add    $2,%esi
-	movsbl %cl,%edi
-	jmp    i_next
-
-iiny:
-	inc    %edx
-	inc    %ebx
-	add    $2,%esi
-	movsbl %dl,%edi
-	jmp    i_next
-
-ibcc:
-	addl   $2,%ebx
-	addl   $2,%esi
-	testl  %ebp,%ebp
-	jnz    i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
-	jmp    i_next
-
-ieorimm:
-	xorb   _RAM+1(%ebx),%al
-	addl   $2,%ebx
-	addl   $2,%esi
-	movsbl %al,%edi
-	jmp    i_next
-
-iora: /* fixme - no i/o check */
-	movzwl _RAM+1(%ebx),%edi
+ista:
 	addl   $3,%ebx
-	pushl  %ebx
-	movl   %edi,%ebx
-	shrl   $0xc,%edi
-	movl   MAPTABLE(,%edi,4),%edi
-	movsbl %al,%eax
-	movsbl (%edi,%ebx,1),%ebx
-	orl    %ebx,%eax
-	movl   %eax,%edi
-	popl   %ebx
-	addl   $4,%esi
-	jmp    i_next
-
-isbcimm:
-	movsbl %al,%eax
-	pushl  %ebx
-	movsbl _RAM+1(%ebx),%ebx
-	notl   %ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   2(%esi),%esi
-	sbbl   %ebp,%ebp
-	popl   %ebx
-	movl   %eax,VFLAG
-	addl   $2,%ebx
-	movsbl %al,%edi
-	jmp    i_next
-
-istay:
-	addl   $3,%ebx
-	andl   $0xff,%edx
 	pushl  %ebx
 	movzwl _RAM-2(%ebx),%ebx
-	addl   %edx,%ebx
-	addl   $5,%esi
+	addl   $4,%esi
 	subl   $0x2000,%ebx
-	cmpl   $0x4000,%ebx
+	cmpl   $0x3000,%ebx
 	jb     istaout
 	addl   $0x2000,%ebx
 	testl  $0x8000,%ebx
@@ -1554,62 +1412,18 @@ istay:
 	movb   %al,_RAM(%ebx)
 	popl   %ebx
 	jmp    i_next
-
-icmp: /* No I/O */
-	pushl  %ebx
-	pushl  %eax
-	movzwl _RAM+1(%ebx),%ebx
-	movl   %ebx,%edi
-	shrl   $0xc,%ebx
-	movl   MAPTABLE(,%ebx,4),%ebx
-	andl   $0xff,%eax
-	movzbl (%edi,%ebx,1),%ebx
-	movl   $0xffffffff,%ebp
-	subl   %ebx,%eax
-	adcl   $0,%ebp
-	movsbl %al,%edi
-	popl   %eax
-	popl   %ebx
-	addl   $3,%ebx
-	addl   $4,%esi
-	jmp    i_next
-
-ibeq:
-	addl   $2,%ebx
-	addl   $2,%esi
-	testl  $0xff,%edi
-	jnz    i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
-	jmp    i_next
-
-iincz:
-	addl   $2,%ebx
-	pushl  %ebx
-	movzbl _RAM-1(%ebx),%ebx
-	addl   $5,%esi
-	incb   _RAM(%ebx)
-	movsbl _RAM(%ebx),%edi
+istaout:
+	addl   $0x2000,%ebx
+	call   OUTPUT
 	popl   %ebx
 	jmp    i_next
-
-ibpl:
-	addl   $2,%ebx
-	addl   $2,%esi
-	testl  $0x100,%edi
-	jne    i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
+istamapper:
+	pushl  %ecx
+	movl   MAPPERNUMBER,%ecx
+	movl   Mapper(,%ecx,4),%ecx
+	call   *%ecx
+	popl   %ecx
+	popl   %ebx
 	jmp    i_next
 
 istx:
@@ -1644,22 +1458,246 @@ istxmapper:
 	popl   %ebx
 	jmp    i_next
 
-itxa:
-	movl   %ecx,%eax
-	addl   $2,%esi
-	movsbl %cl,%edi
-	incl   %ebx
+isty:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+	subl   $0x2000,%ebx
+	cmpl   $0x4000,%ebx
+	jb     istyout
+	addl   $0x2000,%ebx
+	testl  $0x8000,%ebx
+	jnz    istymapper
+	movb   %dl,_RAM(%ebx)
+	popl   %ebx
+	jmp    i_next
+istyout:
+	addl   $0x2000,%ebx
+	xchg   %edx,%eax
+	call   OUTPUT
+	xchg   %edx,%eax
+	popl   %ebx
+	jmp    i_next
+istymapper:
+	pushl  %ecx
+	movl   MAPPERNUMBER,%ecx
+	movl   Mapper(,%ecx,4),%ecx
+	xchg   %edx,%eax
+	call   *%ecx
+	xchg   %edx,%eax
+	popl   %ecx
+	popl   %ebx
 	jmp    i_next
 
-ipla:
-	movl   STACKPTR,%eax
+istax:
+	addl   $3,%ebx
+	andl   $0xff,%ecx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   %ecx,%ebx
+	addl   $5,%esi
+	subl   $0x2000,%ebx
+	cmpl   $0x4000,%ebx
+	jb     istaout
+	addl   $0x2000,%ebx
+	testl  $0x8000,%ebx
+	jnz    istamapper
+	movb   %al,_RAM(%ebx)
+	popl   %ebx
+	jmp    i_next
+
+istay:
+	addl   $3,%ebx
+	andl   $0xff,%edx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   %edx,%ebx
+	addl   $5,%esi
+	subl   $0x2000,%ebx
+	cmpl   $0x4000,%ebx
+	jb     istaout
+	addl   $0x2000,%ebx
+	testl  $0x8000,%ebx
+	jnz    istamapper
+	movb   %al,_RAM(%ebx)
+	popl   %ebx
+	jmp    i_next
+
+iincz:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $5,%esi
+	incb   _RAM(%ebx)
+	movsbl _RAM(%ebx),%edi
+	popl   %ebx
+	jmp    i_next
+
+iinc: /* None of the I/O regs are read/write so shouldn't need to check that */
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $6,%esi
+	testl  $0x8000,%ebx
+	jnz    iincmapper
+	incb   _RAM(%ebx)
+	movsbl _RAM(%ebx),%edi
+	popl   %ebx
+	jmp    i_next
+iincmapper:
+	movl   %ebx,%edi
+	pushl  %eax
+	shrl   $0xc,%edi
+	pushl  %ecx
+	movl   MAPPERNUMBER,%ecx
+	movl   MAPTABLE(,%edi,4),%edi
+	movl   Mapper(,%ecx,4),%ecx
+	movb   (%edi,%ebx,1),%al
 	incb   %al
-	movb   %al,STACKPTR
-	movb   (%eax),%al
-	movzbl %al,%eax
 	movsbl %al,%edi
+	call   *%ecx
+	popl   %ecx
+	popl   %eax
+	popl   %ebx
+	jmp    i_next
+
+idec: /* None of the I/O regs are read/write so shouldn't need to check that */
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $6,%esi
+	testl  $0x8000,%ebx
+	jnz    idecmapper
+	decb   _RAM(%ebx)
+	movsbl _RAM(%ebx),%edi
+	popl   %ebx
+	jmp    i_next
+idecmapper:
+	movl   %ebx,%edi
+	pushl  %eax
+	shrl   $0xc,%edi
+	pushl  %ecx
+	movl   MAPPERNUMBER,%ecx
+	movl   MAPTABLE(,%edi,4),%edi
+	movl   Mapper(,%ecx,4),%ecx
+	movb   (%edi,%ebx,1),%al
+	decb   %al
+	movsbl %al,%edi
+	call   *%ecx
+	popl   %ecx
+	popl   %eax
+	popl   %ebx
+	jmp    i_next
+
+iinx:
+	inc    %ecx
+	inc    %ebx
+	add    $2,%esi
+	movsbl %cl,%edi
+	jmp    i_next
+
+idex:
+	dec    %ecx
+	inc    %ebx
+	add    $2,%esi
+	movsbl %cl,%edi
+	jmp    i_next
+
+iiny:
+	inc    %edx
+	inc    %ebx
+	add    $2,%esi
+	movsbl %dl,%edi
+	jmp    i_next
+
+idey:
+	decl   %edx
 	incl   %ebx
-	addl   $4,%esi
+	addl   $2,%esi
+	movsbl %dl,%edi
+	jmp    i_next
+
+iadcimm:
+	movsbl %al,%eax
+	pushl  %ebx
+	movsbl _RAM+1(%ebx),%ebx
+	addl   $0xffffffff,%ebp
+	adcl   %ebx,%eax
+	leal   2(%esi),%esi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	movl   %eax,VFLAG
+	addl   $2,%ebx
+	movsbl %al,%edi
+	jmp    i_next
+
+isbcimm:
+	movsbl %al,%eax
+	pushl  %ebx
+	movsbl _RAM+1(%ebx),%ebx
+	notl   %ebx
+	addl   $0xffffffff,%ebp
+	adcl   %ebx,%eax
+	leal   2(%esi),%esi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	movl   %eax,VFLAG
+	addl   $2,%ebx
+	movsbl %al,%edi
+	jmp    i_next
+
+iadcz:
+	movsbl %al,%eax
+	pushl  %ebx
+	movzbl _RAM+1(%ebx),%ebx
+	movsbl _RAM(%ebx),%ebx
+	addl   $0xffffffff,%ebp
+	adcl   %ebx,%eax
+	leal   3(%esi),%esi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	movl   %eax,VFLAG
+	addl   $2,%ebx
+	movsbl %al,%edi
+	jmp    i_next
+
+isbcz:
+	movsbl %al,%eax
+	pushl  %ebx
+	movzbl _RAM+1(%ebx),%ebx
+	movsbl _RAM(%ebx),%ebx
+	xorl   $0xffffffff,%ebx
+	addl   $0xffffffff,%ebp
+	adcl   %ebx,%eax
+	leal   3(%esi),%esi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	movl   %eax,VFLAG
+	addl   $2,%ebx
+	movsbl %al,%edi
+	jmp    i_next
+
+isbcx: /* No I/O */
+	pushl  %ebx
+	movzwl _RAM+1(%ebx),%ebx
+	andl   $0xff,%ecx
+	addl   %ecx,%ebx
+	movl   %ebx,%edi
+	cmpb   %cl,%bl
+	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (cl>bl) */
+	shrl   $0xc,%ebx
+	movl   MAPTABLE(,%ebx,4),%ebx
+	movsbl %al,%eax
+	movsbl (%edi,%ebx,1),%ebx
+	xorl   $0xffffffff,%ebx
+	addl   $0xffffffff,%ebp
+	adcl   %ebx,%eax
+	sbbl   %ebp,%ebp
+	movl   %eax,VFLAG
+	movsbl %al,%edi
+	popl   %ebx
+	addl   $3,%ebx
 	jmp    i_next
 
 icmpimm:
@@ -1672,6 +1710,21 @@ icmpimm:
 	adcl   $0,%ebp
 	movsbl %al,%edi
 	popl   %eax
+	popl   %ebx
+	addl   $2,%ebx
+	addl   $2,%esi
+	jmp    i_next
+
+icpximm:
+	pushl  %ebx
+	pushl  %ecx
+	movzbl _RAM+1(%ebx),%ebx
+	andl   $0xff,%ecx
+	movl   $0xffffffff,%ebp
+	subl   %ebx,%ecx
+	adcl   $0,%ebp
+	movsbl %cl,%edi
+	popl   %ecx
 	popl   %ebx
 	addl   $2,%ebx
 	addl   $2,%esi
@@ -1692,39 +1745,23 @@ icpyimm:
 	addl   $2,%esi
 	jmp    i_next
 
-ibmi:
-	addl   $2,%ebx
-	addl   $2,%esi
-	testl  $0x100,%edi
-	je     i_next
+icmp: /* No I/O */
+	pushl  %ebx
 	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
+	movzwl _RAM+1(%ebx),%ebx
+	movl   %ebx,%edi
+	shrl   $0xc,%ebx
+	movl   MAPTABLE(,%ebx,4),%ebx
+	andl   $0xff,%eax
+	movzbl (%edi,%ebx,1),%ebx
+	movl   $0xffffffff,%ebp
+	subl   %ebx,%eax
+	adcl   $0,%ebp
+	movsbl %al,%edi
 	popl   %eax
-	jmp    i_next
-
-ildy:
-	movzwl _RAM+1(%ebx),%edi
-	movl   %edi,%edx
-	subl   $0x2000,%edi
-	addl   $4,%esi
+	popl   %ebx
 	addl   $3,%ebx
-	cmpl   $0x4000,%edi
-	jb     ildyinp
-	movl   %edx,%edi
-	shrl   $0xc,%edx
-	movl   MAPTABLE(,%edx,4),%edx
-	movsbl (%edi,%edx,1),%edx
-	movl   %edx,%edi
-	jmp    i_next
-ildyinp:
-	xchg   %edx,%ebx
-	call   INPUT
-	movl   %edx,%ebx
-	movl   %edi,%edx
+	addl   $4,%esi
 	jmp    i_next
 
 ibitz:
@@ -1741,92 +1778,57 @@ ibitz:
 	addl   $3,%esi
 	jmp    i_next
 
-icpximm:
-	pushl  %ebx
-	pushl  %ecx
-	movzbl _RAM+1(%ebx),%ebx
-	andl   $0xff,%ecx
-	movl   $0xffffffff,%ebp
-	subl   %ebx,%ecx
-	adcl   $0,%ebp
-	movsbl %cl,%edi
-	popl   %ecx
-	popl   %ebx
+iandimm:
+	andb   _RAM+1(%ebx),%al
 	addl   $2,%ebx
 	addl   $2,%esi
-	jmp    i_next
-
-ildx:
-	movzwl _RAM+1(%ebx),%edi
-	movl   %edi,%ecx
-	subl   $0x2000,%edi
-	addl   $4,%esi
-	addl   $3,%ebx
-	cmpl   $0x4000,%edi
-	jb     ildxinp
-	movl   %ecx,%edi
-	shrl   $0xc,%ecx
-	movl   MAPTABLE(,%ecx,4),%ecx
-	movsbl (%edi,%ecx,1),%ecx
-	movl   %ecx,%edi
-	jmp    i_next
-ildxinp:
-	xchg   %ecx,%ebx
-	call   INPUT
-	movl   %ecx,%ebx
-	movl   %edi,%ecx
-	jmp    i_next
-
-irorz:
-	addl   $2,%ebx
-	pushl  %ebx
-	movzbl _RAM-1(%ebx),%ebx
-	addl   $5,%esi
-	addl   $0xffffffff,%ebp
-	rcrb   _RAM(%ebx)
-	movsbl _RAM(%ebx),%edi
-	sbbl   %ebp,%ebp
-	popl   %ebx
-	jmp    i_next
-
-ildazx:
-	movzbl _RAM+1(%ebx),%eax
-	addl   %ecx,%eax
-	addl   $2,%ebx
-	andl   $0xff,%eax
-	addl   $4,%esi
-	movsbl _RAM(%eax),%eax
-	movl   %eax,%edi
-	jmp    i_next
-
-isbcz:
-	movsbl %al,%eax
-	pushl  %ebx
-	movzbl _RAM+1(%ebx),%ebx
-	movsbl _RAM(%ebx),%ebx
-	xorl   $0xffffffff,%ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   3(%esi),%esi
-	sbbl   %ebp,%ebp
-	popl   %ebx
-	movl   %eax,VFLAG
-	addl   $2,%ebx
 	movsbl %al,%edi
 	jmp    i_next
 
-ibcs:
+ieorimm:
+	xorb   _RAM+1(%ebx),%al
 	addl   $2,%ebx
 	addl   $2,%esi
-	testl  %ebp,%ebp
-	jz     i_next
-	pushl  %eax
-	movsbl _RAM-1(%ebx),%eax
-	addl   %eax,%ebx
-	cmpb   %al,%bl
-	adcl   $1,%esi
-	andl   $0xffff,%ebx
-	popl   %eax
+	movsbl %al,%edi
+	jmp    i_next
+
+ioraimm:
+	orb    _RAM+1(%ebx),%al
+	addl   $2,%ebx
+	addl   $2,%esi
+	movsbl %al,%edi
+	jmp    i_next
+
+iora: /* fixme - no i/o check */
+	movzwl _RAM+1(%ebx),%edi
+	addl   $3,%ebx
+	pushl  %ebx
+	movl   %edi,%ebx
+	shrl   $0xc,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	movsbl %al,%eax
+	movsbl (%edi,%ebx,1),%ebx
+	orl    %ebx,%eax
+	movl   %eax,%edi
+	popl   %ebx
+	addl   $4,%esi
+	jmp    i_next
+
+iasl:
+	addb   %al,%al
+	incl   %ebx
+	sbbl   %ebp,%ebp
+	addl   $2,%esi
+	movsbl %al,%edi
+	jmp    i_next
+
+ilsr:
+	shrl   %eax
+	incl   %ebx
+	sbbl   %ebp,%ebp
+	andl   $0x7f,%eax
+	addl   $2,%esi
+	movl   %eax,%edi
 	jmp    i_next
 
 irolz:
@@ -1841,18 +1843,16 @@ irolz:
 	popl   %ebx
 	jmp    i_next
 
-irts:
-	xorl   %ebx,%ebx
-	pushl  %eax
-	movl   STACKPTR,%eax
-	incb   %al
-	movb   (%eax),%bl
-	incb   %al
-	movb   (%eax),%bh
-	movb   %al,STACKPTR
-	popl   %eax
-	addl   $1,%ebx
-	addl   $6,%esi
+irorz:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $5,%esi
+	addl   $0xffffffff,%ebp
+	rcrb   _RAM(%ebx)
+	movsbl _RAM(%ebx),%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
 	jmp    i_next
 
 .type U,@function
