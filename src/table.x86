@@ -197,13 +197,10 @@
 	/
 # 06 - ASL - Zero Page
 06,2:
-	31 db                   # xorl   %ebx,%ebx
-	8a 1d [Z+1]             # movb   ZP,%bl
-	00 db                   # addb   %bl,%bl
-	8d 76 05                # leal   0x5(%esi),%esi
+	d0 25 [Z+1]             # shlb   [Z+1]
+	0f be 3d [Z+1]          # movsbl [Z+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 1d [Z+1]             # movb   %bl,ZP
-	0f be fb                # movsbl %bl,%edi
+	83 c6 05                # addl   $5,%esi
 	/
 # 07 - (bad)
 # 08 - PHP
@@ -242,10 +239,10 @@
 	/
 # 0a - ASL - Accumulator
 0a,1:
-	00 c0                   # addb   %al,%al
-	8d 76 02                # leal   0x2(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
+	d0 e0                   # shlb   %al
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # 0b - (bad)
 # 0c - (bad)
@@ -258,14 +255,11 @@
 	/
 # 0e - ASL - Absolute
 0e,3:
-# Warning - doesn't check mapper
-	31 db                   # xorl   %ebx,%ebx
-	8a 1d [A+1]             # movb   ADDR,%bl
-	00 db                   # addb   %bl,%bl
-	8d 76 06                # leal   0x6(%esi),%esi
+	# TODO: Check mapper
+	d0 25 [A+1]             # shlb   [A+1]
+	0f be 3d [A+1]          # movsbl [A+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 1d [A+1]             # movb   %bl,ADDR
-	0f be fb                # movsbl %bl,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 # 0f - (bad)
 # 10 - BPL
@@ -313,15 +307,12 @@
 	/
 # 16 - ASL - Zero Page,X
 16,2:
-	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
-	31 db                   # xorl   %ebx,%ebx
-	81 e7 ff 00 00 00       # andl   $0xff,%edi
-	8d 76 06                # leal   6(%esi),%esi
-	8a 9f [L]               # movb   RAM(%edi),%bl
-	00 db                   # addb   %bl,%bl
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	d0 a3 [L]               # shlb   RAM(%ebx)
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 9f [L]               # movb   %bl,RAM(%edi)
-	0f be fb                # movsbl %bl,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 # 17 - (bad)
 # 18 - CLC
@@ -358,12 +349,13 @@
 	/
 # 1e - ASL - Absolute,X
 1e,3:
-# warning: assumes RAM target; doesn't check ROM mapper or ffff->0000 overflow
-	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	83 c6 07                # addl   $0x7,%esi        (cycle count +7)
-	d0 a1 [A+1]             # shlb   [A+1](%ecx)
-	19 ed                   # sbbl   %ebp,%ebp        (saves carry flag)
-	0f be b9 [A+1]          # movsbl [A+1](%ecx),%edi (saves other flags)
+	# TODO: Check mapper
+	0f b6 d9                # movzbl %cl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	d0 a3 [L]               # shlb   RAM(%ebx)
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 07                # addl   $7,%esi
 	/
 # 1f - (bad)
 # 20 - JSR
@@ -408,11 +400,11 @@
 	/
 # 26 - ROL - Zero Page
 26,2:
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	d0 15 [Z+1]             # rclb   ZP
-	8d 76 05                # leal   5(%esi),%esi
+	83 c5 ff                # addl   $-1,%ebp
+	d0 15 [Z+1]             # rclb   [Z+1]
+	0f be 3d [Z+1]          # movsbl [Z+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	0f be 3d [Z+1]          # movsbl ZP,%edi
+	83 c6 05                # addl   $5,%esi
 	/
 # 27 - (bad)
 # 28 - PLP
@@ -445,11 +437,11 @@
 	/
 # 2a - ROL - Accumulator
 2a,1:
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	83 c5 ff                # addl   $-1,%ebp
 	d0 d0                   # rclb   %al
-	8d 76 02                # leal   2(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # 2b - (bad)
 # 2c - BIT - Absolute
@@ -472,12 +464,12 @@
 	/
 # 2e - ROL - Absolute
 2e,3:
-#warning - assumes ram target, doesn't check mapper
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	d0 15 [A+1]             # rclb   ADDR
-	8d 76 06                # leal   6(%esi),%esi
+	# TODO: Check mapper
+	83 c5 ff                # addl   $-1,%ebp
+	d0 15 [A+1]             # rclb   [A+1]
+	0f be 3d [A+1]          # movsbl [A+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	0f be 3d [A+1]          # movsbl ADDR,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 # 2f - (bad)
 # 30 - BMI
@@ -525,13 +517,13 @@
 	/
 # 36 - ROL - Zero Page,X
 36,2:
-	8d 59 [B+1]             # leal   [B+1](%ecx),%ebx
-	81 e3 ff 00 00 00       # andl   $0xff,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	83 c5 ff                # addl   $-1,%ebp
 	d0 93 [L]               # rclb   RAM(%ebx)
-	8d 76 06                # leal   6(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	0f be bb [L]            # movsbl RAM(%ebx),%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 06                # addl   $6,%esi
 	/
 # 37 - (bad)
 # 38 - SEC
@@ -569,13 +561,14 @@
 	/
 # 3e - ROL - Absolute,X
 3e,3:
-# warning: assumes RAM target; doesn't check ROM mapper!
-	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	8d 76 07                # leal   7(%esi),%esi
-	d0 91 [A+1]             # rclb   ADDR(%ecx)
-	19 ed                   # sbbl   %ebp,%ebp       (saves carry flag)
-	0f be b9 [A+1]          # movsbl ADDR(%ecx),%edi (saves other flags)
+	# TODO: Check mapper
+	0f b6 d9                # movzbl %cl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	83 c5 ff                # addl   $-1,%ebp
+	d0 93 [L]               # rclb   RAM(%ebx)
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 07                # addl   $7,%esi
 	/
 # 3f - (bad)
 # 40 - RTI
@@ -616,13 +609,10 @@
 	/
 # 46 - LSR - Zero Page
 46,2:
-	31 db                   # xorl   %ebx,%ebx
-	8a 1d [Z+1]             # movb   ZP,%bl
-	d0 eb                   # shrb   %bl
-	8d 76 05                # leal   0x5(%esi),%esi
+	d0 2d [Z+1]             # shrb   [Z+1]
+	0f be 3d [Z+1]          # movsbl [Z+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 1d [Z+1]             # movb   %bl,ZP
-	89 df                   # movl   %ebx,%edi
+	83 c6 05                # addl   $5,%esi
 	/
 # 47 - (bad)
 # 48 - PHA
@@ -641,11 +631,10 @@
 	/
 # 4a - LSR - Accumulator
 4a,1:
-	d1 e8                   # shrl   %eax
+	d0 e8                   # shrb   %al
+	0f be f8                # movsbl %al,%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	83 e0 7f                # andl   $0x7f,%eax
-	8d 76 02                # leal   0x2(%esi),%esi
-	89 c7                   # movl   %eax,%edi
+	83 c6 02                # addl   $2,%esi
 	/
 # 4b - (bad)
 # 4c - JMP - Absolute
@@ -669,14 +658,11 @@
 	/
 # 4e - LSR - Absolute
 4e,3:
-# Warning: read-modify-write operation assumes RAM target, does not check mapper table
-	8b 1d [A+1]             # movl   ADDR,%ebx
-	d1 eb                   # shrl   %ebx
+	# TODO: Check mapper
+	d0 2d [A+1]             # shrb   [A+1]
+	0f be 3d [A+1]          # movsbl [A+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	83 e3 7f                # andl   $0x7f,%ebx
-	8d 76 06                # leal   6(%esi),%esi
-	88 1d [A+1]             # movb   %bl,ADDR
-	89 df                   # movl   %ebx,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 # 4f - (bad)
 # 50 - BVC
@@ -726,15 +712,12 @@
 	/
 # 56 - LSR - Zero Page,X
 56,2:
-	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
-	31 db                   # xorl   %ebx,%ebx
-	81 e7 ff 00 00 00       # andl   $0xff,%edi
-	8d 76 06                # leal   0x6(%esi),%esi
-	8a 9f [L]               # movb   RAM(%edi),%bl
-	d0 eb                   # shrb   %bl
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	d0 ab [L]               # shrb   RAM(%ebx)
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 9f [L]               # movb   %bl,RAM(%edi)
-	89 df                   # movl   %ebx,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 # 57 - (bad)
 # 58 - CLI
@@ -771,15 +754,13 @@
 	/
 # 5e - LSR - Absolute,X
 5e,3:
-# Warning- Doesn't check mapper
-	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	31 db                   # xorl   %ebx,%ebx
-	8a 99 [A+1]             # movb   RAM(%ecx),%bl
-	d0 eb                   # shrb   %bl
-	8d 76 07                # leal   0x7(%esi),%esi
+	# TODO: Check mapper
+	0f b6 d9                # movzbl %cl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	d0 ab [L]               # shrb   RAM(%ebx)
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 99 [A+1]             # movb   %bl,RAM(%ecx)
-	89 df                   # movl   %ebx,%edi
+	83 c6 07                # addl   $7,%esi
 	/
 # 5f - (bad)
 # 60 - RTS
@@ -840,14 +821,11 @@
 	/
 # 66 - ROR - Zero Page
 66,2:
-	31 db                   # xorl   %ebx,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	8a 1d [Z+1]             # movb   ZP,%bl
-	d0 db                   # rcrb   %bl
-	8d 76 05                # leal   5(%esi),%esi
+	83 c5 ff                # addl   $-1,%ebp
+	d0 1d [Z+1]             # rcrb   [Z+1]
+	0f be 3d [Z+1]          # movsbl [Z+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 1d [Z+1]             # movb   %bl,ZP
-	0f be fb                # movsbl %bl,%edi
+	83 c6 05                # addl   $5,%esi
 	/
 # 67 - (bad)
 # 68 - PLA
@@ -871,11 +849,11 @@
 	/
 # 6a - ROR - Accumulator
 6a,1:
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	83 c5 ff                # addl   $-1,%ebp
 	d0 d8                   # rcrb   %al
-	8d 76 02                # leal   0x2(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # 6b - (bad)
 # 6c - JMP - Indirect
@@ -901,13 +879,13 @@
 	0f be f8                # movsbl %al,%edi
 	/
 # 6e - ROR - Absolute
-#warning - assumes ram target, doesn't check mapper
 6e,3:
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	d0 1d [A+1]             # rcrb   ADDR
-	8d 76 06                # leal   6(%esi),%esi
+	# TODO: Check mapper
+	83 c5 ff                # addl   $-1,%ebp
+	d0 1d [A+1]             # rcrb   [A+1]
+	0f be 3d [A+1]          # movsbl [A+1],%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	0f be 3d [A+1]          # movsbl ADDR,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 # 6f - (bad)
 # 70 - BVS
@@ -966,16 +944,13 @@
 	/
 # 76 - ROR - Zero Page,X
 76,2:
-	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
-	81 e7 ff 00 00 00       # andl   $0xff,%edi
-	31 db                   # xorl   %ebx,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	8a 9f [L]               # movb   RAM(%edi),%bl
-	d0 db                   # rcrb   %bl
-	8d 76 06                # leal   0x6(%esi),%esi
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	83 c5 ff                # addl   $-1,%ebp
+	d0 9b [L]               # rcrb   RAM(%ebx)
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	88 9f [L]               # movb   %bl,RAM(%edi)
-	0f be fb                # movsbl %bl,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 # 77 - (bad)
 # 78 - SEI
@@ -1021,13 +996,14 @@
 	/
 # 7e - ROR - Absolute,X
 7e,3:
-#warning - assumes ram target, no mapper
-	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	d0 99 [A+1]             # rcrb   ADDR(%ecx)
-	8d 76 07                # leal   7(%esi),%esi
+	# TODO: Check mapper
+	0f b6 d9                # movzbl %cl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	83 c5 ff                # addl   $-1,%ebp
+	d0 9b [L]               # rcrb   RAM(%ebx)
+	0f be bb [L]            # movsbl RAM(%ebx),%edi
 	19 ed                   # sbbl   %ebp,%ebp
-	0f be b9 [A+1]          # movsbl ADDR(%ecx),%edi
+	83 c6 07                # addl   $7,%esi
 	/
 # 7f - (bad)
 # 80 - (bad)
@@ -2036,45 +2012,42 @@ ca ca ca ca,4:
 
 # Repeated ASL
 0a 0a,2:
-	c0 e0 02                # shlb   $0x2,%al
-	8d 76 04                # leal   0x4(%esi),%esi  # cycle count +4
+	c0 e0 02                # shlb   $2,%al
 	19 ed                   # sbbl   %ebp,%ebp
 	0f be f8                # movsbl %al,%edi
+	83 c6 04                # addl   $4,%esi
 	/
 0a 0a 0a,3:
-	c0 e0 03                # shlb   $0x3,%al
-	8d 76 06                # leal   0x6(%esi),%esi  # cycle count +6
+	c0 e0 03                # shlb   $3,%al
 	19 ed                   # sbbl   %ebp,%ebp
 	0f be f8                # movsbl %al,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 0a 0a 0a 0a,4:
-	c0 e0 04                # shlb   $0x4,%al
-	8d 76 08                # leal   0x8(%esi),%esi  # cycle count +8
+	c0 e0 04                # shlb   $4,%al
 	19 ed                   # sbbl   %ebp,%ebp
 	0f be f8                # movsbl %al,%edi
+	83 c6 08                # addl   $8,%esi
 	/
 
 # Repeated LSR
 4a 4a,2:
-	25 ff 00 00 00          # andl   $0xff,%eax
-	c1 e8 02                # shrl   $0x2,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
+	c0 e8 02                # shrb   $2,%al
 	19 ed                   # sbbl   %ebp,%ebp
-	89 c7                   # movl   %eax,%edi
+	0f be f8                # movsbl %al,%edi
+	83 c6 04                # addl   $4,%esi
 	/
 4a 4a 4a,3:
-	25 ff 00 00 00          # andl   $0xff,%eax
-	c1 e8 03                # shrl   $0x3,%eax
-	8d 76 06                # leal   0x6(%esi),%esi
+	c0 e8 03                # shrb   $3,%al
 	19 ed                   # sbbl   %ebp,%ebp
-	89 c7                   # movl   %eax,%edi
+	0f be f8                # movsbl %al,%edi
+	83 c6 06                # addl   $6,%esi
 	/
 4a 4a 4a 4a,4:
-	25 ff 00 00 00          # andl   $0xff,%eax
-	c1 e8 04                # shrl   $0x4,%eax
-	8d 76 08                # leal   0x8(%esi),%esi
+	c0 e8 04                # shrb   $4,%al
 	19 ed                   # sbbl   %ebp,%ebp
-	89 c7                   # movl   %eax,%edi
+	0f be f8                # movsbl %al,%edi
+	83 c6 08                # addl   $8,%esi
 	/
 
 
