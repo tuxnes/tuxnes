@@ -928,6 +928,8 @@ selfmod:
 	je     ildax
 	cmpb   $0xc0,_RAM(%ebx)
 	je     icpyimm
+	cmpb   $0xc6,_RAM(%ebx)
+	je     idecz
 	cmpb   $0xc8,_RAM(%ebx)
 	je     iiny
 	cmpb   $0xc9,_RAM(%ebx)
@@ -940,8 +942,12 @@ selfmod:
 	je     idec
 	cmpb   $0xd0,_RAM(%ebx)
 	je     ibne
+	cmpb   $0xd6,_RAM(%ebx)
+	je     ideczx
 	cmpb   $0xd8,_RAM(%ebx)
 	je     icld
+	cmpb   $0xde,_RAM(%ebx)
+	je     idecx
 	cmpb   $0xe0,_RAM(%ebx)
 	je     icpximm
 	cmpb   $0xe5,_RAM(%ebx)
@@ -958,10 +964,14 @@ selfmod:
 	je     iinc
 	cmpb   $0xf0,_RAM(%ebx)
 	je     ibeq
+	cmpb   $0xf6,_RAM(%ebx)
+	je     iinczx
 	cmpb   $0xf8,_RAM(%ebx)
 	je     ised
 	cmpb   $0xfd,_RAM(%ebx)
 	je     isbcx
+	cmpb   $0xfe,_RAM(%ebx)
+	je     iincx
 
 i_done:
 	movl   %ebx,PCR
@@ -1610,27 +1620,68 @@ iincz:
 	pushl  %ebx
 	movzbl _RAM-1(%ebx),%ebx
 	addl   $5,%esi
-	incb   _RAM(%ebx)
-	movsbl _RAM(%ebx),%edi
-	popl   %ebx
-	jmp    i_next
+	jmp    iinczp
 
-iinc: /* None of the I/O regs are read/write so shouldn't need to check that */
+idecz:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $5,%esi
+	jmp    ideczp
+
+iinczx:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	addl   $6,%esi
+	jmp    iinczp
+
+ideczx:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	addl   $6,%esi
+	jmp    ideczp
+
+iincx:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
+	addl   $7,%esi
+	jmp    iincabs
+
+idecx:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
+	addl   $7,%esi
+	jmp    idecabs
+
+iinc:
 	addl   $3,%ebx
 	pushl  %ebx
 	movzwl _RAM-2(%ebx),%ebx
 	addl   $6,%esi
+iincabs:
+	/* None of the I/O regs are read/write so shouldn't need to check that */
 	testl  $0x8000,%ebx
 	jnz    iincmapper
+iinczp:
 	incb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edi
 	popl   %ebx
 	jmp    i_next
 iincmapper:
-	movl   %ebx,%edi
 	pushl  %eax
-	shrl   $0xc,%edi
 	pushl  %ecx
+	movl   %ebx,%edi
+	shrl   $12,%edi
 	movl   MAPPERNUMBER,%ecx
 	movl   MAPTABLE(,%edi,4),%edi
 	movl   Mapper(,%ecx,4),%ecx
@@ -1643,22 +1694,25 @@ iincmapper:
 	popl   %ebx
 	jmp    i_next
 
-idec: /* None of the I/O regs are read/write so shouldn't need to check that */
+idec:
 	addl   $3,%ebx
 	pushl  %ebx
 	movzwl _RAM-2(%ebx),%ebx
 	addl   $6,%esi
+idecabs:
+	/* None of the I/O regs are read/write so shouldn't need to check that */
 	testl  $0x8000,%ebx
 	jnz    idecmapper
+ideczp:
 	decb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edi
 	popl   %ebx
 	jmp    i_next
 idecmapper:
-	movl   %ebx,%edi
 	pushl  %eax
-	shrl   $0xc,%edi
 	pushl  %ecx
+	movl   %ebx,%edi
+	shrl   $12,%edi
 	movl   MAPPERNUMBER,%ecx
 	movl   MAPTABLE(,%edi,4),%edi
 	movl   Mapper(,%ecx,4),%ecx
@@ -1672,31 +1726,31 @@ idecmapper:
 	jmp    i_next
 
 iinx:
-	inc    %ecx
-	inc    %ebx
-	add    $2,%esi
+	incl   %ebx
+	incb   %cl
 	movsbl %cl,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 idex:
-	dec    %ecx
-	inc    %ebx
-	add    $2,%esi
+	incl   %ebx
+	decb   %cl
 	movsbl %cl,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 iiny:
-	inc    %edx
-	inc    %ebx
-	add    $2,%esi
+	incl   %ebx
+	incb   %dl
 	movsbl %dl,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 idey:
-	decl   %edx
 	incl   %ebx
-	addl   $2,%esi
+	decb   %dl
 	movsbl %dl,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 iadcimm:
