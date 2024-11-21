@@ -774,6 +774,10 @@ i_next:
 
 selfmod:
 	/* This will be converted to a lookup table when it's complete */
+	cmpb   $0x01,_RAM(%ebx)
+	je     iorazix
+	cmpb   $0x05,_RAM(%ebx)
+	je     ioraz
 	cmpb   $0x06,_RAM(%ebx)
 	je     iaslz
 	cmpb   $0x08,_RAM(%ebx)
@@ -788,16 +792,28 @@ selfmod:
 	je     iasl
 	cmpb   $0x10,_RAM(%ebx)
 	je     ibpl
+	cmpb   $0x11,_RAM(%ebx)
+	je     ioraziy
+	cmpb   $0x15,_RAM(%ebx)
+	je     iorazx
 	cmpb   $0x16,_RAM(%ebx)
 	je     iaslzx
 	cmpb   $0x18,_RAM(%ebx)
 	je     iclc
+	cmpb   $0x19,_RAM(%ebx)
+	je     ioray
+	cmpb   $0x1d,_RAM(%ebx)
+	je     iorax
 	cmpb   $0x1e,_RAM(%ebx)
 	je     iaslx
 	cmpb   $0x20,_RAM(%ebx)
 	je     ijsr
+	cmpb   $0x21,_RAM(%ebx)
+	je     iandzix
 	cmpb   $0x24,_RAM(%ebx)
 	je     ibitz
+	cmpb   $0x25,_RAM(%ebx)
+	je     iandz
 	cmpb   $0x26,_RAM(%ebx)
 	je     irolz
 	cmpb   $0x28,_RAM(%ebx)
@@ -806,16 +822,32 @@ selfmod:
 	je     iandimm
 	cmpb   $0x2a,_RAM(%ebx)
 	je     irolacc
+	cmpb   $0x2c,_RAM(%ebx)
+	je     ibit
+	cmpb   $0x2d,_RAM(%ebx)
+	je     iand
 	cmpb   $0x2e,_RAM(%ebx)
 	je     irol
 	cmpb   $0x30,_RAM(%ebx)
 	je     ibmi
+	cmpb   $0x31,_RAM(%ebx)
+	je     iandziy
+	cmpb   $0x35,_RAM(%ebx)
+	je     iandzx
 	cmpb   $0x36,_RAM(%ebx)
 	je     irolzx
 	cmpb   $0x38,_RAM(%ebx)
 	je     isec
+	cmpb   $0x39,_RAM(%ebx)
+	je     iandy
+	cmpb   $0x3d,_RAM(%ebx)
+	je     iandx
 	cmpb   $0x3e,_RAM(%ebx)
 	je     irolx
+	cmpb   $0x41,_RAM(%ebx)
+	je     ieorzix
+	cmpb   $0x45,_RAM(%ebx)
+	je     ieorz
 	cmpb   $0x46,_RAM(%ebx)
 	je     ilsrz
 	cmpb   $0x48,_RAM(%ebx)
@@ -826,14 +858,24 @@ selfmod:
 	je     ilsracc
 	cmpb   $0x4c,_RAM(%ebx)
 	je     ijmp
+	cmpb   $0x4d,_RAM(%ebx)
+	je     ieor
 	cmpb   $0x4e,_RAM(%ebx)
 	je     ilsr
 	cmpb   $0x50,_RAM(%ebx)
 	je     ibvc
+	cmpb   $0x51,_RAM(%ebx)
+	je     ieorziy
+	cmpb   $0x55,_RAM(%ebx)
+	je     ieorzx
 	cmpb   $0x56,_RAM(%ebx)
 	je     ilsrzx
 	cmpb   $0x58,_RAM(%ebx)
 	je     icli
+	cmpb   $0x59,_RAM(%ebx)
+	je     ieory
+	cmpb   $0x5d,_RAM(%ebx)
+	je     ieorx
 	cmpb   $0x5e,_RAM(%ebx)
 	je     ilsrx
 	cmpb   $0x60,_RAM(%ebx)
@@ -1900,53 +1942,298 @@ icmp: /* No I/O */
 	jmp    i_next
 
 ibitz:
-	movzbl _RAM+1(%ebx),%edi
-	orl    $0x100,%eax
-	movsbl _RAM(%edi),%edi
+	addl   $2,%ebx
 	pushl  %ebx
+	movzbl _RAM-1(%ebx),%edi
+	movsbl _RAM(%edi),%edi
 	leal   (%edi,%edi,1),%ebx
 	andl   $0x80,%ebx
 	movl   %ebx,VFLAG
+	orl    $0x100,%eax
 	andl   %eax,%edi
 	popl   %ebx
-	addl   $2,%ebx
 	addl   $3,%esi
 	jmp    i_next
 
+ibit:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%edi
+	movl   %edi,%ebx
+	shrl   $12,%ebx
+	movl   MAPTABLE(,%ebx,4),%ebx
+	movsbl (%ebx,%edi,1),%edi
+	leal   (%edi,%edi,1),%ebx
+	andl   $0x80,%ebx
+	movl   %ebx,VFLAG
+	orl    $0x100,%eax
+	andl   %eax,%edi
+	popl   %ebx
+	addl   $4,%esi
+	jmp    i_next
+
 iandimm:
-	andb   _RAM+1(%ebx),%al
 	addl   $2,%ebx
-	addl   $2,%esi
+	andb   _RAM-1(%ebx),%al
 	movsbl %al,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 ieorimm:
-	xorb   _RAM+1(%ebx),%al
 	addl   $2,%ebx
-	addl   $2,%esi
+	xorb   _RAM-1(%ebx),%al
 	movsbl %al,%edi
+	addl   $2,%esi
 	jmp    i_next
 
 ioraimm:
-	orb    _RAM+1(%ebx),%al
 	addl   $2,%ebx
+	orb    _RAM-1(%ebx),%al
+	movsbl %al,%edi
 	addl   $2,%esi
+	jmp    i_next
+
+iandzx:
+	addl   $2,%ebx
+	movzbl _RAM-1(%ebx),%edi
+	xchgl  %edi,%ebx
+	addb   %cl,%bl
+	xchgl  %edi,%ebx
+	addl   $4,%esi
+	jmp    iandzp
+
+ieorzx:
+	addl   $2,%ebx
+	movzbl _RAM-1(%ebx),%edi
+	xchgl  %edi,%ebx
+	addb   %cl,%bl
+	xchgl  %edi,%ebx
+	addl   $4,%esi
+	jmp    ieorzp
+
+iorazx:
+	addl   $2,%ebx
+	movzbl _RAM-1(%ebx),%edi
+	xchgl  %edi,%ebx
+	addb   %cl,%bl
+	xchgl  %edi,%ebx
+	addl   $4,%esi
+	jmp    iorazp
+
+iandz:
+	addl   $2,%ebx
+	movzbl _RAM-1(%ebx),%edi
+	addl   $3,%esi
+iandzp:
+	andb   _RAM(%edi),%al
 	movsbl %al,%edi
 	jmp    i_next
 
-iora: /* fixme - no i/o check */
-	movzwl _RAM+1(%ebx),%edi
+ieorz:
+	addl   $2,%ebx
+	movzbl _RAM-1(%ebx),%edi
+	addl   $3,%esi
+ieorzp:
+	xorb   _RAM(%edi),%al
+	movsbl %al,%edi
+	jmp    i_next
+
+ioraz:
+	addl   $2,%ebx
+	movzbl _RAM-1(%ebx),%edi
+	addl   $3,%esi
+iorazp:
+	orb    _RAM(%edi),%al
+	movsbl %al,%edi
+	jmp    i_next
+
+iandx:
 	addl   $3,%ebx
 	pushl  %ebx
-	movl   %edi,%ebx
-	shrl   $0xc,%edi
-	movl   MAPTABLE(,%edi,4),%edi
-	movsbl %al,%eax
-	movsbl (%edi,%ebx,1),%ebx
-	orl    %ebx,%eax
-	movl   %eax,%edi
-	popl   %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
+	cmpb   %cl,%bl
+	adcl   $4,%esi
+	jmp    iandabs
+
+ieorx:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
+	cmpb   %cl,%bl
+	adcl   $4,%esi
+	jmp    ieorabs
+
+iorax:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
+	cmpb   %cl,%bl
+	adcl   $4,%esi
+	jmp    ioraabs
+
+iandy:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $4,%esi
+	jmp    iandabs
+
+ieory:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $4,%esi
+	jmp    ieorabs
+
+ioray:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $4,%esi
+	jmp    ioraabs
+
+iandzix:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addl   $6,%esi
+	jmp    iandabs
+
+ieorzix:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addl   $6,%esi
+	jmp    ieorabs
+
+iorazix:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addl   $6,%esi
+	jmp    ioraabs
+
+iandziy:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $5,%esi
+	jmp    iandabs
+
+ieorziy:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $5,%esi
+	jmp    ieorabs
+
+ioraziy:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $5,%esi
+	jmp    ioraabs
+
+iand:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
 	addl   $4,%esi
+iandabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	andb   (%edi,%ebx,1),%al
+	movsbl %al,%edi
+	popl   %ebx
+	jmp    i_next
+
+ieor:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+ieorabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	xorb   (%edi,%ebx,1),%al
+	movsbl %al,%edi
+	popl   %ebx
+	jmp    i_next
+
+iora:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+ioraabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	orb    (%edi,%ebx,1),%al
+	movsbl %al,%edi
+	popl   %ebx
 	jmp    i_next
 
 iaslacc:
