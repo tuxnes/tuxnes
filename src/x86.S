@@ -880,6 +880,8 @@ selfmod:
 	je     ilsrx
 	cmpb   $0x60,_RAM(%ebx)
 	je     irts
+	cmpb   $0x61,_RAM(%ebx)
+	je     iadczix
 	cmpb   $0x65,_RAM(%ebx)
 	je     iadcz
 	cmpb   $0x66,_RAM(%ebx)
@@ -892,14 +894,24 @@ selfmod:
 	je     iroracc
 	cmpb   $0x6c,_RAM(%ebx)
 	je     ijmpind
+	cmpb   $0x6d,_RAM(%ebx)
+	je     iadc
 	cmpb   $0x6e,_RAM(%ebx)
 	je     iror
 	cmpb   $0x70,_RAM(%ebx)
 	je     ibvs
+	cmpb   $0x71,_RAM(%ebx)
+	je     iadcziy
+	cmpb   $0x75,_RAM(%ebx)
+	je     iadczx
 	cmpb   $0x76,_RAM(%ebx)
 	je     irorzx
 	cmpb   $0x78,_RAM(%ebx)
 	je     isei
+	cmpb   $0x79,_RAM(%ebx)
+	je     iadcy
+	cmpb   $0x7d,_RAM(%ebx)
+	je     iadcx
 	cmpb   $0x7e,_RAM(%ebx)
 	je     irorx
 	cmpb   $0x81,_RAM(%ebx)
@@ -986,6 +998,12 @@ selfmod:
 	je     ildxy
 	cmpb   $0xc0,_RAM(%ebx)
 	je     icpyimm
+	cmpb   $0xc1,_RAM(%ebx)
+	je     icmpzix
+	cmpb   $0xc4,_RAM(%ebx)
+	je     icpyz
+	cmpb   $0xc5,_RAM(%ebx)
+	je     icmpz
 	cmpb   $0xc6,_RAM(%ebx)
 	je     idecz
 	cmpb   $0xc8,_RAM(%ebx)
@@ -994,20 +1012,34 @@ selfmod:
 	je     icmpimm
 	cmpb   $0xca,_RAM(%ebx)
 	je     idex
+	cmpb   $0xcc,_RAM(%ebx)
+	je     icpy
 	cmpb   $0xcd,_RAM(%ebx)
 	je     icmp
 	cmpb   $0xce,_RAM(%ebx)
 	je     idec
 	cmpb   $0xd0,_RAM(%ebx)
 	je     ibne
+	cmpb   $0xd1,_RAM(%ebx)
+	je     icmpziy
+	cmpb   $0xd5,_RAM(%ebx)
+	je     icmpzx
 	cmpb   $0xd6,_RAM(%ebx)
 	je     ideczx
 	cmpb   $0xd8,_RAM(%ebx)
 	je     icld
+	cmpb   $0xd9,_RAM(%ebx)
+	je     icmpy
+	cmpb   $0xdd,_RAM(%ebx)
+	je     icmpx
 	cmpb   $0xde,_RAM(%ebx)
 	je     idecx
 	cmpb   $0xe0,_RAM(%ebx)
 	je     icpximm
+	cmpb   $0xe1,_RAM(%ebx)
+	je     isbczix
+	cmpb   $0xe4,_RAM(%ebx)
+	je     icpxz
 	cmpb   $0xe5,_RAM(%ebx)
 	je     isbcz
 	cmpb   $0xe6,_RAM(%ebx)
@@ -1018,14 +1050,24 @@ selfmod:
 	je     isbcimm
 	cmpb   $0xea,_RAM(%ebx)
 	je     inop
+	cmpb   $0xec,_RAM(%ebx)
+	je     icpx
+	cmpb   $0xed,_RAM(%ebx)
+	je     isbc
 	cmpb   $0xee,_RAM(%ebx)
 	je     iinc
 	cmpb   $0xf0,_RAM(%ebx)
 	je     ibeq
+	cmpb   $0xf1,_RAM(%ebx)
+	je     isbcziy
+	cmpb   $0xf5,_RAM(%ebx)
+	je     isbczx
 	cmpb   $0xf6,_RAM(%ebx)
 	je     iinczx
 	cmpb   $0xf8,_RAM(%ebx)
 	je     ised
+	cmpb   $0xf9,_RAM(%ebx)
+	je     isbcy
 	cmpb   $0xfd,_RAM(%ebx)
 	je     isbcx
 	cmpb   $0xfe,_RAM(%ebx)
@@ -1854,149 +1896,408 @@ idey:
 	jmp    i_next
 
 iadcimm:
-	movsbl %al,%eax
-	pushl  %ebx
-	movsbl _RAM+1(%ebx),%ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   2(%esi),%esi
-	sbbl   %ebp,%ebp
-	popl   %ebx
-	movl   %eax,VFLAG
 	addl   $2,%ebx
+	addl   $-1,%ebp
+	movsbl %al,%eax
+	movsbl _RAM-1(%ebx),%edi
+	adcl   %edi,%eax
+	movl   %eax,VFLAG
 	movsbl %al,%edi
+	sbbl   %ebp,%ebp
+	addl   $2,%esi
 	jmp    i_next
 
 isbcimm:
-	movsbl %al,%eax
-	pushl  %ebx
-	movsbl _RAM+1(%ebx),%ebx
-	notl   %ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   2(%esi),%esi
-	sbbl   %ebp,%ebp
-	popl   %ebx
-	movl   %eax,VFLAG
 	addl   $2,%ebx
+	addl   $-1,%ebp
+	movsbl %al,%eax
+	movsbl _RAM-1(%ebx),%edi
+	notl   %edi
+	adcl   %edi,%eax
+	movl   %eax,VFLAG
 	movsbl %al,%edi
+	sbbl   %ebp,%ebp
+	addl   $2,%esi
 	jmp    i_next
 
-iadcz:
-	movsbl %al,%eax
+iadczx:
+	addl   $2,%ebx
 	pushl  %ebx
-	movzbl _RAM+1(%ebx),%ebx
-	movsbl _RAM(%ebx),%ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   3(%esi),%esi
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	addl   $4,%esi
+	jmp    iadczp
+
+isbczx:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	addl   $4,%esi
+	jmp    isbczp
+
+iadcz:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $3,%esi
+iadczp:
+	addl   $-1,%ebp
+	movsbl %al,%eax
+	movsbl _RAM(%ebx),%edi
+	adcl   %edi,%eax
+	movl   %eax,VFLAG
+	movsbl %al,%edi
 	sbbl   %ebp,%ebp
 	popl   %ebx
-	movl   %eax,VFLAG
-	addl   $2,%ebx
-	movsbl %al,%edi
 	jmp    i_next
 
 isbcz:
-	movsbl %al,%eax
+	addl   $2,%ebx
 	pushl  %ebx
-	movzbl _RAM+1(%ebx),%ebx
-	movsbl _RAM(%ebx),%ebx
-	xorl   $0xffffffff,%ebx
-	addl   $0xffffffff,%ebp
-	adcl   %ebx,%eax
-	leal   3(%esi),%esi
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $3,%esi
+isbczp:
+	addl   $-1,%ebp
+	movsbl %al,%eax
+	movsbl _RAM(%ebx),%edi
+	notl   %edi
+	adcl   %edi,%eax
+	movl   %eax,VFLAG
+	movsbl %al,%edi
 	sbbl   %ebp,%ebp
 	popl   %ebx
-	movl   %eax,VFLAG
-	addl   $2,%ebx
-	movsbl %al,%edi
 	jmp    i_next
 
-isbcx: /* No I/O */
+iadcx:
+	addl   $3,%ebx
 	pushl  %ebx
-	movzwl _RAM+1(%ebx),%ebx
-	andl   $0xff,%ecx
-	addl   %ecx,%ebx
-	movl   %ebx,%edi
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
 	cmpb   %cl,%bl
-	adcl   $4,%esi  /* 1 extra cycle if page boundary is crossed (cl>bl) */
-	shrl   $0xc,%ebx
-	movl   MAPTABLE(,%ebx,4),%ebx
+	adcl   $4,%esi
+	jmp    iadcabs
+
+isbcx:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
+	cmpb   %cl,%bl
+	adcl   $4,%esi
+	jmp    isbcabs
+
+iadcy:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $4,%esi
+	jmp    iadcabs
+
+isbcy:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $4,%esi
+	jmp    isbcabs
+
+iadczix:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addl   $6,%esi
+	jmp    iadcabs
+
+isbczix:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addl   $6,%esi
+	jmp    isbcabs
+
+iadcziy:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $5,%esi
+	jmp    iadcabs
+
+isbcziy:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $5,%esi
+	jmp    isbcabs
+
+iadc:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+iadcabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	addl   $-1,%ebp
 	movsbl %al,%eax
 	movsbl (%edi,%ebx,1),%ebx
-	xorl   $0xffffffff,%ebx
-	addl   $0xffffffff,%ebp
 	adcl   %ebx,%eax
-	sbbl   %ebp,%ebp
 	movl   %eax,VFLAG
 	movsbl %al,%edi
+	sbbl   %ebp,%ebp
 	popl   %ebx
+	jmp    i_next
+
+isbc:
 	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+isbcabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	addl   $-1,%ebp
+	movsbl %al,%eax
+	movsbl (%edi,%ebx,1),%ebx
+	notl   %ebx
+	adcl   %ebx,%eax
+	movl   %eax,VFLAG
+	movsbl %al,%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
 	jmp    i_next
 
 icmpimm:
-	pushl  %ebx
-	pushl  %eax
-	movzbl _RAM+1(%ebx),%ebx
-	andl   $0xff,%eax
-	movl   $0xffffffff,%ebp
-	subl   %ebx,%eax
-	adcl   $0,%ebp
-	movsbl %al,%edi
-	popl   %eax
-	popl   %ebx
 	addl   $2,%ebx
+	movl   %ebx,%edi
+	movb   %al,%bl
+	subb   _RAM-1(%edi),%bl
+	cmc
+	movsbl %bl,%ebx
+	sbbl   %ebp,%ebp
+	xchgl  %ebx,%edi
 	addl   $2,%esi
 	jmp    i_next
 
 icpximm:
-	pushl  %ebx
-	pushl  %ecx
-	movzbl _RAM+1(%ebx),%ebx
-	andl   $0xff,%ecx
-	movl   $0xffffffff,%ebp
-	subl   %ebx,%ecx
-	adcl   $0,%ebp
-	movsbl %cl,%edi
-	popl   %ecx
-	popl   %ebx
 	addl   $2,%ebx
+	movl   %ebx,%edi
+	movb   %cl,%bl
+	subb   _RAM-1(%edi),%bl
+	cmc
+	movsbl %bl,%ebx
+	sbbl   %ebp,%ebp
+	xchgl  %ebx,%edi
 	addl   $2,%esi
 	jmp    i_next
 
 icpyimm:
-	pushl  %ebx
-	pushl  %edx
-	movzbl _RAM+1(%ebx),%ebx
-	andl   $0xff,%edx
-	movl   $0xffffffff,%ebp
-	subl   %ebx,%edx
-	adcl   $0,%ebp
-	movsbl %dl,%edi
-	popl   %edx
-	popl   %ebx
 	addl   $2,%ebx
+	movl   %ebx,%edi
+	movb   %dl,%bl
+	subb   _RAM-1(%edi),%bl
+	cmc
+	movsbl %bl,%ebx
+	sbbl   %ebp,%ebp
+	xchgl  %ebx,%edi
 	addl   $2,%esi
 	jmp    i_next
 
-icmp: /* No I/O */
+icmpzx:
+	addl   $2,%ebx
 	pushl  %ebx
-	pushl  %eax
-	movzwl _RAM+1(%ebx),%ebx
-	movl   %ebx,%edi
-	shrl   $0xc,%ebx
-	movl   MAPTABLE(,%ebx,4),%ebx
-	andl   $0xff,%eax
-	movzbl (%edi,%ebx,1),%ebx
-	movl   $0xffffffff,%ebp
-	subl   %ebx,%eax
-	adcl   $0,%ebp
-	movsbl %al,%edi
-	popl   %eax
-	popl   %ebx
-	addl   $3,%ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
 	addl   $4,%esi
+	jmp    icmpzp
+
+icmpz:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $3,%esi
+icmpzp:
+	movb   _RAM(%ebx),%bl
+	notb   %bl
+	stc
+	adcb   %al,%bl
+	movsbl %bl,%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	jmp    i_next
+
+icpxz:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $3,%esi
+icpxzp:
+	movb   _RAM(%ebx),%bl
+	notb   %bl
+	stc
+	adcb   %cl,%bl
+	movsbl %bl,%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	jmp    i_next
+
+icpyz:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addl   $3,%esi
+icpyzp:
+	movb   _RAM(%ebx),%bl
+	notb   %bl
+	stc
+	adcb   %dl,%bl
+	movsbl %bl,%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	jmp    i_next
+
+icmpx:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %cl,%bl
+	adcb   $0,%bh
+	cmpb   %cl,%bl
+	adcl   $4,%esi
+	jmp    icmpabs
+
+icmpy:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $4,%esi
+	jmp    icmpabs
+
+icmpzix:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	addb   %cl,%bl
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addl   $6,%esi
+	jmp    icmpabs
+
+icmpziy:
+	addl   $2,%ebx
+	pushl  %ebx
+	movzbl _RAM-1(%ebx),%ebx
+	movl   %ebx,%edi
+	incb   %bl
+	xchgl  %ebx,%edi
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edi),%bh
+	addb   %dl,%bl
+	adcb   $0,%bh
+	cmpb   %dl,%bl
+	adcl   $5,%esi
+	jmp    icmpabs
+
+icmp:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+icmpabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	movb   (%edi,%ebx,1),%bl
+	notb   %bl
+	stc
+	adcb   %al,%bl
+	movsbl %bl,%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	jmp    i_next
+
+icpx:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+icpxabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	movb   (%edi,%ebx,1),%bl
+	notb   %bl
+	stc
+	adcb   %cl,%bl
+	movsbl %bl,%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
+	jmp    i_next
+
+icpy:
+	addl   $3,%ebx
+	pushl  %ebx
+	movzwl _RAM-2(%ebx),%ebx
+	addl   $4,%esi
+icpyabs:
+	/* TODO: Check I/O */
+	movl   %ebx,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	movb   (%edi,%ebx,1),%bl
+	notb   %bl
+	stc
+	adcb   %dl,%bl
+	movsbl %bl,%edi
+	sbbl   %ebp,%ebp
+	popl   %ebx
 	jmp    i_next
 
 ibitz:

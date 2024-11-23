@@ -844,42 +844,45 @@
 	/
 # 61 - ADC - (Indirect,X)
 61,2:
-	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
-	81 e7 ff 00 00 00       # andl   $0xff,%edi
-	0f b7 bf [L]            # movzwl RAM(%edi),%edi
-	89 fb                   # movl   %edi,%ebx
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	89 df                   # movl   %ebx,%edi
+	fe c3                   # incb   %bl
+	87 df                   # xchgl  %ebx,%edi
+	8a 9b [L]               # movb   RAM(%ebx),%bl
+	8a bf [L]               # movb   RAM(%edi),%bh
+	83 c6 06                # addl   $6,%esi
 
-# FIXME - trap I/O
-	81 fb 00 60 00 00       # cmpl   $0x6000,%ebx
-	73 09                   # jae    +9
-	81 fb 00 20 00 00       # cmpl   $0x2000,%ebx
-	72 01                   # jb     +1
+	# FIXME: Trap I/O
+	8d bb 00 e0 ff ff       # leal   -0x2000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
 	[^]                     # int3
 
-	c1 ef 0c                # shrl   $0xc,%edi
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	89 df                   # movl   %ebx,%edi
+	c1 ef 0c                # shrl   $12,%edi
 	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
 	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 06                # leal   0x6(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # 62 - (bad)
 # 63 - (bad)
 # 64 - (bad)
 # 65 - ADC - Zero Page
 65,2:
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
-	0f be 1d [Z+1]          # movsbl ZP,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be 1d [Z+1]          # movsbl [Z+1],%ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 03                # leal   3(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 03                # addl   $3,%esi
 	/
 # 66 - ROR - Zero Page
 66,2:
@@ -901,13 +904,13 @@
 	/
 # 69 - ADC - Immediate
 69,2:
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
 	83 d0 [B+1]             # adcl   $[B+1],%eax
-	8d 76 02                # leal   0x2(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # 6a - ROR - Accumulator
 6a,1:
@@ -930,15 +933,15 @@
 	/
 # 6d - ADC - Absolute
 6d,3:
-	8b 1d [X+1]             # movl   XMAPADDR,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 1d [X+1]             # movl   [X+1],%ebx
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
-	0f be 9b [W+1] 00 00    # movsbl ADDR(%ebx),%ebx
+	0f be 9b [W+1] 00 00    # movsbl [W+1](%ebx),%ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # 6e - ROR - Absolute
 6e,3:
@@ -965,44 +968,49 @@
 	/
 # 71 - ADC - (Indirect),Y
 71,2:
-	31 db                   # xorl   %ebx,%ebx
-	81 e2 ff 00 00 00       # andl   $0xff,%edx
-	66 8b 1d [Z+1]          # movw   ZP,%bx
-	01 d3                   # addl   %edx,%ebx
+	bb [B+1] 00 00 00       # movl   $[B+1],%ebx
+	89 df                   # movl   %ebx,%edi
+	fe c3                   # incb   %bl
+	87 df                   # xchgl  %ebx,%edi
+	8a 9b [L]               # movb   RAM(%ebx),%bl
+	8a bf [L]               # movb   RAM(%edi),%bh
+	00 d3                   # addb   %dl,%bl
+	80 d7 00                # adcb   $0,%bh
+	38 d3                   # cmpb   %dl,%bl
+	83 d6 05                # adcl   $5,%esi
 
-# FIXME - trap I/O
-	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	# FIXME: Trap I/O
+	8d bb 00 e0 ff ff       # leal   -0x2000(%ebx),%edi
 	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
 	73 01                   # jae    +1
 	[^]                     # int3
 
 	89 df                   # movl   %ebx,%edi
-	c1 eb 0c                # shrl   $0xc,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	c1 ef 0c                # shrl   $12,%edi
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
-	0f be 1c 3b             # movsbl (%ebx,%edi,1),%ebx
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 05                # leal   0x5(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # 72 - (bad)
 # 73 - (bad)
 # 74 - (bad)
 # 75 - ADC - Zero Page,X
 75,2:
-	8d 59 [B+1]             # leal   [B+1](%ecx),%ebx
-	81 e3 ff 00 00 00       # andl   $0xff,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
 	0f be 9b [L]            # movsbl RAM(%ebx),%ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # 76 - ROR - Zero Page,X
 76,2:
@@ -1022,39 +1030,43 @@
 	/
 
 # 79 - ADC - Absolute,Y
-79,3: # FIXME - cycle count
-	81 e2 ff 00 00 00       # andl   $0xff,%edx
-	8d ba [W+1] 00 00       # leal   addr(%edx),%edi
-	8d 9a [W+1] 00 00       # leal   addr(%edx),%ebx
-	c1 ef 0c                # shrl   $0xc,%edi
-	83 c5 ff                # addl   $0xffffffff,%ebp
+79,3:
+	0f b6 da                # movzbl %dl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	38 d3                   # cmpb   %dl,%bl
+	83 d6 04                # adcl   $4,%esi
+
+	89 df                   # movl   %ebx,%edi
+	c1 ef 0c                # shrl   $12,%edi
 	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
 	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # 7a - (bad)
 # 7b - (bad)
 # 7c - (bad)
 # 7d - ADC - Absolute,X
-7d,3: # FIXME - cycle count
-	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	8d b9 [W+1] 00 00       # leal   addr(%ecx),%edi
-	8d 99 [W+1] 00 00       # leal   addr(%ecx),%ebx
-	c1 ef 0c                # shrl   $0xc,%edi
-	83 c5 ff                # addl   $0xffffffff,%ebp
+7d,3:
+	0f b6 d9                # movzbl %cl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	38 cb                   # cmpb   %cl,%bl
+	83 d6 04                # adcl   $4,%esi
+
+	89 df                   # movl   %ebx,%edi
+	c1 ef 0c                # shrl   $12,%edi
 	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
 	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # 7e - ROR - Absolute,X
 7e,3:
@@ -1471,60 +1483,58 @@ be,3:
 # bf - (bad)
 # c0 - CPY - Immediate
 c0,2:
-	0f b6 da                # movzbl %dl,%ebx
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	81 eb [B+1] 00 00 00    # subl   $[B+1],%ebx
+	88 d3                   # movb   %dl,%bl
+	80 eb [B+1]             # subb   $[B+1],%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
-	8d 76 02                # leal   0x2(%esi),%esi  # cycle count +2
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # c1 - CMP - (Indirect,X)
 c1,2:
-	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
-	31 db                   # xorl   %ebx,%ebx
-	81 e7 ff 00 00 00       # andl   $0xff,%edi
-	25 ff 00 00 00          # andl   $0xff,%eax
-	66 8b 9f [L]            # movw   RAM(%edi),%bx
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	89 df                   # movl   %ebx,%edi
+	fe c3                   # incb   %bl
+	87 df                   # xchgl  %ebx,%edi
+	8a 9b [L]               # movb   RAM(%ebx),%bl
+	8a bf [L]               # movb   RAM(%edi),%bh
+	83 c6 06                # addl   $6,%esi
 
-# FIXME - trap I/O
-	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	# FIXME: Trap I/O
+	8d bb 00 e0 ff ff       # leal   -0x2000(%ebx),%edi
 	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
 	73 01                   # jae    +1
 	[^]                     # int3
 
 	89 df                   # movl   %ebx,%edi
-	c1 eb 0c                # shrl   $0xc,%ebx
-	8d 76 06                # leal   0x6(%esi),%esi
+	c1 eb 0c                # shrl   $12,%ebx
 	8b 2c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebp
-	89 c3                   # movl   %eax,%ebx
-	0f b6 3c 2f             # movzbl (%edi,%ebp,1),%edi
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	29 fb                   # subl   %edi,%ebx
+	88 c3                   # movb   %al,%bl
+	2a 5c 3d 00             # subb   (%ebp,%edi,1),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # c2 - (bad)
 # c3 - (bad)
 # c4 - CPY - Zero Page
 c4,2:
-	0f b6 da                # movzbl %dl,%ebx
-	0f b6 3d [Z+1]          # movzbl ZP,%edi
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	29 fb                   # subl   %edi,%ebx
+	88 d3                   # movb   %dl,%bl
+	2a 1d [Z+1]             # subb   [Z+1],%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
-	8d 76 03                # leal   0x3(%esi),%esi  # cycle count +3
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 03                # addl   $3,%esi
 	/
 # c5 - CMP - Zero Page
 c5,2:
-	31 db                   # xorl   %ebx,%ebx
-	0f b6 3d [Z+1]          # movzbl ZP,%edi
 	88 c3                   # movb   %al,%bl
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	29 fb                   # subl   %edi,%ebx
-	8d 76 03                # leal   0x3(%esi),%esi  # cycle count +3
+	2a 1d [Z+1]             # subb   [Z+1],%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 03                # addl   $3,%esi
 	/
 # c6 - DEC - Zero Page
 c6,2:
@@ -1541,12 +1551,12 @@ c8,1:
 	/
 # c9 - CMP - Immediate
 c9,2:
-	bd 01 00 00 00          # movl   $1,%ebp
-	0f b6 d8                # movzbl %al,%ebx
-	83 c6 02                # addl   $2,%esi  # cycle count +2
-	81 eb [B+1] 00 00 00    # subl   $[B+1],%ebx
+	88 c3                   # movb   %al,%bl
+	80 eb [B+1]             # subb   $[B+1],%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # ca - DEX
 ca,1:
@@ -1557,27 +1567,23 @@ ca,1:
 # cb - (bad)
 # cc - CPY - Absolute
 cc,3:
-	8b 3d [X+1]             # movl   X,%edi
-	31 db                   # xorl   %ebx,%ebx
-	bd 01 00 00 00          # movl   $0x1,%ebp
 	88 d3                   # movb   %dl,%bl
-	0f b6 bf [W+1] 00 00    # movzbl ADDR(%edi),%edi
-	29 fb                   # subl   %edi,%ebx
-	8d 76 04                # leal   4(%esi),%esi
+	8b 3d [X+1]             # movl   [X+1],%edi
+	2a 9f [W+1] 00 00       # subb   [W+1](%edi),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # cd - CMP - Absolute
 cd,3:
-	8b 3d [X+1]             # movl   X,%edi
-	31 db                   # xorl   %ebx,%ebx
-	bd 01 00 00 00          # movl   $0x1,%ebp
 	88 c3                   # movb   %al,%bl
-	0f b6 bf [W+1] 00 00    # movzbl ADDR(%edi),%edi
-	29 fb                   # subl   %edi,%ebx
-	8d 76 04                # leal   4(%esi),%esi
+	8b 3d [X+1]             # movl   [X+1],%edi
+	2a 9f [W+1] 00 00       # subb   [W+1](%edi),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # ce - DEC - Absolute
 ce,3:
@@ -1597,46 +1603,49 @@ d0,2:
 	0f 85 [U]               # jne    U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
-# d1 - CMP   (Indirect),Y
+# d1 - CMP - (Indirect),Y
 d1,2:
-	31 db                   # xorl   %ebx,%ebx
-	81 e2 ff 00 00 00       # andl   $0xff,%edx
-	66 8b 1d [Z+1]          # movw   [Z+1],%bx
-	25 ff 00 00 00          # andl   $0xff,%eax
-	01 d3                   # addl   %edx,%ebx
+	bb [B+1] 00 00 00       # movl   $[B+1],%ebx
+	89 df                   # movl   %ebx,%edi
+	fe c3                   # incb   %bl
+	87 df                   # xchgl  %ebx,%edi
+	8a 9b [L]               # movb   RAM(%ebx),%bl
+	8a bf [L]               # movb   RAM(%edi),%bh
+	00 d3                   # addb   %dl,%bl
+	80 d7 00                # adcb   $0,%bh
+	38 d3                   # cmpb   %dl,%bl
+	83 d6 05                # adcl   $5,%esi
 
-# FIXME - trap I/O
-	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	# FIXME: Trap I/O
+	8d bb 00 e0 ff ff       # leal   -0x2000(%ebx),%edi
 	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
 	73 01                   # jae    +1
 	[^]                     # int3
 
 	89 df                   # movl   %ebx,%edi
-	c1 eb 0c                # shrl   $0xc,%ebx
-	8d 76 05                # leal   0x5(%esi),%esi
+	c1 eb 0c                # shrl   $12,%ebx
 	8b 2c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebp
-	89 c3                   # movl   %eax,%ebx
-	0f b6 3c 2f             # movzbl (%edi,%ebp,1),%edi
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	29 fb                   # subl   %edi,%ebx
+	88 c3                   # movb   %al,%bl
+	2a 5c 3d 00             # subb   (%ebp,%edi,1),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # d2 - (bad)
 # d3 - (bad)
 # d4 - (bad)
 # d5 - CMP - Zero Page,X
 d5,2:
-	8d 69 [B+1]             # leal   [B+1](%ecx),%ebp
-	31 db                   # xorl   %ebx,%ebx
-	81 e5 ff 00 00 00       # andl   $0xff,%ebp
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	83 c6 04                # addl   $4,%esi
+
+	89 df                   # movl   %ebx,%edi
 	88 c3                   # movb   %al,%bl
-	8d 76 04                # leal   0x4(%esi),%esi
-	0f b6 bd [L]            # movzbl RAM(%ebp),%edi
-	29 fb                   # subl   %edi,%ebx
-	bd 01 00 00 00          # movl   $0x1,%ebp
+	2a 9f [L]               # subb   RAM(%edi),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # d6 - DEC - Zero Page,X
 d6,2:
@@ -1655,40 +1664,38 @@ d8,1:
 	/
 # d9 - CMP - Absolute,Y
 d9,3:
-	81 e2 ff 00 00 00       # andl   $0xff,%edx
-	25 ff 00 00 00          # andl   $0xff,%eax
-	8d 9a [W+1] 00 00       # leal   [W+1](%edx),%ebx
-	89 df                   # movl   %ebx,%edi
+	0f b6 da                # movzbl %dl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
 	38 d3                   # cmpb   %dl,%bl
-	83 d6 04                # adcl   $0x4,%esi
-	c1 eb 0c                # shrl   $0xc,%ebx
+	83 d6 04                # adcl   $4,%esi
+
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $12,%ebx
 	8b 2c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebp
-	89 c3                   # movl   %eax,%ebx
-	0f b6 3c 2f             # movzbl (%edi,%ebp,1),%edi
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	29 fb                   # subl   %edi,%ebx
+	88 c3                   # movb   %al,%bl
+	2a 5c 3d 00             # subb   (%ebp,%edi,1),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # da - (bad)
 # db - (bad)
 # dc - (bad)
 # dd - CMP - Absolute,X
 dd,3:
-# FIXME - cycle count wrong
-	bd [W+1] 00 00          # movl   $ADDR,%ebp
-	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	01 cd                   # addl   %ecx,%ebp
-	31 db                   # xorl   %ebx,%ebx
-	c1 ed 0c                # shrl   $0xc,%ebp
+	0f b6 d9                # movzbl %cl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	38 cb                   # cmpb   %cl,%bl
+	83 d6 04                # adcl   $4,%esi
+
+	89 df                   # movl   %ebx,%edi
+	c1 eb 0c                # shrl   $12,%ebx
+	8b 2c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebp
 	88 c3                   # movb   %al,%bl
-	8b 2c ad [M]            # movl   MAPTABLE(,%ebp,4),%ebp
-	8d 76 04                # leal   0x4(%esi),%esi
-	0f b6 bc 29 [W+1] 00 00 # movzbl ADDR(%ecx,%ebp,1),%edi
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	29 fb                   # subl   %edi,%ebx
+	2a 5c 3d 00             # subb   (%ebp,%edi,1),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # de - DEC - Absolute,X
 de,3:
@@ -1702,37 +1709,64 @@ de,3:
 # df - (bad)
 # e0 - CPX - Immediate
 e0,2:
-	0f b6 d9                # movzbl %cl,%ebx
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	81 eb [B+1] 00 00 00    # subl   $[B+1],%ebx
+	88 cb                   # movb   %cl,%bl
+	80 eb [B+1]             # subb   $[B+1],%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
-	8d 76 02                # leal   0x2(%esi),%esi  # cycle count +2
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # e1 - SBC - (Indirect,X)
+e1,2:
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	89 df                   # movl   %ebx,%edi
+	fe c3                   # incb   %bl
+	87 df                   # xchgl  %ebx,%edi
+	8a 9b [L]               # movb   RAM(%ebx),%bl
+	8a bf [L]               # movb   RAM(%edi),%bh
+	83 c6 06                # addl   $6,%esi
+
+	# FIXME: Trap I/O
+	8d bb 00 e0 ff ff       # leal   -0x2000(%ebx),%edi
+	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
+	73 01                   # jae    +1
+	[^]                     # int3
+
+	89 df                   # movl   %ebx,%edi
+	c1 ef 0c                # shrl   $12,%edi
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 c5 ff                # addl   $-1,%ebp
+	0f be c0                # movsbl %al,%eax
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
+	f7 d3                   # notl   %ebx
+	11 d8                   # adcl   %ebx,%eax
+	a3 [V]                  # movl   %eax,VFLAG
+	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	/
 # e2 - (bad)
 # e3 - (bad)
 # e4 - CPX - Zero Page
 e4,2:
-	0f b6 d9                # movzbl %cl,%ebx
-	0f b6 3d [Z+1]          # movzbl [Z+1],%edi
-	bd 01 00 00 00          # movl   $0x1,%ebp
-	29 fb                   # subl   %edi,%ebx
+	88 cb                   # movb   %cl,%bl
+	2a 1d [Z+1]             # subb   [Z+1],%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
-	8d 76 03                # leal   0x3(%esi),%esi  # cycle count +3
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 03                # addl   $3,%esi
 	/
 # e5 - SBC - Zero Page
 e5,2:
-	0f be 1d [Z+1]          # movsbl [Z+1],%ebx
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
-	83 f3 ff                # xorl   $0xffffffff,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f be 1d [Z+1]          # movsbl [Z+1],%ebx
+	f7 d3                   # notl   %ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 03                # leal   0x3(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 03                # addl   $3,%esi
 	/
 # e6 - INC - Zero Page
 e6,2:
@@ -1749,17 +1783,13 @@ e8,1:
 	/
 # e9 - SBC - Immediate
 e9,2:
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
 	83 d0 [C+1]             # adcl   $[C+1],%eax
-	8d 76 02                # leal   0x2(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
-#alternatively, could do: subl $0x1,%ebp
-#                         sbbl $imm,%eax
-# but then the carry flag must be inverted again before putting into ebp,
-# so it's easier to invert the immediate value
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 02                # addl   $2,%esi
 	/
 # ea - NOP
 ea,1:
@@ -1768,32 +1798,26 @@ ea,1:
 # eb - (bad)
 # ec - CPX - Absolute
 ec,3:
-	8b 3d [X+1]             # movl   XLATADDR,%edi
-	31 db                   # xorl   %ebx,%ebx
-	bd 01 00 00 00          # movl   $0x1,%ebp
 	88 cb                   # movb   %cl,%bl
-	0f b6 bf [W+1] 00 00    # movzbl ADDR(%edi),%edi
-	29 fb                   # subl   %edi,%ebx
-	8d 76 04                # leal   0x4(%esi),%esi
+	8b 3d [X+1]             # movl   [X+1],%edi
+	2a 9f [W+1] 00 00       # subb   [W+1](%edi),%bl
+	f5                      # cmc
 	0f be fb                # movsbl %bl,%edi
-	83 dd 00                # sbbl   $0x0,%ebp
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # ed - SBC - Absolute
 ed,3:
-	8b 3d [X+1]             # movl   XMAPADDR,%edi
-	25 ff 00 00 00          # andl   $0xff,%eax
-	31 db                   # xorl   %ebx,%ebx
-	83 c0 80                # addl   $0xffffff80,%eax
-	8a 9f [W+1] 00 00       # movb   ADDR(%edi),%bl
-	83 f0 80                # xorl   $0xffffff80,%eax
-	83 c3 80                # addl   $0xffffff80,%ebx
-	8d 76 04                # leal   0x4(%esi),%esi
-	83 f3 7f                # xorl   $0x7f,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	8b 1d [X+1]             # movl   [X+1],%ebx
+	83 c5 ff                # addl   $-1,%ebp
+	0f be c0                # movsbl %al,%eax
+	0f be 9b [W+1] 00 00    # movsbl [W+1](%ebx),%ebx
+	f7 d3                   # notl   %ebx
 	11 d8                   # adcl   %ebx,%eax
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # ee - INC - Absolute
 ee,3:
@@ -1815,50 +1839,51 @@ f0,2:
 	/
 # f1 - SBC - (Indirect),Y
 f1,2:
-	31 db                   # xorl   %ebx,%ebx
-	81 e2 ff 00 00 00       # andl   $0xff,%edx
-	66 8b 1d [Z+1]          # movw   ZP,%bx
-	01 d3                   # addl   %edx,%ebx
+	bb [B+1] 00 00 00       # movl   $[B+1],%ebx
+	89 df                   # movl   %ebx,%edi
+	fe c3                   # incb   %bl
+	87 df                   # xchgl  %ebx,%edi
+	8a 9b [L]               # movb   RAM(%ebx),%bl
+	8a bf [L]               # movb   RAM(%edi),%bh
+	00 d3                   # addb   %dl,%bl
+	80 d7 00                # adcb   $0,%bh
+	38 d3                   # cmpb   %dl,%bl
+	83 d6 05                # adcl   $5,%esi
 
-# FIXME - trap I/O
-	8d bb 00 e0 ff ff       # leal   0xffffe000(%ebx),%edi
+	# FIXME: Trap I/O
+	8d bb 00 e0 ff ff       # leal   -0x2000(%ebx),%edi
 	81 ff 00 40 00 00       # cmpl   $0x4000,%edi
 	73 01                   # jae    +1
 	[^]                     # int3
 
 	89 df                   # movl   %ebx,%edi
-	c1 eb 0c                # shrl   $0xc,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
-	8b 1c 9d [M]            # movl   MAPTABLE(,%ebx,4),%ebx
+	c1 ef 0c                # shrl   $12,%edi
+	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
+	83 c5 ff                # addl   $-1,%ebp
 	0f be c0                # movsbl %al,%eax
-	0f be 1c 3b             # movsbl (%ebx,%edi,1),%ebx
+	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
 	f7 d3                   # notl   %ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 05                # leal   0x5(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # f2 - (bad)
 # f3 - (bad)
 # f4 - (bad)
 # f5 - SBC - Zero Page,X
 f5,2:
-	8d 79 [B+1]             # leal   [B+1](%ecx),%edi
-	25 ff 00 00 00          # andl   $0xff,%eax
-	81 e7 ff 00 00 00       # andl   $0xff,%edi
-	31 db                   # xorl   %ebx,%ebx
-	83 c0 80                # addl   $0xffffff80,%eax
-	8a 9f [L]               # movb   RAM(%edi),%bl
-	83 f0 80                # xorl   $0xffffff80,%eax
-	83 c3 80                # addl   $0xffffff80,%ebx
-	8d 76 04                # leal   0x4(%esi),%esi
-	83 f3 7f                # xorl   $0x7f,%ebx
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	0f b6 d9                # movzbl %cl,%ebx
+	80 c3 [B+1]             # addb   $[B+1],%bl
+	83 c5 ff                # addl   $-1,%ebp
+	0f be c0                # movsbl %al,%eax
+	0f be 9b [L]            # movsbl RAM(%ebx),%ebx
+	f7 d3                   # notl   %ebx
 	11 d8                   # adcl   %ebx,%eax
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
+	83 c6 04                # addl   $4,%esi
 	/
 # f6 - INC - Zero Page,X
 f6,2:
@@ -1877,46 +1902,44 @@ f8,1: #What happens on a real NES when the CPU is put into decimal mode?
 	/
 # f9 - SBC - Absolute,Y
 f9,3:
-# FIXME - cycle count wrong
-	81 e2 ff 00 00 00       # andl   $0xff,%edx
-	25 ff 00 00 00          # andl   $0xff,%eax
-	8d ba [W+1] 00 00       # leal   ADDR(%edx),%edi
-	8d 9a [W+1] 00 00       # leal   ADDR(%edx),%ebx
-	c1 ef 0c                # shrl   $0xc,%edi
-	83 c0 80                # addl   $0xffffff80,%eax
+	0f b6 da                # movzbl %dl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	38 d3                   # cmpb   %dl,%bl
+	83 d6 04                # adcl   $4,%esi
+
+	89 df                   # movl   %ebx,%edi
+	c1 ef 0c                # shrl   $12,%edi
 	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
-	83 f0 80                # xorl   $0xffffff80,%eax
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	83 c5 ff                # addl   $-1,%ebp
+	0f be c0                # movsbl %al,%eax
 	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
 	f7 d3                   # notl   %ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # fa - (bad)
 # fb - (bad)
 # fc - (bad)
 # fd - SBC - Absolute,X
 fd,3:
-# FIXME - cycle count wrong
-	81 e1 ff 00 00 00       # andl   $0xff,%ecx
-	25 ff 00 00 00          # andl   $0xff,%eax
-	8d b9 [W+1] 00 00       # leal   ADDR(%ecx),%edi
-	8d 99 [W+1] 00 00       # leal   ADDR(%ecx),%ebx
-	c1 ef 0c                # shrl   $0xc,%edi
-	83 c0 80                # addl   $0xffffff80,%eax
+	0f b6 d9                # movzbl %cl,%ebx
+	66 81 c3 [W+1]          # addw   $[W+1],%bx
+	38 cb                   # cmpb   %cl,%bl
+	83 d6 04                # adcl   $4,%esi
+
+	89 df                   # movl   %ebx,%edi
+	c1 ef 0c                # shrl   $12,%edi
 	8b 3c bd [M]            # movl   MAPTABLE(,%edi,4),%edi
-	83 f0 80                # xorl   $0xffffff80,%eax
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	83 c5 ff                # addl   $-1,%ebp
+	0f be c0                # movsbl %al,%eax
 	0f be 1c 1f             # movsbl (%edi,%ebx,1),%ebx
 	f7 d3                   # notl   %ebx
 	11 d8                   # adcl   %ebx,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 # fe - INC - Absolute,X
 fe,3:
@@ -2538,15 +2561,16 @@ ac 07 20,3:
 
 # ADC $2007
 6d 07 20,3:
-	0f be c0                # movsbl %al,%eax
 	bb 07 20 00 00          # movl   $0x2007,%ebx
+	83 c6 04                # addl   $4,%esi
+
 	e8 [I]                  # call   INPUT
-	83 c5 ff                # addl   $0xffffffff,%ebp
+	83 c5 ff                # addl   $-1,%ebp
+	0f be c0                # movsbl %al,%eax
 	11 f8                   # adcl   %edi,%eax
-	8d 76 04                # leal   0x4(%esi),%esi
-	19 ed                   # sbbl   %ebp,%ebp
 	a3 [V]                  # movl   %eax,VFLAG
 	0f be f8                # movsbl %al,%edi
+	19 ed                   # sbbl   %ebp,%ebp
 	/
 
 # LDA $40xx - I/O read
