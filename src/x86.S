@@ -763,7 +763,6 @@ recompile_always:
 
 /*
  * This is an interpreter to handle self-modifying code.
- * This is far from complete, but the most common cases are handled.
  */
 
 i_next:
@@ -774,6 +773,8 @@ i_next:
 
 selfmod:
 	/* This will be converted to a lookup table when it's complete */
+	cmpb   $0x00,_RAM(%ebx)
+	je     ibrk
 	cmpb   $0x01,_RAM(%ebx)
 	je     iorazix
 	cmpb   $0x05,_RAM(%ebx)
@@ -844,6 +845,8 @@ selfmod:
 	je     iandx
 	cmpb   $0x3e,_RAM(%ebx)
 	je     irolx
+	cmpb   $0x40,_RAM(%ebx)
+	je     irti
 	cmpb   $0x41,_RAM(%ebx)
 	je     ieorzix
 	cmpb   $0x45,_RAM(%ebx)
@@ -1079,31 +1082,74 @@ i_done:
 	jmp    recompile
 
 inop:
-	inc    %ebx
-	add    $2,%esi
+	incl   %ebx
+	addl   $2,%esi
+	jmp    i_next
+
+ibrk:
+	pushl  %eax
+	movl   STACKPTR,%eax
+	addl   $2,%ebx
+	movb   %bh,(%eax)
+	decb   %al
+	movb   %bl,(%eax)
+	decb   %al
+	movl   FLAGS,%ebx
+	andl   $0x0c,%ebx
+	addl   $-1,%ebp
+	adcl   $0,%ebx
+	movl   %edi,%ebp
+	shrl   %ebp
+	andl   $0x80,%ebp
+	orl    %ebx,%ebp
+	xorl   %ebx,%ebx
+	testl  $0xff,%edi
+	setz   %bl
+	leal   (%ebp,%ebx,2),%ebp
+	movl   VFLAG,%ebx
+	addl   $0x80,%ebx
+	addl   $-256,%ebx
+	sbbl   %ebx,%ebx
+	andl   $0x40,%ebx
+	orl    %ebp,%ebx
+	andl   $0x1,%ebp
+	orl    $0x30,%ebx
+	orl    $0x04,FLAGS
+	movb   %bl,(%eax)
+	decb   %al
+	movb   %al,STACKPTR
+	popl   %eax
+	addl   $7,%esi
+	movl   MAPTABLE+60,%ebx
+	movzwl 0xfffe(%ebx),%ebx
 	jmp    i_next
 
 ijmp:
 	movzwl _RAM+1(%ebx),%ebx
-	add    $3,%esi
+	addl   $3,%esi
 	jmp    i_next
 
 ijmpind:
-	movzwl _RAM+1(%ebx),%ebx
 	pushl  %eax
-	movl   %ebx,%eax
-	shrl   $0xc,%ebx
-	movl   MAPTABLE(,%ebx,4),%ebx
-	addl   $5,%esi
-	movzwl (%ebx,%eax,1),%ebx
+	pushl  %edi
+	movzwl _RAM+1(%ebx),%eax
+	movl   %eax,%edi
+	shrl   $12,%edi
+	movl   MAPTABLE(,%edi,4),%edi
+	xorl   %ebx,%ebx
+	movb   (%edi,%eax,1),%bl
+	incb   %al
+	movb   (%edi,%eax,1),%bh
+	popl   %edi
 	popl   %eax
+	addl   $5,%esi
 	jmp    i_next
 
 ijsr:
-	add    $2,%ebx
+	addl   $2,%ebx
 	pushl  %eax
-	mov    STACKPTR,%eax
-	mov    %bh,(%eax)
+	movl   STACKPTR,%eax
+	movb   %bh,(%eax)
 	decb   %al
 	movb   %bl,(%eax)
 	decb   %al
@@ -1123,7 +1169,31 @@ irts:
 	movb   (%eax),%bh
 	movb   %al,STACKPTR
 	popl   %eax
-	addl   $1,%ebx
+	incl   %ebx
+	addl   $6,%esi
+	jmp    i_next
+
+irti:
+	xorl   %ebx,%ebx
+	pushl  %eax
+	movl   STACKPTR,%eax
+	incb   %al
+	movb   (%eax),%bl
+	movl   %ebx,%ebp
+	incb   %al
+	movb   (%eax),%bl
+	incb   %al
+	movb   (%eax),%bh
+	movb   %al,STACKPTR
+	popl   %eax
+	movl   %ebp,FLAGS
+	leal   (%ebp,%ebp,1),%edi
+	andl   $0x80,%edi
+	movl   %edi,VFLAG
+	xorl   $0x2,%ebp
+	leal   (%ebp,%ebp,1),%edi
+	andl   $0x104,%edi
+	andl   $0x1,%ebp
 	addl   $6,%esi
 	jmp    i_next
 

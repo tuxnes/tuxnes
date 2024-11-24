@@ -379,7 +379,7 @@
 	fe c8                   # decb   %al
 	a2 [S]                  # movb   %al,STACKPTR
 	58                      # popl   %eax
-	bb [W+1] 00 00          # movl   $0000[W+1],%ebx
+	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 06                # addl   $6,%esi
 	0f 89 [N]               # jns    NMI
 	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
@@ -694,8 +694,8 @@
 # 4b - (bad)
 # 4c - JMP - Absolute
 4c,3:
+	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 03                # addl   $3,%esi
-	bb [W+1] 00 00          # movl   $0000[W+1],%ebx
 	0f 89 [N]               # jns    NMI
 	81 fb [P]               # cmpl   $[P],%ebx
 	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
@@ -836,7 +836,7 @@
 	8a 38                   # movb   (%eax),%bh
 	a2 [S]                  # movb   %al,STACKPTR
 	58                      # popl   %eax
-	83 c3 01                # addl   $1,%ebx
+	43                      # incl   %ebx
 	83 c6 06                # addl   $6,%esi
 	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
 	e9 [U]                  # jmp    U
@@ -923,10 +923,17 @@
 # 6b - (bad)
 # 6c - JMP - Indirect
 6c,3:
-	8b 1d [X+1]             # movl   [X+1],%ebx
-	83 c6 05                # addl   $0x5,%esi
-	8b 9b [W+1] 00 00       # movl   ADDR(%ebx),%ebx
-	81 e3 ff ff 00 00       # andl   $0xffff,%ebx
+	50                      # pushl  %eax
+	57                      # pushl  %edi
+	b8 [W+1] 00 00          # movl   $[W+1],%eax
+	8b 3d [X+1]             # movl   [X+1],%edi
+	31 db                   # xorl   %ebx,%ebx
+	8a 1c 07                # movb   (%edi,%eax,1),%bl
+	fe c0                   # incb   %al
+	8a 3c 07                # movb   (%edi,%eax,1),%bh
+	5f                      # popl   %edi
+	58                      # popl   %eax
+	83 c6 05                # addl   $5,%esi
 	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
 	e9 [U]                  # jmp    U
 	[!]
@@ -1793,7 +1800,7 @@ e9,2:
 	/
 # ea - NOP
 ea,1:
-	83 c6 02                # addl   $0x2,%esi  # cycle count +2
+	83 c6 02                # addl   $2,%esi
 	/
 # eb - (bad)
 # ec - CPX - Absolute
@@ -2023,13 +2030,13 @@ a0 00,2: # LDY #$00  (clear registers)
 
 # Repeated NOP
 ea ea,2:
-	83 c6 04                # addl   $0x4,%esi  # cycle count +4
+	83 c6 04                # addl   $4,%esi
 	/
 ea ea ea,3:
-	83 c6 06                # addl   $0x6,%esi  # cycle count +6
+	83 c6 06                # addl   $6,%esi
 	/
 ea ea ea ea,4:
-	83 c6 08                # addl   $0x8,%esi  # cycle count +8
+	83 c6 08                # addl   $8,%esi
 	/
 
 # Repeated INX
