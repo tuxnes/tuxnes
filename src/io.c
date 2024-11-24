@@ -459,7 +459,7 @@ trace(int pc, ...)
 	va_list ap;
 	va_start(ap, pc);
 	/* x86 registers:  %edi, %esi, %ebp, %esp, %ebx, %edx, %ecx, %eax */
-	/* 6502 registers: N&Z, Cycle counter, C, -, PC, -, Y&X, A */
+	/* 6502 registers: -, Cycle counter, C, -, PC, N&Z, Y&X, A */
 	vprintf("branch, stack: %x,%d,%x,%x,%x,%x,%x,%x\n", ap);
 	va_end(ap);
 #else
