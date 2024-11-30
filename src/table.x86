@@ -93,12 +93,11 @@
 #
 # To execute a jump to a 6502 address, load the address into %ebx and jump
 # to [U].  Also load the address of the operand of the jump instruction into
-# %esp-4; that is, put it on top of the stack without modifying the stack
-# pointer.  The Update function will translate any new code if necessary and
+# %ebp.  The Update function will translate any new code if necessary and
 # resolve the 6502 target address into a native 32-bit address.  It will
-# then use the value at %esp-4 to update the jump instruction to point to
+# then use the value at %ebp to update the jump instruction to point to
 # the new location.  For indirect jumps which can not be predicted, zero
-# should be loaded into %esp-4, and the address will not be modified.  This
+# should be loaded into %ebp, and the address will not be modified.  This
 # may also be necessary if the target of the jump is swapped by the mapper.
 #
 # The %esi register is constantly incremented to reflect the 6502 cycle count.
@@ -159,7 +158,7 @@
 	bb [M]                  # movl   $MAPTABLE,%ebx
 	8b 5b 3c                # movl   0x3c(%ebx),%ebx
 	0f b7 9b fe ff 00 00    # movzwl 0xfffe(%ebx),%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	[!]                     #  -STOP-
 	/
@@ -264,7 +263,7 @@
 	0f 89 [N]               # jns    NMI
 	f6 c6 01                # testb  $0x01,%dh
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 84 [U]               # je     U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -373,7 +372,7 @@
 	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 06                # addl   $6,%esi
 	0f 89 [N]               # jns    NMI
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]                     #  -STOP-
 # It's fairly common for 6502 code to follow a JSR with parameter data,
@@ -492,7 +491,7 @@
 	0f 89 [N]               # jns    NMI
 	f6 c6 01                # testb  $0x01,%dh
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 85 [U]               # jne    U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -612,7 +611,7 @@
 	80 e2 04                # andb   $0x04,%dl
 	80 f2 04                # xorb   $0x04,%dl
 	83 c6 06                # addl   $6,%esi
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -683,7 +682,7 @@
 	83 c6 03                # addl   $3,%esi
 	0f 89 [N]               # jns    NMI
 	81 fb [P]               # cmpl   $[P],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 85 [U]               # jne    U
 	31 f6                   # xorl   %esi,%esi
 	e9 [N]                  # jmp    NMI
@@ -714,7 +713,7 @@
 	81 c5 80 00 00 00       # addl   $0x80,%ebp
 	f7 c5 00 ff ff ff       # testl  $-256,%ebp
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 84 [U]               # je     U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -822,7 +821,7 @@
 	58                      # popl   %eax
 	43                      # incl   %ebx
 	83 c6 06                # addl   $6,%esi
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	[!]                     #  end of function; stop translating
 	/
@@ -916,7 +915,7 @@
 	5a                      # popl   %edx
 	58                      # popl   %eax
 	83 c6 05                # addl   $5,%esi
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -951,7 +950,7 @@
 	81 c5 80 00 00 00       # addl   $0x80,%ebp
 	f7 c5 00 ff ff ff       # testl  $-256,%ebp
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 85 [U]               # jne    U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -1149,7 +1148,7 @@
 	0f 89 [N]               # jns    NMI
 	f6 c4 01                # testb  $0x01,%ah
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 84 [U]               # je     U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -1339,7 +1338,7 @@ b0,2:
 	0f 89 [N]               # jns    NMI
 	f6 c4 01                # testb  $0x01,%ah
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 85 [U]               # jne    U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -1580,7 +1579,7 @@ d0,2:
 	0f 89 [N]               # jns    NMI
 	84 d2                   # testb  %dl,%dl
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 85 [U]               # jne    U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -1811,7 +1810,7 @@ f0,2:
 	0f 89 [N]               # jns    NMI
 	84 d2                   # testb  %dl,%dl
 	bb [R+1]                # movl   $[R+1],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 84 [U]               # je     U
 	83 ee [>+1] 01          # subl   $1+,%esi
 	/
@@ -2128,7 +2127,7 @@ a9 00/00 d0,4:
 	bb [P]                  # movl   $[P],%ebx
 	0f 89 [N]               # jns    NMI
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2146,7 +2145,7 @@ a2 00/00 d0,4:
 	bb [P]                  # movl   $[P],%ebx
 	0f 89 [N]               # jns    NMI
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2165,7 +2164,7 @@ a0 00/00 d0,4:
 	bb [P]                  # movl   $[P],%ebx
 	0f 89 [N]               # jns    NMI
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2182,7 +2181,7 @@ a9 00 f0,4:
 	31 d2                   # xorl   %edx,%edx
 	83 c6 [>+3] 05          # addl   $5+,%esi
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2192,7 +2191,7 @@ a2 00 f0,4:
 	31 d2                   # xorl   %edx,%edx
 	83 c6 [>+3] 05          # addl   $5+,%esi
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2202,7 +2201,7 @@ a0 00 f0,4:
 	31 d2                   # xorl   %edx,%edx
 	83 c6 [>+3] 05          # addl   $5+,%esi
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2214,7 +2213,7 @@ a9 00 85 00/00 f0,6:
 	a2 [Z+3]                # movb   %al,[Z+3]
 	83 c6 [>+5] 08          # addl   $8+,%esi
 	bb [R+5]                # movl   $[R+5],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2228,7 +2227,7 @@ a9 00 85 00/00 f0,6:
 #	88 83 [L]               # movb   %al,RAM(%ebx)
 #	83 c6 [>+5] 09          # addl   $9+,%esi
 #	bb [R+5]                # movl   $[R+5],%ebx
-#	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+#	bd [D+5]                # movl   $[D+5],%ebp
 #	e9 [U]                  # jmp    U
 #	[!]
 #	/
@@ -2249,7 +2248,7 @@ a9 00 85 00/00 f0,6:
 	bb [P]                  # movl   $[P],%ebx
 	0f 89 [N]               # jns    NMI
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+	bd [D+5]                # movl   $[D+5],%ebp
 	e9 [U]                  # jmp    U
 	[!]
 	/
@@ -2260,7 +2259,7 @@ a9 00 85 00/00 f0,6:
 	0f 89 [N]               # jns    NMI
 	84 d2                   # testb  %dl,%dl
 	bb [R+3]                # movl   $[R+3],%ebx
-	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+	bd [D+6]                # movl   $[D+6],%ebp
 	0f 85 [U]               # jne    U
 	83 ee [>+3] 01          # subl   $1+,%esi
 	/
@@ -2274,11 +2273,11 @@ a9 00 85 00/00 f0,6:
 #	0f 89 [N]               # jns    NMI
 #	84 d2                   # testb  %dl,%dl
 #	bb [R+1]                # movl   $[R+1],%ebx
-#	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+#	bd [D+6]                # movl   $[D+6],%ebp
 #	0f 85 [U]               # jne    U
 #	83 c6 02                # addl   $2,%esi
 #	bb [R+3]                # movl   $[R+3],%ebx
-#	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+#	bd [D+5]                # movl   $[D+5],%ebp
 #	e9 [U]                  # jmp    U
 #	[!]                     # STOP
 #	/
@@ -2289,11 +2288,11 @@ a9 00 85 00/00 f0,6:
 #	0f 89 [N]               # jns    NMI
 #	84 d2                   # testb  %dl,%dl
 #	bb [R+1]                # movl   $[R+1],%ebx
-#	c7 44 24 fc [D+6]       # movl   $[D+6],-4(%esp)
+#	bd [D+6]                # movl   $[D+6],%ebp
 #	0f 84 [U]               # je     U
 #	83 c6 02                # addl   $2,%esi
 #	bb [R+3]                # movl   $[R+3],%ebx
-#	c7 44 24 fc [D+5]       # movl   $[D+5],-4(%esp)
+#	bd [D+5]                # movl   $[D+5],%ebp
 #	e9 [U]                  # jmp    U
 #	[!]                     # STOP
 #	/
@@ -2308,7 +2307,7 @@ a9 00 85 00/00 f0,6:
 
 	e8 [Y]                  # call   MAPPER
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 
@@ -2321,7 +2320,7 @@ a9 00 85 00/00 f0,6:
 	e8 [Y]                  # call   MAPPER
 	86 c1                   # xchgb  %al,%cl
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 
@@ -2334,7 +2333,7 @@ a9 00 85 00/00 f0,6:
 	e8 [Y]                  # call   MAPPER
 	86 c5                   # xchgb  %al,%ch
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 
@@ -2346,7 +2345,7 @@ a9 00 85 00/00 f0,6:
 
 	e8 [Y]                  # call   MAPPER
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 # STA $8xxx,Y  - write to mapper
@@ -2357,7 +2356,7 @@ a9 00 85 00/00 f0,6:
 
 	e8 [Y]                  # call   MAPPER
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 
@@ -2368,10 +2367,10 @@ a9 00 85 00/00 f0,6:
 	83 c6 05                # addl   $5,%esi
 
 	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
-	74 17                   # je     +23
+	74 11                   # je     +17
 	e8 [Y]                  # call   MAPPER
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	88 83 [L]               # movb   %al,RAM(%ebx)
 	/
@@ -2383,10 +2382,10 @@ a9 00 85 00/00 f0,6:
 	83 c6 05                # addl   $5,%esi
 
 	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
-	74 17                   # je     +23
+	74 11                   # je     +17
 	e8 [Y]                  # call   MAPPER
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	88 83 [L]               # movb   %al,RAM(%ebx)
 	/
@@ -2407,7 +2406,7 @@ ee 00/00 80/80,3:
 	e8 [Y]                  # call   MAPPER
 	58                      # popl   %eax
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 
@@ -2424,7 +2423,7 @@ ce 00/00 80/80,3:
 	e8 [Y]                  # call   MAPPER
 	58                      # popl   %eax
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 
@@ -2444,7 +2443,7 @@ fe 00/00 80/80,3:
 	e8 [Y]                  # call   MAPPER
 	58                      # popl   %eax
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 
@@ -2464,7 +2463,7 @@ de 00/00 80/80,3:
 	e8 [Y]                  # call   MAPPER
 	58                      # popl   %eax
 	bb [P+3]                # movl   $[P+3],%ebx
-	c7 44 24 fc 00 00 00 00 # movl   $0,-4(%esp)
+	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
 	/
 

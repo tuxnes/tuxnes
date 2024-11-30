@@ -39,9 +39,7 @@ TRANS_TBL:
 defvar globl, 4, VFLAG          /* Store overflow flag */
 defvar globl, 4, FLAGS          /* Store 6502 process status reg */
 defvar globl, 4, STACKPTR       /* Store 6502 stack pointer */
-defvar local, 4, PCR            /* Store 6502 program counter */
 defvar globl, 4, CTNI           /* Cycles to next interrupt */
-defvar local, 4, DMOD           /* Dest addr to modify */
 defvar local, 4, LASTBANK       /* Last memory page code executed in */
 
 
@@ -62,7 +60,6 @@ START:
 	xor    %edx,%edx
 	xor    %ebp,%ebp
 	xor    %edi,%edi
-	movl   $0,-4(%esp)
 	movl   MAPTABLE+60,%ebx
 	movzwl 0xfffc(%ebx),%ebx
 	jmp    U
@@ -120,14 +117,14 @@ NMI:
 	andb   $0x04,%dl
 	xorb   $0x04,%dl
 	movl   CTNI,%esi
-	movl   $0,-4(%esp)
+	xorl   %ebp,%ebp
 	movl   MAPTABLE+60,%ebx
 	movzwl 0xfffa(%ebx),%ebx
 	jmp    U
-2:    /* don't do NMI */
+/* don't do NMI */
 skipint:
 	popa
-	movl   $0,-4(%esp)
+	xorl   %ebp,%ebp
 	mov    CTNI,%esi
 	jmp    U
 
@@ -181,7 +178,7 @@ irq:
 	andb   $0x04,%dl
 	xorb   $0x04,%dl
 	movl   CTNI,%esi
-	movl   $0,-4(%esp)
+	xorl   %ebp,%ebp
 	movl   MAPTABLE+60,%ebx
 	movzwl 0xfffe(%ebx),%ebx
 	jmp    U
@@ -683,10 +680,6 @@ MAPPER_NINA7:
 .globl U
 U:
 #if 0  /* This will trace all branches for debugging */
-	mov    %ebx,PCR
-	mov    -4(%esp),%ebx
-	mov    %ebx,DMOD
-	mov    PCR,%ebx
 	sub    $0x8,%esp
 	pusha
 	push   %ebx
@@ -694,62 +687,46 @@ U:
 	pop    %ebx
 	popa
 	add    $0x8,%esp
-	mov    DMOD,%ebx
-	mov    %ebx,-4(%esp)
-	mov    PCR,%ebx
 #endif
 
 	test   %esi,%esi
 	jns    NMI
-	mov    %ebx,PCR
-	mov    -4(%esp),%ebx
-	mov    %ebx,DMOD
-	mov    PCR,%ebx
 	cmp    $0x7fff,%ebx
 	jle    selfmod
 recompile:
-	push   %eax
-	mov    %ebx,%eax
-	shr    $12,%eax
-	sub    $_RAM,%ebx
-	mov    MAPTABLE(,%eax,4),%eax
-	add    %ebx,%eax
-	mov    _INT_MAP(,%eax,4),%ebx
-	pop    %eax
-	test   %ebx,%ebx
-	jne    0f
+	mov    %ebx,%edi
+	shr    $12,%edi
+	mov    MAPTABLE(,%edi,4),%edi
+	lea    -_RAM(%edi,%ebx,1),%edi
+	mov    _INT_MAP(,%edi,4),%edi
+	test   %edi,%edi
+	jne    link
 recompile_always:
 	pusha
 	sub    $0x8,%esp
-	mov    PCR,%ebx
 	push   %ebx
 	call   translate
 	add    $0xc,%esp
-	mov    %eax,0x10(%esp)
+	mov    %eax,(%esp)
 	popa
-0:
-	push   %ecx
+link:
 	cmpl   $0,dolink
-	jz     1f  /* to disable linking (for debugging) */
-	mov    PCR,%ecx
-	and    $0xfffff000,%ecx
-	cmp    %ecx,LASTBANK
-	mov    %ecx,LASTBANK
-	jne    1f /* don't link across memory banks - mapper might change! */
-	cmp    $0x7fff,%ecx
-	jle    1f /* don't link to RAM code */
-	mov    DMOD,%ecx
-	test   %ecx,%ecx
-	jz     1f  /* skip null address */
-	push   %eax
-	mov    %ebx,%eax
-	sub    %ecx,%eax
-	sub    $4,%eax
-	mov    %eax,(%ecx)
-	pop    %eax
-1:
-	pop    %ecx
-	jmp    *%ebx
+	jz     execute  /* to disable linking (for debugging) */
+	and    $0xfffff000,%ebx
+	cmp    %ebx,LASTBANK
+	mov    %ebx,LASTBANK
+	jne    execute  /* don't link across memory banks - mapper might change! */
+	cmp    $0x7fff,%ebx
+	jle    execute  /* don't link to RAM code */
+	test   %ebp,%ebp
+	jz     execute  /* skip null address */
+link_always:
+	mov    %edi,%ebx
+	sub    %ebp,%ebx
+	sub    $4,%ebx
+	mov    %ebx,(%ebp)
+execute:
+	jmp    *%edi
 
 /*
  * This is an interpreter to handle self-modifying code.
@@ -1067,8 +1044,7 @@ selfmod:
 	je     iincx
 
 i_done:
-	movl   %ebx,PCR
-	movl   $0,DMOD
+	xorl   %ebp,%ebp
 	jmp    recompile
 
 inop:
