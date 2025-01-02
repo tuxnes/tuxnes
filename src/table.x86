@@ -84,7 +84,7 @@
 #
 # To read an input register, place the location into %ebx and call [I].  The
 # value is returned in %edx.  To write to an output register, place the
-# location into %ebx and the value to write in %eax, and call [O].  For
+# location into %ebx and the value to write in %dl, and call [O].  For
 # writes into the ROM area, call [Y] to pass these values to the mapper.
 # (The compiler will replace [I], [O], and [Y] with the proper address.)
 #
@@ -1084,16 +1084,18 @@
 	83 c6 06                # addl   $6,%esi
 
 	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
-	75 23                   # jne    +35
+	bd [Y]                  # movl   $MAPPER,%ebp
+	75 21                   # jne    +33
 	81 eb 00 20 00 00       # subl   $0x2000,%ebx
 	81 fb 00 40 00 00       # cmpl   $0x4000,%ebx
 	8d 9b 00 20 00 00       # leal   0x2000(%ebx),%ebx
+	bd [O]                  # movl   $OUTPUT,%ebp
 	72 08                   # jb     +8
 	88 83 [L]               # movb   %al,RAM(%ebx)
-	eb 0c                   # jmp    +12
-	e8 [O]                  # call   OUTPUT
-	eb 05                   # jmp    +5
-	e8 [Y]                  # call   MAPPER
+	eb 06                   # jmp    +6
+	86 c2                   # xchgb  %al,%dl
+	ff d5                   # call   *%ebp
+	86 c2                   # xchgb  %al,%dl
 	/
 # 82 - (bad)
 # 83 - (bad)
@@ -1169,16 +1171,18 @@
 	83 c6 06                # addl   $6,%esi
 
 	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
-	75 23                   # jne    +35
+	bd [Y]                  # movl   $MAPPER,%ebp
+	75 21                   # jne    +33
 	81 eb 00 20 00 00       # subl   $0x2000,%ebx
 	81 fb 00 40 00 00       # cmpl   $0x4000,%ebx
 	8d 9b 00 20 00 00       # leal   0x2000(%ebx),%ebx
+	bd [O]                  # movl   $OUTPUT,%ebp
 	72 08                   # jb     +8
 	88 83 [L]               # movb   %al,RAM(%ebx)
-	eb 0c                   # jmp    +12
-	e8 [O]                  # call   OUTPUT
-	eb 05                   # jmp    +5
-	e8 [Y]                  # call   MAPPER
+	eb 06                   # jmp    +6
+	86 c2                   # xchgb  %al,%dl
+	ff d5                   # call   *%ebp
+	86 c2                   # xchgb  %al,%dl
 	/
 # 92 - (bad)
 # 93 - (bad)
@@ -2308,7 +2312,9 @@ a9 00 85 00/00 f0,6:
 	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [Y]                  # call   MAPPER
+	86 c2                   # xchgb  %al,%dl
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2319,9 +2325,9 @@ a9 00 85 00/00 f0,6:
 	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [Y]                  # call   MAPPER
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2332,9 +2338,9 @@ a9 00 85 00/00 f0,6:
 	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [Y]                  # call   MAPPER
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2346,7 +2352,9 @@ a9 00 85 00/00 f0,6:
 	66 81 c3 [W+1]          # addw   $[W+1],%bx
 	83 c6 05                # addl   $5,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [Y]                  # call   MAPPER
+	86 c2                   # xchgb  %al,%dl
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2357,7 +2365,9 @@ a9 00 85 00/00 f0,6:
 	66 81 c3 [W+1]          # addw   $[W+1],%bx
 	83 c6 05                # addl   $5,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [Y]                  # call   MAPPER
+	86 c2                   # xchgb  %al,%dl
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2370,8 +2380,10 @@ a9 00 85 00/00 f0,6:
 	83 c6 05                # addl   $5,%esi
 
 	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
-	74 11                   # je     +17
+	74 15                   # je     +21
+	86 c2                   # xchgb  %al,%dl
 	e8 [Y]                  # call   MAPPER
+	86 c2                   # xchgb  %al,%dl
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2385,8 +2397,10 @@ a9 00 85 00/00 f0,6:
 	83 c6 05                # addl   $5,%esi
 
 	f7 c3 00 80 00 00       # testl  $0x8000,%ebx
-	74 11                   # je     +17
+	74 15                   # je     +21
+	86 c2                   # xchgb  %al,%dl
 	e8 [Y]                  # call   MAPPER
+	86 c2                   # xchgb  %al,%dl
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2398,16 +2412,14 @@ a9 00 85 00/00 f0,6:
 #   Why?  Although it doesn't save any clock cycles, it does save a byte
 #   of memory compared to the usual LDA/STA method.
 ee 00/00 80/80,3:
-	8b 1d [X+1]             # movl   [X+1],%ebx
+	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 06                # addl   $6,%esi
 
-	50                      # pushl  %eax
-	0f b6 83 [W+1] 00 00    # movzbl [W+1](%ebx),%eax
-	bb [W+1] 00 00          # movl   $[W+1],%ebx
-	fe c0                   # incb   %al
-	0f be d0                # movsbl %al,%edx
+	8b 15 [X+1]             # movl   [X+1],%edx
+	8a 14 1a                # movb   (%edx,%ebx,1),%dl
+	fe c2                   # incb   %dl
+	0f be d2                # movsbl %dl,%edx
 	e8 [Y]                  # call   MAPPER
-	58                      # popl   %eax
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2415,16 +2427,14 @@ ee 00/00 80/80,3:
 
 # DEC $8000+  - write mapper regs
 ce 00/00 80/80,3:
-	8b 1d [X+1]             # movl   [X+1],%ebx
+	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 06                # addl   $6,%esi
 
-	50                      # pushl  %eax
-	0f b6 83 [W+1] 00 00    # movzbl [W+1](%ebx),%eax
-	bb [W+1] 00 00          # movl   $[W+1],%ebx
-	fe c8                   # decb   %al
-	0f be d0                # movsbl %al,%edx
+	8b 15 [X+1]             # movl   [X+1],%edx
+	8a 14 1a                # movb   (%edx,%ebx,1),%dl
+	fe ca                   # decb   %dl
+	0f be d2                # movsbl %dl,%edx
 	e8 [Y]                  # call   MAPPER
-	58                      # popl   %eax
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2439,12 +2449,10 @@ fe 00/00 80/80,3:
 	89 da                   # movl   %ebx,%edx
 	c1 ea 0c                # shrl   $12,%edx
 	8b 14 95 [M]            # movl   MAPTABLE(,%edx,4),%edx
-	50                      # pushl  %eax
-	0f b6 04 1a             # movzbl (%edx,%ebx,1),%eax
-	fe c0                   # incb   %al
-	0f be d0                # movsbl %al,%edx
+	8a 14 1a                # movb   (%edx,%ebx,1),%dl
+	fe c2                   # incb   %dl
+	0f be d2                # movsbl %dl,%edx
 	e8 [Y]                  # call   MAPPER
-	58                      # popl   %eax
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2459,12 +2467,10 @@ de 00/00 80/80,3:
 	89 da                   # movl   %ebx,%edx
 	c1 ea 0c                # shrl   $12,%edx
 	8b 14 95 [M]            # movl   MAPTABLE(,%edx,4),%edx
-	50                      # pushl  %eax
-	0f b6 04 1a             # movzbl (%edx,%ebx,1),%eax
-	fe c8                   # decb   %al
-	0f be d0                # movsbl %al,%edx
+	8a 14 1a                # movb   (%edx,%ebx,1),%dl
+	fe ca                   # decb   %dl
+	0f be d2                # movsbl %dl,%edx
 	e8 [Y]                  # call   MAPPER
-	58                      # popl   %eax
 	bf [P+3]                # movl   $[P+3],%edi
 	31 ed                   # xorl   %ebp,%ebp
 	e9 [U]                  # jmp    U
@@ -2595,25 +2601,27 @@ b9 00/00 40,3:
 	bb 00 20 00 00          # movl   $0x2000,%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $2000  - write to $2000
 8e 00 20,3:
 	bb 00 20 00 00          # movl   $0x2000,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $2000  - write to $2000
 8c 00 20,3:
 	bb 00 20 00 00          # movl   $0x2000,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 # STA $2001  - write to $2001
@@ -2621,25 +2629,27 @@ b9 00/00 40,3:
 	bb 01 20 00 00          # movl   $0x2001,%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $2001  - write to $2001
 8e 01 20,3:
 	bb 01 20 00 00          # movl   $0x2001,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $2001  - write to $2001
 8c 01 20,3:
 	bb 01 20 00 00          # movl   $0x2001,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 # STA $2002  - write to $2002?? should not happen
@@ -2647,7 +2657,9 @@ b9 00/00 40,3:
 #	bb 02 20 00 00          # movl   $0x2002,%ebx
 	83 c6 04                # addl   $4,%esi
 
+#	86 c2                   # xchgb  %al,%dl
 #	e8 [O]                  # call   OUTPUT
+#	86 c2                   # xchgb  %al,%dl
 	/
 
 # STA $2003  - write to $2003
@@ -2655,25 +2667,27 @@ b9 00/00 40,3:
 	bb 03 20 00 00          # movl   $0x2003,%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $2003  - write to $2003
 8e 03 20,3:
 	bb 03 20 00 00          # movl   $0x2003,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $2003  - write to $2003
 8c 03 20,3:
 	bb 03 20 00 00          # movl   $0x2003,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 # STA $2004  - write to $2004
@@ -2681,25 +2695,27 @@ b9 00/00 40,3:
 	bb 04 20 00 00          # movl   $0x2004,%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $2004  - write to $2004
 8e 04 20,3:
 	bb 04 20 00 00          # movl   $0x2004,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $2004  - write to $2004
 8c 04 20,3:
 	bb 04 20 00 00          # movl   $0x2004,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 # STA $2005  - write to $2005
@@ -2707,25 +2723,27 @@ b9 00/00 40,3:
 	bb 05 20 00 00          # movl   $0x2005,%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $2005  - write to $2005
 8e 05 20,3:
 	bb 05 20 00 00          # movl   $0x2005,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $2005  - write to $2005
 8c 05 20,3:
 	bb 05 20 00 00          # movl   $0x2005,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 # STA $2006  - write to $2006
@@ -2733,25 +2751,27 @@ b9 00/00 40,3:
 	bb 06 20 00 00          # movl   $0x2006,%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $2006  - write to $2006
 8e 06 20,3:
 	bb 06 20 00 00          # movl   $0x2006,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $2006  - write to $2006
 8c 06 20,3:
 	bb 06 20 00 00          # movl   $0x2006,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 # STA $2007  - write to $2007
@@ -2759,25 +2779,27 @@ b9 00/00 40,3:
 	bb 07 20 00 00          # movl   $0x2007,%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $2007  - write to $2007
 8e 07 20,3:
 	bb 07 20 00 00          # movl   $0x2007,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $2007  - write to $2007
 8c 07 20,3:
 	bb 07 20 00 00          # movl   $0x2007,%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 # STA $40xx - I/O write
@@ -2785,25 +2807,27 @@ b9 00/00 40,3:
 	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 04                # addl   $4,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STX $40xx - I/O write
 8e 00/00 40,3:
 	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c1                   # xchgb  %al,%cl
+	86 ca                   # xchgb  %cl,%dl
 	/
 # STY $40xx - I/O write
 8c 00/00 40,3:
 	bb [W+1] 00 00          # movl   $[W+1],%ebx
 	83 c6 04                # addl   $4,%esi
 
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	e8 [O]                  # call   OUTPUT
-	86 c5                   # xchgb  %al,%ch
+	86 ea                   # xchgb  %ch,%dl
 	/
 
 
@@ -2815,7 +2839,9 @@ b9 00/00 40,3:
 	66 81 c3 [W+1]          # addw   $[W+1],%bx
 	83 c6 05                # addl   $5,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
 # STA $40xx,Y
 99 00/00 40,3:
@@ -2823,5 +2849,7 @@ b9 00/00 40,3:
 	66 81 c3 [W+1]          # addw   $[W+1],%bx
 	83 c6 05                # addl   $5,%esi
 
+	86 c2                   # xchgb  %al,%dl
 	e8 [O]                  # call   OUTPUT
+	86 c2                   # xchgb  %al,%dl
 	/
