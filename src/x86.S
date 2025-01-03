@@ -8,12 +8,6 @@
 
 #include "consts.h"
 
-#define _ZPMEM (_RAM+0x0000)
-#define _STACK (_RAM+0x0100)    /* Stack at 0100 */
-#define _REG1  (_RAM+0x2000)    /* ioregs mapped to 2000 in 6502 memory */
-#define _REG2  (_RAM+0x4000)    /* ioregs mapped to 4000 in 6502 memory */
-#define _NVRAM (_RAM+0x6000)    /* Battery RAM (mapped to 6000 in 6502 address space) */
-
 .section .note.GNU-stack,"",@progbits
 
 
@@ -50,10 +44,8 @@ START:
 	movl   %esi,CLOCK
 	subl   $VBL,%esi
 	movl   %esi,CTNI
-	movl   $_STACK+0xfd,%eax
-	movl   %eax,STACKPTR
-	movl   $0x04,%eax
-	movl   %eax,FLAGS
+	movl   $_RAM+0x01fd,STACKPTR
+	movl   $0x04,FLAGS
 	xorl   %eax,%eax
 	movl   %eax,VFLAG
 	xorl   %ecx,%ecx
@@ -144,7 +136,7 @@ irq:
  * This is really only here to stop games from crashing due to unhandled
  * interrupts.
  */
-	movl   _REG1+1,%eax
+	movl   _RAM+0x2001,%eax
 	testl  $0x08,%eax
 	jz     skipint
 	popa
@@ -661,6 +653,7 @@ i_next:
 selfmod:
 	/* This will be converted to a lookup table when it's complete */
 	movb   _RAM(%edi),%bl
+	incw   %di
 	cmpb   $0x00,%bl
 	je     ibrk
 	cmpb   $0x01,%bl
@@ -963,18 +956,18 @@ selfmod:
 	je     isbcx
 	cmpb   $0xfe,%bl
 	je     iincx
+	decw   %di
 
 i_done:
 	xorl   %ebp,%ebp
 	jmp    recompile
 
 inop:
-	incl   %edi
 	addl   $2,%esi
 	jmp    i_next
 
 ibrk:
-	addl   $2,%edi
+	incw   %di
 	testb  %dl,%dl
 	setz   %dl
 	sarb   %ah
@@ -1009,13 +1002,13 @@ ibrk:
 	jmp    i_next
 
 ijmp:
-	movzwl _RAM+1(%edi),%edi
+	movzwl _RAM(%edi),%edi
 	addl   $3,%esi
 	jmp    i_next
 
 ijmpind:
 	movl   %edx,%ebp
-	movzwl _RAM+1(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
 	movl   %ebx,%edi
 	movl   %ebx,%edx
 	shrl   $12,%edi
@@ -1029,16 +1022,17 @@ ijmpind:
 	jmp    i_next
 
 ijsr:
-	addl   $2,%edi
-	xchgl  %eax,%edi
+	movl   %eax,%ebp
+	movl   %edi,%eax
+	incw   %ax
 	movl   STACKPTR,%ebx
 	movb   %ah,(%ebx)
 	decb   %bl
 	movb   %al,(%ebx)
 	decb   %bl
 	movb   %bl,STACKPTR
-	xchgl  %eax,%edi
-	movzwl _RAM-1(%edi),%edi
+	movl   %ebp,%eax
+	movzwl _RAM(%edi),%edi
 	addl   $6,%esi
 	jmp    i_next
 
@@ -1050,7 +1044,7 @@ irts:
 	incb   %bl
 	movb   (%ebx),%ah
 	movb   %bl,STACKPTR
-	incl   %eax
+	incw   %ax
 	xchgl  %eax,%edi
 	addl   $6,%esi
 	jmp    i_next
@@ -1078,21 +1072,21 @@ irti:
 	jmp    i_next
 
 ibpl:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	testb  $0x01,%dh
 	jz     ibrel
 	jmp    i_next
 
 ibmi:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	testb  $0x01,%dh
 	jnz    ibrel
 	jmp    i_next
 
 ibvc:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	movl   VFLAG,%ebx
 	addl   $0x80,%ebx
@@ -1101,7 +1095,7 @@ ibvc:
 	jmp    i_next
 
 ibvs:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	movl   VFLAG,%ebx
 	addl   $0x80,%ebx
@@ -1110,88 +1104,81 @@ ibvs:
 	jmp    i_next
 
 ibcc:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	testb  $0x01,%ah
 	jz     ibrel
 	jmp    i_next
 
 ibcs:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	testb  $0x01,%ah
 	jnz    ibrel
 	jmp    i_next
 
 ibne:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	testb  %dl,%dl
 	jnz    ibrel
 	jmp    i_next
 
 ibeq:
-	addl   $2,%edi
+	incw   %di
 	addl   $2,%esi
 	testb  %dl,%dl
 	jnz    i_next
 ibrel:
+	movl   %eax,%ebp
 	movl   %edi,%ebx
-	movl   %eax,%edi
-	movsbl _RAM-1(%ebx),%eax
+	decw   %di
+	movsbl _RAM(%edi),%eax
 	addw   %ax,%bx
 	cmpb   %al,%bl
 	adcb   $0,%ah
 	sarb   %ah
 	adcl   $1,%esi
-	movl   %edi,%eax
 	movl   %ebx,%edi
+	movl   %ebp,%eax
 	jmp    i_next
 
 iclc:
-	incl   %edi
 	xorb   %ah,%ah
 	addl   $2,%esi
 	jmp    i_next
 
 isec:
-	incl   %edi
 	orb    $-1,%ah
 	addl   $2,%esi
 	jmp    i_next
 
 icli:
-	incl   %edi
 	andb   $0xfb,FLAGS
 	addl   $2,%esi
 	jmp    i_next
 
 isei:
-	incl   %edi
 	orb    $0x04,FLAGS
 	addl   $2,%esi
 	jmp    i_next
 
 icld:
-	incl   %edi
 	andb   $0xf7,FLAGS
 	addl   $2,%esi
 	jmp    i_next
 
 ised:
-	incl   %edi
 	orb    $0x08,FLAGS
 	addl   $2,%esi
 	jmp    i_next
 
 iclv:
-	incl   %edi
 	movl   $0,VFLAG
 	addl   $2,%esi
 	jmp    i_next
 
 iphp:
-	incl   %edi
 	testb  %dl,%dl
 	setz   %dl
 	sarb   %ah
@@ -1217,7 +1204,6 @@ iphp:
 	jmp    i_next
 
 iplp:
-	incl   %edi
 	movl   STACKPTR,%ebx
 	incb   %bl
 	movb   (%ebx),%dl
@@ -1234,7 +1220,6 @@ iplp:
 	jmp    i_next
 
 ipha:
-	incl   %edi
 	movl   STACKPTR,%ebx
 	movb   %al,(%ebx)
 	decb   %bl
@@ -1243,7 +1228,6 @@ ipha:
 	jmp    i_next
 
 ipla:
-	incl   %edi
 	movl   STACKPTR,%ebx
 	incb   %bl
 	movb   (%ebx),%al
@@ -1253,91 +1237,82 @@ ipla:
 	jmp    i_next
 
 itxs:
-	incl   %edi
 	movb   %cl,STACKPTR
 	addl   $2,%esi
 	jmp    i_next
 
 itsx:
-	incl   %edi
 	movb   STACKPTR,%cl
 	movsbl %cl,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 itax:
-	incl   %edi
 	movb   %al,%cl
 	movsbl %cl,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 itxa:
-	incl   %edi
 	movb   %cl,%al
 	movsbl %al,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 itay:
-	incl   %edi
 	movb   %al,%ch
 	movsbl %ch,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 itya:
-	incl   %edi
 	movb   %ch,%al
 	movsbl %al,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 ildaimm:
-	addl   $2,%edi
-	movb   _RAM-1(%edi),%al
-	movsbl %al,%edx
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    ildazp
 
 ildximm:
-	addl   $2,%edi
-	movb   _RAM-1(%edi),%cl
-	movsbl %cl,%edx
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    ildxzp
 
 ildyimm:
-	addl   $2,%edi
-	movb   _RAM-1(%edi),%ch
-	movsbl %ch,%edx
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    ildyzp
 
 ildazx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    ildazp
 
 ildxzy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %ch,%bl
 	addl   $4,%esi
 	jmp    ildxzp
 
 ildyzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    ildyzp
 
 ildaz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 ildazp:
 	movb   _RAM(%ebx),%al
@@ -1345,8 +1320,8 @@ ildazp:
 	jmp    i_next
 
 ildxz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 ildxzp:
 	movb   _RAM(%ebx),%cl
@@ -1354,8 +1329,8 @@ ildxzp:
 	jmp    i_next
 
 ildyz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 ildyzp:
 	movb   _RAM(%ebx),%ch
@@ -1363,8 +1338,8 @@ ildyzp:
 	jmp    i_next
 
 ildax:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -1372,8 +1347,8 @@ ildax:
 	jmp    ildaabs
 
 ilday:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -1381,8 +1356,8 @@ ilday:
 	jmp    ildaabs
 
 ildxy:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -1390,8 +1365,8 @@ ildxy:
 	jmp    ildxabs
 
 ildyx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -1399,8 +1374,8 @@ ildyx:
 	jmp    ildyabs
 
 ildazix:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -1410,8 +1385,8 @@ ildazix:
 	jmp    ildaabs
 
 ildaziy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -1423,8 +1398,8 @@ ildaziy:
 	jmp    ildaabs
 
 ilda:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 ildaabs:
 	leal   -0x2000(%ebx),%edx
@@ -1442,8 +1417,8 @@ ildain:
 	jmp    i_next
 
 ildx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 ildxabs:
 	leal   -0x2000(%ebx),%edx
@@ -1461,8 +1436,8 @@ ildxin:
 	jmp    i_next
 
 ildy:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 ildyabs:
 	leal   -0x2000(%ebx),%edx
@@ -1480,64 +1455,64 @@ ildyin:
 	jmp    i_next
 
 istaz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 	jmp    istazp
 
 istxz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 	jmp    istxzp
 
 istyz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 	jmp    istyzp
 
 istazx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    istazp
 
 istxzy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %ch,%bl
 	addl   $4,%esi
 	jmp    istxzp
 
 istyzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    istyzp
 
 istax:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	addl   $5,%esi
 	jmp    istaabs
 
 istay:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	addl   $5,%esi
 	jmp    istaabs
 
 istazix:
-	addl   $2,%edi
 	movl   %edx,%ebp
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -1548,9 +1523,9 @@ istazix:
 	jmp    istaabs
 
 istaziy:
-	addl   $2,%edi
 	movl   %edx,%ebp
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -1562,8 +1537,8 @@ istaziy:
 	jmp    istaabs
 
 ista:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 istaabs:
 	testl  $0x8000,%ebx
@@ -1586,8 +1561,8 @@ istaout:
 	jmp    i_next
 
 istx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 istxabs:
 	testl  $0x8000,%ebx
@@ -1610,8 +1585,8 @@ istxout:
 	jmp    i_next
 
 isty:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 istyabs:
 	testl  $0x8000,%ebx
@@ -1634,50 +1609,50 @@ istyout:
 	jmp    i_next
 
 iincz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $5,%esi
 	jmp    iinczp
 
 idecz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $5,%esi
 	jmp    ideczp
 
 iinczx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $6,%esi
 	jmp    iinczp
 
 ideczx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $6,%esi
 	jmp    ideczp
 
 iincx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	addl   $7,%esi
 	jmp    iincabs
 
 idecx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	addl   $7,%esi
 	jmp    idecabs
 
 iinc:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $6,%esi
 iincabs:
 	/* None of the I/O regs are read/write so shouldn't need to check that */
@@ -1700,8 +1675,8 @@ iincmapper:
 	jmp    i_next
 
 idec:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $6,%esi
 idecabs:
 	/* None of the I/O regs are read/write so shouldn't need to check that */
@@ -1724,75 +1699,58 @@ idecmapper:
 	jmp    i_next
 
 iinx:
-	incl   %edi
 	incb   %cl
 	movsbl %cl,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 idex:
-	incl   %edi
 	decb   %cl
 	movsbl %cl,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 iiny:
-	incl   %edi
 	incb   %ch
 	movsbl %ch,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 idey:
-	incl   %edi
 	decb   %ch
 	movsbl %ch,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 iadcimm:
-	addl   $2,%edi
-	sarb   %ah
-	movsbl %al,%eax
-	movsbl _RAM-1(%edi),%ebx
-	adcl   %ebx,%eax
-	movl   %eax,VFLAG
-	movsbl %al,%edx
-	rclb   %ah
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    iadczp
 
 isbcimm:
-	addl   $2,%edi
-	sarb   %ah
-	movsbl %al,%eax
-	movsbl _RAM-1(%edi),%ebx
-	notl   %ebx
-	adcl   %ebx,%eax
-	movl   %eax,VFLAG
-	movsbl %al,%edx
-	rclb   %ah
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    isbczp
 
 iadczx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    iadczp
 
 isbczx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    isbczp
 
 iadcz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 iadczp:
 	sarb   %ah
@@ -1805,8 +1763,8 @@ iadczp:
 	jmp    i_next
 
 isbcz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 isbczp:
 	sarb   %ah
@@ -1820,8 +1778,8 @@ isbczp:
 	jmp    i_next
 
 iadcx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -1829,8 +1787,8 @@ iadcx:
 	jmp    iadcabs
 
 isbcx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -1838,8 +1796,8 @@ isbcx:
 	jmp    isbcabs
 
 iadcy:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -1847,8 +1805,8 @@ iadcy:
 	jmp    iadcabs
 
 isbcy:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -1856,8 +1814,8 @@ isbcy:
 	jmp    isbcabs
 
 iadczix:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -1867,8 +1825,8 @@ iadczix:
 	jmp    iadcabs
 
 isbczix:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -1878,8 +1836,8 @@ isbczix:
 	jmp    isbcabs
 
 iadcziy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -1891,8 +1849,8 @@ iadcziy:
 	jmp    iadcabs
 
 isbcziy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -1904,8 +1862,8 @@ isbcziy:
 	jmp    isbcabs
 
 iadc:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 iadcabs:
 	/* TODO: Check I/O */
@@ -1922,8 +1880,8 @@ iadcabs:
 	jmp    i_next
 
 isbc:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 isbcabs:
 	/* TODO: Check I/O */
@@ -1941,45 +1899,33 @@ isbcabs:
 	jmp    i_next
 
 icmpimm:
-	addl   $2,%edi
-	movb   %al,%dl
-	subb   _RAM-1(%edi),%dl
-	cmc
-	movsbl %dl,%edx
-	rclb   %ah
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    icmpzp
 
 icpximm:
-	addl   $2,%edi
-	movb   %cl,%dl
-	subb   _RAM-1(%edi),%dl
-	cmc
-	movsbl %dl,%edx
-	rclb   %ah
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    icpxzp
 
 icpyimm:
-	addl   $2,%edi
-	movb   %ch,%dl
-	subb   _RAM-1(%edi),%dl
-	cmc
-	movsbl %dl,%edx
-	rclb   %ah
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    icpyzp
 
 icmpzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    icmpzp
 
 icmpz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 icmpzp:
 	movb   %al,%dl
@@ -1990,8 +1936,8 @@ icmpzp:
 	jmp    i_next
 
 icpxz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 icpxzp:
 	movb   %cl,%dl
@@ -2002,8 +1948,8 @@ icpxzp:
 	jmp    i_next
 
 icpyz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 icpyzp:
 	movb   %ch,%dl
@@ -2014,8 +1960,8 @@ icpyzp:
 	jmp    i_next
 
 icmpx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -2023,8 +1969,8 @@ icmpx:
 	jmp    icmpabs
 
 icmpy:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -2032,8 +1978,8 @@ icmpy:
 	jmp    icmpabs
 
 icmpzix:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -2043,8 +1989,8 @@ icmpzix:
 	jmp    icmpabs
 
 icmpziy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -2056,8 +2002,8 @@ icmpziy:
 	jmp    icmpabs
 
 icmp:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 icmpabs:
 	/* TODO: Check I/O */
@@ -2072,8 +2018,8 @@ icmpabs:
 	jmp    i_next
 
 icpx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 icpxabs:
 	/* TODO: Check I/O */
@@ -2088,8 +2034,8 @@ icpxabs:
 	jmp    i_next
 
 icpy:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 icpyabs:
 	/* TODO: Check I/O */
@@ -2104,8 +2050,8 @@ icpyabs:
 	jmp    i_next
 
 ibitz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movsbl _RAM(%ebx),%edx
 	leal   (%edx,%edx,1),%ebx
 	andl   $0x80,%ebx
@@ -2115,8 +2061,8 @@ ibitz:
 	jmp    i_next
 
 ibit:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
@@ -2129,50 +2075,47 @@ ibit:
 	jmp    i_next
 
 iandimm:
-	addl   $2,%edi
-	andb   _RAM-1(%edi),%al
-	movsbl %al,%edx
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    iandzp
 
 ieorimm:
-	addl   $2,%edi
-	xorb   _RAM-1(%edi),%al
-	movsbl %al,%edx
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    ieorzp
 
 ioraimm:
-	addl   $2,%edi
-	orb    _RAM-1(%edi),%al
-	movsbl %al,%edx
+	movl   %edi,%ebx
+	incw   %di
 	addl   $2,%esi
-	jmp    i_next
+	jmp    iorazp
 
 iandzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    iandzp
 
 ieorzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    ieorzp
 
 iorazx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $4,%esi
 	jmp    iorazp
 
 iandz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 iandzp:
 	andb   _RAM(%ebx),%al
@@ -2180,8 +2123,8 @@ iandzp:
 	jmp    i_next
 
 ieorz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 ieorzp:
 	xorb   _RAM(%ebx),%al
@@ -2189,8 +2132,8 @@ ieorzp:
 	jmp    i_next
 
 ioraz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $3,%esi
 iorazp:
 	orb    _RAM(%ebx),%al
@@ -2198,8 +2141,8 @@ iorazp:
 	jmp    i_next
 
 iandx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -2207,8 +2150,8 @@ iandx:
 	jmp    iandabs
 
 ieorx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -2216,8 +2159,8 @@ ieorx:
 	jmp    ieorabs
 
 iorax:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	cmpb   %cl,%bl
@@ -2225,8 +2168,8 @@ iorax:
 	jmp    ioraabs
 
 iandy:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -2234,8 +2177,8 @@ iandy:
 	jmp    iandabs
 
 ieory:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -2243,8 +2186,8 @@ ieory:
 	jmp    ieorabs
 
 ioray:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %ch,%bl
 	adcb   $0,%bh
 	cmpb   %ch,%bl
@@ -2252,8 +2195,8 @@ ioray:
 	jmp    ioraabs
 
 iandzix:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -2263,8 +2206,8 @@ iandzix:
 	jmp    iandabs
 
 ieorzix:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -2274,8 +2217,8 @@ ieorzix:
 	jmp    ieorabs
 
 iorazix:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	movl   %ebx,%edx
 	incb   %dl
@@ -2285,8 +2228,8 @@ iorazix:
 	jmp    ioraabs
 
 iandziy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -2298,8 +2241,8 @@ iandziy:
 	jmp    iandabs
 
 ieorziy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -2311,8 +2254,8 @@ ieorziy:
 	jmp    ieorabs
 
 ioraziy:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	movl   %ebx,%edx
 	incb   %dl
 	movb   _RAM(%ebx),%bl
@@ -2324,8 +2267,8 @@ ioraziy:
 	jmp    ioraabs
 
 iand:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 iandabs:
 	/* TODO: Check I/O */
@@ -2337,8 +2280,8 @@ iandabs:
 	jmp    i_next
 
 ieor:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 ieorabs:
 	/* TODO: Check I/O */
@@ -2350,8 +2293,8 @@ ieorabs:
 	jmp    i_next
 
 iora:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $4,%esi
 ioraabs:
 	/* TODO: Check I/O */
@@ -2363,14 +2306,12 @@ ioraabs:
 	jmp    i_next
 
 iaslacc:
-	incl   %edi
 	shll   %eax
 	movsbl %al,%edx
 	addl   $2,%esi
 	jmp    i_next
 
 ilsracc:
-	incl   %edi
 	shrb   %al
 	movsbl %al,%edx
 	rclb   %ah
@@ -2378,7 +2319,6 @@ ilsracc:
 	jmp    i_next
 
 irolacc:
-	incl   %edi
 	sarb   %ah
 	rcll   %eax
 	movsbl %al,%edx
@@ -2386,7 +2326,6 @@ irolacc:
 	jmp    i_next
 
 iroracc:
-	incl   %edi
 	sarl   %eax
 	movsbl %al,%edx
 	rclb   %ah
@@ -2394,92 +2333,92 @@ iroracc:
 	jmp    i_next
 
 iaslz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $5,%esi
 	jmp    iaslzp
 
 ilsrz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $5,%esi
 	jmp    ilsrzp
 
 irolz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $5,%esi
 	jmp    irolzp
 
 irorz:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addl   $5,%esi
 	jmp    irorzp
 
 iaslzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $6,%esi
 	jmp    iaslzp
 
 ilsrzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $6,%esi
 	jmp    ilsrzp
 
 irolzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $6,%esi
 	jmp    irolzp
 
 irorzx:
-	addl   $2,%edi
-	movzbl _RAM-1(%edi),%ebx
+	movzbl _RAM(%edi),%ebx
+	incw   %di
 	addb   %cl,%bl
 	addl   $6,%esi
 	jmp    irorzp
 
 iaslx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	addl   $7,%esi
 	jmp    iaslabs
 
 ilsrx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	addl   $7,%esi
 	jmp    ilsrabs
 
 irolx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	addl   $7,%esi
 	jmp    irolabs
 
 irorx:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addb   %cl,%bl
 	adcb   $0,%bh
 	addl   $7,%esi
 	jmp    irorabs
 
 iasl:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $6,%esi
 iaslabs:
 	/* TODO: Check mapper */
@@ -2490,8 +2429,8 @@ iaslzp:
 	jmp    i_next
 
 ilsr:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $6,%esi
 ilsrabs:
 	/* TODO: Check mapper */
@@ -2502,8 +2441,8 @@ ilsrzp:
 	jmp    i_next
 
 irol:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $6,%esi
 irolabs:
 	/* TODO: Check mapper */
@@ -2515,8 +2454,8 @@ irolzp:
 	jmp    i_next
 
 iror:
-	addl   $3,%edi
-	movzwl _RAM-2(%edi),%ebx
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
 	addl   $6,%esi
 irorabs:
 	/* TODO: Check mapper */

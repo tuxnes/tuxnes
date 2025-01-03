@@ -262,8 +262,8 @@
 # 0f - (bad)
 # 10 - BPL
 10,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	f6 c6 01                # testb  $0x01,%dh
 	bf [R+1]                # movl   $[R+1],%edi
@@ -490,8 +490,8 @@
 # 2f - (bad)
 # 30 - BMI
 30,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	f6 c6 01                # testb  $0x01,%dh
 	bf [R+1]                # movl   $[R+1],%edi
@@ -710,8 +710,8 @@
 # 4f - (bad)
 # 50 - BVC
 50,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	8b 1d [V]               # movl   VFLAG,%ebx
 	81 c3 80 00 00 00       # addl   $0x80,%ebx
@@ -822,7 +822,7 @@
 	fe c3                   # incb   %bl
 	8a 23                   # movb   (%ebx),%ah
 	88 1d [S]               # movb   %bl,STACKPTR
-	40                      # incl   %eax
+	66 40                   # incw   %ax
 	97                      # xchgl  %eax,%edi
 	83 c6 06                # addl   $6,%esi
 	31 ed                   # xorl   %ebp,%ebp
@@ -946,8 +946,8 @@
 # 6f - (bad)
 # 70 - BVS
 70,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	8b 1d [V]               # movl   VFLAG,%ebx
 	81 c3 80 00 00 00       # addl   $0x80,%ebx
@@ -1148,8 +1148,8 @@
 # 8f - (bad)
 # 90 - BCC
 90,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	f6 c4 01                # testb  $0x01,%ah
 	bf [R+1]                # movl   $[R+1],%edi
@@ -1340,8 +1340,8 @@ ae,3:
 # af - (bad)
 # b0 - BCS
 b0,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	f6 c4 01                # testb  $0x01,%ah
 	bf [R+1]                # movl   $[R+1],%edi
@@ -1581,8 +1581,8 @@ ce,3:
 # cf - (bad)
 # d0 - BNE
 d0,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	84 d2                   # testb  %dl,%dl
 	bf [R+1]                # movl   $[R+1],%edi
@@ -1812,8 +1812,8 @@ ee,3:
 # ef - (bad)
 # f0 - BEQ
 f0,2:
-	83 c6 [>+1] 03          # addl   $3+,%esi
 	bf [P]                  # movl   $[P],%edi
+	83 c6 [>+1] 03          # addl   $3+,%esi
 	0f 89 [N]               # jns    NMI
 	84 d2                   # testb  %dl,%dl
 	bf [R+1]                # movl   $[R+1],%edi
