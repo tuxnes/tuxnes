@@ -19,6 +19,27 @@ TRANS_TBL:
 .type TRANS_TBL,@object
 .size TRANS_TBL,.-TRANS_TBL
 
+.balign 4
+optable:
+.long ibrk,    iorazix, i_bad,   i_bad, i_bad,  ioraz,   iaslz,  i_bad, iphp, ioraimm, iaslacc, i_bad, i_bad,   iora,  iasl,  i_bad
+.long ibpl,    ioraziy, i_bad,   i_bad, i_bad,  iorazx,  iaslzx, i_bad, iclc, ioray,   i_bad,   i_bad, i_bad,   iorax, iaslx, i_bad
+.long ijsr,    iandzix, i_bad,   i_bad, ibitz,  iandz,   irolz,  i_bad, iplp, iandimm, irolacc, i_bad, ibit,    iand,  irol,  i_bad
+.long ibmi,    iandziy, i_bad,   i_bad, i_bad,  iandzx,  irolzx, i_bad, isec, iandy,   i_bad,   i_bad, i_bad,   iandx, irolx, i_bad
+.long irti,    ieorzix, i_bad,   i_bad, i_bad,  ieorz,   ilsrz,  i_bad, ipha, ieorimm, ilsracc, i_bad, ijmp,    ieor,  ilsr,  i_bad
+.long ibvc,    ieorziy, i_bad,   i_bad, i_bad,  ieorzx,  ilsrzx, i_bad, icli, ieory,   i_bad,   i_bad, i_bad,   ieorx, ilsrx, i_bad
+.long irts,    iadczix, i_bad,   i_bad, i_bad,  iadcz,   irorz,  i_bad, ipla, iadcimm, iroracc, i_bad, ijmpind, iadc,  iror,  i_bad
+.long ibvs,    iadcziy, i_bad,   i_bad, i_bad,  iadczx,  irorzx, i_bad, isei, iadcy,   i_bad,   i_bad, i_bad,   iadcx, irorx, i_bad
+.long i_bad,   istazix, i_bad,   i_bad, istyz,  istaz,   istxz,  i_bad, idey, i_bad,   itxa,    i_bad, isty,    ista,  istx,  i_bad
+.long ibcc,    istaziy, i_bad,   i_bad, istyzx, istazx,  istxzy, i_bad, itya, istay,   itxs,    i_bad, i_bad,   istax, i_bad, i_bad
+.long ildyimm, ildazix, ildximm, i_bad, ildyz,  ildaz,   ildxz,  i_bad, itay, ildaimm, itax,    i_bad, ildy,    ilda,  ildx,  i_bad
+.long ibcs,    ildaziy, i_bad,   i_bad, ildyzx, ildazx,  ildxzy, i_bad, iclv, ilday,   itsx,    i_bad, ildyx,   ildax, ildxy, i_bad
+.long icpyimm, icmpzix, i_bad,   i_bad, icpyz,  icmpz,   idecz,  i_bad, iiny, icmpimm, idex,    i_bad, icpy,    icmp,  idec,  i_bad
+.long ibne,    icmpziy, i_bad,   i_bad, i_bad,  icmpzx,  ideczx, i_bad, icld, icmpy,   i_bad,   i_bad, i_bad,   icmpx, idecx, i_bad
+.long icpximm, isbczix, i_bad,   i_bad, icpxz,  isbcz,   iincz,  i_bad, iinx, isbcimm, inop,    i_bad, icpx,    isbc,  iinc,  i_bad
+.long ibeq,    isbcziy, i_bad,   i_bad, i_bad,  isbczx,  iinczx, i_bad, ised, isbcy,   i_bad,   i_bad, i_bad,   isbcx, iincx, i_bad
+.type optable,@object
+.size optable,.-optable
+
 
 .macro defvar vis, size, name
 .\vis \name
@@ -651,313 +672,11 @@ i_next:
 	jg     i_done
 
 selfmod:
-	/* This will be converted to a lookup table when it's complete */
-	movb   _RAM(%edi),%bl
+	movzbl _RAM(%edi),%ebx
 	incw   %di
-	cmpb   $0x00,%bl
-	je     ibrk
-	cmpb   $0x01,%bl
-	je     iorazix
-	cmpb   $0x05,%bl
-	je     ioraz
-	cmpb   $0x06,%bl
-	je     iaslz
-	cmpb   $0x08,%bl
-	je     iphp
-	cmpb   $0x09,%bl
-	je     ioraimm
-	cmpb   $0x0a,%bl
-	je     iaslacc
-	cmpb   $0x0d,%bl
-	je     iora
-	cmpb   $0x0e,%bl
-	je     iasl
-	cmpb   $0x10,%bl
-	je     ibpl
-	cmpb   $0x11,%bl
-	je     ioraziy
-	cmpb   $0x15,%bl
-	je     iorazx
-	cmpb   $0x16,%bl
-	je     iaslzx
-	cmpb   $0x18,%bl
-	je     iclc
-	cmpb   $0x19,%bl
-	je     ioray
-	cmpb   $0x1d,%bl
-	je     iorax
-	cmpb   $0x1e,%bl
-	je     iaslx
-	cmpb   $0x20,%bl
-	je     ijsr
-	cmpb   $0x21,%bl
-	je     iandzix
-	cmpb   $0x24,%bl
-	je     ibitz
-	cmpb   $0x25,%bl
-	je     iandz
-	cmpb   $0x26,%bl
-	je     irolz
-	cmpb   $0x28,%bl
-	je     iplp
-	cmpb   $0x29,%bl
-	je     iandimm
-	cmpb   $0x2a,%bl
-	je     irolacc
-	cmpb   $0x2c,%bl
-	je     ibit
-	cmpb   $0x2d,%bl
-	je     iand
-	cmpb   $0x2e,%bl
-	je     irol
-	cmpb   $0x30,%bl
-	je     ibmi
-	cmpb   $0x31,%bl
-	je     iandziy
-	cmpb   $0x35,%bl
-	je     iandzx
-	cmpb   $0x36,%bl
-	je     irolzx
-	cmpb   $0x38,%bl
-	je     isec
-	cmpb   $0x39,%bl
-	je     iandy
-	cmpb   $0x3d,%bl
-	je     iandx
-	cmpb   $0x3e,%bl
-	je     irolx
-	cmpb   $0x40,%bl
-	je     irti
-	cmpb   $0x41,%bl
-	je     ieorzix
-	cmpb   $0x45,%bl
-	je     ieorz
-	cmpb   $0x46,%bl
-	je     ilsrz
-	cmpb   $0x48,%bl
-	je     ipha
-	cmpb   $0x49,%bl
-	je     ieorimm
-	cmpb   $0x4a,%bl
-	je     ilsracc
-	cmpb   $0x4c,%bl
-	je     ijmp
-	cmpb   $0x4d,%bl
-	je     ieor
-	cmpb   $0x4e,%bl
-	je     ilsr
-	cmpb   $0x50,%bl
-	je     ibvc
-	cmpb   $0x51,%bl
-	je     ieorziy
-	cmpb   $0x55,%bl
-	je     ieorzx
-	cmpb   $0x56,%bl
-	je     ilsrzx
-	cmpb   $0x58,%bl
-	je     icli
-	cmpb   $0x59,%bl
-	je     ieory
-	cmpb   $0x5d,%bl
-	je     ieorx
-	cmpb   $0x5e,%bl
-	je     ilsrx
-	cmpb   $0x60,%bl
-	je     irts
-	cmpb   $0x61,%bl
-	je     iadczix
-	cmpb   $0x65,%bl
-	je     iadcz
-	cmpb   $0x66,%bl
-	je     irorz
-	cmpb   $0x68,%bl
-	je     ipla
-	cmpb   $0x69,%bl
-	je     iadcimm
-	cmpb   $0x6a,%bl
-	je     iroracc
-	cmpb   $0x6c,%bl
-	je     ijmpind
-	cmpb   $0x6d,%bl
-	je     iadc
-	cmpb   $0x6e,%bl
-	je     iror
-	cmpb   $0x70,%bl
-	je     ibvs
-	cmpb   $0x71,%bl
-	je     iadcziy
-	cmpb   $0x75,%bl
-	je     iadczx
-	cmpb   $0x76,%bl
-	je     irorzx
-	cmpb   $0x78,%bl
-	je     isei
-	cmpb   $0x79,%bl
-	je     iadcy
-	cmpb   $0x7d,%bl
-	je     iadcx
-	cmpb   $0x7e,%bl
-	je     irorx
-	cmpb   $0x81,%bl
-	je     istazix
-	cmpb   $0x84,%bl
-	je     istyz
-	cmpb   $0x85,%bl
-	je     istaz
-	cmpb   $0x86,%bl
-	je     istxz
-	cmpb   $0x88,%bl
-	je     idey
-	cmpb   $0x8a,%bl
-	je     itxa
-	cmpb   $0x8c,%bl
-	je     isty
-	cmpb   $0x8d,%bl
-	je     ista
-	cmpb   $0x8e,%bl
-	je     istx
-	cmpb   $0x90,%bl
-	je     ibcc
-	cmpb   $0x91,%bl
-	je     istaziy
-	cmpb   $0x94,%bl
-	je     istyzx
-	cmpb   $0x95,%bl
-	je     istazx
-	cmpb   $0x96,%bl
-	je     istxzy
-	cmpb   $0x98,%bl
-	je     itya
-	cmpb   $0x99,%bl
-	je     istay
-	cmpb   $0x9a,%bl
-	je     itxs
-	cmpb   $0x9d,%bl
-	je     istax
-	cmpb   $0xa0,%bl
-	je     ildyimm
-	cmpb   $0xa1,%bl
-	je     ildazix
-	cmpb   $0xa2,%bl
-	je     ildximm
-	cmpb   $0xa4,%bl
-	je     ildyz
-	cmpb   $0xa5,%bl
-	je     ildaz
-	cmpb   $0xa6,%bl
-	je     ildxz
-	cmpb   $0xa8,%bl
-	je     itay
-	cmpb   $0xa9,%bl
-	je     ildaimm
-	cmpb   $0xaa,%bl
-	je     itax
-	cmpb   $0xac,%bl
-	je     ildy
-	cmpb   $0xad,%bl
-	je     ilda
-	cmpb   $0xae,%bl
-	je     ildx
-	cmpb   $0xb0,%bl
-	je     ibcs
-	cmpb   $0xb1,%bl
-	je     ildaziy
-	cmpb   $0xb4,%bl
-	je     ildyzx
-	cmpb   $0xb5,%bl
-	je     ildazx
-	cmpb   $0xb6,%bl
-	je     ildxzy
-	cmpb   $0xb8,%bl
-	je     iclv
-	cmpb   $0xb9,%bl
-	je     ilday
-	cmpb   $0xba,%bl
-	je     itsx
-	cmpb   $0xbc,%bl
-	je     ildyx
-	cmpb   $0xbd,%bl
-	je     ildax
-	cmpb   $0xbe,%bl
-	je     ildxy
-	cmpb   $0xc0,%bl
-	je     icpyimm
-	cmpb   $0xc1,%bl
-	je     icmpzix
-	cmpb   $0xc4,%bl
-	je     icpyz
-	cmpb   $0xc5,%bl
-	je     icmpz
-	cmpb   $0xc6,%bl
-	je     idecz
-	cmpb   $0xc8,%bl
-	je     iiny
-	cmpb   $0xc9,%bl
-	je     icmpimm
-	cmpb   $0xca,%bl
-	je     idex
-	cmpb   $0xcc,%bl
-	je     icpy
-	cmpb   $0xcd,%bl
-	je     icmp
-	cmpb   $0xce,%bl
-	je     idec
-	cmpb   $0xd0,%bl
-	je     ibne
-	cmpb   $0xd1,%bl
-	je     icmpziy
-	cmpb   $0xd5,%bl
-	je     icmpzx
-	cmpb   $0xd6,%bl
-	je     ideczx
-	cmpb   $0xd8,%bl
-	je     icld
-	cmpb   $0xd9,%bl
-	je     icmpy
-	cmpb   $0xdd,%bl
-	je     icmpx
-	cmpb   $0xde,%bl
-	je     idecx
-	cmpb   $0xe0,%bl
-	je     icpximm
-	cmpb   $0xe1,%bl
-	je     isbczix
-	cmpb   $0xe4,%bl
-	je     icpxz
-	cmpb   $0xe5,%bl
-	je     isbcz
-	cmpb   $0xe6,%bl
-	je     iincz
-	cmpb   $0xe8,%bl
-	je     iinx
-	cmpb   $0xe9,%bl
-	je     isbcimm
-	cmpb   $0xea,%bl
-	je     inop
-	cmpb   $0xec,%bl
-	je     icpx
-	cmpb   $0xed,%bl
-	je     isbc
-	cmpb   $0xee,%bl
-	je     iinc
-	cmpb   $0xf0,%bl
-	je     ibeq
-	cmpb   $0xf1,%bl
-	je     isbcziy
-	cmpb   $0xf5,%bl
-	je     isbczx
-	cmpb   $0xf6,%bl
-	je     iinczx
-	cmpb   $0xf8,%bl
-	je     ised
-	cmpb   $0xf9,%bl
-	je     isbcy
-	cmpb   $0xfd,%bl
-	je     isbcx
-	cmpb   $0xfe,%bl
-	je     iincx
+	jmp    *optable(,%ebx,4)
+i_bad:
 	decw   %di
-
 i_done:
 	xorl   %ebp,%ebp
 	jmp    recompile
