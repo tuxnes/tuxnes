@@ -214,6 +214,7 @@ INPUT:
 	subl   $0x4,%esp
 	pushl  %ebx
 	call   input
+	movsbl %al,%eax
 	movl   %eax,0x1c(%esp)
 	addl   $0x8,%esp
 	popa
@@ -235,6 +236,7 @@ OUTPUT:
 	andl   $CPF,%ecx
 	addl   %ecx,%esi
 	movl   %esi,CLOCK
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   output
@@ -267,6 +269,7 @@ MAPPER_MMC1:
 	andl   $CPF,%ecx
 	addl   %ecx,%esi
 	movl   %esi,CLOCK
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   mmc1
@@ -281,6 +284,7 @@ MAPPER_MMC1:
 .globl MAPPER_UNROM
 MAPPER_UNROM:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   unrom
@@ -294,6 +298,7 @@ MAPPER_UNROM:
 .globl MAPPER_CNROM
 MAPPER_CNROM:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   cnrom
@@ -316,6 +321,7 @@ MAPPER_MMC3:
 	andl   $CPF,%ecx
 	addl   %ecx,%esi
 	movl   %esi,CLOCK
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   mmc3
@@ -330,6 +336,7 @@ MAPPER_MMC3:
 .globl MAPPER_MMC5
 MAPPER_MMC5:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   mmc5
@@ -352,6 +359,7 @@ MAPPER_AOROM:
 	andl   $CPF,%ecx
 	addl   %ecx,%esi
 	movl   %esi,CLOCK
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   aorom
@@ -366,6 +374,7 @@ MAPPER_AOROM:
 .globl MAPPER_MMC2
 MAPPER_MMC2:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   mmc2
@@ -379,6 +388,7 @@ MAPPER_MMC2:
 .globl MAPPER_MMC4
 MAPPER_MMC4:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   mmc4
@@ -392,6 +402,7 @@ MAPPER_MMC4:
 .globl MAPPER_CLRDRMS
 MAPPER_CLRDRMS:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   clrdrms
@@ -405,6 +416,7 @@ MAPPER_CLRDRMS:
 .globl MAPPER_CPROM
 MAPPER_CPROM:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   cprom
@@ -418,6 +430,7 @@ MAPPER_CPROM:
 .globl MAPPER_100IN1
 MAPPER_100IN1:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   m100in1
@@ -431,6 +444,7 @@ MAPPER_100IN1:
 .globl MAPPER_NAMCOT106
 MAPPER_NAMCOT106:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   namcot106
@@ -444,6 +458,7 @@ MAPPER_NAMCOT106:
 .globl MAPPER_VRC2_A
 MAPPER_VRC2_A:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   vrc2_a
@@ -457,6 +472,7 @@ MAPPER_VRC2_A:
 .globl MAPPER_VRC2_B
 MAPPER_VRC2_B:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   vrc2_b
@@ -470,6 +486,7 @@ MAPPER_VRC2_B:
 .globl MAPPER_G101
 MAPPER_G101:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   g101
@@ -483,6 +500,7 @@ MAPPER_G101:
 .globl MAPPER_TAITO_TC0190
 MAPPER_TAITO_TC0190:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   taito_tc0190
@@ -496,6 +514,7 @@ MAPPER_TAITO_TC0190:
 .globl MAPPER_TENGEN_RAMBO1
 MAPPER_TENGEN_RAMBO1:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   tengen_rambo1
@@ -509,6 +528,7 @@ MAPPER_TENGEN_RAMBO1:
 .globl MAPPER_GNROM
 MAPPER_GNROM:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   gnrom
@@ -522,6 +542,7 @@ MAPPER_GNROM:
 .globl MAPPER_SUNSOFT4
 MAPPER_SUNSOFT4:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   sunsoft4
@@ -535,6 +556,7 @@ MAPPER_SUNSOFT4:
 .globl MAPPER_FME7
 MAPPER_FME7:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   fme7
@@ -548,6 +570,7 @@ MAPPER_FME7:
 .globl MAPPER_CAMERICA
 MAPPER_CAMERICA:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   camerica
@@ -561,6 +584,7 @@ MAPPER_CAMERICA:
 .globl MAPPER_IREM_74HC161_32
 MAPPER_IREM_74HC161_32:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   irem_74hc161_32
@@ -574,6 +598,7 @@ MAPPER_IREM_74HC161_32:
 .globl MAPPER_VS
 MAPPER_VS:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   vs
@@ -587,6 +612,7 @@ MAPPER_VS:
 .globl MAPPER_SUPERVISION
 MAPPER_SUPERVISION:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   supervision
@@ -600,6 +626,7 @@ MAPPER_SUPERVISION:
 .globl MAPPER_NINA7
 MAPPER_NINA7:
 	pusha
+	movzbl %dl,%edx
 	pushl  %edx
 	pushl  %ebx
 	call   nina7

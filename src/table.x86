@@ -83,10 +83,11 @@
 # [^]   Insert breakpoint/trap
 #
 # To read an input register, place the location into %ebx and call [I].  The
-# value is returned in %edx.  To write to an output register, place the
-# location into %ebx and the value to write in %dl, and call [O].  For
-# writes into the ROM area, call [Y] to pass these values to the mapper.
-# (The compiler will replace [I], [O], and [Y] with the proper address.)
+# value is returned in %dl and then sign-extended into %edx.  To write to an
+# output register, place the location into %ebx and the value to write in
+# %dl, and call [O].  For writes into the ROM area, call [Y] instead to pass
+# these values to the mapper.  (The compiler will replace [I], [O], and [Y]
+# with the proper address.)
 #
 # Reads of memory are redirected thru the mapper table.  This table consists
 # of 16 entries, each representing 4K of memory in the 6502 address space

@@ -56,32 +56,6 @@ extern void MAPPER_VS(void);
 extern void MAPPER_SUPERVISION(void);
 extern void MAPPER_NINA7(void);
 
-void mmc1(int, int);
-void unrom(int, int);
-void cnrom(int, int);
-void mmc3(int, int);
-void mmc5(int, int);
-void aorom(int, int);
-void mmc2(int, int);
-void mmc4(int, int);
-void clrdrms(int, int);
-void cprom(int, int);
-void m100in1(int, int);
-void namcot106(int, int);
-void vrc2_a(int, int);
-void vrc2_b(int, int);
-void g101(int, int);
-void taito_tc0190(int, int);
-void tengen_rambo1(int, int);
-void gnrom(int, int);
-void sunsoft4(int, int);
-void fme7(int, int);
-void camerica(int, int);
-void irem_74hc161_32(int, int);
-void vs(int, int);
-void supervision(int, int);
-void nina7(int, int);
-
 void mmc2_4_latch(int);
 void mmc2_4_latchspr(int);
 
@@ -178,11 +152,10 @@ init_mmc1(void)
 }
 
 void
-mmc1(int addr, int val)
+mmc1(int addr, unsigned char val)
 {
 	static int mmc1reg[4];
 	static int mmc1shc[4];
-	val &= 0xff;
 	/*printf("Mapper MMC1:%4x,%2x\n", addr, val); */
 	/*printf("Mapper: %4x,%2x stack at %x, shift %d,%d,%d,%d\n", addr, val, STACKPTR,
 	   mmc1shc[0], mmc1shc[1], mmc1shc[2], mmc1shc[3]); */
@@ -289,10 +262,8 @@ init_unrom(void)
 }
 
 void
-unrom(int addr, int val)
+unrom(int addr, unsigned char val)
 {
-	val &= 0x0f;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -318,10 +289,8 @@ init_cnrom(void)
 }
 
 void
-cnrom(int addr, int val)
+cnrom(int addr, unsigned char val)
 {
-	val &= 0xff;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -391,13 +360,11 @@ init_mmc3(void)
 }
 
 void
-mmc3(int addr, int val)
+mmc3(int addr, unsigned char val)
 {
 	static unsigned char mmc3cmd;
 	static unsigned char irqval;
 	static unsigned char irqenabled = 0;
-
-	val &= 0xff;
 
 #ifdef DEBUG_MAPPER
 	if (verbose) {
@@ -542,10 +509,8 @@ init_mmc5(void)
 }
 
 void
-mmc5(int addr, int val)
+mmc5(int addr, unsigned char val)
 {
-	val &= 0xff;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("address = %04X, value = %02X\n", addr, val);
@@ -697,11 +662,11 @@ init_aorom(void)
 }
 
 void
-aorom(int addr, int val)
+aorom(int addr, unsigned char val)
 {
 	static int mirrorbit = 0;
 	char temp[1024];
-	/*val&=0xff;printf("Mapper AOROM:%4x,%2x (%d)\n", addr, val, CLOCK); */
+	/*printf("Mapper AOROM:%4x,%2x (%d)\n", addr, val, CLOCK); */
 	val &= 0x1f;
 	if ((val >> 4) != mirrorbit) {
 		drawimage(CLOCK * 3);
@@ -793,7 +758,7 @@ mmc2_4_latchspr(int tile)
 }
 
 void
-mmc2(int addr, int val)
+mmc2(int addr, unsigned char val)
 {
 	if (addr >= 0xA000 && addr <= 0xAFFF) {
 		/* switch $8000 */
@@ -842,7 +807,7 @@ mmc2(int addr, int val)
 }
 
 void
-mmc4(int addr, int val)
+mmc4(int addr, unsigned char val)
 {
 	if (addr >= 0xA000 && addr <= 0xAFFF) {
 		/* switch $8000 */
@@ -913,10 +878,8 @@ init_clrdrms(void)
 }
 
 void
-clrdrms(int addr, int val)
+clrdrms(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -938,7 +901,7 @@ init_cprom(void)
 }
 
 void
-cprom(int addr, int val)
+cprom(int addr, unsigned char val)
 {
 	if (addr & 0x8000) {
 		MapRom(PAGE_8000, (val >> 4) & 0x03, SIZE_32K);
@@ -962,11 +925,9 @@ static int locC000;
 static int locE000;
 
 void
-m100in1(int addr, int val)
+m100in1(int addr, unsigned char val)
 {
 /*	static int locswap; */
-
-	val &= 0xff;
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -1051,10 +1012,8 @@ init_namcot106(void)
 }
 
 void
-namcot106(int addr, int val)
+namcot106(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -1132,7 +1091,7 @@ init_vrc2_a(void)
 }
 
 void
-vrc2_a(int addr, int val)
+vrc2_a(int addr, unsigned char val)
 {
 	static int reg0000;
 	static int reg0400;
@@ -1142,8 +1101,6 @@ vrc2_a(int addr, int val)
 	static int reg1400;
 	static int reg1800;
 	static int reg1C00;
-
-	val &= 0xFF;
 
 #ifdef DEBUG_MAPPER
 	if (verbose) {
@@ -1276,7 +1233,7 @@ init_vrc2_b(void)
 }
 
 void
-vrc2_b(int addr, int val)
+vrc2_b(int addr, unsigned char val)
 {
 	static int reg0000;
 	static int reg0400;
@@ -1287,7 +1244,6 @@ vrc2_b(int addr, int val)
 	static int reg1800;
 	static int reg1C00;
 
-	val &= 0xFF;
 	switch (addr) {
 	case 0x8000:
 		MapRom(PAGE_8000, (val & 0x0F) * 8192, SIZE_8K);
@@ -1390,7 +1346,7 @@ init_g101(void)
 }
 
 void
-g101(int addr, int val)
+g101(int addr, unsigned char val)
 {
 	static int switchmode = 0;
 
@@ -1456,10 +1412,8 @@ init_taito_tc0190(void)
 }
 
 void
-taito_tc0190(int addr, int val)
+taito_tc0190(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -1521,10 +1475,8 @@ init_tengen_rambo1(void)
 }
 
 void
-tengen_rambo1(int addr, int val)
+tengen_rambo1(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -1599,7 +1551,7 @@ init_gnrom(void)
 }
 
 void
-gnrom(int addr, int val)
+gnrom(int addr, unsigned char val)
 {
 	if (addr > 0x8000) {
 		MapRom(PAGE_8000, (val >> 4 & 0x03) * 32768, SIZE_32K);
@@ -1619,10 +1571,8 @@ init_sunsoft4(void)
 }
 
 void
-sunsoft4(int addr, int val)
+sunsoft4(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -1685,9 +1635,8 @@ init_fme7(void)
 }
 
 void
-fme7(int addr, int val)
+fme7(int addr, unsigned char val)
 {
-	val &= 0xFF;
 	if (addr == 0x8000) {
 		commandregister = val;
 	} else if (addr == 0xA000) {
@@ -1751,10 +1700,8 @@ init_camerica(void)
 }
 
 void
-camerica(int addr, int val)
+camerica(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -1785,10 +1732,8 @@ init_irem_74hc161_32(void)
 }
 
 void
-irem_74hc161_32(int addr, int val)
+irem_74hc161_32(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);
@@ -1817,7 +1762,7 @@ init_vs(void)
 }
 
 void
-vs(int addr, int val)
+vs(int addr, unsigned char val)
 {
 	if (addr == 0x4016) {
 		if (vsreg != (val & 0x04)) {
@@ -1843,7 +1788,7 @@ init_supervision(void)
 }
 
 void
-supervision(int addr, int val)
+supervision(int addr, unsigned char val)
 {
 #ifdef DEBUG_MAPPER
 /*	if (verbose) {
@@ -1881,10 +1826,8 @@ init_nina7(void)
 }
 
 void
-nina7(int addr, int val)
+nina7(int addr, unsigned char val)
 {
-	val &= 0xFF;
-
 #ifdef DEBUG_MAPPER
 	if (verbose) {
 		printf("addr = %04X, val = %02X\n", addr, val);

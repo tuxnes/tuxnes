@@ -23,13 +23,7 @@
 #include "sound.h"
 
 /* forward and external declarations */
-void    vs(int, int);
-
-/* Called by x86.S */
-int     donmi(void);
-int     input(int);
-void    output(int, int);
-void    trace(int, ...);
+void    vs(int, unsigned char);
 
 /* Declaration of global variables */
 unsigned char   vram[16384];
@@ -52,11 +46,11 @@ static int hscrollval, vscrollval;
 static int sprite0hit;
 
 /* This is called whenever the game reads from 2xxx or 4xxx */
-int
+unsigned char
 input(int addr)
 {
-	static signed char vram_read;
-	signed char INRET = 0;
+	static unsigned char vram_read;
+	unsigned char INRET = 0;
 
 	/* Read PPU status register */
 	if (addr == 0x2002) {
@@ -84,7 +78,7 @@ input(int addr)
 		/*        if ((vbl && CLOCK >= VBL && CLOCK < 29695) | */
 		/*          (CLOCK < VBL && CLOCK > 27393)) */
 		/*          { */
-		/*            INRET |= (signed char) 0x80; */
+		/*            INRET |= 0x80; */
 		/*            vbl--; */
 		/*          } */
 
@@ -94,20 +88,20 @@ input(int addr)
 		}
 		last_clock=CLOCK;
 		if (vbl && (CLOCK > 27393)) {
-			INRET |= (signed char)0x80;
+			INRET |= 0x80;
 			vbl--;
 		}
 
 		/*       if ((CLOCK * 3 >= sprite0hit) && (CLOCK < 29695)) */
-		/*         INRET |= (signed char) 0x40; */
+		/*         INRET |= 0x40; */
 
 		/* When does sprite0hit go off? */
-		/*if((CLOCK*3>=sprite0hit)&&(CLOCK<VBL)) INRET|=(signed char)0x40; */
+		/*if((CLOCK*3>=sprite0hit)&&(CLOCK<VBL)) INRET |= 0x40; */
 
 		/* Pick a number, any number... hmm... this one seems to work
 		   okay, I think I'll use it. */
 		if ((CLOCK * 3 >= sprite0hit) && (CLOCK < 27742))
-			INRET|=(signed char)0x40;
+			INRET |= 0x40;
 		if (CLOCK > VBL && !(RAM[0x2000] & 0x80)) {
 			/* This is totally wierd, but SMB and Zelda depend on it. */
 			RAM[0x2000] &= 0xFE;
@@ -197,12 +191,11 @@ input(int addr)
 
 /* This is called whenever the game writes to 2xxx or 4xxx */
 void
-output(int addr, int val)
+output(int addr, unsigned char val)
 {
 	int scanline;
 	static int spriteaddr;
 
-	val &= 0xFF;
 	if ((scanline = (CLOCK * 3 / HCYCLES) + 1) >= 240)
 		scanline = 0;
 
@@ -265,14 +258,14 @@ output(int addr, int val)
 	/* Load VRAM target address */
 	if (addr == 0x2006) {
 		drawimage(CLOCK * 3);
-		/* VRAMPTR = ((VRAMPTR & 0x3f) << 8) | (val & 0xff); */
+		/* VRAMPTR = ((VRAMPTR & 0x3f) << 8) | val; */
 
 		/* It appears that h/v scroll and the VRAM address registers share
 		   a common toggle-bit which deterines which byte is written to. */
 		if (hvscroll ^= 1) {
-			vramlatch = (vramlatch & 0xFF) | ((val & 0xff) << 8);
+			vramlatch = (vramlatch & 0xFF) | (val << 8);
 		} else {
-			vramlatch = (vramlatch & 0xFF00) | (val & 0xff);
+			vramlatch = (vramlatch & 0xFF00) | val;
 		}
 
 		/* For mid-hblank updates: */
@@ -338,7 +331,7 @@ output(int addr, int val)
 			/* Write to color palette */
 
 			/* FIXME: when CLOCK<VBL we should switch into static-color mode */
-			VRAM[VRAMPTR & ((VRAMPTR & 0x3) ? 0x3f1f : 0x3f0f)] = (unsigned char)val;
+			VRAM[VRAMPTR & ((VRAMPTR & 0x3) ? 0x3f1f : 0x3f0f)] = val;
 
 			/* FIXME - This might flicker on palettized displays; see
 			 * above for suggested fix, or use the "--static-color"
@@ -347,28 +340,28 @@ output(int addr, int val)
 			renderer->UpdateColors();
 		} else if (VRAMPTR >= 0x2000 && VRAMPTR < 0x3000) {
 			if (nomirror)
-				VRAM[VRAMPTR] = (unsigned char)val;
+				VRAM[VRAMPTR] = val;
 			else if (osmirror)
-				VRAM[VRAMPTR & 0x23FF] = (unsigned char)val;       /* One-Screen Mirroring */
+				VRAM[VRAMPTR & 0x23FF] = val;       /* One-Screen Mirroring */
 			else if (!hvmirror)
 				VRAM[VRAMPTR] =
-				VRAM[VRAMPTR ^ 0x800] = (unsigned char)val;
+				VRAM[VRAMPTR ^ 0x800] = val;
 			else if (hvmirror) {
 				if (VRAMPTR >= 0x2000 && VRAMPTR < 0x2400)
 					VRAM[VRAMPTR] =
-					VRAM[VRAMPTR ^ 0x800] = (unsigned char)val;
+					VRAM[VRAMPTR ^ 0x800] = val;
 				if (VRAMPTR >= 0x2400 && VRAMPTR < 0x2800)
 					VRAM[VRAMPTR - 0x400] =
-					VRAM[VRAMPTR + 0x400] = (unsigned char)val;
+					VRAM[VRAMPTR + 0x400] = val;
 				if (VRAMPTR >= 0x2800 && VRAMPTR < 0x2c00)
 					VRAM[VRAMPTR - 0x400] =
-					VRAM[VRAMPTR + 0x400] = (unsigned char)val;
+					VRAM[VRAMPTR + 0x400] = val;
 				if (VRAMPTR >= 0x2c00 && VRAMPTR < 0x3000)
 					VRAM[VRAMPTR] =
-					VRAM[VRAMPTR ^ 0x800] = (unsigned char)val;
+					VRAM[VRAMPTR ^ 0x800] = val;
 			}
 		} else
-			VRAM[VRAMPTR] = (unsigned char)val;
+			VRAM[VRAMPTR] = val;
 
 		VRAMPTR += 1 << (((*REG1 & 4) >> 2) * 5);     /* bit 2 of $2000 controls increment */
 		VRAMPTR &= 0x3fff;
