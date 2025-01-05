@@ -54,6 +54,8 @@ optable:
 defvar globl, 4, VFLAG          /* Store overflow flag */
 defvar globl, 4, FLAGS          /* Store 6502 process status reg */
 defvar globl, 4, STACKPTR       /* Store 6502 stack pointer */
+defvar globl, 4, RESET          /* Take reset vector at next opportunity */
+defvar globl, 4, CLOCK          /* Current scanline position */
 defvar globl, 4, CTNI           /* Cycles to next interrupt */
 defvar local, 4, LASTBANK       /* Last memory page code executed in */
 
@@ -61,21 +63,14 @@ defvar local, 4, LASTBANK       /* Last memory page code executed in */
 .section .text
 .globl START
 START:
-	xorl   %esi,%esi
-	movl   %esi,CLOCK
-	subl   $VBL,%esi
+	movl   $-VBL,%esi
 	movl   %esi,CTNI
-	movl   $_RAM+0x01fd,STACKPTR
-	movl   $0x04,FLAGS
+	movl   $_RAM+0x0100,STACKPTR
 	xorl   %eax,%eax
-	movl   %eax,VFLAG
 	xorl   %ecx,%ecx
-	xorl   %edx,%edx
-	xorl   %ebx,%ebx
-	xorl   %ebp,%ebp
-	movl   MAPTABLE+60,%edi
-	movzwl 0xfffc(%edi),%edi
-	jmp    U
+	movl   $0x04,%edx
+	movl   %eax,VFLAG
+	jmp    reset
 .type START,@function
 .size START,.-START
 
@@ -83,23 +78,24 @@ START:
 .globl NMI
 NMI:
 	pusha
-	movl   $7,%esi
-	subl   CTNI,%esi
-	addl   CLOCK,%esi
-	subl   $CPF,%esi
+	movl   $7,%eax
+	subl   CTNI,%eax
+	addl   CLOCK,%eax
+	subl   $CPF,%eax
 	sbbl   %ecx,%ecx
 	andl   $CPF,%ecx
-	addl   %ecx,%esi
-	movl   %esi,CLOCK
-	movl   irqflag,%eax
-	testl  %eax,%eax
+	addl   %ecx,%eax
+	movl   %eax,CLOCK
+	cmpl   $0,irqflag
 	jnz    irq
 	subl   $0xc,%esp
 	call   donmi
 	addl   $0xc,%esp
-	testl  %eax,%eax
-	jz     skipint
 	popa
+	cmpl   $0,RESET
+	jnz    reset
+	testb  $0x80,_RAM+0x2000
+	jz     skipint
 /* do the actual NMI code */
 	testb  %dl,%dl
 	setz   %dl
@@ -136,19 +132,29 @@ NMI:
 	jmp    U
 /* don't do NMI */
 skipint:
-	popa
-	xorl   %ebp,%ebp
 	movl   CTNI,%esi
+	xorl   %ebp,%ebp
+	jmp    U
+
+reset:
+	movl   $0,RESET
+	orl    $0x04,FLAGS
+	movl   STACKPTR,%ebx
+	subb   $3,%bl
+	movb   %bl,STACKPTR
+	movl   CTNI,%esi
+	xorl   %ebp,%ebp
+	movl   MAPTABLE+60,%edi
+	movzwl 0xfffc(%edi),%edi
 	jmp    U
 
 irq:
-	movl   CLOCK,%eax
+	movl   $0,irqflag
 	subl   $VBL,%eax
 	movl   %eax,CTNI
+	popa
 /* Check interrupt-disable flag */
-	movl   FLAGS,%eax
-	movl   $0,irqflag
-	testl  $0x04,%eax
+	testl  $0x04,FLAGS
 	jnz    skipint
 /*
  * no interrupts while the screen is off -
@@ -157,10 +163,8 @@ irq:
  * This is really only here to stop games from crashing due to unhandled
  * interrupts.
  */
-	movl   _RAM+0x2001,%eax
-	testl  $0x08,%eax
+	testb  $0x08,_RAM+0x2001
 	jz     skipint
-	popa
 /* do IRQ */
 	testb  %dl,%dl
 	setz   %dl

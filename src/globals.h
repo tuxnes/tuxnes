@@ -33,7 +33,6 @@ extern unsigned int      mapmirror;
 extern unsigned int      hvmirror;
 extern unsigned int      nomirror;
 extern unsigned int      osmirror;
-extern unsigned int      CLOCK;
 extern unsigned int      bpp;
 extern unsigned int      bpu;
 extern unsigned int      bytes_per_line;
@@ -62,6 +61,8 @@ extern int      unisystem;
 extern unsigned int VFLAG;          /* Store overflow flag */
 extern unsigned int FLAGS;          /* Store 6502 process status reg */
 extern unsigned int STACKPTR;       /* Store 6502 stack pointer */
+extern unsigned int RESET;          /* Take reset vector at next opportunity */
+extern unsigned int CLOCK;          /* Current scanline position */
 extern signed int   CTNI;           /* Cycles to next interrupt */
 
 extern unsigned char *RAM;

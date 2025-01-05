@@ -34,7 +34,6 @@ unsigned int    osmirror = 0;
 unsigned short int      hscroll[240];
 unsigned short int      vscroll[240];
 unsigned char   linereg[240];
-unsigned int    CLOCK;             /* Current scanline position */
 unsigned char   hscrollreg, vscrollreg;
 
 static int last_clock; /* For vblank bit */
@@ -410,10 +409,10 @@ output(int addr, unsigned char val)
 
 }
 
-/* This determines whether an NMI should occur and returns 1 if so. */
+/* This determines whether an NMI should occur. */
 /* This function is called even when interrupts are off, and also */
 /* refreshes the screen as necessary. */
-int
+void
 donmi(void)
 {
 	/*printf("donmi: at %d\n", CLOCK); */
@@ -437,9 +436,6 @@ donmi(void)
 		vscroll[x] = vscrollval;
 		linereg[x] = RAM[0x2000];
 	}
-
-	/* Is an NMI to be generated?  Return 1 if so. */
-	return (*REG1 & 0x80) != 0;
 }
 
 /*

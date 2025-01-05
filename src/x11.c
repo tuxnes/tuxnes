@@ -704,7 +704,7 @@ HandleKeyboardX11(const XEvent *ev)
 			SaveScreenshotX11();
 			break;
 		case XK_BackSpace:
-			START();
+			RESET = 1;
 			break;
 		case XK_Pause:
 		case XK_P:
