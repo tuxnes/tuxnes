@@ -60,6 +60,45 @@ defvar globl, 4, CTNI           /* Cycles to next interrupt */
 defvar local, 4, LASTBANK       /* Last memory page code executed in */
 
 
+.macro push_scratch_012
+	pushl  %eax
+	pushl  %ecx
+	pushl  %edx
+.endm
+
+.macro pop_scratch_210
+	popl   %edx
+	popl   %ecx
+	popl   %eax
+.endm
+
+.macro push_scratch_01
+	pushl  %eax
+	pushl  %ecx
+.endm
+
+.macro pop_scratch_10
+	popl   %ecx
+	popl   %eax
+.endm
+
+.macro store_ctni_clock
+	movl   %esi,%ecx
+	subl   CTNI,%esi
+	movl   %ecx,CTNI
+	addl   CLOCK,%esi
+	subl   $CPF,%esi
+	sbbl   %ecx,%ecx
+	andl   $CPF,%ecx
+	addl   %ecx,%esi
+	movl   %esi,CLOCK
+.endm
+
+.macro load_ctni
+	movl   CTNI,%esi
+.endm
+
+
 .section .text
 .globl START
 START:
@@ -77,7 +116,7 @@ START:
 
 .globl NMI
 NMI:
-	pusha
+	push_scratch_012
 	movl   $7,%eax
 	subl   CTNI,%eax
 	addl   CLOCK,%eax
@@ -88,10 +127,8 @@ NMI:
 	movl   %eax,CLOCK
 	cmpl   $0,irqflag
 	jnz    irq
-	subl   $0xc,%esp
 	call   donmi
-	addl   $0xc,%esp
-	popa
+	pop_scratch_210
 	cmpl   $0,RESET
 	jnz    reset
 	testb  $0x80,_RAM+0x2000
@@ -152,7 +189,7 @@ irq:
 	movl   $0,irqflag
 	subl   $VBL,%eax
 	movl   %eax,CTNI
-	popa
+	pop_scratch_210
 /* Check interrupt-disable flag */
 	testl  $0x04,FLAGS
 	jnz    skipint
@@ -205,24 +242,15 @@ irq:
 
 .globl INPUT
 INPUT:
-	pusha
-	movl   %esi,%ecx
-	subl   CTNI,%esi
-	movl   %ecx,CTNI
-	addl   CLOCK,%esi
-	subl   $CPF,%esi
-	sbbl   %ecx,%ecx
-	andl   $CPF,%ecx
-	addl   %ecx,%esi
-	movl   %esi,CLOCK
-	subl   $0x4,%esp
+	push_scratch_01
+	store_ctni_clock
+	subl   $0xc,%esp
 	pushl  %ebx
 	call   input
-	movsbl %al,%eax
-	movl   %eax,0x1c(%esp)
-	addl   $0x8,%esp
-	popa
-	movl   CTNI,%esi
+	addl   $0x10,%esp
+	movsbl %al,%edx
+	pop_scratch_10
+	load_ctni
 	ret
 .type INPUT,@function
 .size INPUT,.-INPUT
@@ -230,23 +258,16 @@ INPUT:
 
 .globl OUTPUT
 OUTPUT:
-	pusha
-	movl   %esi,%ecx
-	subl   CTNI,%esi
-	movl   %ecx,CTNI
-	addl   CLOCK,%esi
-	subl   $CPF,%esi
-	sbbl   %ecx,%ecx
-	andl   $CPF,%ecx
-	addl   %ecx,%esi
-	movl   %esi,CLOCK
+	push_scratch_012
+	store_ctni_clock
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   output
-	addl   $0x8,%esp
-	popa
-	movl   CTNI,%esi
+	addl   $0xc,%esp
+	pop_scratch_210
+	load_ctni
 	ret
 .type OUTPUT,@function
 .size OUTPUT,.-OUTPUT
@@ -263,23 +284,16 @@ MAPPER_NONE:
 
 .globl MAPPER_MMC1
 MAPPER_MMC1:
-	pusha
-	movl   %esi,%ecx
-	subl   CTNI,%esi
-	movl   %ecx,CTNI
-	addl   CLOCK,%esi
-	subl   $CPF,%esi
-	sbbl   %ecx,%ecx
-	andl   $CPF,%ecx
-	addl   %ecx,%esi
-	movl   %esi,CLOCK
+	push_scratch_012
+	store_ctni_clock
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   mmc1
-	addl   $0x8,%esp
-	popa
-	movl   CTNI,%esi
+	addl   $0xc,%esp
+	pop_scratch_210
+	load_ctni
 	ret
 .type MAPPER_MMC1,@function
 .size MAPPER_MMC1,.-MAPPER_MMC1
@@ -287,13 +301,14 @@ MAPPER_MMC1:
 
 .globl MAPPER_UNROM
 MAPPER_UNROM:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   unrom
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_UNROM,@function
 .size MAPPER_UNROM,.-MAPPER_UNROM
@@ -301,13 +316,14 @@ MAPPER_UNROM:
 
 .globl MAPPER_CNROM
 MAPPER_CNROM:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   cnrom
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_CNROM,@function
 .size MAPPER_CNROM,.-MAPPER_CNROM
@@ -315,23 +331,16 @@ MAPPER_CNROM:
 
 .globl MAPPER_MMC3
 MAPPER_MMC3:
-	pusha
-	movl   %esi,%ecx
-	subl   CTNI,%esi
-	movl   %ecx,CTNI
-	addl   CLOCK,%esi
-	subl   $CPF,%esi
-	sbbl   %ecx,%ecx
-	andl   $CPF,%ecx
-	addl   %ecx,%esi
-	movl   %esi,CLOCK
+	push_scratch_012
+	store_ctni_clock
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   mmc3
-	addl   $0x8,%esp
-	popa
-	movl   CTNI,%esi
+	addl   $0xc,%esp
+	pop_scratch_210
+	load_ctni
 	ret
 .type MAPPER_MMC3,@function
 .size MAPPER_MMC3,.-MAPPER_MMC3
@@ -339,13 +348,14 @@ MAPPER_MMC3:
 
 .globl MAPPER_MMC5
 MAPPER_MMC5:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   mmc5
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_MMC5,@function
 .size MAPPER_MMC5,.-MAPPER_MMC5
@@ -353,23 +363,16 @@ MAPPER_MMC5:
 
 .globl MAPPER_AOROM
 MAPPER_AOROM:
-	pusha
-	movl   %esi,%ecx
-	subl   CTNI,%esi
-	movl   %ecx,CTNI
-	addl   CLOCK,%esi
-	subl   $CPF,%esi
-	sbbl   %ecx,%ecx
-	andl   $CPF,%ecx
-	addl   %ecx,%esi
-	movl   %esi,CLOCK
+	push_scratch_012
+	store_ctni_clock
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   aorom
-	addl   $0x8,%esp
-	popa
-	movl   CTNI,%esi
+	addl   $0xc,%esp
+	pop_scratch_210
+	load_ctni
 	ret
 .type MAPPER_AOROM,@function
 .size MAPPER_AOROM,.-MAPPER_AOROM
@@ -377,13 +380,14 @@ MAPPER_AOROM:
 
 .globl MAPPER_MMC2
 MAPPER_MMC2:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   mmc2
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_MMC2,@function
 .size MAPPER_MMC2,.-MAPPER_MMC2
@@ -391,13 +395,14 @@ MAPPER_MMC2:
 
 .globl MAPPER_MMC4
 MAPPER_MMC4:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   mmc4
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_MMC4,@function
 .size MAPPER_MMC4,.-MAPPER_MMC4
@@ -405,13 +410,14 @@ MAPPER_MMC4:
 
 .globl MAPPER_CLRDRMS
 MAPPER_CLRDRMS:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   clrdrms
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_CLRDRMS,@function
 .size MAPPER_CLRDRMS,.-MAPPER_CLRDRMS
@@ -419,13 +425,14 @@ MAPPER_CLRDRMS:
 
 .globl MAPPER_CPROM
 MAPPER_CPROM:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   cprom
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_CPROM,@function
 .size MAPPER_CPROM,.-MAPPER_CPROM
@@ -433,13 +440,14 @@ MAPPER_CPROM:
 
 .globl MAPPER_100IN1
 MAPPER_100IN1:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   m100in1
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_100IN1,@function
 .size MAPPER_100IN1,.-MAPPER_100IN1
@@ -447,13 +455,14 @@ MAPPER_100IN1:
 
 .globl MAPPER_NAMCOT106
 MAPPER_NAMCOT106:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   namcot106
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_NAMCOT106,@function
 .size MAPPER_NAMCOT106,.-MAPPER_NAMCOT106
@@ -461,13 +470,14 @@ MAPPER_NAMCOT106:
 
 .globl MAPPER_VRC2_A
 MAPPER_VRC2_A:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   vrc2_a
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_VRC2_A,@function
 .size MAPPER_VRC2_A,.-MAPPER_VRC2_A
@@ -475,13 +485,14 @@ MAPPER_VRC2_A:
 
 .globl MAPPER_VRC2_B
 MAPPER_VRC2_B:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   vrc2_b
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_VRC2_B,@function
 .size MAPPER_VRC2_B,.-MAPPER_VRC2_B
@@ -489,13 +500,14 @@ MAPPER_VRC2_B:
 
 .globl MAPPER_G101
 MAPPER_G101:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   g101
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_G101,@function
 .size MAPPER_G101,.-MAPPER_G101
@@ -503,13 +515,14 @@ MAPPER_G101:
 
 .globl MAPPER_TAITO_TC0190
 MAPPER_TAITO_TC0190:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   taito_tc0190
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_TAITO_TC0190,@function
 .size MAPPER_TAITO_TC0190,.-MAPPER_TAITO_TC0190
@@ -517,13 +530,14 @@ MAPPER_TAITO_TC0190:
 
 .globl MAPPER_TENGEN_RAMBO1
 MAPPER_TENGEN_RAMBO1:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   tengen_rambo1
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_TENGEN_RAMBO1,@function
 .size MAPPER_TENGEN_RAMBO1,.-MAPPER_TENGEN_RAMBO1
@@ -531,13 +545,14 @@ MAPPER_TENGEN_RAMBO1:
 
 .globl MAPPER_GNROM
 MAPPER_GNROM:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   gnrom
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_GNROM,@function
 .size MAPPER_GNROM,.-MAPPER_GNROM
@@ -545,13 +560,14 @@ MAPPER_GNROM:
 
 .globl MAPPER_SUNSOFT4
 MAPPER_SUNSOFT4:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   sunsoft4
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_SUNSOFT4,@function
 .size MAPPER_SUNSOFT4,.-MAPPER_SUNSOFT4
@@ -559,13 +575,14 @@ MAPPER_SUNSOFT4:
 
 .globl MAPPER_FME7
 MAPPER_FME7:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   fme7
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_FME7,@function
 .size MAPPER_FME7,.-MAPPER_FME7
@@ -573,13 +590,14 @@ MAPPER_FME7:
 
 .globl MAPPER_CAMERICA
 MAPPER_CAMERICA:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   camerica
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_CAMERICA,@function
 .size MAPPER_CAMERICA,.-MAPPER_CAMERICA
@@ -587,13 +605,14 @@ MAPPER_CAMERICA:
 
 .globl MAPPER_IREM_74HC161_32
 MAPPER_IREM_74HC161_32:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   irem_74hc161_32
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_IREM_74HC161_32,@function
 .size MAPPER_IREM_74HC161_32,.-MAPPER_IREM_74HC161_32
@@ -601,13 +620,14 @@ MAPPER_IREM_74HC161_32:
 
 .globl MAPPER_VS
 MAPPER_VS:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   vs
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_VS,@function
 .size MAPPER_VS,.-MAPPER_VS
@@ -615,13 +635,14 @@ MAPPER_VS:
 
 .globl MAPPER_SUPERVISION
 MAPPER_SUPERVISION:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   supervision
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_SUPERVISION,@function
 .size MAPPER_SUPERVISION,.-MAPPER_SUPERVISION
@@ -629,13 +650,14 @@ MAPPER_SUPERVISION:
 
 .globl MAPPER_NINA7
 MAPPER_NINA7:
-	pusha
+	push_scratch_012
 	movzbl %dl,%edx
+	subl   $0x4,%esp
 	pushl  %edx
 	pushl  %ebx
 	call   nina7
-	addl   $0x8,%esp
-	popa
+	addl   $0xc,%esp
+	pop_scratch_210
 	ret
 .type MAPPER_NINA7,@function
 .size MAPPER_NINA7,.-MAPPER_NINA7
@@ -644,13 +666,11 @@ MAPPER_NINA7:
 .globl U
 U:
 #if 0  /* This will trace all branches for debugging */
-	subl   $0x8,%esp
+	push_scratch_012
 	pusha
-	pushl  %edi
 	call   trace
-	addl   $0x4,%esp
-	popa
-	addl   $0x8,%esp
+	addl   $0x20,%esp
+	pop_scratch_210
 #endif
 
 	testl  %esi,%esi
@@ -666,13 +686,13 @@ recompile:
 	testl  %ebx,%ebx
 	jne    link
 recompile_always:
-	pusha
-	subl   $0x8,%esp
+	push_scratch_012
+	subl   $0xc,%esp
 	pushl  %edi
 	call   translate
-	addl   $0xc,%esp
-	movl   %eax,0x10(%esp)
-	popa
+	addl   $0x10,%esp
+	movl   %eax,%ebx
+	pop_scratch_210
 link:
 	cmpl   $0,dolink
 	jz     execute  /* to disable linking (for debugging) */

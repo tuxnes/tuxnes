@@ -12,7 +12,6 @@
 #include "config.h"
 #endif
 
-#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -442,16 +441,9 @@ donmi(void)
  * this is left in here for debugging purposes but is not normally called:
  */
 void
-trace(int pc, ...)
+trace(unsigned int pc, int cc, unsigned int ebp, unsigned int esp, unsigned int ebx, unsigned int nz, unsigned int yx, unsigned int ca)
 {
-#if 0
-	va_list ap;
-	va_start(ap, pc);
 	/* x86 registers:  %edi, %esi, %ebp, %esp, %ebx, %edx, %ecx, %eax */
 	/* 6502 registers: PC, Cycle counter, -, -, -, N&Z, Y&X, C&A */
-	vprintf("branch, stack: %x,%d,%x,%x,%x,%x,%x,%x\n", ap);
-	va_end(ap);
-#else
-	printf("%04x\n", pc);
-#endif
+	printf("branch: %04x,%d,%x,%x,%x\n", pc, cc, nz, yx, ca);
 }
