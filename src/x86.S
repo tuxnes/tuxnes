@@ -21,22 +21,22 @@ TRANS_TBL:
 
 .balign 4
 optable:
-.long ibrk,    iorazix, i_bad,   i_bad, i_bad,  ioraz,   iaslz,  i_bad, iphp, ioraimm, iaslacc, i_bad, i_bad,   iora,  iasl,  i_bad
-.long ibpl,    ioraziy, i_bad,   i_bad, i_bad,  iorazx,  iaslzx, i_bad, iclc, ioray,   i_bad,   i_bad, i_bad,   iorax, iaslx, i_bad
-.long ijsr,    iandzix, i_bad,   i_bad, ibitz,  iandz,   irolz,  i_bad, iplp, iandimm, irolacc, i_bad, ibit,    iand,  irol,  i_bad
-.long ibmi,    iandziy, i_bad,   i_bad, i_bad,  iandzx,  irolzx, i_bad, isec, iandy,   i_bad,   i_bad, i_bad,   iandx, irolx, i_bad
-.long irti,    ieorzix, i_bad,   i_bad, i_bad,  ieorz,   ilsrz,  i_bad, ipha, ieorimm, ilsracc, i_bad, ijmp,    ieor,  ilsr,  i_bad
-.long ibvc,    ieorziy, i_bad,   i_bad, i_bad,  ieorzx,  ilsrzx, i_bad, icli, ieory,   i_bad,   i_bad, i_bad,   ieorx, ilsrx, i_bad
-.long irts,    iadczix, i_bad,   i_bad, i_bad,  iadcz,   irorz,  i_bad, ipla, iadcimm, iroracc, i_bad, ijmpind, iadc,  iror,  i_bad
-.long ibvs,    iadcziy, i_bad,   i_bad, i_bad,  iadczx,  irorzx, i_bad, isei, iadcy,   i_bad,   i_bad, i_bad,   iadcx, irorx, i_bad
-.long i_bad,   istazix, i_bad,   i_bad, istyz,  istaz,   istxz,  i_bad, idey, i_bad,   itxa,    i_bad, isty,    ista,  istx,  i_bad
-.long ibcc,    istaziy, i_bad,   i_bad, istyzx, istazx,  istxzy, i_bad, itya, istay,   itxs,    i_bad, i_bad,   istax, i_bad, i_bad
-.long ildyimm, ildazix, ildximm, i_bad, ildyz,  ildaz,   ildxz,  i_bad, itay, ildaimm, itax,    i_bad, ildy,    ilda,  ildx,  i_bad
-.long ibcs,    ildaziy, i_bad,   i_bad, ildyzx, ildazx,  ildxzy, i_bad, iclv, ilday,   itsx,    i_bad, ildyx,   ildax, ildxy, i_bad
-.long icpyimm, icmpzix, i_bad,   i_bad, icpyz,  icmpz,   idecz,  i_bad, iiny, icmpimm, idex,    i_bad, icpy,    icmp,  idec,  i_bad
-.long ibne,    icmpziy, i_bad,   i_bad, i_bad,  icmpzx,  ideczx, i_bad, icld, icmpy,   i_bad,   i_bad, i_bad,   icmpx, idecx, i_bad
-.long icpximm, isbczix, i_bad,   i_bad, icpxz,  isbcz,   iincz,  i_bad, iinx, isbcimm, inop,    i_bad, icpx,    isbc,  iinc,  i_bad
-.long ibeq,    isbcziy, i_bad,   i_bad, i_bad,  isbczx,  iinczx, i_bad, ised, isbcy,   i_bad,   i_bad, i_bad,   isbcx, iincx, i_bad
+.long ibrk,   ioraix, i_bad,  i_bad, i_bad,  ioraz,   iaslz,  i_bad, iphp, ioraim, iasl,  i_bad, i_bad,   ioraa,  iasla,  i_bad
+.long ibpl,   ioraiy, i_bad,  i_bad, i_bad,  iorazx,  iaslzx, i_bad, iclc, ioraay, i_bad, i_bad, i_bad,   ioraax, iaslax, i_bad
+.long ijsr,   iandix, i_bad,  i_bad, ibitz,  iandz,   irolz,  i_bad, iplp, iandim, irol,  i_bad, ibita,   ianda,  irola,  i_bad
+.long ibmi,   iandiy, i_bad,  i_bad, i_bad,  iandzx,  irolzx, i_bad, isec, ianday, i_bad, i_bad, i_bad,   iandax, irolax, i_bad
+.long irti,   ieorix, i_bad,  i_bad, i_bad,  ieorz,   ilsrz,  i_bad, ipha, ieorim, ilsr,  i_bad, ijmp,    ieora,  ilsra,  i_bad
+.long ibvc,   ieoriy, i_bad,  i_bad, i_bad,  ieorzx,  ilsrzx, i_bad, icli, ieoray, i_bad, i_bad, i_bad,   ieorax, ilsrax, i_bad
+.long irts,   iadcix, i_bad,  i_bad, i_bad,  iadcz,   irorz,  i_bad, ipla, iadcim, iror,  i_bad, ijmpind, iadca,  irora,  i_bad
+.long ibvs,   iadciy, i_bad,  i_bad, i_bad,  iadczx,  irorzx, i_bad, isei, iadcay, i_bad, i_bad, i_bad,   iadcax, irorax, i_bad
+.long i_bad,  istaix, i_bad,  i_bad, istyz,  istaz,   istxz,  i_bad, idey, i_bad,  itxa,  i_bad, istya,   istaa,  istxa,  i_bad
+.long ibcc,   istaiy, i_bad,  i_bad, istyzx, istazx,  istxzy, i_bad, itya, istaay, itxs,  i_bad, i_bad,   istaax, i_bad,  i_bad
+.long ildyim, ildaix, ildxim, i_bad, ildyz,  ildaz,   ildxz,  i_bad, itay, ildaim, itax,  i_bad, ildya,   ildaa,  ildxa,  i_bad
+.long ibcs,   ildaiy, i_bad,  i_bad, ildyzx, ildazx,  ildxzy, i_bad, iclv, ildaay, itsx,  i_bad, ildyax,  ildaax, ildxay, i_bad
+.long icpyim, icmpix, i_bad,  i_bad, icpyz,  icmpz,   idecz,  i_bad, iiny, icmpim, idex,  i_bad, icpya,   icmpa,  ideca,  i_bad
+.long ibne,   icmpiy, i_bad,  i_bad, i_bad,  icmpzx,  ideczx, i_bad, icld, icmpay, i_bad, i_bad, i_bad,   icmpax, idecax, i_bad
+.long icpxim, isbcix, i_bad,  i_bad, icpxz,  isbcz,   iincz,  i_bad, iinx, isbcim, inop,  i_bad, icpxa,   isbca,  iinca,  i_bad
+.long ibeq,   isbciy, i_bad,  i_bad, i_bad,  isbczx,  iinczx, i_bad, ised, isbcay, i_bad, i_bad, i_bad,   isbcax, iincax, i_bad
 .type optable,@object
 .size optable,.-optable
 
@@ -98,6 +98,124 @@ defvar local, 4, LASTBANK       /* Last memory page code executed in */
 	movl   CTNI,%esi
 .endm
 
+.macro call_input name=input
+	subl   $0xc,%esp
+	pushl  %ebx
+	call   \name
+	addl   $0x10,%esp
+	movsbl %al,%edx
+.endm
+
+.macro call_output name=output
+	movzbl %dl,%edx
+	subl   $0x4,%esp
+	pushl  %edx
+	pushl  %ebx
+	call   \name
+	addl   $0xc,%esp
+.endm
+
+.macro addr_im
+	movl   %edi,%ebx
+	incw   %di
+	addl   $2,%esi
+.endm
+
+.macro addr_z rmw=0
+	movzbl _RAM(%edi),%ebx
+	incw   %di
+.if \rmw
+	addl   $5,%esi
+.else
+	addl   $3,%esi
+.endif
+.endm
+
+.macro addr_zx rmw=0
+	movzbl _RAM(%edi),%ebx
+	incw   %di
+	addb   %cl,%bl
+.if \rmw
+	addl   $6,%esi
+.else
+	addl   $4,%esi
+.endif
+.endm
+
+.macro addr_zy
+	movzbl _RAM(%edi),%ebx
+	incw   %di
+	addb   %ch,%bl
+	addl   $4,%esi
+.endm
+
+.macro addr_a rmw=0
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
+.if \rmw
+	addl   $6,%esi
+.else
+	addl   $4,%esi
+.endif
+.endm
+
+.macro addr_ax write=0, rmw=0
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
+	addb   %cl,%bl
+	adcb   $0,%bh
+.if \write
+.if \rmw
+	addl   $7,%esi
+.else
+	addl   $5,%esi
+.endif
+.else
+	cmpb   %cl,%bl
+	adcl   $4,%esi
+.endif
+.endm
+
+.macro addr_ay write=0
+	movzwl _RAM(%edi),%ebx
+	addw   $2,%di
+	addb   %ch,%bl
+	adcb   $0,%bh
+.if \write
+	addl   $5,%esi
+.else
+	cmpb   %ch,%bl
+	adcl   $4,%esi
+.endif
+.endm
+
+.macro addr_ix
+	movzbl _RAM(%edi),%ebx
+	incw   %di
+	addb   %cl,%bl
+	movl   %ebx,%edx
+	incb   %dl
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edx),%bh
+	addl   $6,%esi
+.endm
+
+.macro addr_iy write=0
+	movzbl _RAM(%edi),%ebx
+	incw   %di
+	movl   %ebx,%edx
+	incb   %dl
+	movb   _RAM(%ebx),%bl
+	movb   _RAM(%edx),%bh
+	addb   %ch,%bl
+	adcb   $0,%bh
+.if \write
+	addl   $6,%esi
+.else
+	cmpb   %ch,%bl
+	adcl   $5,%esi
+.endif
+.endm
 
 .section .text
 .globl START
@@ -244,11 +362,7 @@ irq:
 INPUT:
 	push_scratch_01
 	store_ctni_clock
-	subl   $0xc,%esp
-	pushl  %ebx
-	call   input
-	addl   $0x10,%esp
-	movsbl %al,%edx
+	call_input
 	pop_scratch_10
 	load_ctni
 	ret
@@ -260,12 +374,7 @@ INPUT:
 OUTPUT:
 	push_scratch_012
 	store_ctni_clock
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   output
-	addl   $0xc,%esp
+	call_output
 	pop_scratch_210
 	load_ctni
 	ret
@@ -286,12 +395,7 @@ MAPPER_NONE:
 MAPPER_MMC1:
 	push_scratch_012
 	store_ctni_clock
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   mmc1
-	addl   $0xc,%esp
+	call_output mmc1
 	pop_scratch_210
 	load_ctni
 	ret
@@ -302,12 +406,7 @@ MAPPER_MMC1:
 .globl MAPPER_UNROM
 MAPPER_UNROM:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   unrom
-	addl   $0xc,%esp
+	call_output unrom
 	pop_scratch_210
 	ret
 .type MAPPER_UNROM,@function
@@ -317,12 +416,7 @@ MAPPER_UNROM:
 .globl MAPPER_CNROM
 MAPPER_CNROM:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   cnrom
-	addl   $0xc,%esp
+	call_output cnrom
 	pop_scratch_210
 	ret
 .type MAPPER_CNROM,@function
@@ -333,12 +427,7 @@ MAPPER_CNROM:
 MAPPER_MMC3:
 	push_scratch_012
 	store_ctni_clock
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   mmc3
-	addl   $0xc,%esp
+	call_output mmc3
 	pop_scratch_210
 	load_ctni
 	ret
@@ -349,12 +438,7 @@ MAPPER_MMC3:
 .globl MAPPER_MMC5
 MAPPER_MMC5:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   mmc5
-	addl   $0xc,%esp
+	call_output mmc5
 	pop_scratch_210
 	ret
 .type MAPPER_MMC5,@function
@@ -365,12 +449,7 @@ MAPPER_MMC5:
 MAPPER_AOROM:
 	push_scratch_012
 	store_ctni_clock
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   aorom
-	addl   $0xc,%esp
+	call_output aorom
 	pop_scratch_210
 	load_ctni
 	ret
@@ -381,12 +460,7 @@ MAPPER_AOROM:
 .globl MAPPER_MMC2
 MAPPER_MMC2:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   mmc2
-	addl   $0xc,%esp
+	call_output mmc2
 	pop_scratch_210
 	ret
 .type MAPPER_MMC2,@function
@@ -396,12 +470,7 @@ MAPPER_MMC2:
 .globl MAPPER_MMC4
 MAPPER_MMC4:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   mmc4
-	addl   $0xc,%esp
+	call_output mmc4
 	pop_scratch_210
 	ret
 .type MAPPER_MMC4,@function
@@ -411,12 +480,7 @@ MAPPER_MMC4:
 .globl MAPPER_CLRDRMS
 MAPPER_CLRDRMS:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   clrdrms
-	addl   $0xc,%esp
+	call_output clrdrms
 	pop_scratch_210
 	ret
 .type MAPPER_CLRDRMS,@function
@@ -426,12 +490,7 @@ MAPPER_CLRDRMS:
 .globl MAPPER_CPROM
 MAPPER_CPROM:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   cprom
-	addl   $0xc,%esp
+	call_output cprom
 	pop_scratch_210
 	ret
 .type MAPPER_CPROM,@function
@@ -441,12 +500,7 @@ MAPPER_CPROM:
 .globl MAPPER_100IN1
 MAPPER_100IN1:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   m100in1
-	addl   $0xc,%esp
+	call_output m100in1
 	pop_scratch_210
 	ret
 .type MAPPER_100IN1,@function
@@ -456,12 +510,7 @@ MAPPER_100IN1:
 .globl MAPPER_NAMCOT106
 MAPPER_NAMCOT106:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   namcot106
-	addl   $0xc,%esp
+	call_output namcot106
 	pop_scratch_210
 	ret
 .type MAPPER_NAMCOT106,@function
@@ -471,12 +520,7 @@ MAPPER_NAMCOT106:
 .globl MAPPER_VRC2_A
 MAPPER_VRC2_A:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   vrc2_a
-	addl   $0xc,%esp
+	call_output vrc2_a
 	pop_scratch_210
 	ret
 .type MAPPER_VRC2_A,@function
@@ -486,12 +530,7 @@ MAPPER_VRC2_A:
 .globl MAPPER_VRC2_B
 MAPPER_VRC2_B:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   vrc2_b
-	addl   $0xc,%esp
+	call_output vrc2_b
 	pop_scratch_210
 	ret
 .type MAPPER_VRC2_B,@function
@@ -501,12 +540,7 @@ MAPPER_VRC2_B:
 .globl MAPPER_G101
 MAPPER_G101:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   g101
-	addl   $0xc,%esp
+	call_output g101
 	pop_scratch_210
 	ret
 .type MAPPER_G101,@function
@@ -516,12 +550,7 @@ MAPPER_G101:
 .globl MAPPER_TAITO_TC0190
 MAPPER_TAITO_TC0190:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   taito_tc0190
-	addl   $0xc,%esp
+	call_output taito_tc0190
 	pop_scratch_210
 	ret
 .type MAPPER_TAITO_TC0190,@function
@@ -531,12 +560,7 @@ MAPPER_TAITO_TC0190:
 .globl MAPPER_TENGEN_RAMBO1
 MAPPER_TENGEN_RAMBO1:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   tengen_rambo1
-	addl   $0xc,%esp
+	call_output tengen_rambo1
 	pop_scratch_210
 	ret
 .type MAPPER_TENGEN_RAMBO1,@function
@@ -546,12 +570,7 @@ MAPPER_TENGEN_RAMBO1:
 .globl MAPPER_GNROM
 MAPPER_GNROM:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   gnrom
-	addl   $0xc,%esp
+	call_output gnrom
 	pop_scratch_210
 	ret
 .type MAPPER_GNROM,@function
@@ -561,12 +580,7 @@ MAPPER_GNROM:
 .globl MAPPER_SUNSOFT4
 MAPPER_SUNSOFT4:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   sunsoft4
-	addl   $0xc,%esp
+	call_output sunsoft4
 	pop_scratch_210
 	ret
 .type MAPPER_SUNSOFT4,@function
@@ -576,12 +590,7 @@ MAPPER_SUNSOFT4:
 .globl MAPPER_FME7
 MAPPER_FME7:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   fme7
-	addl   $0xc,%esp
+	call_output fme7
 	pop_scratch_210
 	ret
 .type MAPPER_FME7,@function
@@ -591,12 +600,7 @@ MAPPER_FME7:
 .globl MAPPER_CAMERICA
 MAPPER_CAMERICA:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   camerica
-	addl   $0xc,%esp
+	call_output camerica
 	pop_scratch_210
 	ret
 .type MAPPER_CAMERICA,@function
@@ -606,12 +610,7 @@ MAPPER_CAMERICA:
 .globl MAPPER_IREM_74HC161_32
 MAPPER_IREM_74HC161_32:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   irem_74hc161_32
-	addl   $0xc,%esp
+	call_output irem_74hc161_32
 	pop_scratch_210
 	ret
 .type MAPPER_IREM_74HC161_32,@function
@@ -621,12 +620,7 @@ MAPPER_IREM_74HC161_32:
 .globl MAPPER_VS
 MAPPER_VS:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   vs
-	addl   $0xc,%esp
+	call_output vs
 	pop_scratch_210
 	ret
 .type MAPPER_VS,@function
@@ -636,12 +630,7 @@ MAPPER_VS:
 .globl MAPPER_SUPERVISION
 MAPPER_SUPERVISION:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   supervision
-	addl   $0xc,%esp
+	call_output supervision
 	pop_scratch_210
 	ret
 .type MAPPER_SUPERVISION,@function
@@ -651,12 +640,7 @@ MAPPER_SUPERVISION:
 .globl MAPPER_NINA7
 MAPPER_NINA7:
 	push_scratch_012
-	movzbl %dl,%edx
-	subl   $0x4,%esp
-	pushl  %edx
-	pushl  %ebx
-	call   nina7
-	addl   $0xc,%esp
+	call_output nina7
 	pop_scratch_210
 	ret
 .type MAPPER_NINA7,@function
@@ -1041,137 +1025,78 @@ itya:
 	addl   $2,%esi
 	jmp    i_next
 
-ildaimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    ildazp
+ildaim:
+	addr_im
+	jmp    ildaram
 
-ildximm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    ildxzp
+ildxim:
+	addr_im
+	jmp    ildxram
 
-ildyimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    ildyzp
+ildyim:
+	addr_im
+	jmp    ildyram
 
 ildazx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    ildazp
+	addr_zx
+	jmp    ildaram
 
 ildxzy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %ch,%bl
-	addl   $4,%esi
-	jmp    ildxzp
+	addr_zy
+	jmp    ildxram
 
 ildyzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    ildyzp
+	addr_zx
+	jmp    ildyram
 
 ildaz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-ildazp:
+	addr_z
+ildaram:
 	movb   _RAM(%ebx),%al
 	movsbl %al,%edx
 	jmp    i_next
 
 ildxz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-ildxzp:
+	addr_z
+ildxram:
 	movb   _RAM(%ebx),%cl
 	movsbl %cl,%edx
 	jmp    i_next
 
 ildyz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-ildyzp:
+	addr_z
+ildyram:
 	movb   _RAM(%ebx),%ch
 	movsbl %ch,%edx
 	jmp    i_next
 
-ildax:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    ildaabs
+ildaax:
+	addr_ax
+	jmp    ildaany
 
-ilday:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    ildaabs
+ildaay:
+	addr_ay
+	jmp    ildaany
 
-ildxy:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    ildxabs
+ildxay:
+	addr_ay
+	jmp    ildxany
 
-ildyx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    ildyabs
+ildyax:
+	addr_ax
+	jmp    ildyany
 
-ildazix:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addl   $6,%esi
-	jmp    ildaabs
+ildaix:
+	addr_ix
+	jmp    ildaany
 
-ildaziy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $5,%esi
-	jmp    ildaabs
+ildaiy:
+	addr_iy
+	jmp    ildaany
 
-ilda:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-ildaabs:
+ildaa:
+	addr_a
+ildaany:
 	leal   -0x2000(%ebx),%edx
 	cmpl   $0x4000,%edx
 	jb     ildain
@@ -1186,11 +1111,9 @@ ildain:
 	movb   %dl,%al
 	jmp    i_next
 
-ildx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-ildxabs:
+ildxa:
+	addr_a
+ildxany:
 	leal   -0x2000(%ebx),%edx
 	cmpl   $0x4000,%edx
 	jb     ildxin
@@ -1205,11 +1128,9 @@ ildxin:
 	movb   %dl,%cl
 	jmp    i_next
 
-ildy:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-ildyabs:
+ildya:
+	addr_a
+ildyany:
 	leal   -0x2000(%ebx),%edx
 	cmpl   $0x4000,%edx
 	jb     ildyin
@@ -1225,92 +1146,52 @@ ildyin:
 	jmp    i_next
 
 istaz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-	jmp    istazp
+	addr_z
+	jmp    istaram
 
 istxz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-	jmp    istxzp
+	addr_z
+	jmp    istxram
 
 istyz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-	jmp    istyzp
+	addr_z
+	jmp    istyram
 
 istazx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    istazp
+	addr_zx
+	jmp    istaram
 
 istxzy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %ch,%bl
-	addl   $4,%esi
-	jmp    istxzp
+	addr_zy
+	jmp    istxram
 
 istyzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    istyzp
+	addr_zx
+	jmp    istyram
 
-istax:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	addl   $5,%esi
-	jmp    istaabs
+istaax:
+	addr_ax 1
+	jmp    istaany
 
-istay:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	addl   $5,%esi
-	jmp    istaabs
+istaay:
+	addr_ay 1
+	jmp    istaany
 
-istazix:
+istaix:
 	movl   %edx,%ebp
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
+	addr_ix
 	movl   %ebp,%edx
-	addl   $6,%esi
-	jmp    istaabs
+	jmp    istaany
 
-istaziy:
+istaiy:
 	movl   %edx,%ebp
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
+	addr_iy 1
 	movl   %ebp,%edx
-	addl   $6,%esi
-	jmp    istaabs
+	jmp    istaany
 
-ista:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-istaabs:
+istaa:
+	addr_a
+istaany:
 	testl  $0x8000,%ebx
 	jnz    istamapper
 	subl   $0x2000,%ebx
@@ -1318,7 +1199,7 @@ istaabs:
 	leal   0x2000(%ebx),%ebx
 	movl   $OUTPUT,%ebp
 	jb     istaout
-istazp:
+istaram:
 	movb   %al,_RAM(%ebx)
 	jmp    i_next
 istamapper:
@@ -1330,11 +1211,9 @@ istaout:
 	xchgb  %al,%dl
 	jmp    i_next
 
-istx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-istxabs:
+istxa:
+	addr_a
+istxany:
 	testl  $0x8000,%ebx
 	jnz    istxmapper
 	subl   $0x2000,%ebx
@@ -1342,7 +1221,7 @@ istxabs:
 	leal   0x2000(%ebx),%ebx
 	movl   $OUTPUT,%ebp
 	jb     istxout
-istxzp:
+istxram:
 	movb   %cl,_RAM(%ebx)
 	jmp    i_next
 istxmapper:
@@ -1354,11 +1233,9 @@ istxout:
 	xchgb  %cl,%dl
 	jmp    i_next
 
-isty:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-istyabs:
+istya:
+	addr_a
+istyany:
 	testl  $0x8000,%ebx
 	jnz    istymapper
 	subl   $0x2000,%ebx
@@ -1366,7 +1243,7 @@ istyabs:
 	leal   0x2000(%ebx),%ebx
 	movl   $OUTPUT,%ebp
 	jb     istyout
-istyzp:
+istyram:
 	movb   %ch,_RAM(%ebx)
 	jmp    i_next
 istymapper:
@@ -1379,56 +1256,36 @@ istyout:
 	jmp    i_next
 
 iincz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $5,%esi
-	jmp    iinczp
+	addr_z 1
+	jmp    iincram
 
 idecz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $5,%esi
-	jmp    ideczp
+	addr_z 1
+	jmp    idecram
 
 iinczx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $6,%esi
-	jmp    iinczp
+	addr_zx 1
+	jmp    iincram
 
 ideczx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $6,%esi
-	jmp    ideczp
+	addr_zx 1
+	jmp    idecram
 
-iincx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	addl   $7,%esi
-	jmp    iincabs
+iincax:
+	addr_ax 1,1
+	jmp    iincany
 
-idecx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	addl   $7,%esi
-	jmp    idecabs
+idecax:
+	addr_ax 1,1
+	jmp    idecany
 
-iinc:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $6,%esi
-iincabs:
+iinca:
+	addr_a 1
+iincany:
 	/* None of the I/O regs are read/write so shouldn't need to check that */
 	testl  $0x8000,%ebx
 	jnz    iincmapper
-iinczp:
+iincram:
 	incb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	jmp    i_next
@@ -1444,15 +1301,13 @@ iincmapper:
 	call   *%ebp
 	jmp    i_next
 
-idec:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $6,%esi
-idecabs:
+ideca:
+	addr_a 1
+idecany:
 	/* None of the I/O regs are read/write so shouldn't need to check that */
 	testl  $0x8000,%ebx
 	jnz    idecmapper
-ideczp:
+idecram:
 	decb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	jmp    i_next
@@ -1492,37 +1347,25 @@ idey:
 	addl   $2,%esi
 	jmp    i_next
 
-iadcimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    iadczp
+iadcim:
+	addr_im
+	jmp    iadcram
 
-isbcimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    isbczp
+isbcim:
+	addr_im
+	jmp    isbcram
 
 iadczx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    iadczp
+	addr_zx
+	jmp    iadcram
 
 isbczx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    isbczp
+	addr_zx
+	jmp    isbcram
 
 iadcz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-iadczp:
+	addr_z
+iadcram:
 	sarb   %ah
 	movsbl %al,%eax
 	movsbl _RAM(%ebx),%edx
@@ -1533,10 +1376,8 @@ iadczp:
 	jmp    i_next
 
 isbcz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-isbczp:
+	addr_z
+isbcram:
 	sarb   %ah
 	movsbl %al,%eax
 	movsbl _RAM(%ebx),%edx
@@ -1547,95 +1388,41 @@ isbczp:
 	rclb   %ah
 	jmp    i_next
 
-iadcx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    iadcabs
+iadcax:
+	addr_ax
+	jmp    iadcany
 
-isbcx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    isbcabs
+isbcax:
+	addr_ax
+	jmp    isbcany
 
-iadcy:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    iadcabs
+iadcay:
+	addr_ay
+	jmp    iadcany
 
-isbcy:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    isbcabs
+isbcay:
+	addr_ay
+	jmp    isbcany
 
-iadczix:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addl   $6,%esi
-	jmp    iadcabs
+iadcix:
+	addr_ix
+	jmp    iadcany
 
-isbczix:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addl   $6,%esi
-	jmp    isbcabs
+isbcix:
+	addr_ix
+	jmp    isbcany
 
-iadcziy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $5,%esi
-	jmp    iadcabs
+iadciy:
+	addr_iy
+	jmp    iadcany
 
-isbcziy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $5,%esi
-	jmp    isbcabs
+isbciy:
+	addr_iy
+	jmp    isbcany
 
-iadc:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-iadcabs:
+iadca:
+	addr_a
+iadcany:
 	/* TODO: Check I/O */
 	movl   %ebx,%edx
 	shrl   $12,%edx
@@ -1649,11 +1436,9 @@ iadcabs:
 	rclb   %ah
 	jmp    i_next
 
-isbc:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-isbcabs:
+isbca:
+	addr_a
+isbcany:
 	/* TODO: Check I/O */
 	movl   %ebx,%edx
 	shrl   $12,%edx
@@ -1668,36 +1453,25 @@ isbcabs:
 	rclb   %ah
 	jmp    i_next
 
-icmpimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    icmpzp
+icmpim:
+	addr_im
+	jmp    icmpram
 
-icpximm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    icpxzp
+icpxim:
+	addr_im
+	jmp    icpxram
 
-icpyimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    icpyzp
+icpyim:
+	addr_im
+	jmp    icpyram
 
 icmpzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    icmpzp
+	addr_zx
+	jmp    icmpram
 
 icmpz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-icmpzp:
+	addr_z
+icmpram:
 	movb   %al,%dl
 	subb   _RAM(%ebx),%dl
 	cmc
@@ -1706,10 +1480,8 @@ icmpzp:
 	jmp    i_next
 
 icpxz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-icpxzp:
+	addr_z
+icpxram:
 	movb   %cl,%dl
 	subb   _RAM(%ebx),%dl
 	cmc
@@ -1718,10 +1490,8 @@ icpxzp:
 	jmp    i_next
 
 icpyz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-icpyzp:
+	addr_z
+icpyram:
 	movb   %ch,%dl
 	subb   _RAM(%ebx),%dl
 	cmc
@@ -1729,53 +1499,25 @@ icpyzp:
 	rclb   %ah
 	jmp    i_next
 
-icmpx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    icmpabs
+icmpax:
+	addr_ax
+	jmp    icmpany
 
-icmpy:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    icmpabs
+icmpay:
+	addr_ay
+	jmp    icmpany
 
-icmpzix:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addl   $6,%esi
-	jmp    icmpabs
+icmpix:
+	addr_ix
+	jmp    icmpany
 
-icmpziy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $5,%esi
-	jmp    icmpabs
+icmpiy:
+	addr_iy
+	jmp    icmpany
 
-icmp:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-icmpabs:
+icmpa:
+	addr_a
+icmpany:
 	/* TODO: Check I/O */
 	movl   %ebx,%ebp
 	shrl   $12,%ebp
@@ -1787,11 +1529,9 @@ icmpabs:
 	rclb   %ah
 	jmp    i_next
 
-icpx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-icpxabs:
+icpxa:
+	addr_a
+icpxany:
 	/* TODO: Check I/O */
 	movl   %ebx,%ebp
 	shrl   $12,%ebp
@@ -1803,11 +1543,9 @@ icpxabs:
 	rclb   %ah
 	jmp    i_next
 
-icpy:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-icpyabs:
+icpya:
+	addr_a
+icpyany:
 	/* TODO: Check I/O */
 	movl   %ebx,%ebp
 	shrl   $12,%ebp
@@ -1820,19 +1558,18 @@ icpyabs:
 	jmp    i_next
 
 ibitz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
+	addr_z
+ibitram:
 	movsbl _RAM(%ebx),%edx
 	leal   (%edx,%edx,1),%ebx
 	andl   $0x80,%ebx
 	movl   %ebx,VFLAG
 	andb   %al,%dl
-	addl   $3,%esi
 	jmp    i_next
 
-ibit:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
+ibita:
+	addr_a
+ibitany:
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
@@ -1841,206 +1578,104 @@ ibit:
 	andl   $0x80,%ebx
 	movl   %ebx,VFLAG
 	andb   %al,%dl
-	addl   $4,%esi
 	jmp    i_next
 
-iandimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    iandzp
+iandim:
+	addr_im
+	jmp    iandram
 
-ieorimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    ieorzp
+ieorim:
+	addr_im
+	jmp    ieorram
 
-ioraimm:
-	movl   %edi,%ebx
-	incw   %di
-	addl   $2,%esi
-	jmp    iorazp
+ioraim:
+	addr_im
+	jmp    ioraram
 
 iandzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    iandzp
+	addr_zx
+	jmp    iandram
 
 ieorzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    ieorzp
+	addr_zx
+	jmp    ieorram
 
 iorazx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $4,%esi
-	jmp    iorazp
+	addr_zx
+	jmp    ioraram
 
 iandz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-iandzp:
+	addr_z
+iandram:
 	andb   _RAM(%ebx),%al
 	movsbl %al,%edx
 	jmp    i_next
 
 ieorz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-ieorzp:
+	addr_z
+ieorram:
 	xorb   _RAM(%ebx),%al
 	movsbl %al,%edx
 	jmp    i_next
 
 ioraz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $3,%esi
-iorazp:
+	addr_z
+ioraram:
 	orb    _RAM(%ebx),%al
 	movsbl %al,%edx
 	jmp    i_next
 
-iandx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    iandabs
+iandax:
+	addr_ax
+	jmp    iandany
 
-ieorx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    ieorabs
+ieorax:
+	addr_ax
+	jmp    ieorany
 
-iorax:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	cmpb   %cl,%bl
-	adcl   $4,%esi
-	jmp    ioraabs
+ioraax:
+	addr_ax
+	jmp    ioraany
 
-iandy:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    iandabs
+ianday:
+	addr_ay
+	jmp    iandany
 
-ieory:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    ieorabs
+ieoray:
+	addr_ay
+	jmp    ieorany
 
-ioray:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $4,%esi
-	jmp    ioraabs
+ioraay:
+	addr_ay
+	jmp    ioraany
 
-iandzix:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addl   $6,%esi
-	jmp    iandabs
+iandix:
+	addr_ix
+	jmp    iandany
 
-ieorzix:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addl   $6,%esi
-	jmp    ieorabs
+ieorix:
+	addr_ix
+	jmp    ieorany
 
-iorazix:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addl   $6,%esi
-	jmp    ioraabs
+ioraix:
+	addr_ix
+	jmp    ioraany
 
-iandziy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $5,%esi
-	jmp    iandabs
+iandiy:
+	addr_iy
+	jmp    iandany
 
-ieorziy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $5,%esi
-	jmp    ieorabs
+ieoriy:
+	addr_iy
+	jmp    ieorany
 
-ioraziy:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	movl   %ebx,%edx
-	incb   %dl
-	movb   _RAM(%ebx),%bl
-	movb   _RAM(%edx),%bh
-	addb   %ch,%bl
-	adcb   $0,%bh
-	cmpb   %ch,%bl
-	adcl   $5,%esi
-	jmp    ioraabs
+ioraiy:
+	addr_iy
+	jmp    ioraany
 
-iand:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-iandabs:
+ianda:
+	addr_a
+iandany:
 	/* TODO: Check I/O */
 	movl   %ebx,%edx
 	shrl   $12,%edx
@@ -2049,11 +1684,9 @@ iandabs:
 	movsbl %al,%edx
 	jmp    i_next
 
-ieor:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-ieorabs:
+ieora:
+	addr_a
+ieorany:
 	/* TODO: Check I/O */
 	movl   %ebx,%edx
 	shrl   $12,%edx
@@ -2062,11 +1695,9 @@ ieorabs:
 	movsbl %al,%edx
 	jmp    i_next
 
-iora:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $4,%esi
-ioraabs:
+ioraa:
+	addr_a
+ioraany:
 	/* TODO: Check I/O */
 	movl   %ebx,%edx
 	shrl   $12,%edx
@@ -2075,27 +1706,27 @@ ioraabs:
 	movsbl %al,%edx
 	jmp    i_next
 
-iaslacc:
+iasl:
 	shll   %eax
 	movsbl %al,%edx
 	addl   $2,%esi
 	jmp    i_next
 
-ilsracc:
+ilsr:
 	shrb   %al
 	movsbl %al,%edx
 	rclb   %ah
 	addl   $2,%esi
 	jmp    i_next
 
-irolacc:
+irol:
 	sarb   %ah
 	rcll   %eax
 	movsbl %al,%edx
 	addl   $2,%esi
 	jmp    i_next
 
-iroracc:
+iror:
 	sarl   %eax
 	movsbl %al,%edx
 	rclb   %ah
@@ -2103,133 +1734,89 @@ iroracc:
 	jmp    i_next
 
 iaslz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $5,%esi
-	jmp    iaslzp
+	addr_z 1
+	jmp    iaslram
 
 ilsrz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $5,%esi
-	jmp    ilsrzp
+	addr_z 1
+	jmp    ilsrram
 
 irolz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $5,%esi
-	jmp    irolzp
+	addr_z 1
+	jmp    irolram
 
 irorz:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addl   $5,%esi
-	jmp    irorzp
+	addr_z 1
+	jmp    irorram
 
 iaslzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $6,%esi
-	jmp    iaslzp
+	addr_zx 1
+	jmp    iaslram
 
 ilsrzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $6,%esi
-	jmp    ilsrzp
+	addr_zx 1
+	jmp    ilsrram
 
 irolzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $6,%esi
-	jmp    irolzp
+	addr_zx 1
+	jmp    irolram
 
 irorzx:
-	movzbl _RAM(%edi),%ebx
-	incw   %di
-	addb   %cl,%bl
-	addl   $6,%esi
-	jmp    irorzp
+	addr_zx 1
+	jmp    irorram
 
-iaslx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	addl   $7,%esi
-	jmp    iaslabs
+iaslax:
+	addr_ax 1,1
+	jmp    iaslany
 
-ilsrx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	addl   $7,%esi
-	jmp    ilsrabs
+ilsrax:
+	addr_ax 1,1
+	jmp    ilsrany
 
-irolx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	addl   $7,%esi
-	jmp    irolabs
+irolax:
+	addr_ax 1,1
+	jmp    irolany
 
-irorx:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addb   %cl,%bl
-	adcb   $0,%bh
-	addl   $7,%esi
-	jmp    irorabs
+irorax:
+	addr_ax 1,1
+	jmp    irorany
 
-iasl:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $6,%esi
-iaslabs:
+iasla:
+	addr_a 1
+iaslany:
 	/* TODO: Check mapper */
-iaslzp:
+iaslram:
 	shlb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	rclb   %ah
 	jmp    i_next
 
-ilsr:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $6,%esi
-ilsrabs:
+ilsra:
+	addr_a 1
+ilsrany:
 	/* TODO: Check mapper */
-ilsrzp:
+ilsrram:
 	shrb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	rclb   %ah
 	jmp    i_next
 
-irol:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $6,%esi
-irolabs:
+irola:
+	addr_a 1
+irolany:
 	/* TODO: Check mapper */
-irolzp:
+irolram:
 	sarb   %ah
 	rclb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	rclb   %ah
 	jmp    i_next
 
-iror:
-	movzwl _RAM(%edi),%ebx
-	addw   $2,%di
-	addl   $6,%esi
-irorabs:
+irora:
+	addr_a 1
+irorany:
 	/* TODO: Check mapper */
-irorzp:
+irorram:
 	sarb   %ah
 	rcrb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
