@@ -1871,43 +1871,101 @@ irorax:
 iasla:
 	addr_a 1
 iaslany:
-	/* TODO: Check mapper */
+	/* None of the I/O regs are read/write so shouldn't need to check that */
+	testl  $0x8000,%ebx
+	jnz    iaslmapper
 iaslram:
 	shlb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	rclb   %ah
 	jmp    i_next
+iaslmapper:
+	movl   %ebx,%edx
+	shrl   $12,%edx
+	movl   MAPPERNUMBER,%ebp
+	movl   MAPTABLE(,%edx,4),%edx
+	movl   Mapper(,%ebp,4),%ebp
+	movb   (%edx,%ebx,1),%dl
+	shlb   %dl
+	movsbl %dl,%edx
+	rclb   %ah
+	call   *%ebp
+	jmp    i_next
 
 ilsra:
 	addr_a 1
 ilsrany:
-	/* TODO: Check mapper */
+	/* None of the I/O regs are read/write so shouldn't need to check that */
+	testl  $0x8000,%ebx
+	jnz    ilsrmapper
 ilsrram:
 	shrb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	rclb   %ah
 	jmp    i_next
+ilsrmapper:
+	movl   %ebx,%edx
+	shrl   $12,%edx
+	movl   MAPPERNUMBER,%ebp
+	movl   MAPTABLE(,%edx,4),%edx
+	movl   Mapper(,%ebp,4),%ebp
+	movb   (%edx,%ebx,1),%dl
+	shrb   %dl
+	movsbl %dl,%edx
+	rclb   %ah
+	call   *%ebp
+	jmp    i_next
 
 irola:
 	addr_a 1
 irolany:
-	/* TODO: Check mapper */
+	/* None of the I/O regs are read/write so shouldn't need to check that */
+	testl  $0x8000,%ebx
+	jnz    irolmapper
 irolram:
 	sarb   %ah
 	rclb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	rclb   %ah
 	jmp    i_next
+irolmapper:
+	movl   %ebx,%edx
+	shrl   $12,%edx
+	movl   MAPPERNUMBER,%ebp
+	movl   MAPTABLE(,%edx,4),%edx
+	movl   Mapper(,%ebp,4),%ebp
+	movb   (%edx,%ebx,1),%dl
+	sarb   %ah
+	rclb   %dl
+	movsbl %dl,%edx
+	rclb   %ah
+	call   *%ebp
+	jmp    i_next
 
 irora:
 	addr_a 1
 irorany:
-	/* TODO: Check mapper */
+	/* None of the I/O regs are read/write so shouldn't need to check that */
+	testl  $0x8000,%ebx
+	jnz    irormapper
 irorram:
 	sarb   %ah
 	rcrb   _RAM(%ebx)
 	movsbl _RAM(%ebx),%edx
 	rclb   %ah
+	jmp    i_next
+irormapper:
+	movl   %ebx,%edx
+	shrl   $12,%edx
+	movl   MAPPERNUMBER,%ebp
+	movl   MAPTABLE(,%edx,4),%edx
+	movl   Mapper(,%ebp,4),%ebp
+	movb   (%edx,%ebx,1),%dl
+	sarb   %ah
+	rcrb   %dl
+	movsbl %dl,%edx
+	rclb   %ah
+	call   *%ebp
 	jmp    i_next
 
 .type U,@function
