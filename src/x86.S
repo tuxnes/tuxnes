@@ -1423,7 +1423,9 @@ isbciy:
 iadca:
 	addr_a
 iadcany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     iadcin
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
@@ -1435,17 +1437,38 @@ iadcany:
 	movsbl %al,%edx
 	rclb   %ah
 	jmp    i_next
+iadcin:
+	call   INPUT
+	sarb   %ah
+	movsbl %al,%eax
+	adcl   %edx,%eax
+	movl   %eax,VFLAG
+	movsbl %al,%edx
+	rclb   %ah
+	jmp    i_next
 
 isbca:
 	addr_a
 isbcany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     isbcin
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
 	sarb   %ah
 	movsbl %al,%eax
 	movsbl (%edx,%ebx,1),%edx
+	notl   %edx
+	adcl   %edx,%eax
+	movl   %eax,VFLAG
+	movsbl %al,%edx
+	rclb   %ah
+	jmp    i_next
+isbcin:
+	call   INPUT
+	sarb   %ah
+	movsbl %al,%eax
 	notl   %edx
 	adcl   %edx,%eax
 	movl   %eax,VFLAG
@@ -1518,7 +1541,9 @@ icmpiy:
 icmpa:
 	addr_a
 icmpany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     icmpin
 	movl   %ebx,%ebp
 	shrl   $12,%ebp
 	movl   MAPTABLE(,%ebp,4),%ebp
@@ -1528,11 +1553,22 @@ icmpany:
 	movsbl %dl,%edx
 	rclb   %ah
 	jmp    i_next
+icmpin:
+	call   INPUT
+	movb   (%ebp,%ebx,1),%dl
+	notb   %dl
+	stc
+	adcb   %al,%dl
+	movsbl %dl,%edx
+	rclb   %ah
+	jmp    i_next
 
 icpxa:
 	addr_a
 icpxany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     icpxin
 	movl   %ebx,%ebp
 	shrl   $12,%ebp
 	movl   MAPTABLE(,%ebp,4),%ebp
@@ -1542,17 +1578,37 @@ icpxany:
 	movsbl %dl,%edx
 	rclb   %ah
 	jmp    i_next
+icpxin:
+	call   INPUT
+	movb   (%ebp,%ebx,1),%dl
+	notb   %dl
+	stc
+	adcb   %cl,%dl
+	movsbl %dl,%edx
+	rclb   %ah
+	jmp    i_next
 
 icpya:
 	addr_a
 icpyany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     icpyin
 	movl   %ebx,%ebp
 	shrl   $12,%ebp
 	movl   MAPTABLE(,%ebp,4),%ebp
 	movb   %ch,%dl
 	subb   (%ebp,%ebx,1),%dl
 	cmc
+	movsbl %dl,%edx
+	rclb   %ah
+	jmp    i_next
+icpyin:
+	call   INPUT
+	movb   (%ebp,%ebx,1),%dl
+	notb   %dl
+	stc
+	adcb   %ch,%dl
 	movsbl %dl,%edx
 	rclb   %ah
 	jmp    i_next
@@ -1570,10 +1626,20 @@ ibitram:
 ibita:
 	addr_a
 ibitany:
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     ibitin
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
 	movsbl (%edx,%ebx,1),%edx
+	leal   (%edx,%edx,1),%ebx
+	andl   $0x80,%ebx
+	movl   %ebx,VFLAG
+	andb   %al,%dl
+	jmp    i_next
+ibitin:
+	call   INPUT
 	leal   (%edx,%edx,1),%ebx
 	andl   $0x80,%ebx
 	movl   %ebx,VFLAG
@@ -1676,33 +1742,54 @@ ioraiy:
 ianda:
 	addr_a
 iandany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     iandin
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
 	andb   (%edx,%ebx,1),%al
 	movsbl %al,%edx
 	jmp    i_next
+iandin:
+	call   INPUT
+	andb   %dl,%al
+	movsbl %al,%edx
+	jmp    i_next
 
 ieora:
 	addr_a
 ieorany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     ieorin
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
 	xorb   (%edx,%ebx,1),%al
 	movsbl %al,%edx
 	jmp    i_next
+ieorin:
+	call   INPUT
+	xorb   %dl,%al
+	movsbl %al,%edx
+	jmp    i_next
 
 ioraa:
 	addr_a
 ioraany:
-	/* TODO: Check I/O */
+	leal   -0x2000(%ebx),%edx
+	cmpl   $0x4000,%edx
+	jb     iorain
 	movl   %ebx,%edx
 	shrl   $12,%edx
 	movl   MAPTABLE(,%edx,4),%edx
 	orb    (%edx,%ebx,1),%al
+	movsbl %al,%edx
+	jmp    i_next
+iorain:
+	call   INPUT
+	orb    %dl,%al
 	movsbl %al,%edx
 	jmp    i_next
 
